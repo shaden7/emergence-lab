@@ -22,3 +22,14 @@ def test_config_guard():
     assert len(run_pilot(cfg)['records'])==4
     with pytest.raises(ValueError):run_pilot({**cfg,'sizes':[31]})
     with pytest.raises(ValueError):run_pilot({**cfg,'sizes':[64],'sample_sweeps':999999})
+
+
+def test_finite_one_dimensional_partition_formula_vs_bruteforce():
+    import numpy as np
+    size = 8
+    states = 2 * ((np.arange(1 << size, dtype=np.uint32)[:, None] >> np.arange(size)) & 1).astype(int) - 1
+    energies = -(states * np.roll(states, 1, axis=1)).sum(axis=1)
+    for t in (1.5, 2.269185, 3.5):
+        weights = np.exp(-(energies - energies.min())/t)
+        enumeration = float(np.sum(weights*energies)/(size*np.sum(weights)))
+        assert exact_energy_per_spin(size,t) == pytest.approx(enumeration, abs=1e-12)

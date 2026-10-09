@@ -61,7 +61,7 @@ def run_pilot(cfg):
             burn<0 or sample<1 or every<1):
         raise ValueError("invalid 1D plan")
     proposals=sum(sizes)*len(temps)*reps*(burn+sample)
-    if proposals>10_000_000 or len(sizes)*len(temps)*reps>128 or burn+sample>2000:
+    if proposals>10_000_000 or len(sizes)*len(temps)*reps>128 or burn+sample>12000:
         raise ValueError("1D budget exceeded")
     records=[]
     for ti,t in enumerate(temps):
