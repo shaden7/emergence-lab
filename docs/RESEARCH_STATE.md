@@ -25,6 +25,12 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Clarified Issue #4: lattice dimensions encoded at construction time are estimator controls, not emergent spacetime discoveries.
 - The task has **not yet demonstrated a successful subsequent hourly research run**, nor are GitHub write/tool availability or the Lightsail deployment verified by this documentation update. No simulation, proof, or code test was executed in this iteration.
 
+## Representation-choice methodology proposal (2026-10-09, open branch)
+- Proposed `docs/REPRESENTATION_STRATEGY.md` to distinguish graph encodability, efficient representation and physical explanatory power.
+- Establishes representation-neutral observables, explicit assumption audits, model-family alternatives, failure controls and staged search for new descriptive variables/operations.
+- Proposed only: no simulation, proof, model benchmark, ontology inference or actual discovery of new mathematics.
+- As long as this work remains a PR, main-branch research state and the active hourly Research Director should not assume it was adopted. No new computations are authorized before the Ising calibration gate.
+
 ## Implemented (repository code)
 - 2D ferromagnetic Ising model, periodic lattice, Metropolis updates.
 - Deterministic seeded CPU experiments with JSON configs.
