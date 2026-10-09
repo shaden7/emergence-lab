@@ -23,7 +23,7 @@ jobs:
           emergence-lab --config configs/exact4_validation.json --output results/exact4
           python -m emergence_lab.exact4 --config configs/exact4_validation.json --results results/exact4
       - name: Pre-registered M4 interval coverage audit
-        if: github.head_ref == 'research/exact4-coverage-pilot-20261009' || github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
         timeout-minutes: 20
         run: |
           python -m emergence_lab.coverage4 --config configs/exact4_coverage_pilot.json --output results/exact4_coverage.json
