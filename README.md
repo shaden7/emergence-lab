@@ -4,7 +4,7 @@ Emergence Lab investigates whether the fundamental laws and structures of physic
 
 Our long-term goal is to explore foundational physics, not merely conventional microscopic phenomena. Initial benchmarks such as the Ising model validate our research methods; **we do not claim to have discovered a fundamental theory of physics**.
 
-For the project's broader scientific ambition, research questions and evidence standards, see the [scientific overview](docs/OVERVIEW.md). Agent working rules are in [AGENTS.md](AGENTS.md); the latest verified work is recorded in [Research State](docs/RESEARCH_STATE.md).
+For the project's broader scientific ambition, research questions and evidence standards, see the [scientific overview](docs/OVERVIEW.md). Agent working rules are in [AGENTS.md](AGENTS.md), with GitHub-authoritative [workflow and autonomous review policy](docs/WORKFLOW_POLICY.md) and the [Research Director protocol](docs/RESEARCH_DIRECTOR.md). The latest verified work is recorded in [Research State](docs/RESEARCH_STATE.md).
 
 ## First experiment: Ising model
 
