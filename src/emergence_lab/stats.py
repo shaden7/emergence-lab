@@ -60,6 +60,10 @@ def independent_chain_interval(values) -> tuple[float, float | None, float | Non
     if len(x) == 1:
         return mean, None, None, None
     sem = float(np.std(x, ddof=1) / sqrt(len(x)))
+    # A frozen sample of chain means is NOT an infinitely precise estimate.
+    # It may indicate no effective mixing, even when all observed values agree.
+    if sem == 0.0:
+        return mean, None, None, None
     df = len(x) - 1
     critical = _T975[df - 1] if df <= 10 else (2.23 if df <= 30 else 2.05)
     return mean, sem, mean - critical * sem, mean + critical * sem

@@ -59,10 +59,13 @@ def run_coverage(cfg: dict) -> dict:
             summary = summarize_replicates(rows)[0]
             for observable, (lower, upper) in OBSERVABLES.items():
                 target = exact[str(t)][observable]
+                valid_interval = summary[lower] is not None and summary[upper] is not None
                 records.append({
                     "temperature": t, "batch": batch, "observable": observable,
                     "mean": summary[observable], "lower": summary[lower], "upper": summary[upper],
-                    "reference": target, "covered": summary[lower] <= target <= summary[upper],
+                    "reference": target, "interval_defined": valid_interval,
+                    # Undefined intervals are failures, never artificial perfect coverage.
+                    "covered": bool(valid_interval and summary[lower] <= target <= summary[upper]),
                 })
     aggregates = []
     for t in temps:

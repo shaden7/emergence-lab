@@ -70,3 +70,7 @@ def test_cli_creates_auditable_summary_and_manifest(tmp_path, monkeypatch):
     assert manifest["result_rows"] == 2
     assert manifest["summary_rows"] == 1
     assert "uncertainty_method" in manifest
+
+
+def test_frozen_independent_chain_means_do_not_fake_infinite_precision():
+    assert independent_chain_interval([1.0, 1.0, 1.0, 1.0]) == (1.0, None, None, None)

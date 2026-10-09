@@ -35,3 +35,20 @@ def test_rejects_excessive_or_invalid_plan():
                    dict(batches=200), dict(sample_sweeps=0)):
         with pytest.raises(ValueError):
             run_coverage({**cfg, **change})
+
+
+def test_frozen_batch_means_count_as_undefined_noncoverage(monkeypatch):
+    import emergence_lab.coverage4 as module
+    def degenerate_chain(size, temperature, burn, sweeps, seed, sample_every):
+        return {
+            "size": size, "temperature": temperature,
+            "mean_energy_per_spin": -2.0, "mean_abs_magnetization": 1.0,
+            "magnetization_effective_samples": None,
+            "energy_effective_samples": None,
+        }
+    monkeypatch.setattr(module, "run_chain", degenerate_chain)
+    cfg = dict(temperatures=[1.5], batches=2, chains_per_batch=4,
+               base_seed=2027100101, burn_sweeps=5, sample_sweeps=20, sample_every=5)
+    report = module.run_coverage(cfg)
+    assert all(not row["interval_defined"] and not row["covered"] for row in report["batches"])
+    assert all(row["covered_batches"] == 0 for row in report["aggregates"])
