@@ -3,7 +3,9 @@
 Last handoff update: 2026-10-09.
 
 ## Mission
-Investigate minimal microscopic assumptions that give rise to stable macroscopic physical laws. Start with validated benchmark systems before speculative discrete geometry/causality.
+Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
+
+The Ising benchmark is a calibration step. The long-term question encompasses foundational spacetime, matter, interactions, and the principles that might give rise to them; candidate models still require rigorous mathematical and empirical evaluation.
 
 ## Implemented (repository code)
 - 2D ferromagnetic Ising model, periodic lattice, Metropolis updates.
