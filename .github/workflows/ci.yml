@@ -41,6 +41,7 @@ jobs:
         run: |
           python -m emergence_lab.finite_size --config configs/fss_pilot.json --output results/finite_size_pilot.json
           python scripts/autocorr_synthetic_audit.py --output results/autocorr_synthetic.json
+          python -m emergence_lab.equilibration4 --config configs/equilibration4_pilot.json --output results/equilibration4_pilot.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
