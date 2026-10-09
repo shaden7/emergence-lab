@@ -45,6 +45,7 @@ jobs:
           python -m emergence_lab.equilibration4 --config configs/equilibration4_pilot.json --output results/equilibration4_pilot.json
           python -m emergence_lab.mixing_pilot --config configs/mixing_pilot.json --output results/mixing_pilot.json
           python scripts/mixing_diagnostics.py --mixing-json results/mixing_pilot.json --output results/mixing_diagnostics.json
+          python -m emergence_lab.ising_1d_control --config configs/ising_1d_control.json --output results/ising_1d_control.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
