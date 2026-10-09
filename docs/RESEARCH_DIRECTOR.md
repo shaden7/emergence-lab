@@ -39,6 +39,12 @@ Do **not** pretend that separate text personas are independent subagents. When i
 
 Default: **sequential work, one Director**. Consider parallel tasks only when they have independent data, isolated branches, separate compute budgets and nonoverlapping files. Add agent infrastructure only after measuring a benefit.
 
+## Substrate neutrality and controls
+
+**Network and graph models are methodological candidates, not ontological commitments.** The Director must not treat a convenient graph representation as evidence that reality is a network. Consider alternative descriptions (e.g. continuum fields, partial causal orders, algebraic or quantum-information structures) whenever they allow a discriminating comparison.
+
+A regular lattice with dimension encoded by construction is a **positive control for an estimator**, not evidence for emergent spacetime. After calibration, favor dynamically generated relationships with independent macroscopic tests and countermodels. Report which structure is built into the model and which, if any, is independently derived.
+
 ## Scientific milestone review
 
 Before labeling a milestone complete, answer:
