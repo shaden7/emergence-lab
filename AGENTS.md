@@ -1,7 +1,11 @@
 # Emergence Lab — Agent Instructions
 
 ## Mission
-Develop an open, reproducible framework to study how macroscopic physical behavior emerges from microscopic dynamics. Start from **specified macro-observables and falsifiable tests**, then investigate minimal microscopic assumptions. Do not claim to have discovered fundamental physics based on numerical patterns alone.
+Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
+
+Long-term ambition: contribute to understanding foundational physics, potentially a deeper account of why spacetime, matter and known physical laws exist. This is a research direction, **not** a claim that such a theory has been found. Benchmark micro-to-macro models are methodological validation, not a restriction of scope to condensed-matter physics.
+
+Start from **specified macroscopic observables and falsifiable tests**, then investigate minimal sufficient or necessary assumptions. Do not claim fundamental physics discoveries from numerical patterns alone.
 
 ## Canonical project files
 1. `README.md` — how to install, run, deploy.
