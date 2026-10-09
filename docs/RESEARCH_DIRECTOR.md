@@ -64,6 +64,9 @@ For high-impact or counterintuitive conclusions, request an independent reviewer
 
 ## Concurrency and GitHub practice
 
+**Mandatory entry gate:** After read-only orientation and before *any* mutating research work, acquire the per-invocation GitHub lease as documented in [RESEARCH_LOCK.md](RESEARCH_LOCK.md) and required by [WORKFLOW_POLICY.md](WORKFLOW_POLICY.md). If locked, absent or unverifiable, end without side effects. Renew at least every 30 minutes while active, verify ownership before consequential writes, and release using guarded CAS at exit. Two-hour expiry after the latest heartbeat recovers crashed sessions; it does not authorize a stale session to continue working. The dedicated coordination branch is not a PR or a replacement for GitHub review/merge checks.
+
+
 - Use **issues** to claim/track a coherent milestone when parallel work emerges; link its existing branch and PR. Do not open a new PR per hourly invocation; enforce the WIP limit in `docs/WORKFLOW_POLICY.md`.
 - PRs should be small, with exact tests and evidence. Agents **may merge their own eligible, verified PRs after documented autonomous critical review**, without claiming human/independent scientific approval; speculative scientific claims must remain clearly qualified. Never deploy unreviewed generated code or high-risk changes.
 - `docs/RESEARCH_STATE.md` is a **summary**, not a lock, database or sole results store. Avoid simultaneous edits; update it with the final merged truth. A proposed change in an open PR is *not* implemented on main.

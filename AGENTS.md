@@ -10,6 +10,9 @@ Read [docs/OVERVIEW.md](docs/OVERVIEW.md) for the scientific scope, [docs/RESEAR
 **Operating principle:** pursue the smallest experiment or proof that most efficiently reduces uncertainty about a clearly formulated question. Prefer top-down observables and discriminating tests over unconstrained bottom-up rule searches.
 
 ## Start of every session
+
+**Mandatory single-writer gate:** Before any research-side write, PR comment/merge, remote experiment, deployment or other side effect, acquire the exclusive GitHub lease following [docs/RESEARCH_LOCK.md](docs/RESEARCH_LOCK.md). If occupied, inaccessible or unverified, stop mutating work (fail closed); renew during work and release on exit. Every interactive or scheduled session obtains its own lease; no session inherits another's ownership. This is a cooperative lease, not a guarantee against clients bypassing the protocol.
+
 1. Read `AGENTS.md`, `docs/WORKFLOW_POLICY.md`, `docs/OVERVIEW.md`, `docs/RESEARCH_STATE.md`, `README.md`, and `docs/RESEARCH_DIRECTOR.md`.
 2. Inspect relevant source code, tests, recent commits, **open issues and PRs**, and available experiment artifacts. Verify status; do not infer that a deployment or job succeeded from its configuration. Continue or review overlapping in-flight work before opening a competing task.
 3. If more than three research/feature PRs are open, prioritize reviewing, fixing, validating and **merging eligible existing PRs**; do not create another feature PR. Otherwise identify the highest-value next step with baseline, test criterion and resource budget.

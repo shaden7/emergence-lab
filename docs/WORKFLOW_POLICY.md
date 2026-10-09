@@ -20,6 +20,12 @@ Each scheduled invocation is a **fresh Research Director**. It must read current
 
 A separate subsequent session should challenge the producer's claims when feasible; call this a **later-pass review**, not independent external peer review. A distinct tool-backed Skeptic or independent numerical implementation improves scrutiny but remains an AI-mediated check. Never invent reviewer identities, independent validation or GitHub approval events. Review and merge are separate actions; an agent may merge if the objective merge gates below pass, even if GitHub cannot create a formal approval by the PR author's own account.
 
+### Exclusive Research Director lease (mandatory)
+
+To prevent overlapping interactive/hourly Research Directors, **all mutating Director work requires a verified exclusive GitHub lease** from the persistent `coordination/research-lock` branch. Its sole file is `lease.json`. Follow the complete **[acquire / CAS / heartbeat / release and two-hour expiry protocol](RESEARCH_LOCK.md)**. The rules live on `main`; the mutable lease lives only on the dedicated coordination branch. When an existing valid lease is occupied, the new invocation exits without writes. Missing GitHub capability, ownership uncertainty or lost/expired lease means fail closed. A stale Director must not write or release another session's lease. Read-only orientation before acquisition is allowed.
+
+This serialized workflow coordinates **cooperating Directors**; it is not transactional fencing of every GitHub, SSH or compute operation. Continue to use PR/commit validation, expected-head guards and shared Lightsail safety limits. Review/merge policy is unchanged. The lease branch is **never** merged into `main` and is not counted as a research PR. Scheduled ChatGPT automations cannot currently be configured more frequently than once per hour; this rule does not claim otherwise.
+
 ## 3. Hard work-in-progress limits
 
 - Default ceiling: **3 open feature/research PRs across the project**. If >3 are already open, the default task is **backlog reduction**; no additional feature PRs.

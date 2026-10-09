@@ -37,6 +37,10 @@ A **manual** GitHub Actions workflow deploys to Ubuntu on `18.158.243.28` using 
 
 See [deployment instructions](docs/deployment.md). Open **Actions → Deploy to Lightsail → Run workflow** after verifying SSH and the Docker prerequisites. A successful run builds the project, verifies a smoke experiment, and installs the 02:00 UTC cron job. It does not touch EatSleepFeel.
 
+## Exclusive Research Director sessions
+
+Research Director invocations (manual or scheduled) coordinate through the independent `coordination/research-lock` GitHub branch. The operational [exclusive lease protocol](docs/RESEARCH_LOCK.md), including guarded atomic acquisition, heartbeat, two-hour crash recovery and guarded release, is binding via [AGENTS.md](AGENTS.md) and [workflow policy](docs/WORKFLOW_POLICY.md) on `main`. This lease serializes cooperating sessions; it does not launch new ChatGPT sessions or change their minimum hourly scheduling interval. The Lightsail nightly cron is separate.
+
 ## Research safeguards
 
 - The deterministic Monte Carlo implementation is a reference system, not evidence for new physics.
