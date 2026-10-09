@@ -62,3 +62,63 @@ def test_short_independent_smoke_has_correct_mean_scale():
     assert actual["replicates"] == 4
     assert -2 <= actual["mean_energy_per_spin"] <= 2
     assert 0 <= actual["mean_abs_magnetization"] <= 1
+
+
+def _write_provenance_fixture(tmp_path):
+    import csv
+    import hashlib
+
+    cfg = {
+        "sizes": [4], "temperatures": [1.5], "repeats": 4,
+        "base_seed": 2026120101, "burn_sweeps": 10,
+        "sample_sweeps": 100, "sample_every": 5,
+    }
+    config = tmp_path / "config.json"
+    config.write_text(json.dumps(cfg))
+    (tmp_path / "manifest.json").write_text(json.dumps({
+        "config": cfg,
+        "config_sha256": hashlib.sha256(config.read_bytes()).hexdigest(),
+    }))
+    rows = [
+        run_chain(4, 1.5, 10, 100, 2026120101 + 400000 + 150000 + repeat, 5)
+        for repeat in range(4)
+    ]
+    summary = summarize_replicates(rows)
+    for name, values in (("measurements.csv", rows), ("summary.csv", summary)):
+        with (tmp_path / name).open("w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=values[0].keys())
+            writer.writeheader()
+            writer.writerows(values)
+    return config, rows
+
+
+def test_preregistered_seed_schedule_rejects_unique_wrong_seeds(tmp_path):
+    import csv
+    config, rows = _write_provenance_fixture(tmp_path)
+    # Valid shape and independent seeds are insufficient if data were substituted.
+    assert len(validate_results(config, tmp_path)["comparisons"]) == 2
+    rows[0]["seed"] += 100
+    with (tmp_path / "measurements.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+    with pytest.raises(ValueError, match="preregistered schedule"):
+        validate_results(config, tmp_path)
+
+
+@pytest.mark.parametrize("column,new_value", [
+    ("burn_sweeps", 11),
+    ("sample_sweeps", 99),
+    ("sample_every", 4),
+    ("measurements", 19),
+])
+def test_rejects_measurement_config_mismatch(tmp_path, column, new_value):
+    import csv
+    config, rows = _write_provenance_fixture(tmp_path)
+    rows[0][column] = new_value
+    with (tmp_path / "measurements.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+    with pytest.raises(ValueError, match="disagrees with config"):
+        validate_results(config, tmp_path)
