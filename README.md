@@ -4,6 +4,8 @@ Emergence Lab investigates whether the fundamental laws and structures of physic
 
 Our long-term goal is to explore foundational physics, not merely conventional microscopic phenomena. Initial benchmarks such as the Ising model validate our research methods; **we do not claim to have discovered a fundamental theory of physics**.
 
+For the project's broader scientific ambition, research questions and evidence standards, see the [scientific overview](docs/OVERVIEW.md). Agent working rules are in [AGENTS.md](AGENTS.md); the latest verified work is recorded in [Research State](docs/RESEARCH_STATE.md).
+
 ## First experiment: Ising model
 
 A 2D ferromagnetic Ising lattice with periodic boundaries, Metropolis updates, fixed random seeds, energy density and absolute magnetization. The known infinite-lattice transition temperature is `2 / log(1+sqrt(2)) ≈ 2.269185` for `J=k_B=1`. Finite lattices require finite-size scaling and uncertainty analysis before quantitative conclusions.
