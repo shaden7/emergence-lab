@@ -29,6 +29,8 @@ sudo docker compose build
 sudo docker compose run --rm emergence-lab --config configs/smoke.json --output /results/smoke
 ```
 
+Each run writes `measurements.csv` (chain diagnostics), `summary.csv` (between-seed confidence intervals) and `manifest.json` (methods/caveats). These diagnostics do not prove Monte Carlo equilibration.
+
 The Compose service is capped at 0.5 vCPU and 1.5 GiB RAM. Lightsail CPU-burst credits still limit sustained performance. Running this alongside other apps can affect their responsiveness.
 
 ## Deploy to Lightsail
@@ -40,8 +42,9 @@ See [deployment instructions](docs/deployment.md). Open **Actions → Deploy to 
 ## Research safeguards
 
 - The deterministic Monte Carlo implementation is a reference system, not evidence for new physics.
-- Samples are autocorrelated and v0.1 does **not** calculate confidence intervals.
-- Next: finite-size scaling, error bars, distinct baselines, and explicit falsification criteria.
+- The proposed milestone-2 code estimates autocorrelation, effective sample counts and per-chain standard errors. Trapped or short series have undefined diagnostics rather than spurious precision.
+- `summary.csv` reports exploratory 95% Student-t intervals across **independent chain means**; 2 smoke replicates are insufficient for calibrated error bars.
+- Next: longer holdout runs, equilibration checks, finite-size scaling, distinct baselines and explicit falsification criteria.
 - No AI API integration, automatic theory generation or Lean formalization is implemented yet.
 
 See [research plan](docs/research-plan.md).
