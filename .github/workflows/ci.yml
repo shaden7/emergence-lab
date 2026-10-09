@@ -32,6 +32,14 @@ jobs:
         timeout-minutes: 20
         run: |
           python -m emergence_lab.burnin4 --config configs/exact4_burnin_sensitivity.json --output results/exact4_burnin.json
+      - name: Bounded phase-0 finite-size and J=0 pilot
+        if: github.event_name == 'push' && github.ref == 'refs/heads/research/phase0-director-audit-20261009'
+        timeout-minutes: 5
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.finite_size --config configs/fss_pilot.json --output results/finite_size_pilot.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
