@@ -32,8 +32,9 @@ jobs:
         timeout-minutes: 20
         run: |
           python -m emergence_lab.burnin4 --config configs/exact4_burnin_sensitivity.json --output results/exact4_burnin.json
+      # Heavy fixed-seed pilots already have archived CI runs; rerun only by explicit dispatch.
       - name: Bounded phase-0 finite-size and J=0 pilot
-        if: github.event_name == 'push' && github.ref == 'refs/heads/research/phase0-director-audit-20261009'
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/phase0-director-audit-20261009' || github.ref == 'refs/heads/main')
         timeout-minutes: 5
         env:
           OPENBLAS_NUM_THREADS: 1
