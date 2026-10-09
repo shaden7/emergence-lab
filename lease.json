@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "integration-test",
-  "leaseId": "cas-integration-test-20261010",
-  "acquiredAt": "2026-10-10T00:30:00Z",
-  "heartbeatAt": "2026-10-10T00:30:00Z",
-  "expiresAt": "2026-10-10T02:30:00Z",
-  "task": "temporary CAS first writer",
-  "previousOwner": null
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "integration-test"
 }
