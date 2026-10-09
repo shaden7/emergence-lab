@@ -12,12 +12,12 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Refined `AGENTS.md` to require top-down observables, controls, evidence levels, bounded experiments, and reproducible session handoffs.
 - Documentation-only change; no new experiment, proof, or deployment verification resulted from this iteration.
 
-## Research process iteration (proposed PR, 2026-10-09)
+## Research process iteration (2026-10-09)
 - Documented a sequential hourly **Research Director** model in `docs/RESEARCH_DIRECTOR.md`, with optional specialized review only when delegation is actually available.
 - Added deconfliction guidance: inspect open issues/PRs, prefer continuing existing work, use isolated branches, do not treat repository files as concurrency locks.
 - Added evidence and milestone-review checklists, including an independent skepticism gate for novel claims.
-- This is **workflow documentation only on a review branch**. It does not update the scheduled ChatGPT automation, verify the Lightsail deployment, run experiments, implement subagents, or introduce new scientific findings.
-- Proposed adoption: review and merge the PR, then ensure the hourly automation follows the linked protocol.
+- This is **workflow documentation only**. It does not update the scheduled ChatGPT automation, verify the Lightsail deployment, run experiments, implement subagents, or introduce new scientific findings.
+- The hourly automation should read the Director protocol after PR #2 is merged; actual tool/subagent capabilities in scheduled invocations are unverified.
 
 ## Implemented (repository code)
 - 2D ferromagnetic Ising model, periodic lattice, Metropolis updates.
