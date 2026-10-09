@@ -7,6 +7,8 @@ These estimates are diagnostics, not rigorous confidence bounds on tau.
 """
 import argparse
 import json
+import os
+import platform
 import numpy as np
 from emergence_lab.stats import autocorrelation_diagnostics
 
@@ -68,6 +70,7 @@ def evaluate():
             "median_tau": {key: float(np.median([r[key] for r in rows])) for key in rows[0]},
         })
     return {
+        "environment": {"python": platform.python_version(), "numpy": np.__version__, "commit": os.getenv("GIT_SHA")},
         "cases": cases,
         "constant_is_undefined": autocorrelation_diagnostics(np.ones(100))["tau_int"] is None,
         "short_is_undefined": autocorrelation_diagnostics(np.arange(10))["tau_int"] is None,

@@ -6,6 +6,8 @@ are diagnostic ensemble means, not autocorrelation or mixing-time upper bounds.
 import argparse
 import json
 import math
+import os
+import platform
 from functools import lru_cache
 from pathlib import Path
 
@@ -104,7 +106,8 @@ def run(cfg):
                                 "bias": m - (ref["mean_"+obs] if obs == "energy_per_spin" else ref["mean_abs_magnetization"]),
                                 "stderr": se, "ci95_low": low, "ci95_high": high}
                 summaries.append(row)
-    return {"config": cfg, "summary": summaries, "raw": results, "proposals": len(temps)*3*repeats*max(probes)*16,
+    return {"config": cfg, "environment": {"python": platform.python_version(), "numpy": np.__version__, "commit": os.getenv("GIT_SHA")},
+            "summary": summaries, "raw": results, "proposals": len(temps)*3*repeats*max(probes)*16,
             "limitations": ["Single snapshots from independent chains show ensemble relaxation, not integrated correlation times.",
                             "Independent exact-initial states are stationary in the target distribution only if the Metropolis kernel is correct.",
                             "Multiple probe times and both observables are correlated; intervals are descriptive, not simultaneous tests."]}

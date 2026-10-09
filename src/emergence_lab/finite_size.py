@@ -7,6 +7,7 @@ calculated from independent chain estimates, not individual autocorrelated sweep
 import argparse
 import json
 import math
+import os
 import platform
 from pathlib import Path
 
@@ -99,7 +100,7 @@ def run_pilot(cfg: dict) -> dict:
                         mean, se, low, high = independent_chain_interval(values)
                         s[observable] = {"mean": mean, "stderr": se, "ci95_low": low, "ci95_high": high}
                 summaries.append(s)
-    return {"config": cfg, "environment": {"python": platform.python_version(), "numpy": np.__version__},
+    return {"config": cfg, "environment": {"python": platform.python_version(), "numpy": np.__version__, "commit": os.getenv("GIT_SHA")},
             "records": records, "summaries": summaries,
             "proposed_flips_interacting": proposals,
             "caveats": [
