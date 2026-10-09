@@ -1,4 +1,4 @@
-"""Preregistered near-critical finite-size mixing diagnostic, not a mixing-time proof.
+"""Bounded near-critical finite-size mixing diagnostic, not a mixing-time proof.
 
 Even-L checkerboard Metropolis run from independent random and ordered starts.
 Compare windows, hot/cold end-ensemble means and correlation times from an
