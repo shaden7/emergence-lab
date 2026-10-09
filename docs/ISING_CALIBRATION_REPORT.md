@@ -197,3 +197,38 @@ Die Prüfung ergab zwei konkret reproduzierbare, fachlich relevante Fehler, die 
 - C. N. Yang (1952), *The Spontaneous Magnetization of a Two-Dimensional Ising Model*, Physical Review 85, 808. DOI: https://doi.org/10.1103/PhysRev.85.808 — spontane Magnetisierung.
 - Charles J. Geyer (1992), *Practical Markov Chain Monte Carlo*, Statistical Science 7, 473–483. DOI: https://doi.org/10.1214/ss/1177011137 — Zeitreihen- und MC-Varianzmethoden (die hier implementierte Lag-Paar-Variante ist nur „Geyer-like“, **nicht** die vollständige etablierte IPS/IMS-Methode).
 - Aki Vehtari et al. (2021), *Rank-Normalization, Folding, and Localization*, Bayesian Analysis 16, 667–718. DOI: https://doi.org/10.1214/20-BA1221 — Grenzen klassischer R-hat-Diagnostik und bessere Alternative. **Hier nicht implementiert.**
+
+## I. Zweite Negativkontrolle: wechselwirkendes eindimensionales Ising-Modell
+
+Die triviale J=0-Nullkontrolle kann nicht ausschließen, dass eine Auswertung bereits **jede** Wechselwirkung mit einem falschen kritischen Punkt verwechselt. Deshalb wurde ein zusätzlicher fachlich strengerer Kontrollfall realisiert: **periodisches ferromagnetisches Ising-Modell in einer Raumdimension** mit echter nächster-Nachbar-Wechselwirkung und **ohne endlichen positiven kritischen Temperaturpunkt**.
+
+**Mathematisch bekannte Kontrolle:** Für das 1D-Ising-Modell bei J=k_B=1 und periodischen Randbedingungen lässt sich die endliche Zustandssumme exakt in der Transfermatrixform schreiben:
+
+`Z_L = (2cosh(1/T))^L + (2sinh(1/T))^L`.
+
+Daraus folgt die unabhängig von Simulation vorgegebene finite-L-Energie pro Spin
+
+`e_L = -[tanh(1/T) + tanh(1/T)^(L-1)]/[1 + tanh(1/T)^L]`.
+
+Die Formel wurde bei L8 zudem **direkt gegen Enumeration aller 2^8 Spin-Konfigurationen** verglichen; die unabhängige Enumeration bestätigt die Werte bis zur Fließkommatoleranz. Der nicht vorhandene positive-T-Phasenübergang ist **mathematisches Modellwissen**, keine neue empirische Entdeckung.
+
+**Neues reproduzierbares Experiment:** `src/emergence_lab/ising_1d_control.py` und `configs/ising_1d_control.json`, Quellrevision `71f0f3c77e3006e54ee42a1f142335bb9d5c58a0`: L=8/16/24/32, T=1.5/2.269185/3.5, je acht unabhängige Ketten, 300 Burn + 700 Mess-Sweeps, jede fünfte Messung; **96 Ketten, 1,920,000 versuchte Updates**. Checkerboard-Metropolis-Update in 1D; analysiert dieselben vier observablen Größen (E, |m|, χ_abs, Binder U4). Laufzeit lokal 4.58 s CPU/Wall und ~96 MB; drei neue Modelltests bestanden.
+
+**Unabhängig reproduziert:** [GitHub CI 37998097492](https://github.com/shaden7/emergence-lab/actions/runs/37998097492) **success**; [Original-JSON-Artefakt 11648136813](https://github.com/shaden7/emergence-lab/actions/runs/37998097492/artifacts/11648136813), Python 3.12.15/NumPy 2.5.3/Commit-SHA im Manifest. Alle **96 Roh-Kettendatensätze und zwölf Aggregat-Zeilen** sind mit lokaler Python-3.13.5/NumPy-2.3.5-Ausführung **genau identisch**.
+
+**Bei T=2.269185** (dem **2D**-Referenz-Tc, in **1D kein** Übergang):
+
+| L | 1D |m| | 1D χ_abs | 1D Binder U4 | 1D gemessene Energie | Analytische 1D-Energie |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 8 | 0.4589 | 0.282 | 0.419 | −0.4134 | −0.4159 |
+| 16 | 0.3135 | 0.390 | 0.177 | −0.4181 | −0.4142 |
+| 24 | 0.2418 | 0.350 | 0.110 | −0.4241 | −0.4142 |
+| 32 | 0.2138 | 0.381 | 0.029 | −0.4155 | −0.4142 |
+
+Die Binder-Kumulante fällt hier von 0.419 auf 0.029, statt wie im 2D-Tc-Ising-Pilot um ca. 0.61 annähernd größenstabil zu sein. χ_abs wächst nicht entsprechend einem klaren `L^1.75`-Trend, obwohl Wechselwirkungen vorliegen. Das ist eine **numerische qualitative Negativkontrolle**, keine formale Garantie gegen Scheinexponenten in anderen Modellfamilien.
+
+**Negatives / auffälliges Ergebnis unverändert dokumentiert:** Bei T=3.5 lag die gemessene 1D-Energie in allen vier L-Gruppen **unter** der exakten Referenz. Die Abweichungen in zwischen-Ketten-SEM-Einheiten waren **1.721, 1.675, 2.734 und 1.620** (L8/16/24/32). Ein vorher verwendeter explorativer Einzelzellen-Anomaliescreen von 3.5 SEM würde diese nicht einzeln markieren; die gleichgerichtete Folge ist dennoch diagnostisch auffällig. Es wäre methodisch unzulässig, diese Beobachtungen nachträglich zu entfernen oder das Ausbleiben individueller Signifikanz als Gleichgewicht zu interpretieren.
+
+**Adaptiver Nachversuch** aufgrund dieser Beobachtung (also ausdrücklich **kein** blind preregistrierter Bestätigungsholdout): `configs/ising_1d_anomaly_followup.json`, T=3.5, vier L, acht **neue** Ketten je L, 1000 Burn + 10,000 Sampling-Sweeps (jede fünfte), Basis-Seed `2099990101`, **32 Ketten / 7,040,000 Updates**, harter Deckel 10 Mio. Updates, maximal 12000 Sweeps/Kette. Lokal 14.97 s Wall / ~96 MB. Energie-Abweichungen in SEM-Einheiten: L8 −0.431, L16 −1.943, L24 +0.427, L32 −0.431. Diese längeren Ketten zeigen **keine ebenso starke gleichgerichtete Abweichung**, beseitigen aber die zunächst beobachtete Auffälligkeit **nicht nachträglich** und liefern wegen adaptiver Planung keine unabhängige vorher festgelegte Fehlerwahrscheinlichkeit. Vollständige erste und zweite Ergebnisserie bleiben erhalten.
+
+**Ergänzter Gate-Befund:** Das Forschungswerkzeug kann **zwei negative Modelle** (nichtwechselwirkende Spins und wechselwirkendes 1D-Ising) von der qualitativen 2D-Tc-Skalierung unterscheiden. Die Frage, ob bei hinreichend langen und adäquat gemischten Trajektorien quantitative 2D-Exponenten stabil reproduziert werden, bleibt wegen L32-ESS-Problemen unbeantwortet. **NO-GO unverändert.**
