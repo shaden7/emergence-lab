@@ -1,6 +1,8 @@
 # Emergence Lab
 
-Reproducible, hypothesis-led experiments on the emergence of macroscopic physical behavior from microscopic dynamics. **This project does not claim to discover a fundamental theory of physics.**
+Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
+
+Our long-term goal is to explore foundational physics, not merely conventional microscopic phenomena. Initial benchmarks such as the Ising model validate our research methods; **we do not claim to have discovered a fundamental theory of physics**.
 
 ## First experiment: Ising model
 
