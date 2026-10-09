@@ -16,7 +16,14 @@ jobs:
       - run: pip install -e '.[test]'
       - run: pytest -q
       - run: emergence-lab --config configs/smoke.json --output results
+      - name: Exact 4x4 reference holdout
+        env:
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          emergence-lab --config configs/exact4_validation.json --output results/exact4
+          python -m emergence_lab.exact4 --config configs/exact4_validation.json --results results/exact4
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: smoke-results
           path: results/
