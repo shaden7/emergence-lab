@@ -40,6 +40,7 @@ jobs:
           OMP_NUM_THREADS: 1
         run: |
           python -m emergence_lab.finite_size --config configs/fss_pilot.json --output results/finite_size_pilot.json
+          python scripts/autocorr_synthetic_audit.py --output results/autocorr_synthetic.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
