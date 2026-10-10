@@ -1,0 +1,51 @@
+name: Deploy to Lightsail
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: emergence-lab-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: lightsail
+    steps:
+      - name: Configure SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$PRIVATE_KEY" || { echo "LIGHTSAIL_SSH_PRIVATE_KEY is missing"; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$PRIVATE_KEY" > ~/.ssh/emergence_key
+          chmod 600 ~/.ssh/emergence_key
+          ssh-keyscan -T 10 -H 18.158.243.28 >> ~/.ssh/known_hosts
+      - name: Deploy and smoke test (isolated directory)
+        run: |
+          ssh -i ~/.ssh/emergence_key -o BatchMode=yes ubuntu@18.158.243.28 'bash -se' <<'REMOTE'
+          set -euo pipefail
+          command -v git
+          command -v docker
+          sudo docker compose version
+          command -v cron
+          if [ ! -d /opt/emergence-lab/.git ]; then
+            sudo mkdir -p /opt/emergence-lab
+            sudo chown ubuntu:ubuntu /opt/emergence-lab
+            git clone https://github.com/shaden7/emergence-lab.git /opt/emergence-lab
+          fi
+          cd /opt/emergence-lab
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+          mkdir -p results
+          sudo chown 10001:10001 results
+          sudo docker compose build
+          sudo docker compose run --rm emergence-lab --config configs/smoke.json --output /results/smoke
+          test -s results/smoke/manifest.json
+          test -s results/smoke/measurements.csv
+          # Enable daily schedule only after the build and smoke run pass.
+          printf '%s\n' '0 2 * * * root /bin/bash /opt/emergence-lab/scripts/run-nightly.sh >> /var/log/emergence-lab.log 2>&1' | sudo tee /etc/cron.d/emergence-lab >/dev/null
+          sudo chmod 644 /etc/cron.d/emergence-lab
+          echo "Deployment OK; nightly cron installed for 02:00 UTC"
+          REMOTE
