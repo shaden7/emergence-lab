@@ -35,6 +35,19 @@ jobs:
           OMP_NUM_THREADS: 1
         run: |
           python -m emergence_lab.pilot_a_noise --config configs/pilot_a_n5.json --output results/pilot_a_n5
+      # Pilot B stage 1: dev key only (labels public). The blind key does not exist yet.
+      - name: Pilot B stage-1 development set (twice, byte-identical)
+        timeout-minutes: 3
+        env:
+          GIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev
+          python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev_repeat
+          cmp results/pilot_b_dev/rows.csv results/pilot_b_dev_repeat/rows.csv
+          cmp results/pilot_b_dev/result.json results/pilot_b_dev_repeat/result.json
+          python -c "import json; m=json.load(open('results/pilot_b_dev/manifest.json')); print('::notice title=Pilot B dev::' + json.dumps(m['outputs']) + ' gates_pass=' + str(m['gates_pass_B_G0_to_G5']) + ' cpu=' + str(m['cpu_seconds']) + ' python=' + m['python'] + ' numpy=' + m['numpy'])"
       - name: Pre-registered M4 interval coverage audit
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
         timeout-minutes: 20
