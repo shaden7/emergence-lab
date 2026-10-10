@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-20261010-99e93qkld67",
+  "leaseId": "rd-20261010-99e93qkld67-2rxankzat5tov1charovom",
+  "acquiredAt": "2026-10-10T06:35:06.494Z",
+  "heartbeatAt": "2026-10-10T06:35:06.494Z",
+  "expiresAt": "2026-10-10T08:35:06.494Z",
+  "task": "Integrate verified existing Ising PRs",
   "previousOwner": "research-director-20261010-olro37qcgx"
 }
