@@ -73,6 +73,16 @@ jobs:
         run: |
           python -m emergence_lab.burnin_replication --config configs/exact4_burnin_replication.json --output results/burnin_replication.json | tee results/burnin_replication.txt
           python -c "import json; r=json.load(open('results/burnin_replication.json')); print('::notice title=Burn-in replication raw::' + ' '.join('%s=%s' % kv for kv in r['raw_digests'].items()) + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy']); [print('::notice title=Burn-in %s::mean=%r se=%r t=%r p=%r verdict=%s' % (p['id'], p['mean'], p['stderr'], p['t'], p['p'], p['verdict'])) for p in r['analysis']['primary']]"
+      - name: Preregistered many-batch coverage gate (report gate 4)
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/coverage-gate-20261010' || github.ref == 'refs/heads/main')
+        timeout-minutes: 45
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          python -m emergence_lab.coverage_gate --config configs/coverage_gate.json --output results/coverage_gate.json --workers 4 | tee results/coverage_gate.txt
+          python -c "import json; r=json.load(open('results/coverage_gate.json')); print('::notice title=Coverage gate raw::npz_sha256=' + r['raw_npz_sha256'] + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy'] + ' commit=' + str(r['environment']['commit'])); [print('::notice title=Coverage gate L%s::covered=%d/%d wilson95=%r bias_z=%r per_chain=%d pass=%s control_covered=%d control_pass=%s' % (L, s['main']['energy']['covered'], s['main']['energy']['batches'], s['main']['energy']['wilson95'], s['main']['bias_z'], s['main']['per_chain_energy']['covered'], s['main']['pass'], s['power_control']['energy']['covered'], s['power_control']['pass'])) for L, s in r['sizes'].items()]; print('::notice title=Coverage gate::gate_pass=%s' % r['gate_pass'])"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

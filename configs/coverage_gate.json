@@ -1,0 +1,18 @@
+{
+  "description": "Preregistered many-batch coverage gate (Phase-0 report gate 4); see docs/COVERAGE_GATE_PREREGISTRATION.md. Do not edit after the preregistration commit.",
+  "sizes": [16, 32],
+  "temperature": 2.269185,
+  "batches": 400,
+  "chains_per_batch": 4,
+  "base_seed": 2030010001,
+  "warmup_sweeps": 1000,
+  "sample_sweeps": 3000,
+  "sample_every": 4,
+  "power_control_sweeps": 40,
+  "max_proposals": 9000000000,
+  "criteria": {
+    "wilson_halfwidth_max": 0.05,
+    "wilson_lower_min": 0.90,
+    "bias_z_flag": 3.0
+  }
+}
