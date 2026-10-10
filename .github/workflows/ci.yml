@@ -53,9 +53,7 @@ jobs:
           python -m emergence_lab.ising_1d_control --config configs/ising_1d_control.json --output results/ising_1d_control.json
           python -m emergence_lab.ising_1d_control --config configs/ising_1d_anomaly_followup.json --output results/ising_1d_anomaly_followup.json
       - name: Preregistered L32 critical-mixing gate
-        # TEMPORARY push condition for one independent runner execution (dispatch is unavailable to the
-        # review integration); removed again before merge.
-        if: (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/l32-critical-gate-20261010' || github.ref == 'refs/heads/main')) || (github.event_name == 'push' && github.ref == 'refs/heads/research/l32-critical-gate-20261010')
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/l32-critical-gate-20261010' || github.ref == 'refs/heads/main')
         timeout-minutes: 20
         env:
           OPENBLAS_NUM_THREADS: 1

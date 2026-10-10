@@ -48,7 +48,7 @@ Research Director invocations (manual or scheduled) coordinate through the indep
 - The deterministic Monte Carlo implementation is a reference system, not evidence for new physics.
 - The milestone-2 code (merged) estimates autocorrelation, effective sample counts and per-chain standard errors. Trapped or short series have undefined diagnostics rather than spurious precision.
 - `summary.csv` reports exploratory 95% Student-t intervals across **independent chain means**; 2 smoke replicates are insufficient for calibrated error bars.
-- Phase-0 calibration decision is currently **NO-GO** (insufficient L32 critical mixing); see [Research State](docs/RESEARCH_STATE.md) for the next gate.
+- Phase-0 calibration decision is currently **NO-GO**. The L32 critical-mixing blocker passed its preregistered gate (PR #13); burn-in replication, many-batch coverage, finite-size stability and raw-artifact archival remain open. See [Research State](docs/RESEARCH_STATE.md).
 - No AI API integration, automatic theory generation or Lean formalization is implemented yet.
 
 See [research plan](docs/research-plan.md).

@@ -13,6 +13,8 @@ Preregistration: [L32_CRITICAL_GATE_PREREGISTRATION.md](../L32_CRITICAL_GATE_PRE
 | Report | [2026-10-10-l32-critical-gate-report.json](2026-10-10-l32-critical-gate-report.json) (SHA-256 `047612e5…88fe06d`) |
 | Raw draws | `l32_critical_gate.npz`, SHA-256 `57ae4ea037e7f16402d3f0f41645f8f357cd4b09ab11c76648338a9b75bf47a2` (769 kB, not in Git; regenerate with `python -m emergence_lab.critical_gate --config configs/l32_critical_gate.json --output <dir>/l32_critical_gate.json`) |
 
+**Independent re-execution on GitHub's runner:** [Actions run 38035618292](https://github.com/shaden7/emergence-lab/actions/runs/38035618292), commit `2a6ce8b7f4e7d827d3ec6b2ac3e6f12a52edcd8b` (gate module unchanged since `ab67cdc` except stdout printing), Python 3.12.15 / NumPy 2.5.3: **raw `.npz` SHA-256 identical** (`57ae4ea0…bf47a2`) and identical pooled means, R̂, minimum ESS, coverage count and power-control outcome, read from the run's check annotations (job logs and artifacts sit on blob storage that the review environment cannot reach). The run was triggered by a temporary branch-only push condition because `workflow_dispatch` returns HTTP 403 to the review integration; the condition was removed before merge. This is a reproduction of the same seeded computation in a second environment, not a statistically independent replication.
+
 ## Outcome: GATE PASS (all ten checks)
 
 | Criterion | Energy E | Absolute magnetization |m| | Threshold |
@@ -35,8 +37,12 @@ Median per-chain Geyer τ (draws of 4 sweeps): E 9.0, |m| 21.2, i.e. τ ≈ 36 a
 - *Numerical observation:* the short-window design of the PR #12 pilot fails the same criteria on fresh seeds, reproducing the reason for the earlier NO-GO; the short-run heuristic τ_int ≈ 19 sweeps for |m| is about half of the τ_int ≈ 42 sweeps implied here.
 - *Not shown:* convergence in a proof sense; correctness for other L, T or samplers; any |m| calibration against an exact value; anything about emergent spacetime or new physics.
 
+## Consequence for the Phase-0 decision
+
+The decision stays **NO-GO**, with a narrower blocker set. Against the prospective GO gates in [ISING_CALIBRATION_REPORT.md](../ISING_CALIBRATION_REPORT.md) §D: gate 1 (reviewed integration, green `main`) met; gate 2 (L4 equilibrium) met by earlier work; gate 3 (robust τ/ESS, short chains flagged) now supported at L32/Tc by validated Geyer ESS and the failing power control; **open:** gate 4 (coverage on new seeds with ≈ 200 batches, Wilson half-width < 0.05), gate 5 (L = 8…32 with long chains and fit-window stability), gate 6 (durable raw artifacts — here mitigated by byte-identical deterministic regeneration plus registered SHA-256, but no archived copy).
+
 ## Limitations
 
-- One execution environment so far; an independent re-execution on GitHub's runner is pending (workflow dispatch is not permitted to the review integration; see PR #13).
+- Same seeds in both environments: the byte-identical reproduction rules out environment-dependent nondeterminism, not sampler bias shared by both executions (the exact-energy check G5/G6 addresses the latter for E only).
 - 32 chains give a coarse coverage check (G6 cannot distinguish nominal coverage from a ≈ √2 standard-error underestimate with high power).
 - Diagnostics cannot detect unvisited regions of state space. The two start types (random, fully ordered) bracket the obvious modes of |m| but not every conceivable trap.

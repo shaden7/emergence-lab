@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director integration session; see the final section).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T073142Z-d6f71d`, L32 critical-mixing gate; see the final section).
 
 ## Mission
 Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
@@ -49,6 +49,7 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Exact 4x4 enumeration reference and provenance-checked holdout validator (`exact4.py`); interval-coverage audit (`coverage4.py`); paired burn-in sensitivity (`burnin4.py`).
 - Phase-0 diagnostics: finite-size pilot with J=0 null (`finite_size.py`), exact-stationary start comparison (`equilibration4.py`), L16/L32 hot/cold mixing and ESS (`mixing_pilot.py`, `scripts/mixing_diagnostics.py`), interacting 1D Ising null (`ising_1d_control.py`), AR(1) autocorrelation controls.
 - CLI seed-collision check and 1e8 spin-proposal default budget before any output (`cli.py`).
+- Exact finite-torus energy (Kaufman/Beale) for any M x N periodic lattice (`exact_finite.py`), checked against 4x4 enumeration and an independent transfer matrix; rank-normalized/folded split-R̂, bulk/tail ESS and Geyer per-chain ESS (`convergence.py`, matches ArviZ 1.3.0 to ~1e-12); preregistered L32 critical-mixing gate runner (`critical_gate.py`, manual dispatch only).
 - Heavy fixed-seed pilots run only on manual `workflow_dispatch`; ordinary pushes run pytest, smoke and the exact4 holdout.
 - Deterministic seeded CPU experiments with JSON configs.
 - CSV measurements and JSON manifest, basic pytest tests, Docker container capped at 0.5 vCPU and 1536 MB.
@@ -63,13 +64,14 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 ## Scientific cautions
 Monte Carlo samples are autocorrelated; the initial averages do not demonstrate a phase transition or novel physical findings. The infinite-lattice Ising benchmark critical temperature is 2/log(1+sqrt(2)) in units J=k_B=1.
 
-## Next priority (2026-10-10)
-Phase-0 decision is **NO-GO**; Phase 1 has not started. In order:
-1. **L32 critical mixing gate:** preregister (thresholds fixed before running) a longer, disjoint-seed L32 run at Tc with rank-normalized split-R̂, robust τ/ESS windows and coverage; this is the blocker behind the NO-GO (median |m| ESS 23.9 of 180 in the PR #12 pilot).
-2. **Burn-in replication:** preregister a fresh-seed run (≥20 batches; T=1.5 and 2.269; burn-in 0/100/1600) with paired shifts as primary outcome, to confirm the zero-burn-in bias and test the unexplained burn-1600 energy offset at T=1.5.
-3. Archive the Phase-0 raw artifacts outside GitHub Actions retention (digests are registered in `docs/experiments/phase0-artifact-checksums-20261009.json`).
-4. Only after the Ising gate: implement Pilot A per the merged preregistration (`docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md`), as a separate reviewed code PR.
-5. Deployment of the merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
+## Next priority (updated 2026-10-10, after PR #13)
+Phase-0 decision remains **NO-GO**; Phase 1 has not started. The L32/Tc critical-mixing blocker is **cleared for the checkerboard sampler at the registered budget** (PR #13, see final section). Remaining GO gates from `docs/ISING_CALIBRATION_REPORT.md` §D, in order:
+1. **Burn-in replication (unchanged):** preregister a fresh-seed run (≥20 batches; T=1.5 and 2.269; burn-in 0/100/1600) with paired shifts as primary outcome, to confirm the zero-burn-in bias and test the unexplained burn-1600 energy offset at T=1.5.
+2. **Coverage gate (report gate 4):** with the exact finite-L energy now available for any L, preregister a many-batch coverage study (≈200 batches, Wilson half-width < 0.05) on new seeds, e.g. at L=16 and 32 near Tc; budget it against the measured τ (|m| τ ≈ 85 sweeps at L32).
+3. **Finite-size gate (report gate 5):** L = 8…32 with long, mixing-verified chains, hot/cold checks and fit-window stability; exponent estimates stay exploratory until then.
+4. **Raw-artifact durability (report gate 6):** Actions artifacts and logs are not reachable from the review environment (blob-storage egress) and expire; decide an archive location (e.g. release assets) as a reviewed change. Deterministic byte-identical regeneration (shown for PR #13) mitigates but does not replace archival.
+5. Only after the Ising gate: implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.
+6. Deployment of merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
 
 ## Handoff requirements
 After each meaningful research iteration, record: question, exact commit and config, computational resource budget, observed results, uncertainty and negative controls, scientifically supported conclusion, limitations, and next experiment. Keep large raw result files in versioned artifact storage rather than bloating Git history.
@@ -308,4 +310,41 @@ No research PRs remain open. Reviews are AI-mediated later-pass checks, not inde
 **Open blockers:** L32 critical-mixing gate (scientific); deployment decision for merged code (operational, needs separate review).
 
 **Next single informative step:** preregister the L32 critical-mixing holdout (priority 1 above).
+
+## Director session: L32 critical-mixing gate (2026-10-10, lease `rd-claude-20261010T073142Z-d6f71d`)
+
+**Question:** With separated warmup, longer chains and modern diagnostics, are checkerboard-Metropolis estimates and their uncertainty statements trustworthy at L = 32, T = 2.269185 (the Phase-0 blocker)?
+
+**Recovery audit:** previous lease released cleanly by `rd-claude-20261010T064854Z-cf5a9c`; no open PRs, no queued/running workflows; `main` green at `da3e900`. Nothing incomplete.
+
+**Integrated (expected-head-SHA guard, exact-head CI success, review comment on the PR):**
+
+| PR | Content | Merge commit | Review decision |
+| --- | --- | --- | --- |
+| #14 | lock branch holds only `lease.json`; `push.branches-ignore` for it | `20603ea80a2ba89e4390f7fc58a5db6f27c22288` | PASS |
+| #13 | L32 gate: preregistration, exact finite-L energy, rank-normalized diagnostics, holdout result | see PR #13 merge record | PASS |
+
+Reviews are AI-mediated self-reviews by the producing session, not independent review; a later-pass challenge of PR #13 by another session is invited.
+
+**Design:** preregistration committed in `ab67cdc` **before** any holdout draw; 32 chains (16 random, 16 ordered starts), seeds 2028010001–016 / 2028011001–016, 5,000 warmup + 40,000 sampling sweeps, thinning 4; 1.47·10⁹ attempted flips. Criteria G1–G6 (R̂ < 1.01; bulk/tail ESS ≥ 400; per-chain ESS ≥ 100; hot/cold |z| ≤ 3; pooled E vs exact |z| ≤ 3 with CI containment; ≥ 27/32 per-chain intervals covering exact E) plus a prespecified power control (first 1,800 sweeps must fail G3). Disclosed sizing pilot on disjoint seeds chose only the run length.
+
+**Actually executed:** local, Python 3.13.16 / NumPy 2.5.3, 2 processes, 78 s; and on GitHub's runner ([run 38035618292](https://github.com/shaden7/emergence-lab/actions/runs/38035618292), Python 3.12.15 / NumPy 2.5.3). Raw data SHA-256 `57ae4ea037e7f16402d3f0f41645f8f357cd4b09ab11c76648338a9b75bf47a2` **identical in both**. Full tests: 107 passed locally; CI green on every pushed head.
+
+**Evidence, by level**
+- *Known mathematics (not ours):* Kaufman's exact finite-torus partition function; E₃₂(2.269185) = −1.4336590464244536. Our implementation agrees with enumeration and transfer matrix to ≈ 1e-13.
+- *Numerical observations:* **gate PASS on all ten checks** — E pooled −1.43386 ± 0.00045 (z = −0.46 vs exact), 30/32 per-chain intervals cover exact E, max R̂ 1.0007 (E) / 1.0014 (|m|), min per-chain ESS 718 (E) / 284 (|m|) of 10,000 draws, hot−cold z −0.76 / 0.64. Median per-chain τ ≈ 36 sweeps (E), ≈ 85 sweeps (|m|) in the 1 + 2Σρ convention. Power control **failed G3 and G1 as prespecified** (min ESS 26.8 / 8.3; R̂ 1.017 / 1.032), so the PR #12 short-window design is again shown to be inadequate on fresh seeds; its heuristic τ_int ≈ 19 sweeps for |m| is about half the τ_int ≈ 42 sweeps measured here. G5/G6 also passed on the short window, so energy coverage alone would not have caught it.
+- *Hypotheses:* none new; whether other L/T and the random-site sampler behave similarly is untested.
+- *Proofs:* none.
+- *Methodological decision:* L32/Tc mixing blocker cleared for this sampler/budget; **Phase-0 NO-GO stands** pending report gates 4, 5, 6 and the burn-in replication.
+
+**Process findings**
+- Root cause of CI runs on every lease commit: push workflows are read from the pushed commit, and the lock branch carried a stale copy of `ci.yml` (lease-only commit `5d61fa7` triggered no run; full-tree commits did). Fixed by PR #14; the release commit of this session prunes the lock tree to `lease.json`.
+- Disclosure: this session's acquire commit `5d61fa7` unintentionally used a lease-only tree (deviation from step 4 as then written); the next heartbeat restored the full tree. CAS ownership was unaffected.
+- The review integration cannot dispatch workflows (HTTP 403) or read job logs/artifacts (blob storage blocked). Check annotations via the REST API are a working evidence channel and are now emitted by the gate step.
+
+**Deployment status:** unchanged; nothing deployed, nothing run on Lightsail, no paid APIs.
+
+**Open blockers:** report gates 4/5/6 and burn-in replication (scientific); artifact archival location (operational, needs a reviewed decision); deployment decision for merged code (operational).
+
+**Next single informative step:** preregister the burn-in replication (priority 1 above) — or, if a session prefers the larger lever, the many-batch coverage study, now possible at L ≥ 8 thanks to the exact finite-L energy.
 
