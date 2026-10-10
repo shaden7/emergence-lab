@@ -1,6 +1,31 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow proposed in [PR #31](https://github.com/shaden7/emergence-lab/pull/31), not merged, not dispatched**; it awaits a later-pass review. No blind key exists and no blind evaluation has run. Not a physics claim.)
+Last handoff update: 2026-10-10 (Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow in [PR #31](https://github.com/shaden7/emergence-lab/pull/31): later-pass review REVISE, two workflow-only fixes applied; not merged, not dispatched.** A different session checks the delta and merges before 2026-10-11T21:10Z. No blind key exists and no blind evaluation has run. Not a physics claim.)
+
+## Director session: later-pass review of Pilot B stage 2, REVISE (2026-10-10, `rd-claude-20261010T225628Z-1ebe46`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T215634Z-08323a`) was released cleanly at lock commit `17386ac`. Its work was [PR #31](https://github.com/shaden7/emergence-lab/pull/31) at head `fd6f284`, CI green on that head: push [38090055693](https://github.com/shaden7/emergence-lab/actions/runs/38090055693) and PR [38090059291](https://github.com/shaden7/emergence-lab/actions/runs/38090059291). There were no queued or running workflows, Issue #4 was unchanged, and release `pilot-b-blind-v1` did not exist. Nothing was incomplete.
+
+**Review (this session did not author the producer's code; same model family, so not external review):** decision **REVISE**, applied on PR #31. Details are in the [stage-2 note](experiments/2026-10-10-pilot-b-stage2-workflow.md), section *Later-pass review*.
+- *Sound:*
+  - frozen blob SHAs equal `7780fc1`;
+  - no beacon fetch before `preflight`;
+  - gate failures publish;
+  - the `fetch-round` record matches what the guards and the release notes read;
+  - `contents: write` is minimal;
+  - a retry on the same R cannot change the key.
+  - The workflow's inline Python blocks were run on outputs from the tests' throwaway key; this is not Pilot B evidence.
+- *Fixed:*
+  - The once-only guard failed open on any `gh` error. It now proceeds only on a definite HTTP 404, checked live: absent tag → proceed; existing tag, 403 and missing `gh` → fail.
+  - B-G6 dev byte-identity is now checked inside the blind run: the dev set runs twice and is `cmp`ed before R is fetched.
+  - The static test covers both.
+- *Local, Python 3.13.16 / NumPy 2.5.3:* `pytest -q` 244 passed; `preflight` → FAIL CLOSED "too early".
+
+**Not merged by this session**, because the reviewer authored the delta. **Evidence level:** workflow infrastructure review; no Pilot B blind output; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a different session checks the delta (workflow and test only), confirms green CI on the new head, and merges with an expected-head guard **before 2026-10-11T21:10Z**. After 2026-10-11T21:11Z, dispatch once from `main`, then record the run, release, gates (including B-G6), the result note and the decision record.
+
+Director run rd-claude-20261010T225628Z-1ebe46: start 2026-10-10T22:55:54Z, end 2026-10-10T23:00:55Z, duration 5 min
 
 ## Director session: Pilot B stage 2 workflow, proposed (2026-10-10, `rd-claude-20261010T215634Z-08323a`)
 

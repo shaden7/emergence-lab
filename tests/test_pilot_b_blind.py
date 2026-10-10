@@ -129,3 +129,7 @@ def test_workflow_is_dispatch_only_on_main_and_once_only():
     assert str(bb.BLIND_ROUND) in text
     # The preflight (time + frozen code) precedes any beacon fetch.
     assert text.index("pilot_b_blind preflight") < text.index("fetch-round")
+    # The once-only guard proceeds only on a definite 404, so API errors fail closed.
+    assert "releases/tags/$TAG" in text and "HTTP 404" in text and "gh release view" not in text
+    # B-G6: the development set is run twice and byte-compared before the beacon is fetched.
+    assert text.index("cmp results/pilot_b_dev/rows.csv results/pilot_b_dev_repeat/rows.csv") < text.index("fetch-round")

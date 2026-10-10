@@ -41,15 +41,28 @@ jobs:
           python -c "import numpy; assert numpy.__version__ == '2.5.3'"
       - name: Once-only guard (release tag must not exist)
         run: |
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          # Proceed only on a definite HTTP 404; any other API error fails closed.
+          set +e
+          out=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" 2>&1); rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
             echo "::error::Fail closed: release $TAG already exists; the blind run is once-only. Reconcile manually."
             exit 1
+          elif ! printf '%s' "$out" | grep -q 'HTTP 404'; then
+            echo "::error::Fail closed: could not establish that release $TAG is absent: $out"
+            exit 1
           fi
+          echo "Release $TAG absent (HTTP 404); proceeding."
       - name: Preflight (round pin, frozen stage-1 code, prereg/config pins, time >= R + margin)
         run: python -m emergence_lab.pilot_b_blind preflight
       - name: Development set must reproduce the stage-1 decision digest
         timeout-minutes: 3
-        run: python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev
+        run: |
+          python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev
+          # Prereg B-G6: development outputs byte-identical on two invocations in this environment.
+          python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev_repeat
+          cmp results/pilot_b_dev/rows.csv results/pilot_b_dev_repeat/rows.csv
+          cmp results/pilot_b_dev/result.json results/pilot_b_dev_repeat/result.json
       - name: Fetch and verify drand quicknet round R (same R on any retry)
         timeout-minutes: 3
         run: |
