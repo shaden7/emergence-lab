@@ -1,6 +1,6 @@
 {
   "preregistration": "docs/PILOT_B_BLINDED_INTERVENTION_PREREGISTRATION.md",
-  "version": "1.0",
+  "version": "1.0-r1",
   "ring_L": 256,
   "times": [1, 2, 4],
   "sites": [0, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32],
@@ -23,7 +23,8 @@
     "N3": {"k": [1, 2], "base": "symmetric S1", "epsilon_loguniform": [1e-6, 1e-2], "d_uniform_int": [20, 100]}
   },
   "dev_key": "pilot-b-dev-2027101101",
-  "blind_key_rule": "SHA-256('pilot-b-v1' || R || drand quicknet randomness_R), R = first round >= 24 h after stage-1 merge commit on main",
-  "gates": {"B_G1_max_false_rejections_of_24": 3, "B_G2_max_speed_overestimates_of_16": 3, "B_G4_min_power_detectable": 0.9, "B_G4_detectable_factor": 2.0, "reference_tolerance": 1e-12},
+  "dev_key_bytes": "SHA-256(b'pilot-b-dev-2027101101')",
+  "blind_key_rule": "SHA-256(b'pilot-b-v1|' + ascii_decimal(R) + b'|' + bytes.fromhex(drand quicknet randomness_R)), R = first round >= 24 h after stage-1 merge commit on main",
+  "gates": {"B_G1_max_false_rejections_of_24": 3, "B_G2_max_speed_overestimates_of_16": 3, "B_G3_max_spurious_null_controls_of_8": 2, "B_G4_min_power_detectable": 0.9, "B_G4_detectable_factor": 2.0, "reference_tolerance": 1e-12},
   "budget": {"cpu_seconds_max": 120, "ram_mib_max": 512, "output_mib_max": 5, "lightsail": false}
 }

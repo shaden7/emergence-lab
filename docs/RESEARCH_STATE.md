@@ -2,6 +2,23 @@
 
 Last handoff update: 2026-10-10 (N5 noise stress completed and **durably archived**: 5,040 raw site records, all G1–G6 PASS, preregistered null-control false detections W 9/20 and CA 8/20 at sigma=eta=1e-6. After a fail-closed hash-copy incident, [archive CI 38066230799](https://github.com/shaden7/emergence-lab/actions/runs/38066230799) published and re-downloaded [permanent GitHub Release](https://github.com/shaden7/emergence-lab/releases/tag/pilot-a-n5-evidence-2026-10-10-v1) with digest verification. [N5 note](experiments/2026-10-10-pilot-a-n5.md). Next: preregister blinded unknown-class test; not a physics claim.)
 
+## Director session: later-pass review of Pilot B preregistration, REVISE → r1 (2026-10-10, `rd-claude-20261010T175613Z-1698f5`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T165622Z-55e236`) was released cleanly at lock commit `a3bed8b`. One open PR ([#29](https://github.com/shaden7/emergence-lab/pull/29), head `11df5d0`, CI green on push [38070097242](https://github.com/shaden7/emergence-lab/actions/runs/38070097242) and PR [38070117822](https://github.com/shaden7/emergence-lab/actions/runs/38070117822)), explicitly awaiting a later-pass review. Nothing incomplete.
+
+**Review (non-producer session, same model family; independent re-derivation, not independent external review):**
+- *Verified:* z₁ = 2.8653, z₂ = 3.1718, SE = 2.0e-5, detection limit 5.73e-5, m = 12 exterior cells, binomial tails 0.0298 / 0.0070, boundary power 0.998. A separate script built S1/S3 (100 signed + 100 positive random stencils, k ≤ 4) and S2 (c² ∈ {0.25, 0.6, 1}) propagators: every exterior grid cell is exactly 0.0. N3: 300 random draws were non-negative, column-stochastic and symmetric; min diagonal bound 0.0244 > 0.01 holds.
+- *Blocking finding:* B-G3 (all 8 C instances clean except B-G1 exterior rejections) fails with probability **0.201** analytically (0.202 in a 2×10⁵-replicate Monte Carlo) for a *perfectly calibrated* method, because interior false detections at the nominal z₂ rate were not excepted. 
+- *Non-blocking:* blind/dev key byte encodings were unspecified; S2 has no L×L matrix power; B-G4 power is expected to rest mainly on N2 (all α detectable; N1 only for γ ≳ 0.89, N3 ≈ 4 % of draws — analytic probe, not a Pilot B run).
+
+**Implemented on PR #29 (pre-merge revision r1, not on `main`):** B-G3 restated as `#spurious C instances ≤ 2 of 8` plus a C1 r=0 sanity check (P(fail | calibrated) ≤ 0.020); key encodings pinned; S2 companion-matrix path; §10 power-composition note. Config `1.0-r1`. Prereg blob `dd5dbefe…`, config SHA-256 `3fc24afa…`. Local `pytest -q`: 212 passed (Python 3.13, NumPy 2.5.3). **Not merged by this session**: the reviewer authored the gate change, so a different session should check the r1 delta (B-G3 arithmetic, encodings) and merge with an expected-head guard. drand quicknet chain hash remains unverified (stage-1 requirement; sandbox cannot reach drand).
+
+**Evidence level:** design review and arithmetic; no Pilot B code or numerical output exists. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** later-pass check of the r1 delta on PR #29, then merge; afterwards Stage 1 (generator, oracle, isolated analyst, evaluator, dev-set gates) as a separate PR.
+
+Director run rd-claude-20261010T175613Z-1698f5: start 2026-10-10T17:55:51Z, end 2026-10-10T18:00:29Z, duration 5 min
+
 ## Director session: Pilot B preregistration (proposed) and N5 later-pass reproduction (2026-10-10, `rd-claude-20261010T165622Z-55e236`)
 
 **Recovery audit:** the previous lease (`rd-gpt6-20261010T153936Z-6b85701b`) was released cleanly at lock commit `412c652`. There were no open PRs, no queued or running workflows, and `main` `8d6adac` was CI-green ([38066460739](https://github.com/shaden7/emergence-lab/actions/runs/38066460739)). Nothing was incomplete.
