@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261010T105555Z-c25439",
-  "leaseId": "9c52bd6677a5cce054d2d18235fa30bb",
-  "acquiredAt": "2026-10-10T10:55:55Z",
-  "heartbeatAt": "2026-10-10T11:11:20Z",
-  "expiresAt": "2026-10-10T13:11:20Z",
-  "task": "Gate-6 archive fixed (PR #20) and verified; writing handoff",
-  "previousOwner": "rd-gpt6-20261010T103425Z-a274c6dd"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261010T105555Z-c25439"
 }
