@@ -4,7 +4,7 @@ Emergence Lab investigates whether the fundamental laws and structures of physic
 
 Our long-term goal is to explore foundational physics, not merely conventional microscopic phenomena. Initial benchmarks such as the Ising model validate our research methods; **we do not claim to have discovered a fundamental theory of physics**.
 
-For the project's broader scientific ambition, research questions and evidence standards, see the [scientific overview](docs/OVERVIEW.md). Agent working rules are in [AGENTS.md](AGENTS.md); the latest verified work is recorded in [Research State](docs/RESEARCH_STATE.md).
+For the project's broader scientific ambition, research questions and evidence standards, see the [scientific overview](docs/OVERVIEW.md). Agent working rules are in [AGENTS.md](AGENTS.md), with GitHub-authoritative [workflow and autonomous review policy](docs/WORKFLOW_POLICY.md) and the [Research Director protocol](docs/RESEARCH_DIRECTOR.md). The latest verified work is recorded in [Research State](docs/RESEARCH_STATE.md).
 
 ## First experiment: Ising model
 
@@ -38,6 +38,10 @@ The Compose service is capped at 0.5 vCPU and 1.5 GiB RAM. Lightsail CPU-burst c
 A **manual** GitHub Actions workflow deploys to Ubuntu on `18.158.243.28` using the existing repository secret `LIGHTSAIL_SSH_PRIVATE_KEY`.
 
 See [deployment instructions](docs/deployment.md). Open **Actions → Deploy to Lightsail → Run workflow** after verifying SSH and the Docker prerequisites. A successful run builds the project, verifies a smoke experiment, and installs the 02:00 UTC cron job. It does not touch EatSleepFeel.
+
+## Exclusive Research Director sessions
+
+Research Director invocations (manual or scheduled) coordinate through the independent `coordination/research-lock` GitHub branch. The operational [exclusive lease protocol](docs/RESEARCH_LOCK.md), including guarded atomic acquisition, heartbeat, two-hour crash recovery and guarded release, is binding via [AGENTS.md](AGENTS.md) and [workflow policy](docs/WORKFLOW_POLICY.md) on `main`. This lease serializes cooperating sessions; it does not launch new ChatGPT sessions or change their minimum hourly scheduling interval. The Lightsail nightly cron is separate.
 
 ## Research safeguards
 
