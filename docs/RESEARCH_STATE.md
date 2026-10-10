@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-693e0a`: **Pilot A stage 1** reference solvers and null controls in open [PR #22](https://github.com/shaden7/emergence-lab/pull/22), development grid only; see below).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-693e0a`: **Pilot A stage 1** reference solvers and null controls merged via [PR #22](https://github.com/shaden7/emergence-lab/pull/22) (`c8831af`), development grid only; see below).
 
 ## Director session: Pilot A stage 1, reference solvers and null controls (2026-10-10, `rd-claude-20261010T125630Z-693e0a`)
 
@@ -8,7 +8,7 @@ Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-69
 
 **Recovery audit:** the previous lease (`rd-claude-20261010T115647Z-4e5855`) was released cleanly. There were no open PRs, and no queued or running workflows. `main` `5da5d00` was CI-green ([38050894924](https://github.com/shaden7/emergence-lab/actions/runs/38050894924)). Nothing was incomplete.
 
-**Implemented (on PR branch, not yet on `main`):** [PR #22](https://github.com/shaden7/emergence-lab/pull/22), head `fcbe14d`:
+**Implemented and integrated:** [PR #22](https://github.com/shaden7/emergence-lab/pull/22), head `fcbe14d`:
 - `src/emergence_lab/pilot_a.py`, `tests/test_pilot_a.py` and `configs/pilot_a.json`. The config pins the preregistration SHA-256 `c8061aed…`.
 - Paths compared: W (d'Alembert); H (erfc vs Gauss–Legendre kernel quadrature); CA (simulation vs induction); Q (eigh vs explicit Fourier sum vs Taylor, plus the Bessel limit).
 - The A3 classifier, with censoring below 1e-8.
@@ -24,7 +24,7 @@ Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-69
 
 **Review:** [PASS for engineering merge](https://github.com/shaden7/emergence-lab/pull/22#issuecomment-6097810844). This is a self-review by the producer.
 
-**Not merged:** the merge attempt (`PUT …/pulls/22/merge` with the expected head SHA) was denied by the session's permission classifier. It was not retried by other means. A later session should review independently and merge. That also gives the independent pass the policy prefers.
+**Merged on explicit owner request:** the Director's own merge attempt (`PUT …/pulls/22/merge` with the expected head SHA) was first denied by the session's permission classifier and was not retried by other means. The owner then asked for the merge in the same session. It was merged under a fresh lease with expected head `3ce7357`, giving merge commit `c8831af0bc235a8818b15d34931dea220314e06b`. `main` CI [38056010852](https://github.com/shaden7/emergence-lab/actions/runs/38056010852) passed. The review is still a producer self-review; the merge does not accept Pilot A as validated.
 
 **Limitations:**
 - W has no independent solver, so its A2 check is tautological.
@@ -33,7 +33,7 @@ Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-69
 
 **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
 
-**Next single step:** a later session reviews PR #22, optionally adds an independent W solver, merges, then runs the holdout once and unchanged (`--phase holdout --allow-holdout`) and reports A1–A4 and A7.
+**Next single step:** a later session reviews the merged stage-1 code (later-pass review), optionally adds an independent W solver, then runs the holdout once and unchanged (`--phase holdout --allow-holdout`) and reports A1–A4 and A7.
 
 Director run rd-claude-20261010T125630Z-693e0a: start 2026-10-10T12:55:50Z, end 2026-10-10T13:07:39Z, duration 11 min
 
