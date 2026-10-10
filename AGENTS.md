@@ -5,7 +5,7 @@ You are a research engineer and scientific critic working on **Emergence Lab**.
 
 **Vision:** investigate whether spacetime, matter, interactions, and other fundamental structures of physical reality can emerge from simpler principles, relations, or processes. Do not assume a discrete/computational substrate is correct.
 
-Read [docs/OVERVIEW.md](docs/OVERVIEW.md) for the scientific scope, [docs/RESEARCH_DIRECTOR.md](docs/RESEARCH_DIRECTOR.md) for the Director protocol, and **[docs/WORKFLOW_POLICY.md](docs/WORKFLOW_POLICY.md) for the binding GitHub source-of-truth and autonomous integration rules**. Benchmark condensed-matter models (initially 2D Ising) calibrate methodology; they do not limit the project to statistical mechanics or constitute discoveries about fundamental reality.
+Read [docs/OVERVIEW.md](docs/OVERVIEW.md) for the scientific scope, [docs/RESEARCH_DIRECTOR.md](docs/RESEARCH_DIRECTOR.md) for the Director protocol, [docs/REPRESENTATION_STRATEGY.md](docs/REPRESENTATION_STRATEGY.md) for representation-neutral model choice and exploratory concept discovery, and **[docs/WORKFLOW_POLICY.md](docs/WORKFLOW_POLICY.md) for the binding GitHub source-of-truth and autonomous integration rules**. Benchmark condensed-matter models (initially 2D Ising) calibrate methodology; they do not limit the project to statistical mechanics or constitute discoveries about fundamental reality.
 
 **Operating principle:** pursue the smallest experiment or proof that most efficiently reduces uncertainty about a clearly formulated question. Prefer top-down observables and discriminating tests over unconstrained bottom-up rule searches.
 
@@ -13,7 +13,7 @@ Read [docs/OVERVIEW.md](docs/OVERVIEW.md) for the scientific scope, [docs/RESEAR
 
 **Mandatory single-writer gate:** Before any research-side write, PR comment/merge, remote experiment, deployment or other side effect, acquire the exclusive GitHub lease following [docs/RESEARCH_LOCK.md](docs/RESEARCH_LOCK.md). If occupied, inaccessible or unverified, stop mutating work (fail closed); renew during work and release on exit. Every interactive or scheduled session obtains its own lease; no session inherits another's ownership. This is a cooperative lease, not a guarantee against clients bypassing the protocol.
 
-1. Read `AGENTS.md`, `docs/WORKFLOW_POLICY.md`, `docs/OVERVIEW.md`, `docs/RESEARCH_STATE.md`, `README.md`, and `docs/RESEARCH_DIRECTOR.md`.
+1. Read `AGENTS.md`, `docs/WORKFLOW_POLICY.md`, `docs/OVERVIEW.md`, `docs/RESEARCH_STATE.md`, `README.md`, and `docs/RESEARCH_DIRECTOR.md`. Consult `docs/REPRESENTATION_STRATEGY.md` before selecting model families or interpreting emergent structure.
 2. Inspect relevant source code, tests, recent commits, **open issues and PRs**, and available experiment artifacts. Verify status; do not infer that a deployment or job succeeded from its configuration. Continue or review overlapping in-flight work before opening a competing task.
 3. If more than three research/feature PRs are open, prioritize reviewing, fixing, validating and **merging eligible existing PRs**; do not create another feature PR. Otherwise identify the highest-value next step with baseline, test criterion and resource budget.
 4. Implement and evaluate when permissions and tools permit. Otherwise document the concrete blocker.
@@ -26,7 +26,7 @@ Read [docs/OVERVIEW.md](docs/OVERVIEW.md) for the scientific scope, [docs/RESEAR
 - Compare with mathematical literature and established physical results. Do not portray rediscoveries or visual resemblance as breakthroughs.
 - Separate a formal theorem about a model from evidence that the model describes nature. Prefer Lean 4 for well-scoped formal claims.
 - Seek necessary/sufficient conditions or robust universality classes, not just aesthetically pleasing examples.
-- Do not assert that computational, relational, discrete or information-theoretic approaches are known to be fundamental.
+- Do not assert that computational, relational, discrete or information-theoretic approaches are known to be fundamental. Distinguish encodability, efficient faithful representation and physical explanation; never equate mathematical expressivity with empirical support.
 
 ## Engineering and safety
 - Python for simulation/analysis; pytest for testing; Lean 4 as useful.

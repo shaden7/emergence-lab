@@ -38,6 +38,11 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - **GitHub connector integration check:** two candidate lease commits derived from the same initial HEAD; the first expected-SHA ref update returned success. The stale contender returned a generic GraphQL error (not a typed concurrency error); rereading the ref confirmed the first candidate remained HEAD. A guarded update then restored `idle` (commit `2a67540b9dd47280b3925b2065c5c858f60c18fd`). This demonstrates observed contention handling, not a proof of universal exclusion under failures.
 - **Operational limitation:** enforcement is cooperative; every Director must obey the protocol, and lost leases cannot cancel already-started external work. ChatGPT automation cannot be configured to run every 15 minutes (hourly minimum). This iteration neither changed a ChatGPT task's enabled state nor executed scientific simulations or CI.
 
+## Representation-neutral strategy adopted (proposed 2026-10-09; integrated via PR #5 on 2026-10-10)
+- `docs/REPRESENTATION_STRATEGY.md` distinguishes encodability, faithful/economical representation and physical explanation; requires an assumption audit, at least two substantively different model families where comparison is meaningful, null/failure cases and explicit discriminators before model choice.
+- Methodology only: no simulation, proof, benchmark, ontology inference or discovery of new mathematics is claimed. Its gates keep cross-family computations **design-only until the Ising calibration gate is met**, which is consistent with the current Phase-0 NO-GO.
+- Review correction at integration: the Physics Reports GPT introduction is attributed to M. Plávala (arXiv:2103.07469), not Janotta et al.
+
 ## Implemented (repository code)
 - 2D ferromagnetic Ising model, periodic lattice, Metropolis updates.
 - Deterministic seeded CPU experiments with JSON configs.
