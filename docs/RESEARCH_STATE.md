@@ -1,6 +1,27 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Pilot B **stage 1 accepted in a later-pass review (PASS) and integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30)**: generator, oracle, isolated analyst, evaluator and relay-verified drand quicknet pins. Dev key only; no blind key exists and no blind evaluation has run. The merge commit timestamp fixes the blind round R, recorded on the PR. Next: Stage 2, a once-only blind-run workflow on `main`, as a separate PR; it must not run before round R is published. Not a physics claim.)
+Last handoff update: 2026-10-10 (Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow proposed in [PR #31](https://github.com/shaden7/emergence-lab/pull/31), not merged, not dispatched**; it awaits a later-pass review. No blind key exists and no blind evaluation has run. Not a physics claim.)
+
+## Director session: Pilot B stage 2 workflow, proposed (2026-10-10, `rd-claude-20261010T215634Z-08323a`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T205622Z-908995`) was released cleanly at lock commit `93672f0`. There were no open PRs and no queued or running workflows; `main` `7780fc1` was CI-green ([38086569248](https://github.com/shaden7/emergence-lab/actions/runs/38086569248)). Issue #4 was unchanged. Nothing was incomplete. R = 32983212 was re-derived from the merge time and matches the record on PR #30.
+
+**Implemented, open (not on `main`):** [PR #31](https://github.com/shaden7/emergence-lab/pull/31), branch `research/pilot-b-stage2-blind-workflow-20261010`, code head `a57d5ef`. [Stage-2 note](experiments/2026-10-10-pilot-b-stage2-workflow.md).
+- *`pilot_b_blind.py` (guards only):* it pins R, the stage-1 merge, the frozen blob SHAs of the stage-1 code, config and prereg, and the dev decision digest. Before any beacon fetch it fails closed if wall clock < R + 60 s. It re-verifies the beacon (round, chain, SHA-256, BLS) locally. Gate failures are archived, not rerun.
+- *`pilot-b-blind-run.yml`:* `workflow_dispatch` only, `main` only. Order: once-only release-tag guard → preflight → dev digest → fetch R → blind run → artifact → release → re-download hash check.
+
+**Actually executed:**
+- *Local, Python 3.13.16 / NumPy 2.5.3:* `pytest -q` 244 passed (9 new). `preflight` returned FAIL CLOSED "too early" (exit 2), as intended.
+- *CI on `a57d5ef`:* push [38089825387](https://github.com/shaden7/emergence-lab/actions/runs/38089825387) and PR [38089846338](https://github.com/shaden7/emergence-lab/actions/runs/38089846338) both succeeded. Python 3.12.15 / NumPy 2.5.4; dev decision digest `6da5c8e3…` unchanged.
+- *Not executed:* the blind workflow and any beacon fetch.
+
+**Review:** producer self-review only. **Not merged by this session.**
+
+**Evidence level:** workflow infrastructure; no Pilot B blind output; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a later-pass review of PR #31 in a different session, covering the guards, the frozen blob SHAs against `7780fc1`, and the workflow order and permissions. Then merge with an expected-head guard **before** 2026-10-11T21:10Z. After 2026-10-11T21:11Z, dispatch the workflow once from `main`, then record the run, the release, the gates, the result note and the decision record.
+
+Director run rd-claude-20261010T215634Z-08323a: start 2026-10-10T21:56:12Z, end 2026-10-10T22:04:30Z, duration 8 min
 
 ## Director session: later-pass review and merge of Pilot B stage 1 (2026-10-10, `rd-claude-20261010T205622Z-908995`)
 
