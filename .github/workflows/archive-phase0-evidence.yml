@@ -1,0 +1,131 @@
+name: Phase-0 durable evidence archive
+
+# This is deliberately one-time on initial merge to main; future runs are manual.
+# Fail closed on changed raw hashes or controls. Never overwrite release assets.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/archive-phase0-evidence.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: phase0-evidence-archive-v1
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+      GIT_SHA: ${{ github.sha }}
+      TAG: phase0-evidence-2026-10-10-v1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact NumPy minor and project tests
+        run: |
+          pip install -e '.[test]'
+          pip install 'numpy==2.5.3'
+          python -c "import numpy; assert numpy.__version__ == '2.5.3'"
+      - name: Retrieve already reproduced gate-4 raw data (run 38042967864)
+        run: |
+          mkdir -p results/source
+          gh run download 38042967864 --repo "$GITHUB_REPOSITORY" --name smoke-results --dir results/source
+          test -s results/source/coverage_gate.npz
+          test -s results/source/coverage_gate.json
+          cp results/source/coverage_gate.npz results/coverage_gate.npz
+          cp results/source/coverage_gate.json results/coverage_gate.json
+          echo '97a81cb7898c1048716a3464793488d4502b00df24a8d4d786f7fdc48adbf5a5  results/coverage_gate.npz' | sha256sum --check
+      - name: Reproduce finite-size gate raw draws from frozen config
+        timeout-minutes: 30
+        run: |
+          python -m emergence_lab.finite_size_gate --config configs/finite_size_gate.json --output results/finite_size_gate.json --workers 2
+          echo 'b18423a20e428583a493e45ff24146a5b0dd5592c6b8654772aecd8914cc2287  results/finite_size_gate.npz' | sha256sum --check
+      - name: Re-analyse saved data independently of the original reports
+        timeout-minutes: 10
+        run: |
+          python -m emergence_lab.coverage_gate --config configs/coverage_gate.json --from-npz results/coverage_gate.npz --output results/reanalysis_coverage.json
+          python -m emergence_lab.finite_size_gate --config configs/finite_size_gate.json --reanalyse results/finite_size_gate.npz --output results/reanalysis_finite_size.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for gate in ('coverage', 'finite_size'):
+              a = json.loads(Path(f'results/{gate}_gate.json').read_text())
+              b = json.loads(Path(f'results/reanalysis_{gate}.json').read_text())
+              assert a['gate_pass'] is True and b['gate_pass'] is True
+              assert a['raw_npz_sha256'] == b['raw_npz_sha256']
+              if gate == 'coverage':
+                  for size in a['sizes']:
+                      for part in ('main', 'power_control'):
+                          assert a['sizes'][size][part]['energy']['covered'] == b['sizes'][size][part]['energy']['covered']
+              else:
+                  assert a['main']['checks'] == b['main']['checks']
+                  for window in a['main']['fits']:
+                      for exponent in ('beta_over_nu', 'gamma_over_nu', 'one_over_nu'):
+                          x, y = (r['main']['fits'][window][exponent]['estimate'] for r in (a, b))
+                          assert abs(x - y) < 1e-8
+          PY
+      - name: Verify all pinned hashes, controls, schema and write provenance
+        run: |
+          python -m emergence_lab.archive_evidence \
+            --coverage-raw results/coverage_gate.npz \
+            --coverage-report results/coverage_gate.json \
+            --finite-raw results/finite_size_gate.npz \
+            --finite-report results/finite_size_gate.json \
+            --out results/phase0_archive_manifest.json
+          pytest -q tests/test_archive_evidence.py
+      - name: Publish non-overwriting versioned release assets
+        run: |
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "Phase-0 calibration raw evidence (gates 4 and 5)" \
+              --notes-file docs/PHASE0_EVIDENCE_ARCHIVE.md --latest=false
+          fi
+          for file in \
+            results/coverage_gate.npz results/coverage_gate.json \
+            results/finite_size_gate.npz results/finite_size_gate.json \
+            results/reanalysis_coverage.json results/reanalysis_finite_size.json \
+            results/phase0_archive_manifest.json; do
+            name="${file##*/}"
+            local_hash="$(sha256sum "$file" | cut -d ' ' -f 1)"
+            remote_hash="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+              --jq ".assets[] | select(.name == \"$name\") | .digest")"
+            if [ -n "$remote_hash" ]; then
+              test "$remote_hash" = "sha256:$local_hash" || { echo "Digest conflict: $name"; exit 1; }
+            else
+              gh release upload "$TAG" "$file" --repo "$GITHUB_REPOSITORY"
+            fi
+          done
+      - name: Verify published bytes by downloading the release
+        run: |
+          mkdir -p results/downloaded
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir results/downloaded
+          python -m emergence_lab.archive_evidence \
+            --coverage-raw results/downloaded/coverage_gate.npz \
+            --coverage-report results/downloaded/coverage_gate.json \
+            --finite-raw results/downloaded/finite_size_gate.npz \
+            --finite-report results/downloaded/finite_size_gate.json \
+            --out results/downloaded/reverification.json
+          echo "PASS: durable release bytes independently re-downloaded and verified."
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase0-evidence-archive-audit
+          path: |
+            results/phase0_archive_manifest.json
+            results/reverification.json
+            results/reanalysis_coverage.json
+            results/reanalysis_finite_size.json
+            results/finite_size_gate.json
+          if-no-files-found: ignore
