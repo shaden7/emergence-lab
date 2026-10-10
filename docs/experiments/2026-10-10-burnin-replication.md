@@ -37,7 +37,17 @@ Nothing here bears on critical behaviour in the thermodynamic limit, emergent ge
 
 ## Byte-level reproduction
 
-The full-report digest differs between local and runner (`a788ba92…` vs `f79a9d3d…`) although all reported statistics agree to every printed digit — the same pattern as the earlier unexplained burn-in mismatch. Field-group digests were added after the run (reporting only; hypotheses and decision code unchanged) to localize the difference; see the PR for the runner comparison.
+The full-report digest differs between local and runner (`a788ba92…` vs `f79a9d3d…`) although all reported statistics agree to every printed digit — the same pattern as the earlier unexplained burn-in mismatch. Field-group digests were added after the run (reporting only; hypotheses and decision code unchanged) and the runner re-executed on `eaaed5a` ([run 38038206636](https://github.com/shaden7/emergence-lab/actions/runs/38038206636)):
+
+| Field group | Local = runner? |
+| --- | --- |
+| batch means (all Monte-Carlo estimates) | **identical** (`bc028efd…`) |
+| per-batch interval bounds | **identical** (`9f701c42…`) |
+| coverage aggregates | **identical** (`87d5b6a6…`) |
+| exact-enumeration references | differ (`d4d72ab2…` vs `17d65429…`) |
+| paired contrasts (contain mean − reference) | differ, as a consequence |
+
+**Numerical observation:** the simulation output is byte-identical across platforms; only the floating-point value of the exhaustive 4 × 4 Boltzmann sum differs, at the ULP level (earlier sessions recorded ≈ 2.4e-14 for these references). *Hypothesis (not verified):* the unexplained byte mismatch of the 2026-10-10 burn-in re-run has the same cause, since that JSON also embeds the references. Future byte-level reproduction checks should hash simulation output separately from analytic references.
 
 ## Phase-0 consequence
 
