@@ -46,3 +46,31 @@ These are calibration results. The protocol says the development grid is **not**
 ## Next step
 
 A later session reviews this stage independently, then runs the holdout once and unchanged (`--phase holdout --allow-holdout`; t = 0.75, 1.5, 3; r = 0, 3, 5, 7, 11, 15; L = 512, 1024). It reports A1–A4 and A7 there. Optional before that: add an independent W solver (e.g. characteristic leapfrog at Courant number 1 with a smooth bump) so A2 for W is numerical, not tautological.
+
+## Later-pass review before the holdout (2026-10-10, `rd-claude-20261010T135604Z-f9e889`)
+
+A separate Director session reviewed the merged stage-1 code (`c8831af`) against the preregistration. It is AI-mediated and from the same model family, so it is not independent peer review. **No holdout cell was evaluated.**
+
+**Blocking finding (engineering, fixed in PR #23):** the registered A3 witnesses (t, r) = (1, 4), (1, 6) are not on the holdout grid (t ∈ {0.75, 1.5, 3}). The old rule `all(...)` over the witnesses found in the phase grid was therefore **vacuously true on the holdout**: A3, and hence A7, would have "passed" with zero witnesses. This was checked from grid membership alone.
+
+**Fix, fixed before any holdout evaluation (a protocol clarification, not a retuning):**
+- The registered witnesses are evaluated directly in every phase: H on the line, and Q on each ring size of the phase.
+- On the holdout, A3 also requires every non-censored H/Q cell with |r| > a + c t to be `match`. These are cells where the strict-support model W is exactly zero.
+- An empty witness set fails A3. A2 and A4 also fail on an empty set.
+- The tolerance, censoring threshold, grids and seeds are unchanged. The config digest `a55fcfa8…` and the protocol pin are unchanged.
+
+**W now has a separate numerical path:**
+- Leapfrog at Courant number 1, h = 0.25. It is exact at grid points, so the values must agree with d'Alembert bit for bit.
+- Tests cover quarter-integer sites at t = 0 … 3, including the fronts. A mutation test injects a 1e-300 value outside the cone, and A2 fails as it should.
+- Limit: the scheme's domain of dependence equals the continuum cone. Its zeros check the code path. They do not prove the support theorem, which remains an input.
+
+**Re-executed (local, Python 3.13.16 / NumPy 2.5.3):**
+- Development grid: same summary as before, and `rows.csv` `7a2ff47c…` is byte-identical twice, because the W values are unchanged bit for bit. A1–A5 pass.
+- `pytest -q`: 207 passed.
+
+**Other review checks, no change needed:**
+- W front points: none on the holdout sites, by grid arithmetic.
+- CA: n < L/2 holds on the holdout.
+- Q normalisation tolerance and the A3 absolute floor are adequate for eigh at L ≤ 1024.
+
+**Not reviewed or open:** N5 is still not implemented. The holdout is still unrun.
