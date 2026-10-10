@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T135604Z-f9e889`: later-pass review of Pilot A stage 1. A vacuous holdout A3 was found and fixed, and an independent W solver was added, in **open** [PR #23](https://github.com/shaden7/emergence-lab/pull/23). Merge pending; holdout not run. See below.)
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T135604Z-f9e889`: later-pass review of Pilot A stage 1. A vacuous holdout A3 was found and fixed, and an independent W solver was added, via [PR #23](https://github.com/shaden7/emergence-lab/pull/23). It was merged on explicit owner request as `c4f2793`. The holdout has not been run. See below.)
 
 ## Director session: Pilot A later-pass review before the holdout (2026-10-10, `rd-claude-20261010T135604Z-f9e889`)
 
@@ -27,6 +27,8 @@ Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T135604Z-f9
 **Review:** [PASS for engineering merge](https://github.com/shaden7/emergence-lab/pull/23#issuecomment-6098282755). This is a producer self-review.
 
 **Merge blocker:** `PUT …/pulls/23/merge` with the expected head was denied by the session permission classifier as self-approval. It was not retried by other means ([comment](https://github.com/shaden7/emergence-lab/pull/23#issuecomment-6098288590)). This handoff commit changes the PR head, so CI must be re-verified on the new head.
+
+**Merged on explicit owner request:** under a fresh lease (`rd-claude-20261010T141114Z-3b0788`), with expected head `9c21807`, whose CI was green on both runs. The merge commit is `c4f2793c3cb8fd4d93cd4d9ed69c9d5ae800bb11`, and `main` CI [38058684785](https://github.com/shaden7/emergence-lab/actions/runs/38058684785) passed. The review is still a producer self-review. The merge does not accept Pilot A as validated.
 
 **Evidence level:** engineering fix plus a numerical consistency observation. No physics claim. The holdout is unrun.
 
