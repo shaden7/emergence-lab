@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261010T153936Z-6b85701b",
+  "leaseId": "6b85701b41a8085c5c22525675cd2833",
+  "acquiredAt": "2026-10-10T15:39:54.646Z",
+  "heartbeatAt": "2026-10-10T15:39:54.646Z",
+  "expiresAt": "2026-10-10T17:39:54.646Z",
+  "task": "Pilot A scoped decision and preregistration audit",
   "previousOwner": "rd-claude-20261010T145640Z-d84b0e"
 }
