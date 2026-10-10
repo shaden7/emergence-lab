@@ -6,7 +6,7 @@
 
 Emergence Lab is an open, reproducible computational research project. The long-term ambition is to contribute to foundational physics and understanding *why* observed physical laws take their particular form. We do **not** presuppose that the substrate is discrete, computational, informational, or even uniquely identifiable.
 
-The ambition is deliberately larger than conventional microscopic-to-macroscopic phenomena. Our first benchmarks in statistical physics are training and validation grounds for research methods, not answers to quantum gravity.
+The ambition is deliberately larger than conventional microscopic-to-macroscopic phenomena. Our first benchmarks in statistical physics are training and validation grounds for research methods, not answers to quantum gravity. **No specific mathematical representation is privileged as the substrate**: see the [representation-neutral strategy](REPRESENTATION_STRATEGY.md) for comparing graphs, fields, quantum, operational and other models, and for systematic discovery of better descriptive variables or structures.
 
 ## Research stance
 
@@ -83,6 +83,7 @@ Identify genuine novel, discriminating predictions or rigorous limits on what ca
 - [AGENTS.md](../AGENTS.md): binding rules for automated researchers.
 - [RESEARCH_STATE.md](RESEARCH_STATE.md): verified current status, results, blockers, and next experiment.
 - [research-plan.md](research-plan.md): near-term research plan.
+- [REPRESENTATION_STRATEGY.md](REPRESENTATION_STRATEGY.md): model comparison, hidden assumptions, and search for more adequate mathematical descriptions.
 - [deployment.md](deployment.md): operational constraints.
 
 ## What success looks like
