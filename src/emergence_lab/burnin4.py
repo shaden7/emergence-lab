@@ -46,7 +46,7 @@ def burnin_sensitivity(cfg: dict) -> dict:
         "config": cfg, "arms": arms, "paired_contrasts": contrasts,
         "caveats": [
             "Matched seeds across burn-in variants create paired, not independent, arms.",
-            "Coverage fractions from 12 batches are imprecise and six observable-temperature cells are correlated.",
+            f"Coverage fractions from {shared['batches']} batches are imprecise and observable-temperature cells are correlated.",
             "Differences in sample means mix equilibration bias and seed-specific trajectory changes.",
             "Non-significant differences cannot establish equilibrium; no multiple-comparison inference.",
         ],

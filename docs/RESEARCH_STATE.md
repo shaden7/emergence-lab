@@ -12,6 +12,32 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Refined `AGENTS.md` to require top-down observables, controls, evidence levels, bounded experiments, and reproducible session handoffs.
 - Documentation-only change; no new experiment, proof, or deployment verification resulted from this iteration.
 
+## Research process iteration (2026-10-09)
+- Documented a sequential hourly **Research Director** model in `docs/RESEARCH_DIRECTOR.md`, with optional specialized review only when delegation is actually available.
+- Added deconfliction guidance: inspect open issues/PRs, prefer continuing existing work, use isolated branches, do not treat repository files as concurrency locks.
+- Added evidence and milestone-review checklists, including an independent skepticism gate for novel claims.
+- This is **workflow documentation only**. It does not update the scheduled ChatGPT automation, verify the Lightsail deployment, run experiments, implement subagents, or introduce new scientific findings.
+- The hourly automation should read the Director protocol after PR #2 is merged; actual tool/subagent capabilities in scheduled invocations are unverified.
+
+## Director automation activation (2026-10-09)
+- Merged Research Director governance protocol via PR #2 (merge commit `5ef471ef98c8e1da05703ef644af784165c35f79`).
+- Updated the existing **enabled hourly ChatGPT task** to read `docs/RESEARCH_DIRECTOR.md`, inspect open work before editing, prioritize Ising calibration, and treat networks as optional mathematical models rather than physical ontology. The hourly cadence remains unchanged.
+- Clarified Issue #4: lattice dimensions encoded at construction time are estimator controls, not emergent spacetime discoveries.
+- The task has **not yet demonstrated a successful subsequent hourly research run**, nor are GitHub write/tool availability or the Lightsail deployment verified by this documentation update. No simulation, proof, or code test was executed in this iteration.
+
+## Autonomous integration governance (2026-10-09)
+- Adopted [docs/WORKFLOW_POLICY.md](WORKFLOW_POLICY.md) directly on `main` as the binding source-of-truth and PR integration policy; synchronized `AGENTS.md`, `docs/RESEARCH_DIRECTOR.md` and the README. This was a **process/documentation-only correction**, not a scientific result or a code deployment.
+- The project owner is **not** a routine PR reviewer. Subsequent research sessions are responsible for review, verification, correction and eligible merges. Agent-led review must not be misrepresented as external peer review; scientific claims and deployments retain stronger evidence/risk gates.
+- Default work-in-progress limit: **3 open research/feature PRs**. When the backlog exceeds this, prioritize reviewing and integrating existing work over opening further feature PRs.
+- At policy adoption, eight PRs were recorded as open: Ising dependency stack #1 → #3 → #7 → #9 → #10, plus #5 (representation-neutral strategy), #8 (literature review), and #11 (causal pilot). This is a historical snapshot; agents must refresh actual GitHub status each run.
+- No Ising PR or other research PR was reviewed/merged by this governance iteration. No experiments were executed. A scheduling prompt may bootstrap this policy, but GitHub remains the binding authority.
+
+## Session coordination implementation (2026-10-10)
+- Created persistent `coordination/research-lock` branch, containing `lease.json` initialized `idle`; the operational state is deliberately not committed to `main`.
+- Adopted [RESEARCH_LOCK.md](RESEARCH_LOCK.md) as the binding Director lease protocol via `AGENTS.md` / [WORKFLOW_POLICY.md](WORKFLOW_POLICY.md) / [RESEARCH_DIRECTOR.md](RESEARCH_DIRECTOR.md). Research-side mutations require CAS acquisition, ownership verification, periodic heartbeat, owner-checked release and two-hour stale-lease recovery.
+- **GitHub connector integration check:** two candidate lease commits derived from the same initial HEAD; the first expected-SHA ref update returned success. The stale contender returned a generic GraphQL error (not a typed concurrency error); rereading the ref confirmed the first candidate remained HEAD. A guarded update then restored `idle` (commit `2a67540b9dd47280b3925b2065c5c858f60c18fd`). This demonstrates observed contention handling, not a proof of universal exclusion under failures.
+- **Operational limitation:** enforcement is cooperative; every Director must obey the protocol, and lost leases cannot cancel already-started external work. ChatGPT automation cannot be configured to run every 15 minutes (hourly minimum). This iteration neither changed a ChatGPT task's enabled state nor executed scientific simulations or CI.
+
 ## Implemented (repository code)
 - 2D ferromagnetic Ising model, periodic lattice, Metropolis updates.
 - Deterministic seeded CPU experiments with JSON configs.
@@ -124,13 +150,13 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Next discriminating measurement:** Pre-register a **new**, disjoint-seed burn-in sensitivity experiment (e.g. 0/100/400/1600 sweeps, matched chain sampling; fixed compute cap), report both mean bias relative to exact reference and interval coverage, and study whether near-critical uncertainty estimates are robust. Do not interpret the current results as evidence for emergent spacetime.
 
-## Burn-in sensitivity follow-up (2026-10-09, proposed)
+## Burn-in sensitivity follow-up (2026-10-09; PR #10)
 
 **Question:** How sensitive are finite-4x4 Ising means and nominal between-chain CI coverage to initial equilibration (burn-in)?
 
 **Design:** Frozen config `configs/exact4_burnin_sensitivity.json`: three temperatures, 10 independent batches of four chains per temperature, same seed within each matched comparison across burn-in arms 0, 100, 400, 1600; 800 sampling sweeps, every fifth sweep. 480 chains, 4 × 10 × 4 × 3 × 800 sampling sweeps plus differing burn-in; budget cap 500 chains; no Lightsail. Paired differences must not be analyzed as independent arms.
 
-**Implementation:** `src/emergence_lab/burnin4.py`, deterministic smoke test, configuration committed to branch `research/exact4-burnin-sensitivity-20261009`. **Not yet scientifically validated**: no full experiment was run or CI verified at this handoff. Code/review checks remain mandatory. Negative findings must not be discarded.
+**Implementation:** `src/emergence_lab/burnin4.py`, tests and configuration on branch `research/exact4-burnin-sensitivity-20261009` (PR #10). The fixed-seed experiment was executed in CI (below) and re-executed in the 2026-10-10 review. Negative findings must not be discarded.
 
 **Limitations:** With only 10 batches per condition, binomial uncertainty of interval coverage is substantial. Initial states are random spins, and chain mean differences conflate burn-in bias, Monte Carlo noise and trajectory divergence. Distinct seeded pairs do not establish absence of bias. No causality, geometry, or fundamental-physics conclusion follows.
 
@@ -151,7 +177,17 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Critical interpretation:** There is **no monotonic burn-in improvement in the observed coverage counts**. A drop from 10/10 to 8/10 at the benchmark temperature with longer burn-in is a reminder that stochastic batch coverage fluctuates; it is not evidence that longer burn-in is harmful. Ten batches have very broad binomial uncertainty; even 10/10 does not prove calibrated 95% coverage. Matched seed arms are correlated, and 24 coverage metrics were inspected; no independent multiplicity-corrected significance finding or equilibration proof is claimed. The JSON contains per-batch mean deviations and paired differences but these have **not yet been summarized or independently reviewed** in this handoff.
 
-**Next discriminating question:** Inspect the raw paired bias shifts (not merely binary coverage), compute uncertainty from independent paired batches, and contrast longer sampling regimes and an analytically initialized equilibrium baseline where feasible. The run was predeclared, with no selective favorable reruns. The CI experiment step has been restricted to manual dispatch for future reproducibility without repeated load on each PR push.
+### Later-pass review and paired bias analysis (2026-10-10)
+
+**Review (AI-mediated, non-independent of the project's agents):** seed schedule verified to depend only on (temperature, batch, chain), so arms are genuinely paired and share their random initial state; seeds 2027021001–2027021120 are disjoint from the M4 pilot (2027010101–2027010532) and the exact4 holdout. Added tests for paired-contrast consistency, shared seed schedule across arms (a deliberate seed-offset mutation fails this test), batch-count caveat and rejection of invalid variants/budgets; corrected a caveat that stated 12 instead of the configured 10 batches.
+
+**Reproduction:** local re-execution (Python 3.13.16, NumPy 2.5.3) reproduces all 24 coverage counts above exactly. The CI artifact ZIP could not be downloaded from the review environment, so no byte-level comparison was made.
+
+**Numerical observation (post hoc, exploratory):** treating the 10 disjoint-seed batches as replicates, zero burn-in leaves a bias at T=1.5 in the direction expected from incomplete equilibration (|M| −0.0032 ± 0.0005, p = 0.00014; energy +0.0069 ± 0.0019, p = 0.005). Paired shifts from burn-in 0 to 100 are clearly nonzero at T=1.5 and T=2.269 (e.g. |M| +0.0039 ± 0.0005 at T=1.5, p = 0.00002) and survive a Bonferroni correction over the 18 paired tests; at T=3.5 no shift is resolvable. Binary coverage counts did not reveal this, so coverage tallies alone are a weak equilibration diagnostic at this sample size. One **unresolved anomaly candidate**: burn-in 1600 at T=1.5 shows an energy bias +0.0033 ± 0.0009 (p = 0.005), not surviving correction over 24 bias tests and without a known mechanism; it is not interpreted. Full table and method: [experimental note](experiments/2026-10-10-burnin-paired-analysis.md).
+
+**Next discriminating step (proposed, not executed):** preregister a fresh-seed replication with ≥20 batches at T=1.5 and T=2.269 for burn-in 0, 100 and 1600, with paired shifts as primary outcome, to confirm the zero-burn-in bias and test whether the burn-1600 offset persists.
+
+**Earlier next-step note (2026-10-09, now addressed above):** Inspect the raw paired bias shifts (not merely binary coverage), compute uncertainty from independent paired batches, and contrast longer sampling regimes and an analytically initialized equilibrium baseline where feasible. The run was predeclared, with no selective favorable reruns. The CI experiment step has been restricted to manual dispatch for future reproducibility without repeated load on each PR push.
 
 ## Research Director Phase-0 audit and decision (2026-10-09; **proposed**, stacked review branch)
 
@@ -206,3 +242,8 @@ Completed bounded pilots were run successfully and primary artifact IDs/code rev
 [Checksum registry](experiments/phase0-artifact-checksums-20261009.json) records **nine** actually downloaded source JSONs: CI run, Actions artifact ID, pinned code SHA, ZIP member name, and SHA-256 of extracted JSON. The JSON registry is versioned in GitHub; it is **not a durable copy of the raw source data**. The latter must be archived separately before Actions expiration for full long-term provenance. No paid service or new resource was created.
 
 **Last known consolidated decision:** **NO-GO**; Ising calibration **not** declared complete. The draft review branch [PR #12](https://github.com/shaden7/emergence-lab/pull/12) contains source, configs, tests, null controls, all measured uncertainties, quantitative L32 ESS failures, report and research-state updates. PRs #1/#3/#7/#9/#10/#12 require human review in dependency order; no automatic merges on CI alone. Next essential research gate is independent longer critical-L32 and interval-coverage confirmation with preregistered controls and trustworthy ESS.
+
+## Interrupted-session recovery protocol (2026-10-10)
+- Added an explicit recovery audit to `docs/RESEARCH_LOCK.md` and the `docs/WORKFLOW_POLICY.md` Director cycle. After acquiring a new lease, a Director responding to an interrupted run checks relevant PR/branch heads, unfinished GitHub Actions jobs, logs, artifacts and partially integrated results **before** launching duplicate work.
+- An `idle` lease is not proof a ChatGPT session or GitHub Actions experiment finished; an expired lease cannot stop external jobs. Missing run status/artifacts remain unknown, not successes. Findings go to existing PR/issue or research-state handoff, avoiding extra feature PRs.
+- Integration: process-only documentation commits `e744d093d2dedcd816c0ab8129f1796e68dcfc04` and `69206ab0c42f11b9035a35189f49448bf29ad58e`. No scientific experiment, CI run, deployment or new liveness-monitor service was performed.
