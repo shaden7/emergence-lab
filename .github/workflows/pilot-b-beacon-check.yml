@@ -1,0 +1,34 @@
+name: Pilot B drand quicknet check
+# Stage-1 requirement (prereg v1.0-r1 section 6.3): verify the pinned quicknet chain parameters
+# against several relays and BLS-verify the latest round. Read-only network access; no secrets.
+on:
+  pull_request:
+    paths:
+      - 'src/emergence_lab/pilot_b_beacon.py'
+      - '.github/workflows/pilot-b-beacon-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[beacon]'
+      - name: Compare pins with relays and verify latest round
+        run: |
+          set -o pipefail
+          python -m emergence_lab.pilot_b_beacon check-chain | tee beacon_check.json
+      - name: Surface result
+        if: always()
+        run: |
+          python -c "import json; r=json.load(open('beacon_check.json')); l=r['latest']; print('::notice title=quicknet check::ok=%s relays_matching=%d round=%d randomness_ok=%s bls_ok=%s behind_s=%.1f' % (r['ok'], r['relays_matching'], l['round'], l['randomness_is_sha256_signature'], l['signature_verified'], l['seconds_behind_now'])); [print('::notice title=relay %s::%s' % (k, json.dumps(v))) for k, v in r['relays'].items()]" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot-b-beacon-check
+          path: beacon_check.json
