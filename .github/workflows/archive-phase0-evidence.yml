@@ -1,12 +1,16 @@
 name: Phase-0 durable evidence archive
 
-# This is deliberately one-time on initial merge to main; future runs are manual.
-# Fail closed on changed raw hashes or controls. Never overwrite release assets.
+# Runs on merge to main when this workflow or the verifier changes; otherwise manual.
+# Fail closed on changed raw hashes or controls. Never overwrite release assets
+# (existing assets are only accepted if their digest matches).
+# Run 38045856455 failed closed on a config-digest convention bug in the verifier
+# (raw digests of both gates reproduced); the verifier path re-triggers after a fix.
 on:
   push:
     branches: [main]
     paths:
       - .github/workflows/archive-phase0-evidence.yml
+      - src/emergence_lab/archive_evidence.py
   workflow_dispatch:
 
 permissions:

@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
+# "config" pins are SHA-256 of the config file bytes (sha256sum of the file).
 EXPECTED = {
     "coverage": {
         "raw": "97a81cb7898c1048716a3464793488d4502b00df24a8d4d786f7fdc48adbf5a5",
@@ -30,6 +31,11 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def canonical_config_sha256(cfg: dict) -> str:
+    """Config digest convention used by coverage_gate.py / finite_size_gate.py reports."""
+    return digest(json.dumps(cfg, sort_keys=True).encode())
+
+
 def verify_gate(
     kind: str,
     raw_path: Path,
@@ -44,14 +50,21 @@ def verify_gate(
     pins = expected if expected is not None else EXPECTED[kind]
     raw = raw_path.read_bytes()
     report_bytes = report_path.read_bytes()
-    cfg = json.loads(config_path.read_text())
+    cfg_bytes = config_path.read_bytes()
+    cfg = json.loads(cfg_bytes)
     report = json.loads(report_bytes)
     raw_sha = digest(raw)
-    cfg_sha = digest(json.dumps(cfg, sort_keys=True).encode())
+    # Two distinct conventions: the preregistration pins SHA-256 of the config
+    # *file bytes*; the gate runners record SHA-256 of canonical JSON
+    # (json.dumps(sort_keys=True)). Check each against its own convention.
+    cfg_file_sha = digest(cfg_bytes)
+    cfg_sha = canonical_config_sha256(cfg)
     if raw_sha != pins["raw"] or report.get("raw_npz_sha256") != raw_sha:
         raise ValueError(f"{kind}: raw bytes differ from preregistered evidence")
-    if cfg_sha != pins["config"] or report.get("config_sha256") != cfg_sha or report.get("config") != cfg:
-        raise ValueError(f"{kind}: config or reported config differs from preregistration")
+    if cfg_file_sha != pins["config"]:
+        raise ValueError(f"{kind}: config file differs from preregistration")
+    if report.get("config_sha256") != cfg_sha or report.get("config") != cfg:
+        raise ValueError(f"{kind}: reported config differs from preregistered config file")
     if report.get("gate_pass") is not True:
         raise ValueError(f"{kind}: gate did not pass")
     if kind == "coverage":
@@ -114,7 +127,8 @@ def verify_gate(
         "report_json": report_path.name,
         "report_json_sha256": digest(report_bytes),
         "config_path": str(config_path),
-        "config_sha256": cfg_sha,
+        "config_file_sha256": cfg_file_sha,
+        "config_canonical_sha256": cfg_sha,
         "environment": report.get("environment"),
         "gate_pass": True,
     }

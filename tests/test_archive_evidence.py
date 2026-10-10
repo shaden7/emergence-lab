@@ -6,7 +6,9 @@ import json
 import numpy as np
 import pytest
 
-from emergence_lab.archive_evidence import digest, verify_gate
+from pathlib import Path
+
+from emergence_lab.archive_evidence import EXPECTED, canonical_config_sha256, digest, verify_gate
 
 
 def fixture_gate(tmp_path, kind="coverage"):
@@ -38,13 +40,16 @@ def fixture_gate(tmp_path, kind="coverage"):
     raw = tmp_path / "input.npz"
     raw.write_bytes(raw_bytes)
     config = tmp_path / "config.json"
-    config.write_text(json.dumps(cfg))
+    # Like the real configs: file bytes (indented, unsorted) differ from canonical JSON.
+    config.write_text(json.dumps(cfg, indent=2) + "\n")
     cfg_hash = digest(json.dumps(cfg, sort_keys=True).encode())
+    cfg_file_hash = digest(config.read_bytes())
+    assert cfg_file_hash != cfg_hash
     report = {"gate_pass": True, "config": cfg, "config_sha256": cfg_hash,
               "raw_npz_sha256": digest(raw_bytes), **extras}
     report_file = tmp_path / "report.json"
     report_file.write_text(json.dumps(report))
-    return raw, report_file, config, {"raw": digest(raw_bytes), "config": cfg_hash}
+    return raw, report_file, config, {"raw": digest(raw_bytes), "config": cfg_file_hash}
 
 
 @pytest.mark.parametrize("kind", ["coverage", "finite_size"])
@@ -91,4 +96,29 @@ def test_report_array_digest_mismatch_rejected(tmp_path):
     report["raw_digests"]["energy_sum_L4"] = "0" * 64
     rep.write_text(json.dumps(report))
     with pytest.raises(ValueError, match="arrays/digests"):
+        verify_gate("coverage", raw, rep, cfg, expected=pins)
+
+
+@pytest.mark.parametrize("kind,path", [("coverage", "configs/coverage_gate.json"),
+                                       ("finite_size", "configs/finite_size_gate.json")])
+def test_production_config_pins_match_repository_files(kind, path):
+    """Regression (archive run 38045856455): pins are file-byte SHA-256, not canonical JSON."""
+    data = (Path(__file__).resolve().parents[1] / path).read_bytes()
+    assert hashlib.sha256(data).hexdigest() == EXPECTED[kind]["config"]
+    assert canonical_config_sha256(json.loads(data)) != EXPECTED[kind]["config"]
+
+
+def test_reformatted_config_file_rejected(tmp_path):
+    raw, rep, cfg, pins = fixture_gate(tmp_path)
+    cfg.write_text(json.dumps(json.loads(cfg.read_text()), sort_keys=True))
+    with pytest.raises(ValueError, match="config file differs"):
+        verify_gate("coverage", raw, rep, cfg, expected=pins)
+
+
+def test_wrong_reported_config_hash_rejected(tmp_path):
+    raw, rep, cfg, pins = fixture_gate(tmp_path)
+    report = json.loads(rep.read_text())
+    report["config_sha256"] = digest(cfg.read_bytes())
+    rep.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="reported config"):
         verify_gate("coverage", raw, rep, cfg, expected=pins)
