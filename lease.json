@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "research-director-20261010-olro37qcgx",
+  "leaseId": "research-director-20261010-olro37qcgx-01j37qm02z0zmvtkpz801rs",
+  "acquiredAt": "2026-10-10T06:28:44.550Z",
+  "heartbeatAt": "2026-10-10T06:28:44.550Z",
+  "expiresAt": "2026-10-10T08:28:44.550Z",
+  "task": "Review and integrate existing PR backlog",
   "previousOwner": "integration-test"
 }
