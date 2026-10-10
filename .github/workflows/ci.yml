@@ -1,6 +1,10 @@
 name: Test and smoke experiment
 on:
   push:
+    # Lease commits are coordination state, not code. Note: a push workflow is read from the
+    # pushed commit, so this only helps once the lock branch carries this file or none at all.
+    branches-ignore:
+      - coordination/research-lock
   pull_request:
   workflow_dispatch:
 permissions:
