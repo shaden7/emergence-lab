@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T235526Z-158381",
+  "leaseId": "a434c088e6ca4fcb5b3775a9aa2b7558",
+  "acquiredAt": "2026-10-10T23:56:00Z",
+  "heartbeatAt": "2026-10-10T23:56:00Z",
+  "expiresAt": "2026-10-11T01:56:00Z",
+  "task": "Director run: review PR #31 (Pilot B stage 2 blind workflow)",
   "previousOwner": "rd-claude-20261010T225628Z-1ebe46"
 }
