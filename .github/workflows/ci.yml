@@ -83,6 +83,16 @@ jobs:
         run: |
           python -m emergence_lab.coverage_gate --config configs/coverage_gate.json --output results/coverage_gate.json --workers 4 | tee results/coverage_gate.txt
           python -c "import json; r=json.load(open('results/coverage_gate.json')); print('::notice title=Coverage gate raw::npz_sha256=' + r['raw_npz_sha256'] + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy'] + ' commit=' + str(r['environment']['commit'])); [print('::notice title=Coverage gate L%s::covered=%d/%d wilson95=%r bias_z=%r per_chain=%d pass=%s control_covered=%d control_pass=%s' % (L, s['main']['energy']['covered'], s['main']['energy']['batches'], s['main']['energy']['wilson95'], s['main']['bias_z'], s['main']['per_chain_energy']['covered'], s['main']['pass'], s['power_control']['energy']['covered'], s['power_control']['pass'])) for L, s in r['sizes'].items()]; print('::notice title=Coverage gate::gate_pass=%s' % r['gate_pass'])"
+      - name: Preregistered finite-size gate (report gate 5)
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/finite-size-gate-20261010' || github.ref == 'refs/heads/main')
+        timeout-minutes: 60
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          python -m emergence_lab.finite_size_gate --config configs/finite_size_gate.json --output results/finite_size_gate.json --workers 4 | tee results/finite_size_gate.txt
+          python -c "import json; r=json.load(open('results/finite_size_gate.json')); print('::notice title=FSS gate raw::npz_sha256=' + r['raw_npz_sha256'] + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy'] + ' commit=' + str(r['environment']['commit'])); [print('::notice title=FSS gate %s::%s' % (w, json.dumps({k: [v['estimate'], v['pass']] for k, v in f.items()}))) for w, f in r['main']['fits'].items()]; print('::notice title=FSS gate::gate_pass=%s failed=%s' % (r['gate_pass'], [k for k, v in r['main']['checks'].items() if not v]))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

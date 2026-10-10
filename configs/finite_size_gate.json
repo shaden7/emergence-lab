@@ -1,0 +1,26 @@
+{
+  "description": "Preregistered finite-size gate (report gate 5); see docs/FINITE_SIZE_GATE_PREREGISTRATION.md. Do not edit after the preregistration commit.",
+  "temperature": 2.269185,
+  "sizes": [8, 12, 16, 24, 32, 48],
+  "chains_per_start": 8,
+  "base_seed": 2032010001,
+  "warmup_sweeps": 10000,
+  "sample_sweeps": {"8": 20000, "12": 20000, "16": 20000, "24": 40000, "32": 40000, "48": 80000},
+  "sample_every": 2,
+  "max_proposals": 6000000000,
+  "primary_window": [12, 16, 24, 32, 48],
+  "stability_windows": [[8, 12, 16, 24, 32, 48], [16, 24, 32, 48], [8, 12, 16, 24, 32], [12, 16, 24, 32]],
+  "exact_exponents": {"beta_over_nu": 0.125, "gamma_over_nu": 1.75, "one_over_nu": 1.0},
+  "criteria": {
+    "rhat_max": 1.01,
+    "ess_bulk_tail_min": 400,
+    "z_max_per_size": 4.0,
+    "fit_sigma_multiplier": 3.0,
+    "tolerance": {"beta_over_nu": 0.005, "gamma_over_nu": 0.03, "one_over_nu": 0.08}
+  },
+  "controls": {
+    "off_critical": {"temperature": 2.6, "chains_per_start": 4, "base_seed": 2033010001,
+                     "warmup_sweeps": 5000, "sample_sweeps": 20000, "sample_every": 2},
+    "j0_iid": {"temperature": 2.269185, "chains": 8, "base_seed": 2034010001, "draws": 2000}
+  }
+}
