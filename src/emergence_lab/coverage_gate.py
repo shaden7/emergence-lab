@@ -22,8 +22,6 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
-from scipy import stats as sps
-
 from . import convergence as cv
 from .coverage4 import wilson_interval
 from .critical_gate import run_chain
@@ -67,7 +65,15 @@ def validate_config(cfg: dict) -> int:
 
 
 def binomial_two_sided_p(k: int, n: int, p: float) -> float:
-    return float(sps.binomtest(k, n, p).pvalue)
+    """Exact two-sided binomial p-value: total probability of outcomes no more likely
+    than k (the 'minlike' rule of scipy.stats.binomtest, relative tolerance 1e-7).
+    NumPy only, because SciPy is not a project dependency."""
+    if not (0 <= k <= n and 0 < p < 1):
+        raise ValueError("invalid binomial test")
+    j = np.arange(n + 1)
+    logc = np.array([math.lgamma(n + 1) - math.lgamma(i + 1) - math.lgamma(n - i + 1) for i in j])
+    pmf = np.exp(logc + j * math.log(p) + (n - j) * math.log1p(-p))
+    return float(min(1.0, pmf[pmf <= pmf[k] * (1 + 1e-7)].sum()))
 
 
 def batch_coverage(chain_means: np.ndarray, reference: float | None) -> dict:

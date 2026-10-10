@@ -89,3 +89,14 @@ def test_gate_logic_on_synthetic_draws():
     assert good["pass"] and not good["bias_flag"]
     bad = cg.evaluate_size(e + 0.01, m, CFG, ref, 10, None)
     assert not bad["pass"] and bad["bias_flag"]
+
+
+def test_binomial_p_matches_scipy_rule():
+    scipy_stats = pytest.importorskip("scipy.stats")
+    for k, n, p in [(372, 400, 0.95), (380, 400, 0.95), (395, 400, 0.95), (0, 10, 0.3), (10, 10, 0.3), (7, 24, 0.5)]:
+        assert cg.binomial_two_sided_p(k, n, p) == pytest.approx(scipy_stats.binomtest(k, n, p).pvalue, rel=1e-9)
+
+
+def test_binomial_p_sanity_without_scipy():
+    assert cg.binomial_two_sided_p(5, 10, 0.5) == pytest.approx(1.0)
+    assert cg.binomial_two_sided_p(0, 10, 0.5) == pytest.approx(2 * 0.5 ** 10)
