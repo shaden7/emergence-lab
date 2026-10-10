@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261010T103425Z-a274c6dd",
+  "leaseId": "a274c6dd25168f13d4b7952df0e95a9d",
+  "acquiredAt": "2026-10-10T10:34:25Z",
+  "heartbeatAt": "2026-10-10T10:34:25Z",
+  "expiresAt": "2026-10-10T12:34:25Z",
+  "task": "Review Phase-0 gate 6 raw-artifact durability and final GO/NO-GO",
   "previousOwner": "rd-claude-20261010T095628Z-d3ba3e"
 }
