@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261010T073142Z-d6f71d",
-  "leaseId": "1af6d1dc110dd16bfd9007bbbce763c4",
-  "acquiredAt": "2026-10-10T07:31:42Z",
-  "heartbeatAt": "2026-10-10T07:52:36Z",
-  "expiresAt": "2026-10-10T09:52:36Z",
-  "task": "Director run: L32 critical-mixing gate preregistration/execution; CI trigger hygiene",
-  "previousOwner": "rd-claude-20261010T064854Z-cf5a9c"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261010T073142Z-d6f71d"
 }
