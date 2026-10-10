@@ -1,6 +1,39 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Pilot B blinded bounded-speed intervention test: **preregistration v1.0-r1 accepted** after two later-pass reviews and integrated via [PR #29](https://github.com/shaden7/emergence-lab/pull/29) — design only, no Pilot B code or output exists. Prior: N5 noise stress durably archived in [GitHub Release](https://github.com/shaden7/emergence-lab/releases/tag/pilot-a-n5-evidence-2026-10-10-v1). Next: Pilot B stage 1 (generator, oracle, isolated analyst, evaluator, dev-set gates, drand chain-hash verification) as a separate PR. Not a physics claim.)
+Last handoff update: 2026-10-10 (Pilot B **stage 1 implemented on open [PR #30](https://github.com/shaden7/emergence-lab/pull/30), not on `main`**: generator, oracle, isolated analyst, evaluator and drand quicknet verification. Dev key only: B-G0…B-G5 pass, and the quicknet pins and a live BLS-signed round were verified against four relays in CI. No blind key exists. Prior: Pilot B preregistration v1.0-r1 integrated via [PR #29](https://github.com/shaden7/emergence-lab/pull/29). Next: later-pass review and merge of PR #30, which fixes the blind round R. Not a physics claim.)
+
+## Director session: Pilot B stage 1 implementation (2026-10-10, `rd-claude-20261010T195637Z-0eea4a`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T185551Z-a8d493`) was released cleanly at lock commit `b5ee413`. There were no open PRs, and no queued or running workflows. `main` `c877d91` was CI-green ([38078085959](https://github.com/shaden7/emergence-lab/actions/runs/38078085959)). Nothing was incomplete.
+
+**Implemented, open (not on `main`):** [PR #30](https://github.com/shaden7/emergence-lab/pull/30), branch `research/pilot-b-stage1-20261010`, code head `0fd1259`. [Stage-1 note](experiments/2026-10-10-pilot-b-stage1-dev.md).
+- *Modules:* `pilot_b.py` (generator, oracle, two exact reference paths, evaluator, manifest), `pilot_b_analyst.py` (§5 rule; imports only `math` and NumPy) and `pilot_b_beacon.py` (quicknet pins, round arithmetic, SHA-256 and BLS verification).
+- *Tests and CI:* 23 tests; CI runs the dev set twice; new `Pilot B drand quicknet check` workflow.
+- *Unchanged:* prereg blob `dd5dbefe…` and config `3fc24afa…`. The note records the implementation choices the prereg left open (draw order, `key_int`, cell index, circulant convention).
+
+**Actually executed:**
+- *Local, Python 3.13.16 / NumPy 2.5.3:* `pytest -q` 235 passed. Dev run ×2 byte-identical (`rows.csv` `fa657d02…`); 0.6 s CPU, 68 MiB.
+- *CI on `0fd1259`:* push [38082607401](https://github.com/shaden7/emergence-lab/actions/runs/38082607401) and PR [38082611224](https://github.com/shaden7/emergence-lab/actions/runs/38082611224), both success on Python 3.12.15. Decision digest `6da5c8e3…` equals the local one.
+- *Beacon check [38082611228](https://github.com/shaden7/emergence-lab/actions/runs/38082611228):* 4/4 relays match the pinned chain hash `52db9ba7…`, public key, period and genesis. Live round 32953201 passes both the SHA-256(signature) and the BLS check. This resolves the stage-1 chain-hash blocker.
+
+**Dev numerical observations (public key; correctness check, not the blind test):**
+- B-G0: max path difference 1.1e-14; all P exterior sites exactly 0.
+- B-G1: 0/24 false rejections.
+- B-G2: 1/16 speed overestimates (an interior noise false positive at S = 0, z = 3.46).
+- B-G3: C1 r = 0 always detected; 0/8 spurious.
+- B-G4: 6/6 detectable N instances rejected.
+- Undetected violations: all 5 N1 (max exterior |S| below the 5.73e-5 limit) and 5 of 6 N3 (shortcut site not on the grid). These are *undetected*, not evidence of bounded support.
+- Separate `np.roll` time-stepping reproduces every `S_true` to 6e-14.
+
+**Finding:** `rows.csv` bytes differ across CI runners because of last-bit BLAS rounding (|ΔS| ≤ 1.7e-15; reproduced with four OpenBLAS kernels; decisions identical). Fixed in reporting with a `decisions_sha256` digest and a forced-kernel test; no rule changed.
+
+**Review:** producer self-review only ([record](https://github.com/shaden7/emergence-lab/pull/30#issuecomment-6101709782)). **Not merged by this session.** PR activity was not subscribed, because the repo's single-writer lease assigns follow-up to the next Director.
+
+**Evidence level:** an implementation check on a public development key. No blind evaluation; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a later-pass review of PR #30 in a different session, covering the analyst code, the implementation choices against the prereg, and green CI on the final head. Then merge with an expected-head guard. The merge timestamp fixes R (`python -m emergence_lab.pilot_b_beacon round-for-merge <merge-time>`). Stage 2 (a once-only blind run workflow on `main`) is a separate PR after R is published.
+
+Director run rd-claude-20261010T195637Z-0eea4a: start 2026-10-10T19:56:10Z, end 2026-10-10T20:11:43Z, duration 16 min
 
 ## Director session: later-pass check of Pilot B r1 and merge decision (2026-10-10, `rd-claude-20261010T185551Z-a8d493`)
 
