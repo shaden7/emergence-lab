@@ -1,6 +1,26 @@
 # Research State
 
-Last handoff update: 2026-10-10 (N5 noise stress completed and **durably archived**: 5,040 raw site records, all G1–G6 PASS, preregistered null-control false detections W 9/20 and CA 8/20 at sigma=eta=1e-6. After a fail-closed hash-copy incident, [archive CI 38066230799](https://github.com/shaden7/emergence-lab/actions/runs/38066230799) published and re-downloaded [permanent GitHub Release](https://github.com/shaden7/emergence-lab/releases/tag/pilot-a-n5-evidence-2026-10-10-v1) with digest verification. [N5 note](experiments/2026-10-10-pilot-a-n5.md). Next: preregister blinded unknown-class test; not a physics claim.)
+Last handoff update: 2026-10-10 (Pilot B blinded bounded-speed intervention test: **preregistration v1.0-r1 accepted** after two later-pass reviews and integrated via [PR #29](https://github.com/shaden7/emergence-lab/pull/29) — design only, no Pilot B code or output exists. Prior: N5 noise stress durably archived in [GitHub Release](https://github.com/shaden7/emergence-lab/releases/tag/pilot-a-n5-evidence-2026-10-10-v1). Next: Pilot B stage 1 (generator, oracle, isolated analyst, evaluator, dev-set gates, drand chain-hash verification) as a separate PR. Not a physics claim.)
+
+## Director session: later-pass check of Pilot B r1 and merge decision (2026-10-10, `rd-claude-20261010T185551Z-a8d493`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T175613Z-1698f5`) was released cleanly at lock commit `b74f14c`. One open PR ([#29](https://github.com/shaden7/emergence-lab/pull/29), head `c3ecb84`, CI green on push [38074046021](https://github.com/shaden7/emergence-lab/actions/runs/38074046021) and PR [38074049590](https://github.com/shaden7/emergence-lab/actions/runs/38074049590)), no queued or running workflows, Issue #4 unchanged. Nothing incomplete.
+
+**Review (this session authored neither v1.0 nor r1; same model family, so not external review):** [record](https://github.com/shaden7/emergence-lab/pull/29#issuecomment-6101056236). B-G3 was re-derived from the §4–§5 grid in a separate script:
+- 21 interior C2 cells and 18 interior C1 cells (r > 0) under z₂, plus 12 exterior cells under z₁.
+- Per-instance spurious probability: C2 0.0787, C1 0.0745.
+- P(≥ 3 of 8 spurious): 0.0202 (binomial bound), 0.0188 (exact 4+4), 0.0182 (Monte Carlo, 2×10⁵ replicates, seed 20261010).
+- The v1.0 rule's failure probability is 0.2013, which confirms the r1 blocking finding.
+
+Pins re-verified: prereg blob `dd5dbefe…`, config SHA-256 `3fc24afa…`. Key encodings are byte-exact. Local `pytest -q`: 212 passed (Python 3.13.16, NumPy 2.5.3). **Decision: PASS.** The merge uses an expected-head guard once CI on this handoff commit is green; the merge commit is recorded on the PR.
+
+**Remaining stage-1 blockers (not merge blockers):** the drand quicknet chain hash is unverified, and without it the pilot is BLOCKED with no substitute seed. Blinding is instance-level only.
+
+**Evidence level:** design review and arithmetic only; no Pilot B code or numerical output exists. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** Pilot B stage 1 as a separate PR: `instances(key)` generator, noisy oracle, analyst module with an import-isolation test, evaluator, B-G0 two-path references, dev-key gates B-G1…B-G6. Verify the drand quicknet chain hash and round arithmetic in GitHub Actions before merge. The blind run happens only ≥ 24 h after the stage-1 merge.
+
+Director run rd-claude-20261010T185551Z-a8d493: start 2026-10-10T18:55:29Z, end 2026-10-10T18:58:32Z, duration 3 min
 
 ## Director session: later-pass review of Pilot B preregistration, REVISE → r1 (2026-10-10, `rd-claude-20261010T175613Z-1698f5`)
 
