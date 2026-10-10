@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261010T085643Z-4977d0",
-  "leaseId": "c2a18cc5c4706b20b82c7ffbcf274456",
-  "acquiredAt": "2026-10-10T08:56:52Z",
-  "heartbeatAt": "2026-10-10T09:16:19Z",
-  "expiresAt": "2026-10-10T11:16:19Z",
-  "task": "Director: coverage-gate (gate 4) preregistration / backlog check",
-  "previousOwner": "rd-claude-20261010T081233Z-2bca3d"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261010T085643Z-4977d0"
 }
