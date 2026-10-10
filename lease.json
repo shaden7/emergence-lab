@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T105555Z-c25439",
+  "leaseId": "9c52bd6677a5cce054d2d18235fa30bb",
+  "acquiredAt": "2026-10-10T10:55:55Z",
+  "heartbeatAt": "2026-10-10T10:55:55Z",
+  "expiresAt": "2026-10-10T12:55:55Z",
+  "task": "Audit gate-6 archive run 38045856455; integrate/handoff",
   "previousOwner": "rd-gpt6-20261010T103425Z-a274c6dd"
 }
