@@ -49,7 +49,7 @@ jobs:
           m = r['manifest']
           assert all(r['gates'].values()), r['gates']
           assert m['preregistration_commit'] == '8686ae276e6cb4892c8410874136ae2baf31c93e'
-          assert m['n5_prereg_git_blob_sha'] == '966a36a163033e62883bebb28ae3e27a21260ff'
+          assert m['n5_prereg_git_blob_sha'] == '966a36a163033e62883b8ebb28ae3e27a21260ff'
           assert m['config_sha256'] == 'a0a010508f15ff490b9a38eda9612607c5908bf00ce6320585d82017c3cc9884'
           assert m['rows_csv_sha256'] == 'af7ec7546f4fa62dabfb0bed29352702c984ab3618ce2e9af73d6e2d293d27fd'
           assert m['executing_commit'] == __import__('os').environ['GIT_SHA']

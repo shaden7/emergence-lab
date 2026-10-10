@@ -79,3 +79,20 @@ def test_cli_writes_complete_replayable_artifacts(tmp_path, monkeypatch):
         (tmp_path / "rows.csv").read_bytes()).hexdigest()
     assert sum(output["gates"].values()) == 6
     assert len((tmp_path / "rows.csv").read_text().splitlines()) == 5041
+
+
+def test_archive_workflow_digest_guards_match_frozen_preregistration():
+    """Avoid silent transcription errors in the main-only durable archive workflow."""
+    import re
+
+    text = Path(".github/workflows/archive-pilot-a-n5.yml").read_text()
+    for manifest_field, expected in (
+        ("n5_prereg_git_blob_sha", n5.PREREG_BLOB_SHA),
+        ("config_sha256", hashlib.sha256(Path("configs/pilot_a_n5.json").read_bytes()).hexdigest()),
+        ("rows_csv_sha256", "af7ec7546f4fa62dabfb0bed29352702c984ab3618ce2e9af73d6e2d293d27fd"),
+    ):
+        match = re.search(
+            r"assert m\['" + manifest_field + r"'\] == '([a-f0-9]+)'", text
+        )
+        assert match is not None, f"Missing {manifest_field} archive guard"
+        assert match.group(1) == expected, f"Invalid {manifest_field} archive pin"
