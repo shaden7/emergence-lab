@@ -35,6 +35,21 @@ This is the concrete coordination protocol for **interactive and scheduled** Eme
 - If a session crashes, no release is possible; a successor may acquire only after `expiresAt`. A successor must treat results of a crashed predecessor as unverified and inspect GitHub for partial writes/PRs/remote activity.
 - The coordination branch is a live operational record, **not** a scientific artifact, progress report, or queue. Document integrated evidence on `main` and ongoing work in existing PRs/issues.
 
+## Recovery audit after an interrupted or crashed session
+
+An idle lease means **no cooperating Director currently owns the write lease**; it does not certify that the preceding Director completed its work or that a separately started CI job has stopped.
+
+After acquiring and verifying a new lease, inspect possible abandoned work **before opening new feature work or merging affected PRs**:
+
+1. Read the prior `previousOwner` / last lease commit, the latest `main` revision, open PRs/issues, recently updated research branches and commit history. Determine which workstream or commits may have been left incomplete. A user-reported interrupted session is a trigger even when its lease was released cleanly.
+2. For every relevant PR or unmerged branch, identify its exact current head and base, and find recent workflow runs and check conclusions. Classify them as **completed-success**, **completed-failure/cancelled**, **queued/in-progress**, or **missing/unknown**. Check each run's head SHA; a successful older run does not validate newer commits.
+3. Inspect available uploaded artifacts, manifests, configs, seed/provenance metadata and logs. Incomplete, missing, or stale artifacts must not be presented as complete results. Record the exact evidence link and whether the job could still be running.
+4. Reconcile any partially written files, PR descriptions, research-state assertions, or unmerged commits. Mark the work **verified, needs repair, pending external run, or blocked**. Only resume or rerun using a clear budget and fresh lease ownership; do not cherry-pick only favorable results or silently reset runs.
+5. For a job still queued/in progress, inspect status and resource implications first. Do **not** blindly rerun, cancel or deploy over it. An expired lease alone cannot prove that an external job stopped, and the new Director lease cannot forcibly terminate jobs.
+6. Record actionable recovery findings in the **existing** PR/issue or research-state handoff as appropriate, with head SHA, CI run URL, artifact ID, missing validation and next action. Respect the three-PR WIP limit; do not open a new feature PR for recovery bookkeeping.
+
+This is a **GitHub evidence audit, not process-liveness detection**. A ChatGPT session may have stopped without leaving an identifiable trace, and unavailable runner logs cannot be inferred. When ownership or an ongoing write remains ambiguous, fail closed for conflicting mutations and document the uncertainty.
+
 ## Scheduled task and limits
 
 - Every scheduled ChatGPT invocation must perform acquisition itself **before doing side-effecting work**; prior invocations' ownership cannot be inherited across sessions. The task prompt should bootstrap the current Git policy rather than duplicate this protocol.
