@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-09.
+Last handoff update: 2026-10-10 (Director integration session; see the final section).
 
 ## Mission
 Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
@@ -43,8 +43,13 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Methodology only: no simulation, proof, benchmark, ontology inference or discovery of new mathematics is claimed. Its gates keep cross-family computations **design-only until the Ising calibration gate is met**, which is consistent with the current Phase-0 NO-GO.
 - Review correction at integration: the Physics Reports GPT introduction is attributed to M. Plávala (arXiv:2103.07469), not Janotta et al.
 
-## Implemented (repository code)
+## Implemented (repository code on `main`, 2026-10-10)
 - 2D ferromagnetic Ising model, periodic lattice, Metropolis updates.
+- Autocorrelation-aware chain diagnostics and independent-chain Student-t intervals; zero between-chain variance yields undefined intervals (`stats.py`).
+- Exact 4x4 enumeration reference and provenance-checked holdout validator (`exact4.py`); interval-coverage audit (`coverage4.py`); paired burn-in sensitivity (`burnin4.py`).
+- Phase-0 diagnostics: finite-size pilot with J=0 null (`finite_size.py`), exact-stationary start comparison (`equilibration4.py`), L16/L32 hot/cold mixing and ESS (`mixing_pilot.py`, `scripts/mixing_diagnostics.py`), interacting 1D Ising null (`ising_1d_control.py`), AR(1) autocorrelation controls.
+- CLI seed-collision check and 1e8 spin-proposal default budget before any output (`cli.py`).
+- Heavy fixed-seed pilots run only on manual `workflow_dispatch`; ordinary pushes run pytest, smoke and the exact4 holdout.
 - Deterministic seeded CPU experiments with JSON configs.
 - CSV measurements and JSON manifest, basic pytest tests, Docker container capped at 0.5 vCPU and 1536 MB.
 - Smoke and larger nightly experiment configs; GitHub CI.
@@ -52,22 +57,24 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 
 ## Verified operational status (2026-10-09)
 - [Lightsail deployment run 37985438961](https://github.com/shaden7/emergence-lab/actions/runs/37985438961), on commit 1533d6f17bd1b23029f9ae86613db0fc2a240de3, completed **success** at 20:12 UTC. The remote build/smoke step succeeded; it checks smoke manifest and measurements files and only then installs the scheduled 02:00 UTC cron file.
-- The server's actual output contents and subsequent cron execution remain **uninspected**. Deployment is still older than the proposed statistics patch. No automatic deployment was triggered.
-- No full finite-size scaling, Lean integration or autonomous LLM hypothesis generator exists.
+- The server's actual output contents and subsequent cron execution remain **uninspected**. The deployed revision predates all code merged on 2026-10-10 (statistics, exact4, CLI guards); **no redeployment has been performed or reviewed**. `configs/nightly.json` (6.1e7 spin proposals) passes the new CLI budget, so a future deploy would not be blocked by it, but deployment still requires a separate reviewed decision.
+- No validated finite-size scaling, Lean integration or autonomous LLM hypothesis generator exists.
 
 ## Scientific cautions
 Monte Carlo samples are autocorrelated; the initial averages do not demonstrate a phase transition or novel physical findings. The infinite-lattice Ising benchmark critical temperature is 2/log(1+sqrt(2)) in units J=k_B=1.
 
-## Next priority
-1. Review and merge milestone 2 statistical code only if PR CI passes; manually deploy after review, and verify actual remote manifest and cron records without affecting EatSleepFeel.
-2. Pre-register a longer independent-seed holdout, verify equilibration sensitivity and autocorrelation-window stability.
-3. Establish calibrated uncertainty, finite-size scaling and plotted model comparisons with a noninteracting-spin negative control.
-4. Only then prototype emergent geometry/causal-structure models and Lean statements.
+## Next priority (2026-10-10)
+Phase-0 decision is **NO-GO**; Phase 1 has not started. In order:
+1. **L32 critical mixing gate:** preregister (thresholds fixed before running) a longer, disjoint-seed L32 run at Tc with rank-normalized split-R̂, robust τ/ESS windows and coverage; this is the blocker behind the NO-GO (median |m| ESS 23.9 of 180 in the PR #12 pilot).
+2. **Burn-in replication:** preregister a fresh-seed run (≥20 batches; T=1.5 and 2.269; burn-in 0/100/1600) with paired shifts as primary outcome, to confirm the zero-burn-in bias and test the unexplained burn-1600 energy offset at T=1.5.
+3. Archive the Phase-0 raw artifacts outside GitHub Actions retention (digests are registered in `docs/experiments/phase0-artifact-checksums-20261009.json`).
+4. Only after the Ising gate: implement Pilot A per the merged preregistration (`docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md`), as a separate reviewed code PR.
+5. Deployment of the merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
 
 ## Handoff requirements
 After each meaningful research iteration, record: question, exact commit and config, computational resource budget, observed results, uncertainty and negative controls, scientifically supported conclusion, limitations, and next experiment. Keep large raw result files in versioned artifact storage rather than bloating Git history.
 
-## Milestone 2: first uncertainty diagnostics (2026-10-09; proposed PR)
+## Milestone 2: first uncertainty diagnostics (2026-10-09; merged via PR #1, `df5ae735`)
 
 **Research question:** How does temporal autocorrelation reduce the information content of sampled finite Ising chains near the benchmark critical temperature?
 
@@ -83,7 +90,7 @@ After each meaningful research iteration, record: question, exact commit and con
 
 **Next discriminating experiment:** Pre-register independent holdout seeds, 4–8 chains, longer burn-in and sampling near critical T, compare correlation-window and burn-in sensitivity, then use finite-size scaling and a noninteracting-spin negative control. No fundamental-physics claim is supported by current numbers.
 
-## Validation milestone 3 — finite 4x4 equilibrium reference (stacked PR, 2026-10-09)
+## Validation milestone 3 — finite 4x4 equilibrium reference (2026-10-09; merged via PR #3, `bfcbbe88`)
 
 **Scientific question:** Do the seeded Metropolis equilibrium estimates and the independent-chain uncertainty summaries reproduce an independently calculated finite-system Boltzmann distribution? This is a method-validation question only, not an argument for fundamental physics.
 
@@ -103,7 +110,7 @@ After each meaningful research iteration, record: question, exact commit and con
 
 **Next action:** Check CI test outcome and the uploaded holdout artifact. If it passes, retain the raw CSV/manifest and compare nominal 95% coverage over multiple distinct seeds, convergence with burn-in, and lattice-size scaling before making statistical claims. Stacked changes require review, then merge PR #1 before PR #2; do not auto-deploy.
 
-## Exact4 provenance hardening (2026-10-09; separate stacked proposal)
+## Exact4 provenance hardening (2026-10-09; merged via PR #7, `98bc941b`)
 
 **Question:** Can an otherwise plausible holdout CSV pass finite-4x4 validation after its preregistered RNG seeds or simulator run parameters are substituted?
 
@@ -117,7 +124,7 @@ After each meaningful research iteration, record: question, exact commit and con
 
 **Next step:** Inspect detailed CI logs/artifacts and request code review before merging the stack in order PR #1 -> PR #3 -> PR #7. Then pre-register an independent multi-batch coverage experiment with known exact 4x4 targets, fixed seeds, planned interval coverage and uncertainty; distinguish long-chain Monte Carlo bias from between-batch randomness.
 
-## M4 proposed: exact4 interval-coverage pilot (2026-10-09; stacked PR)
+## M4: exact4 interval-coverage pilot (2026-10-09; merged via PR #9, `006fa0ed`)
 
 **Question:** Across *independent* batches of six independent seeded 4x4 Ising chains, how frequently do nominal 95% between-chain Student-t intervals enclose the exact finite-system energy and absolute-magnetization expectations?
 
@@ -155,7 +162,7 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Next discriminating measurement:** Pre-register a **new**, disjoint-seed burn-in sensitivity experiment (e.g. 0/100/400/1600 sweeps, matched chain sampling; fixed compute cap), report both mean bias relative to exact reference and interval coverage, and study whether near-critical uncertainty estimates are robust. Do not interpret the current results as evidence for emergent spacetime.
 
-## Burn-in sensitivity follow-up (2026-10-09; PR #10)
+## Burn-in sensitivity follow-up (2026-10-09; merged via PR #10, `171bab66`)
 
 **Question:** How sensitive are finite-4x4 Ising means and nominal between-chain CI coverage to initial equilibration (burn-in)?
 
@@ -194,7 +201,7 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Earlier next-step note (2026-10-09, now addressed above):** Inspect the raw paired bias shifts (not merely binary coverage), compute uncertainty from independent paired batches, and contrast longer sampling regimes and an analytically initialized equilibrium baseline where feasible. The run was predeclared, with no selective favorable reruns. The CI experiment step has been restricted to manual dispatch for future reproducibility without repeated load on each PR push.
 
-## Research Director Phase-0 audit and decision (2026-10-09; PR #12)
+## Research Director Phase-0 audit and decision (2026-10-09; merged via PR #12, `132369e9`)
 
 **Question and decision:** Are the Monte-Carlo, uncertainty, control and provenance tools reliable enough to begin Phase 1? **NO-GO** on the present evidence. See [full audit and criteria](ISING_CALIBRATION_REPORT.md). The phase remains open; this is a **completed critical assessment**, not a claim that all calibration gates passed.
 
@@ -262,3 +269,43 @@ Completed bounded pilots were run successfully and primary artifact IDs/code rev
 - Added an explicit recovery audit to `docs/RESEARCH_LOCK.md` and the `docs/WORKFLOW_POLICY.md` Director cycle. After acquiring a new lease, a Director responding to an interrupted run checks relevant PR/branch heads, unfinished GitHub Actions jobs, logs, artifacts and partially integrated results **before** launching duplicate work.
 - An `idle` lease is not proof a ChatGPT session or GitHub Actions experiment finished; an expired lease cannot stop external jobs. Missing run status/artifacts remain unknown, not successes. Findings go to existing PR/issue or research-state handoff, avoiding extra feature PRs.
 - Integration: process-only documentation commits `e744d093d2dedcd816c0ab8129f1796e68dcfc04` and `69206ab0c42f11b9035a35189f49448bf29ad58e`. No scientific experiment, CI run, deployment or new liveness-monitor service was performed.
+
+## Director integration session (2026-10-10, lease `rd-claude-20261010T064854Z-cf5a9c`)
+
+**Question:** Which open PRs satisfy the objective merge gates, and do their scientific claims survive a later-pass check?
+
+**Recovery audit:** previous lease released cleanly by `rd-recovery-dp1wi9k080g`; no queued or running workflow; `main` green at `e16d6643`. Nothing incomplete found besides stale "proposed" labels in this file (now corrected).
+
+**Integrated (all with expected-head-SHA guard, exact-head CI success, review comment on the PR):**
+
+| PR | Content | Merge commit | Review decision |
+| --- | --- | --- | --- |
+| #10 | paired burn-in sensitivity (+ added pairing tests, caveat fix, paired analysis) | `171bab66e33d9f93178d8f496fa795be56b82b5a` | PASS |
+| #12 | Phase-0 audit, null controls, L32 ESS failure, CLI/stat fixes, NO-GO | `132369e96ed8ed5a4749704ca62ed69cf874dea0` | PASS |
+| #5 | representation-neutral strategy (+ citation correction) | `0b2833399f0edd582ee0ae40fcbcca60c49e352b` | PASS |
+| #11 | Pilot A preregistration (not executed) | `75b9def47d4ecec4713fadf4a5af4d6b8ee3dafc` | PASS |
+| #8 | literature review for Issue #6 | `eaff96605678eb9cb86aa1569bc0fa912f74f4f7` | PASS |
+
+No research PRs remain open. Reviews are AI-mediated later-pass checks, not independent external review.
+
+**Actually executed in this session (local, Python 3.13.16 / NumPy 2.5.3, single core):** full pytest (57 passed on `main`); full re-execution of the burn-in experiment (≈62 s) and all seven Phase-0 pilot commands (≈100 s). No GitHub-hosted experiment was dispatched, nothing ran on Lightsail.
+
+**Evidence, by level**
+- *Known mathematics / theory (not ours):* exact Tc and Ising exponents; d'Alembert, heat-kernel and quantum-walk reference solutions used in Pilot A (numerically re-evaluated for the registered far-witnesses).
+- *Numerical observations (reproduced):* burn-in coverage table (24/24 counts identical); L32/Tc |m| median ESS 23.88, min 4.16, gate failed; Tc log–log slopes −0.1224 (|m|) and 1.7141 (χ_abs); 1D-null Binder 0.419 → 0.029 (L8 → L32).
+- *Numerical observations (new, post hoc, exploratory):* zero burn-in biases T=1.5 means (|M| −0.0032 ± 0.0005, p = 0.00014); paired 0→100 shifts at T=1.5 and 2.269 survive Bonferroni; binary coverage counts did not detect this. Details: [experimental note](experiments/2026-10-10-burnin-paired-analysis.md).
+- *Hypotheses / open anomalies:* burn-1600 energy offset at T=1.5 (+0.0033 ± 0.0009, p = 0.005, not surviving correction) is unexplained and not interpreted; whether the slopes reflect true exponents is untested.
+- *Proofs:* none produced. The Lean statement in Pilot A is a specification only.
+- *Methodological decision:* Phase-0 NO-GO stands.
+
+**Limitations and honest gaps**
+- GitHub Actions artifacts could not be downloaded from the review environment (egress policy). Registered SHA-256 digests were therefore not verified directly; a local burn-in re-run does not match its registered digest byte-for-byte although all compared statistics agree (likely floating-point ULP differences; not confirmed).
+- Literature references were spot-checked, not exhaustively resolved; one misattribution was corrected (Plávala, PR #5); one link (PMC) was unverifiable behind a CAPTCHA.
+- Every push to `coordination/research-lock` triggers the full CI workflow (observed runs on lease commits). Harmless but wasteful; restricting the workflow's push trigger is a proposed, unimplemented change.
+
+**Deployment status:** unchanged; no deployment performed or requested.
+
+**Open blockers:** L32 critical-mixing gate (scientific); deployment decision for merged code (operational, needs separate review).
+
+**Next single informative step:** preregister the L32 critical-mixing holdout (priority 1 above).
+

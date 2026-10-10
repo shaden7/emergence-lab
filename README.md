@@ -46,9 +46,9 @@ Research Director invocations (manual or scheduled) coordinate through the indep
 ## Research safeguards
 
 - The deterministic Monte Carlo implementation is a reference system, not evidence for new physics.
-- The proposed milestone-2 code estimates autocorrelation, effective sample counts and per-chain standard errors. Trapped or short series have undefined diagnostics rather than spurious precision.
+- The milestone-2 code (merged) estimates autocorrelation, effective sample counts and per-chain standard errors. Trapped or short series have undefined diagnostics rather than spurious precision.
 - `summary.csv` reports exploratory 95% Student-t intervals across **independent chain means**; 2 smoke replicates are insufficient for calibrated error bars.
-- Next: longer holdout runs, equilibration checks, finite-size scaling, distinct baselines and explicit falsification criteria.
+- Phase-0 calibration decision is currently **NO-GO** (insufficient L32 critical mixing); see [Research State](docs/RESEARCH_STATE.md) for the next gate.
 - No AI API integration, automatic theory generation or Lean formalization is implemented yet.
 
 See [research plan](docs/research-plan.md).
