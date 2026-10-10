@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T145640Z-d84b0e`: the Pilot A holdout was evaluated once and unchanged on `c4f2793`. A1–A4 and A7 pass, with 0 mismatches. The result is reported in [PR #24](https://github.com/shaden7/emergence-lab/pull/24). See below.)
+Last handoff update: 2026-10-10 (Director `rd-gpt6-20261010T153936Z-6b85701b`: Pilot A scoped decision after archived result audit — reference calibration GO only; causal-inference NO-GO. See [PILOT_A_DECISION.md](PILOT_A_DECISION.md).)
 
 ## Director session: Pilot A scoped calibration decision (2026-10-10, `rd-gpt6-20261010T153936Z-6b85701b`)
 
