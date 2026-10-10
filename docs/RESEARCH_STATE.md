@@ -2,6 +2,20 @@
 
 Last handoff update: 2026-10-10 (Director `rd-gpt6-20261010T153936Z-6b85701b`: Pilot A scoped decision after archived result audit — reference calibration GO only; causal-inference NO-GO. See [PILOT_A_DECISION.md](PILOT_A_DECISION.md).)
 
+## Director session: Pilot A N5 noise stress (2026-10-10, `rd-gpt6-20261010T153936Z-6b85701b`)
+
+**Question:** can finite independent readout noise create spurious threshold detections outside a mathematically strict model cone, and can these be accounted for by an independent analytic Gaussian-null formula?
+
+**Prereviewed design:** [N5 preregistration](PILOT_A_N5_NOISE_PREREGISTRATION.md) and config were committed first as `8686ae276e6cb4892c8410874136ae2baf31c93e`, before results; implementation `afed534d`, CI runner `f336572`. The deterministic Pilot A holdout was not rerun. Tested only frozen development fixtures W/H/CA/Q (7 sites; 3 sigma × 3 thresholds × 20 independent replicates/model).
+
+**Actually executed on GitHub CI:** [push 38065322982](https://github.com/shaden7/emergence-lab/actions/runs/38065322982) and [PR 38065354024](https://github.com/shaden7/emergence-lab/actions/runs/38065354024) completed successfully on exact code head `f336572`: 210 pytest passed and 1 skipped; N5-G1…G6 all PASS, 720 independent seed tuples and 5,040 site records. [Full note](experiments/2026-10-10-pilot-a-n5.md).
+
+**Quantitative adversarial result:** at mathematically zero r=6, sigma=eta=1e-6, W false detections **9/20** (Wilson 95% [0.258, 0.658]) and CA **8/20** ([0.219, 0.613]); analytic Gaussian `p=erfc(0.5)=0.4795`. Strict W's measured farthest front incorrectly reached r=12 in 6/20 trials; strict CA's in 4/20. These are detector false positives and do not alter the strict support theorem. Same-random-stream finite observation sites are not statistically independent replicates.
+
+**Archived data and limits:** GitHub Actions [artifact 11674566926](https://github.com/shaden7/emergence-lab/actions/runs/38065322982/artifacts/11674566926) (CSV SHA-256 `af7ec7546f4fa62dabfb0bed29352702c984ab3618ce2e9af73d6e2d293d27fd`) was actually downloaded, unpacked and hash-checked. Artifact expiry is 2027-01-08: **durable Phase-0 C5 raw-data retention remains unresolved**. Existing separate Pilot A references are known mathematical model inputs, never emergence. No server/production deploy or new spending.
+
+**Evidence level:** computational methodology/stochastic observation in an assumed Gaussian detector model, not real-world experimental support or new physics. **Next single action:** durable digest-pinned archive (or two-environment byte-identical regeneration) for N5; only then a distinct, preregistered blinded causal-influence test on unknown families. Geometry issue #4 remains separate.
+
 ## Director session: Pilot A scoped calibration decision (2026-10-10, `rd-gpt6-20261010T153936Z-6b85701b`)
 
 **Question:** does the archived Pilot A development/holdout evidence justify moving from reference calibration to general causal inference?
