@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director `rd-gpt6-20261010T153936Z-6b85701b`: Pilot A scoped decision after archived result audit — reference calibration GO only; causal-inference NO-GO. See [PILOT_A_DECISION.md](PILOT_A_DECISION.md).)
+Last handoff update: 2026-10-10 (N5 noise stress — 210 passed/1 skipped in GitHub CI; all six pre-registered method gates passed; theorem-zero sentinel false detections W 9/20 and CA 8/20 at sigma=eta=1e-6. The Actions raw archive expires 2027-01-08, so durable C5 evidence retention remains pending. [N5 experimental note](experiments/2026-10-10-pilot-a-n5.md).)
 
 ## Director session: Pilot A N5 noise stress (2026-10-10, `rd-gpt6-20261010T153936Z-6b85701b`)
 
