@@ -1,0 +1,30 @@
+{
+  "preregistration": "docs/PILOT_B_BLINDED_INTERVENTION_PREREGISTRATION.md",
+  "version": "1.0-r1",
+  "ring_L": 256,
+  "times": [1, 2, 4],
+  "sites": [0, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32],
+  "readouts_per_arm_per_cell": 50,
+  "sigma": 0.0001,
+  "v_max": 4,
+  "alpha_family": 0.05,
+  "exterior_tests": 12,
+  "front_tests": 33,
+  "z_exterior": 2.8653,
+  "z_front": 3.1718,
+  "class_counts": {"S1": 6, "S2": 4, "S3": 6, "C1": 4, "C2": 4, "N1": 5, "N2": 5, "N3": 6},
+  "parameter_ranges": {
+    "S1": {"k": [1, 2, 3, 4], "weight_uniform": [0.1, 1.0]},
+    "S2": {"c2_uniform": [0.25, 1.0]},
+    "S3": {"k": [1, 2, 3, 4], "magnitude_uniform": [0.1, 1.0], "signs": "fair coin", "normalisation": "sum_abs_1"},
+    "C2": {"dynamics": "S1"},
+    "N1": {"gamma_loguniform": [0.2, 1.0]},
+    "N2": {"alpha_uniform": [2.0, 4.0], "offsets": [-127, 128]},
+    "N3": {"k": [1, 2], "base": "symmetric S1", "epsilon_loguniform": [1e-6, 1e-2], "d_uniform_int": [20, 100]}
+  },
+  "dev_key": "pilot-b-dev-2027101101",
+  "dev_key_bytes": "SHA-256(b'pilot-b-dev-2027101101')",
+  "blind_key_rule": "SHA-256(b'pilot-b-v1|' + ascii_decimal(R) + b'|' + bytes.fromhex(drand quicknet randomness_R)), R = first round >= 24 h after stage-1 merge commit on main",
+  "gates": {"B_G1_max_false_rejections_of_24": 3, "B_G2_max_speed_overestimates_of_16": 3, "B_G3_max_spurious_null_controls_of_8": 2, "B_G4_min_power_detectable": 0.9, "B_G4_detectable_factor": 2.0, "reference_tolerance": 1e-12},
+  "budget": {"cpu_seconds_max": 120, "ram_mib_max": 512, "output_mib_max": 5, "lightsail": false}
+}
