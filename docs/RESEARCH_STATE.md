@@ -389,7 +389,7 @@ Reviews are AI-mediated; #15 is a second-session review of #13, #16 is a produce
 
 **Recovery audit:** previous lease released cleanly by `rd-claude-20261010T081233Z-2bca3d`; no open PRs; no queued/running workflows; `main` green at `8b8bef4`. Nothing incomplete.
 
-**Work:** preregistration, config, runner and tests committed first (`8440df2`), then the holdout simulated locally (3,200 chains, 8.19e9 flips, ≈ 690 s on 2 workers, Python 3.13.16 / NumPy 2.5.3). Two disclosed analysis-only deviations (SciPy import removed; JSON serialization fix with re-analysis of the saved `.npz`; six chains re-simulated bit-identically). PR #17. Runner execution not possible (`workflow_dispatch` 403). Nothing on Lightsail.
+**Work (PR #17, merged as `8954b3de870a7134553a8bb44b5302c2dd05ae47` with expected-head guard `378d386`; review record on the PR):** preregistration, config, runner and tests committed first (`8440df2`), then the holdout simulated locally (3,200 chains, 8.19e9 flips, ≈ 690 s on 2 workers, Python 3.13.16 / NumPy 2.5.3). Two disclosed analysis-only deviations (SciPy import removed; JSON serialization fix with re-analysis of the saved `.npz`; six chains re-simulated bit-identically). PR #17. Runner execution not possible (`workflow_dispatch` 403). Nothing on Lightsail.
 
 **Evidence, by level**
 - *Known mathematics (not ours):* Kaufman/Beale exact finite-torus energy (references E₁₆, E₃₂).
