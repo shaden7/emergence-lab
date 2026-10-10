@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261010T115647Z-4e5855",
-  "leaseId": "e37f6d3ab5cfb258fbb14a270f058a3c",
-  "acquiredAt": "2026-10-10T11:56:47Z",
-  "heartbeatAt": "2026-10-10T12:06:21Z",
-  "expiresAt": "2026-10-10T14:06:21Z",
-  "task": "Director run: Phase-0 GO/NO-GO review record / backlog check",
-  "previousOwner": "rd-claude-20261010T105555Z-c25439"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261010T115647Z-4e5855"
 }
