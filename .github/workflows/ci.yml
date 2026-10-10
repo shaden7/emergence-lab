@@ -48,6 +48,15 @@ jobs:
           python scripts/mixing_diagnostics.py --mixing-json results/mixing_pilot.json --output results/mixing_diagnostics.json
           python -m emergence_lab.ising_1d_control --config configs/ising_1d_control.json --output results/ising_1d_control.json
           python -m emergence_lab.ising_1d_control --config configs/ising_1d_anomaly_followup.json --output results/ising_1d_anomaly_followup.json
+      - name: Preregistered L32 critical-mixing gate
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/l32-critical-gate-20261010' || github.ref == 'refs/heads/main')
+        timeout-minutes: 20
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          python -m emergence_lab.critical_gate --config configs/l32_critical_gate.json --output results/l32_critical_gate.json --workers 2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
