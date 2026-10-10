@@ -189,7 +189,7 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Earlier next-step note (2026-10-09, now addressed above):** Inspect the raw paired bias shifts (not merely binary coverage), compute uncertainty from independent paired batches, and contrast longer sampling regimes and an analytically initialized equilibrium baseline where feasible. The run was predeclared, with no selective favorable reruns. The CI experiment step has been restricted to manual dispatch for future reproducibility without repeated load on each PR push.
 
-## Research Director Phase-0 audit and decision (2026-10-09; **proposed**, stacked review branch)
+## Research Director Phase-0 audit and decision (2026-10-09; PR #12)
 
 **Question and decision:** Are the Monte-Carlo, uncertainty, control and provenance tools reliable enough to begin Phase 1? **NO-GO** on the present evidence. See [full audit and criteria](ISING_CALIBRATION_REPORT.md). The phase remains open; this is a **completed critical assessment**, not a claim that all calibration gates passed.
 
@@ -242,6 +242,16 @@ Completed bounded pilots were run successfully and primary artifact IDs/code rev
 [Checksum registry](experiments/phase0-artifact-checksums-20261009.json) records **nine** actually downloaded source JSONs: CI run, Actions artifact ID, pinned code SHA, ZIP member name, and SHA-256 of extracted JSON. The JSON registry is versioned in GitHub; it is **not a durable copy of the raw source data**. The latter must be archived separately before Actions expiration for full long-term provenance. No paid service or new resource was created.
 
 **Last known consolidated decision:** **NO-GO**; Ising calibration **not** declared complete. The draft review branch [PR #12](https://github.com/shaden7/emergence-lab/pull/12) contains source, configs, tests, null controls, all measured uncertainties, quantitative L32 ESS failures, report and research-state updates. PRs #1/#3/#7/#9/#10/#12 require human review in dependency order; no automatic merges on CI alone. Next essential research gate is independent longer critical-L32 and interval-coverage confirmation with preregistered controls and trustworthy ESS.
+
+### Later-pass review and integration status of PR #12 (2026-10-10)
+
+**Status correction:** the 2026-10-09 text above records PRs #1 → #10 as open and asks for human review. Since then PRs #1, #3, #7, #9 and #10 were merged by Director sessions, and `docs/WORKFLOW_POLICY.md` assigns routine review and merge to agents; no human review is required. The historical text is kept unchanged as an audit trail.
+
+**Review (AI-mediated, not independent external review):** core code changes checked — `cli.py` keeps the legacy seed formula but now rejects seed collisions and plans above 100 million spin proposals before writing output (`configs/nightly.json` at 6.1·10⁷ proposals stays within the limit, so the Lightsail cron configuration is unaffected); `stats.py` returns undefined intervals for zero between-chain variance; `coverage4.py` counts undefined intervals as non-covered. New CI steps run only on manual `workflow_dispatch`.
+
+**Independent re-execution (Python 3.13.16, NumPy 2.5.3) on the branch merged with `main`:** all seven pilot commands completed in ≈100 s single-core. Headline values reproduce exactly: L32/Tc |m| median ESS 23.88 and minimum 4.16, prospective gate `False`; exploratory log–log slopes at Tc −0.1224 (|m|) and 1.7141 (χ_abs); 1D control Binder at the 2D Tc 0.419 / 0.177 / 0.110 / 0.029 for L = 8 / 16 / 24 / 32. The burn-in re-run output does not match the registered artifact SHA-256 byte-for-byte (cause not determinable without the artifact; all compared statistics agree to the reported precision).
+
+**Evidence levels after integration:** exact Tc and exponents are *known theory*; slopes, ESS and Binder values are *numerical observations*; agreement of slopes with β/ν = 1/8 and γ/ν = 7/4 is *not* a validated exponent measurement; the NO-GO is a *methodological decision* about tool readiness, not a physics result. No theorem is claimed.
 
 ## Interrupted-session recovery protocol (2026-10-10)
 - Added an explicit recovery audit to `docs/RESEARCH_LOCK.md` and the `docs/WORKFLOW_POLICY.md` Director cycle. After acquiring a new lease, a Director responding to an interrupted run checks relevant PR/branch heads, unfinished GitHub Actions jobs, logs, artifacts and partially integrated results **before** launching duplicate work.
