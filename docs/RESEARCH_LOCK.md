@@ -5,7 +5,7 @@ This is the concrete coordination protocol for **interactive and scheduled** Eme
 ## Canonical lock record
 
 - Dedicated persistent branch: `coordination/research-lock`.
-- File at its root: `lease.json` (schema 1).
+- Its tree contains **only** `lease.json` (schema 1) at the root. Do not copy repository files onto this branch: GitHub reads push-triggered workflows from the pushed commit, so any `.github/workflows` file on the lock branch makes every lease commit run CI (observed 2026-10-10: lease commits with a full repository tree triggered the test workflow; a lease-only tree did not).
 - `status`: `idle` or `running`; `owner` and `leaseId` uniquely identify the invocation.
 - `acquiredAt`, `heartbeatAt`, `expiresAt`: UTC ISO 8601 timestamps (`Z`).
 - `task` gives an informative short work description; `previousOwner` is informational.
@@ -16,7 +16,7 @@ This is the concrete coordination protocol for **interactive and scheduled** Eme
 1. Read all required project policy files on `main`. Read `refs/heads/coordination/research-lock` via the GitHub connector, obtaining HEAD commit SHA **H**. Read `lease.json` from **that same commit** (not default `main`), and its tree SHA. Avoid time-of-check/time-of-use errors by using the same snapshot.
 2. If `status=running` and `expiresAt` is strictly in the future, **do not do any research-side mutation**. Report the current owner/expiry and end the invocation. Do not create a PR, comment, deploy, start remote work, merge, or change the lock. Read-only diagnosis is allowed, but do not pretend to be the sole active Director.
 3. If `status=idle`, or a running lease is expired, prepare a new record with `status=running`, a fresh **unique per-invocation owner and unpredictable leaseId**, `acquiredAt=now UTC`, `heartbeatAt=now UTC`, and `expiresAt=now+2 hours`. On takeover of an expired lease, record `previousOwner`. Never reuse a previous lease ID.
-4. Construct a Git tree based on H's **tree SHA**, replacing only `lease.json` (GitHub `create_tree`, mode `100644`, type `blob`); create a Git commit with **parent H** and that tree (`create_commit`).
+4. Construct a Git tree based on H's **tree SHA**, replacing only `lease.json` (GitHub `create_tree`, mode `100644`, type `blob`); if H's tree contains anything besides `lease.json`, the candidate tree may instead contain only the new `lease.json` (one-time pruning to the canonical form above, recorded in the commit message); create a Git commit with **parent H** and that tree (`create_commit`).
 5. Atomically move ONLY `coordination/research-lock` to the candidate commit using GitHub `update_ref` with `branch_name="coordination/research-lock"`, `sha=<candidate commit SHA>`, `expected_sha=H` and `force=true` (**force-with-lease**, never unguarded force). Only one contender using the same H may succeed. Never use `force=true` on `main`.
 6. Read back the branch HEAD and its lease from the resulting HEAD commit. Work may begin only when the observed `leaseId` equals this invocation's lease ID, `status=running`, and the expiry is still in the future. If an API call errors (including ambiguous connector/GraphQL errors), do not infer success or retry blind: reread HEAD and verify the lease ID. On uncertainty, fail closed.
 7. If acquisition fails because the ref changed, **do not immediately retry the takeover in a busy loop**. Read and respect the winner's current lease; the next scheduled run may try again.
