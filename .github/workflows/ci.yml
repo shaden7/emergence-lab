@@ -63,6 +63,16 @@ jobs:
           python -m emergence_lab.critical_gate --config configs/l32_critical_gate.json --output results/l32_critical_gate.json --workers 2
           # Surface key evidence as check annotations (readable via the REST API without log/artifact access).
           python -c "import json; r=json.load(open('results/l32_critical_gate.json')); m=r['main']; o=m['observables']; print('::notice title=L32 gate raw::npz_sha256=' + r['raw_npz_sha256'] + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy'] + ' commit=' + str(r['environment']['commit'])); print('::notice title=L32 gate result::gate_pass=%s E=%r rhatE=%r essminE=%r cover=%d absm=%r rhatM=%r essminM=%r power_control_G3_pass=%s' % (m['gate_pass'], o['energy']['pooled_mean'], o['energy']['rhat_max'], o['energy']['chain_ess_min'], o['energy']['chains_covering_exact'], o['abs_magnetization']['pooled_mean'], o['abs_magnetization']['rhat_max'], o['abs_magnetization']['chain_ess_min'], r['power_control']['checks']['G3_chain_ess_abs_magnetization']))"
+      - name: Preregistered 4x4 burn-in replication
+        # Executed on the preregistration commit via a temporary push trigger (runs 38037948647, 38038206636); dispatch only now.
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/burnin-replication-20261010' || github.ref == 'refs/heads/main')
+        timeout-minutes: 10
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.burnin_replication --config configs/exact4_burnin_replication.json --output results/burnin_replication.json | tee results/burnin_replication.txt
+          python -c "import json; r=json.load(open('results/burnin_replication.json')); print('::notice title=Burn-in replication raw::' + ' '.join('%s=%s' % kv for kv in r['raw_digests'].items()) + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy']); [print('::notice title=Burn-in %s::mean=%r se=%r t=%r p=%r verdict=%s' % (p['id'], p['mean'], p['stderr'], p['t'], p['p'], p['verdict'])) for p in r['analysis']['primary']]"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
