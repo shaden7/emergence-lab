@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261010T145640Z-d84b0e",
-  "leaseId": "dc54f34d-0f65-4bee-803d-23d72f06ca07",
-  "acquiredAt": "2026-10-10T14:56:58Z",
-  "heartbeatAt": "2026-10-10T14:56:58Z",
-  "expiresAt": "2026-10-10T16:56:58Z",
-  "task": "Recovery audit; Pilot A holdout evaluation once on merged main per RESEARCH_STATE next step",
-  "previousOwner": "rd-claude-20261010T141114Z-3b0788"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261010T145640Z-d84b0e"
 }
