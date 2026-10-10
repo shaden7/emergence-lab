@@ -196,3 +196,18 @@ def test_beacon_bls_verification_selftest():
     assert not bc.verify_round(dict(rec, round=R + 1), pkb.hex())["signature_verified"]
     bad = dict(rec, randomness="00" * 32)
     assert not bc.verify_round(bad, pkb.hex())["signature_verified"]
+
+
+def test_decisions_digest_invariant_to_blas_kernel(tmp_path):
+    """rows.csv bytes may differ across CPU kernels (last-bit rounding); decisions must not."""
+    import platform
+    import os
+    if platform.machine() not in ("x86_64", "AMD64"):
+        pytest.skip("OPENBLAS_CORETYPE override is x86-specific")
+    local = pb.run("dev", tmp_path / "a", root=ROOT)["manifest"]["decisions_sha256"]
+    env = dict(os.environ, OPENBLAS_CORETYPE="Prescott", OPENBLAS_NUM_THREADS="1")
+    subprocess.run([sys.executable, "-m", "emergence_lab.pilot_b", "--phase", "dev",
+                    "--output", str(tmp_path / "b")], cwd=ROOT, env=env, check=True,
+                   capture_output=True)
+    other = json.loads((tmp_path / "b" / "manifest.json").read_text())["decisions_sha256"]
+    assert other == local

@@ -400,6 +400,21 @@ def validate_frozen_files(root: Path = Path(".")) -> dict:
     return {"prereg_blob_sha": PREREG_BLOB_SHA, "config_sha256": CONFIG_SHA256}
 
 
+def decisions_digest(summary: dict, rows: list[dict]) -> str:
+    """SHA-256 of decision-relevant content only (per-cell detections, verdicts, r_hat, gate
+    pass flags and listed indices). Unlike rows.csv, which records floats via repr and so
+    depends on last-bit BLAS rounding (CPU kernel), this digest is comparable across machines."""
+    cells = [[r["instance"], r["t"], r["r"], r["detect_front"], r["detect_exterior"], r["verdict"]]
+             for r in rows]
+    inst = [[i["index"], i["class"], i["verdict"], i["r_hat"]] for i in summary["instances"]]
+    gates = {k: {kk: vv for kk, vv in v.items()
+                 if kk in ("pass", "false_rejections", "speed_overestimates", "spurious_instances",
+                           "c1_r0_all_detected", "detectable", "rejected")}
+             for k, v in summary["gates"].items()}
+    blob = json.dumps({"cells": cells, "instances": inst, "gates": gates}, sort_keys=True)
+    return hashlib.sha256(blob.encode()).hexdigest()
+
+
 def rows_to_csv(rows: list[dict]) -> bytes:
     buf = io.StringIO(newline="")
     w = csv.DictWriter(buf, fieldnames=CSV_FIELDS, lineterminator="\n")
@@ -428,7 +443,8 @@ def run(phase: str, output: Path, beacon: dict | None = None, root: Path = Path(
     csv_bytes = rows_to_csv(rows)
     (output / "rows.csv").write_bytes(csv_bytes)
     result = {"phase": phase, "key_hex": key.hex(), "key_source": key_source, **pins,
-              "summary": summary, "rows_sha256": hashlib.sha256(csv_bytes).hexdigest()}
+              "summary": summary, "rows_sha256": hashlib.sha256(csv_bytes).hexdigest(),
+              "decisions_sha256": decisions_digest(summary, rows)}
     result_bytes = (json.dumps(result, indent=1, sort_keys=True) + "\n").encode()
     (output / "result.json").write_bytes(result_bytes)
     manifest = {"phase": phase, "code_commit": os.environ.get("GIT_SHA"),
@@ -436,6 +452,7 @@ def run(phase: str, output: Path, beacon: dict | None = None, root: Path = Path(
                 "scipy": __import__("scipy").__version__, "cpu_seconds": round(cpu, 3),
                 "outputs": {"rows.csv": hashlib.sha256(csv_bytes).hexdigest(),
                             "result.json": hashlib.sha256(result_bytes).hexdigest()},
+                "decisions_sha256": result["decisions_sha256"],
                 "budget": cfg["budget"]}
     all_pass = all(g["pass"] for g in summary["gates"].values())
     manifest["gates_pass_B_G0_to_G5"] = all_pass

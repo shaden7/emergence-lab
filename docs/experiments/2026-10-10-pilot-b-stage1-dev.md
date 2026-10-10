@@ -12,7 +12,7 @@
 | `src/emergence_lab/pilot_b.py` | `instances(key)` generator, noisy `Oracle`, two exact reference paths, evaluator for B-G0…B-G5, manifest (B-G6), CLI (`--phase dev`; `--phase blind --allow-blind --beacon` refuses unverified beacons) |
 | `src/emergence_lab/pilot_b_analyst.py` | Frozen decision rule (§5). Imports only `math` and NumPy; it sees an instance only through `oracle.readouts(t, r, arm)` |
 | `src/emergence_lab/pilot_b_beacon.py` | drand quicknet pins, round↔time arithmetic, `randomness == SHA-256(signature)` check, BLS (G1 signature / G2 key, RFC 9380 hash-to-G1) verification with `py_ecc`, relay comparison |
-| `tests/test_pilot_b.py` | 22 tests: pins, z values, analyst import isolation (AST and subprocess), generator determinism/counts, both reference paths for every class with exact exterior zeros, noise-free oracle exactness, budget enforcement, analyst verdict boundaries at z₁·SE, dev gates + byte identity, blind-phase refusal, beacon arithmetic, BLS self-test |
+| `tests/test_pilot_b.py` | 23 tests: pins, z values, analyst import isolation (AST and subprocess), generator determinism/counts, both reference paths for every class with exact exterior zeros, noise-free oracle exactness, budget enforcement, analyst verdict boundaries at z₁·SE, dev gates + byte identity, decision digest invariant under a forced BLAS kernel, blind-phase refusal, beacon arithmetic, BLS self-test |
 | `.github/workflows/ci.yml` | Dev run twice + `cmp` + notice annotation |
 | `.github/workflows/pilot-b-beacon-check.yml` | PR / dispatch job: compares the pins with four relays' `/info` and BLS-verifies the latest round |
 
@@ -30,7 +30,18 @@
 
 ## Development-set run (key `SHA-256(b"pilot-b-dev-2027101101")` = `266f9a9f…34c9f6`)
 
-**Actually executed:** local cloud sandbox (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1). Two invocations produced byte-identical `rows.csv` (SHA-256 `fa657d024027ce3e587472912e522da61f44f7806b9f662f21f9a72a8cd53404`, 1 + 1,320 rows) and `result.json` (`247bda1c7bd9145ae64316cf5ab0bcee2e7c517b9a91d748c62aaa3bb8462309`). CPU 0.6 s, max RSS 68 MiB, outputs 152 KiB. These are inside the §9 budget (120 s / 512 MiB / 5 MiB). The CI run on the PR head re-executes this on Python 3.12; its digests are in the step annotation. Cross-version byte identity is **not** claimed until that annotation is compared.
+**Actually executed:** local cloud sandbox (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1). Two invocations produced byte-identical `rows.csv` (SHA-256 `fa657d024027ce3e587472912e522da61f44f7806b9f662f21f9a72a8cd53404`, 1 + 1,320 rows) and `result.json` (`43d87373f13945512e049fc0b159da8cdbee8d76001a9eab8fd23afe5599398a`). The **decision digest** is `6da5c8e328ffad3be6172bebf9c0a7a016db88a9abc943e958636724a5fd9f50` (see below). CPU 0.6 s, max RSS 68 MiB, outputs 152 KiB. These are inside the §9 budget (120 s / 512 MiB / 5 MiB).
+
+### Cross-machine reproducibility finding (raised by the first CI run, fixed in reporting)
+
+The first PR head `f8af39b` ran green in CI ([push 38082297835](https://github.com/shaden7/emergence-lab/actions/runs/38082297835), [PR 38082317954](https://github.com/shaden7/emergence-lab/actions/runs/38082317954)). Inside each job the two invocations were byte-identical (`cmp` passed). Across jobs, however, the `rows.csv` digests differed: `db7482b5…` and `0f8f8f04…`, both on Python 3.12.15 / NumPy 2.5.4, versus `fa657d02…` locally. The artifacts could not be downloaded from the sandbox, so the cause was reproduced locally instead. Forcing different OpenBLAS kernels (`OPENBLAS_CORETYPE` = SkylakeX / Haswell / Sandybridge / Prescott) gives four different `rows.csv` digests. Across the four:
+- max |ΔS| ≤ 1.7e-15, max |ΔD| ≤ 1.6e-15, max |Δz| ≤ 8e-11;
+- identical per-cell detections, verdicts, r̂ and gate results;
+- the closest |z| to either threshold is 0.027 away.
+
+`rows.csv` records floats with `repr`, so its bytes depend on last-bit BLAS rounding, which follows the runner's CPU.
+
+**Fix (reporting only; no rule, grid or threshold changed):** the manifest now carries `decisions_sha256`. It hashes per-cell detections, verdicts, r̂ and gate outcomes, and CI prints it. A test asserts it is unchanged under a forced Prescott kernel. B-G6's literal requirement (byte identity of two invocations *in the same environment*) holds. Cross-machine comparison should use the decision digest. For stage 2, the archived blind outputs are whatever the single blind run produced, and re-runs elsewhere are compared by decision digest. The CI annotation on the new head records whether the Python 3.12 decision digest equals `6da5c8e3…`.
 
 | Gate | Dev outcome | Detail |
 | --- | --- | --- |
@@ -40,7 +51,7 @@
 | B-G3 | PASS | all 4 C1 detect r = 0 at every t; 0 / 8 spurious C instances |
 | B-G4 | PASS | 6 detectable N instances (5 N2 and 1 N3 with d = 24, ε = 9.8e-3): 6 / 6 `H0_REJECTED` |
 | B-G5 | PASS | verdicts ⊆ {NO_RESPONSE, CONSISTENT_WITH_H0, H0_REJECTED}; 10 undetected N instances listed with analytic max exterior \|S\| |
-| B-G6 | dev part PASS | manifest with pins, versions, CPU, output hashes; byte identity on two invocations. The `code_commit` field is `null` locally and set from `GIT_SHA` in CI |
+| B-G6 | dev part PASS | manifest with pins, versions, CPU, output hashes and decision digest; byte identity on two invocations in the same environment. The `code_commit` field is `null` locally and set from `GIT_SHA` in CI |
 
 **Undetected non-strict dev instances (descriptive, the intended lesson, not a gate):** all five N1 (γ = 0.21…0.58; max exterior \|S\| 8e-8…1.7e-5, every one below the detection limit 5.73e-5) and five N3 whose shortcut site `d ∈ {20, 49, 73, 84, 94}` puts every grid exterior cell at exactly S = 0 within t ≤ 4. These are **undetected violations**, not evidence of bounded support. Rejection counts by class: N2 5/5, N3 1/6 (Wilson 95 % [0.03, 0.56]), N1 0/5 ([0, 0.43]).
 

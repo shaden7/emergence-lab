@@ -47,7 +47,7 @@ jobs:
           python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev_repeat
           cmp results/pilot_b_dev/rows.csv results/pilot_b_dev_repeat/rows.csv
           cmp results/pilot_b_dev/result.json results/pilot_b_dev_repeat/result.json
-          python -c "import json; m=json.load(open('results/pilot_b_dev/manifest.json')); print('::notice title=Pilot B dev::' + json.dumps(m['outputs']) + ' gates_pass=' + str(m['gates_pass_B_G0_to_G5']) + ' cpu=' + str(m['cpu_seconds']) + ' python=' + m['python'] + ' numpy=' + m['numpy'])"
+          python -c "import json; m=json.load(open('results/pilot_b_dev/manifest.json')); print('::notice title=Pilot B dev::' + json.dumps(m['outputs']) + ' decisions_sha256=' + m['decisions_sha256'] + ' gates_pass=' + str(m['gates_pass_B_G0_to_G5']) + ' cpu=' + str(m['cpu_seconds']) + ' python=' + m['python'] + ' numpy=' + m['numpy'])"
       - name: Pre-registered M4 interval coverage audit
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
         timeout-minutes: 20
