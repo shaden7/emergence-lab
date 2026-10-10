@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T073142Z-d6f71d`, L32 critical-mixing gate; see the final section).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T081233Z-2bca3d`: later-pass review of PR #13 and burn-in replication; see the final section).
 
 ## Mission
 Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
@@ -49,7 +49,7 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Exact 4x4 enumeration reference and provenance-checked holdout validator (`exact4.py`); interval-coverage audit (`coverage4.py`); paired burn-in sensitivity (`burnin4.py`).
 - Phase-0 diagnostics: finite-size pilot with J=0 null (`finite_size.py`), exact-stationary start comparison (`equilibration4.py`), L16/L32 hot/cold mixing and ESS (`mixing_pilot.py`, `scripts/mixing_diagnostics.py`), interacting 1D Ising null (`ising_1d_control.py`), AR(1) autocorrelation controls.
 - CLI seed-collision check and 1e8 spin-proposal default budget before any output (`cli.py`).
-- Exact finite-torus energy (Kaufman/Beale) for any M x N periodic lattice (`exact_finite.py`), checked against 4x4 enumeration and an independent transfer matrix; rank-normalized/folded split-R̂, bulk/tail ESS and Geyer per-chain ESS (`convergence.py`, matches ArviZ 1.3.0 to ~1e-12); preregistered L32 critical-mixing gate runner (`critical_gate.py`, manual dispatch only).
+- Exact finite-torus energy (Kaufman/Beale) for any M x N periodic lattice (`exact_finite.py`), checked against 4x4 enumeration and an independent transfer matrix; rank-normalized/folded split-R̂, bulk/tail ESS and Geyer per-chain ESS (`convergence.py`, matches ArviZ 1.3.0 to ~1e-12); preregistered L32 critical-mixing gate runner (`critical_gate.py`, manual dispatch only); independent single-cluster Wolff cross-check (`scripts/wolff_crosscheck.py`); preregistered burn-in replication runner with exact Student-t p-values (`burnin_replication.py`, manual dispatch only).
 - Heavy fixed-seed pilots run only on manual `workflow_dispatch`; ordinary pushes run pytest, smoke and the exact4 holdout.
 - Deterministic seeded CPU experiments with JSON configs.
 - CSV measurements and JSON manifest, basic pytest tests, Docker container capped at 0.5 vCPU and 1536 MB.
@@ -64,12 +64,12 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 ## Scientific cautions
 Monte Carlo samples are autocorrelated; the initial averages do not demonstrate a phase transition or novel physical findings. The infinite-lattice Ising benchmark critical temperature is 2/log(1+sqrt(2)) in units J=k_B=1.
 
-## Next priority (updated 2026-10-10, after PR #13)
-Phase-0 decision remains **NO-GO**; Phase 1 has not started. The L32/Tc critical-mixing blocker is **cleared for the checkerboard sampler at the registered budget** (PR #13, see final section). Remaining GO gates from `docs/ISING_CALIBRATION_REPORT.md` §D, in order:
-1. **Burn-in replication (unchanged):** preregister a fresh-seed run (≥20 batches; T=1.5 and 2.269; burn-in 0/100/1600) with paired shifts as primary outcome, to confirm the zero-burn-in bias and test the unexplained burn-1600 energy offset at T=1.5.
+## Next priority (updated 2026-10-10, after PRs #15 and #16)
+Phase-0 decision remains **NO-GO**; Phase 1 has not started. The L32/Tc critical-mixing blocker is **cleared for the checkerboard sampler at the registered budget** (PR #13; later-pass review with an independent Wolff sampler confirmed it, PR #15). The **burn-in replication is done** (PR #16): the T = 1.5 zero-burn-in bias replicated, the Tc shifts were unresolved at 20 batches, the burn-1600 anomaly was not replicated. Remaining GO gates from `docs/ISING_CALIBRATION_REPORT.md` §D, in order:
+1. ~~Burn-in replication~~ — completed 2026-10-10, see final section. Practical consequence for later designs: use ≥ 100 sweeps burn-in from random starts; at Tc on 4×4 a bias of order 0.005 needs well over 20 batches of 4 chains to resolve.
 2. **Coverage gate (report gate 4):** with the exact finite-L energy now available for any L, preregister a many-batch coverage study (≈200 batches, Wilson half-width < 0.05) on new seeds, e.g. at L=16 and 32 near Tc; budget it against the measured τ (|m| τ ≈ 85 sweeps at L32).
 3. **Finite-size gate (report gate 5):** L = 8…32 with long, mixing-verified chains, hot/cold checks and fit-window stability; exponent estimates stay exploratory until then.
-4. **Raw-artifact durability (report gate 6):** Actions artifacts and logs are not reachable from the review environment (blob-storage egress) and expire; decide an archive location (e.g. release assets) as a reviewed change. Deterministic byte-identical regeneration (shown for PR #13) mitigates but does not replace archival.
+4. **Raw-artifact durability (report gate 6):** Actions artifacts and logs are not reachable from the review environment (blob-storage egress) and expire; decide an archive location (e.g. release assets) as a reviewed change. Deterministic byte-identical regeneration (shown for PR #13; for PR #16 all Monte-Carlo output, with analytic reference floats differing at ULP level) mitigates but does not replace archival. Hash simulation output separately from analytic references.
 5. Only after the Ising gate: implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.
 6. Deployment of merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
 
@@ -348,3 +348,38 @@ Reviews are AI-mediated self-reviews by the producing session, not independent r
 
 **Next single informative step:** preregister the burn-in replication (priority 1 above) — or, if a session prefers the larger lever, the many-batch coverage study, now possible at L ≥ 8 thanks to the exact finite-L energy.
 
+
+## Director session: PR #13 later-pass review and burn-in replication (2026-10-10, lease `rd-claude-20261010T081233Z-2bca3d`)
+
+**Questions:** (1) Does the L32 critical-mixing gate (PR #13, self-reviewed by its producer) survive a second session's challenge? (2) Do the post hoc burn-in findings of the PR #10 analysis replicate on fresh seeds (report priority 1)?
+
+**Recovery audit:** previous lease released cleanly by `rd-claude-20261010T073142Z-d6f71d` (lock tree pruned to `lease.json`); no open PRs; no queued/running workflows; `main` green at `06705ef`. Nothing incomplete. Lease commits of this session triggered no CI run (PR #14 fix confirmed in practice).
+
+**Integrated (expected-head-SHA guard, exact-head CI success, review comment on the PR):**
+
+| PR | Content | Merge commit | Review decision |
+| --- | --- | --- | --- |
+| #15 | later-pass review of #13; independent Wolff cross-check | `ba78b24bc594d5452fb60eb431a5ae8f13eaf1eb` | PASS (also recorded on #13 as "PASS confirmed") |
+| #16 | preregistered fresh-seed burn-in replication | `5e52ff17b35a3b80f532f0eac853c052711c0d05` | PASS |
+
+Reviews are AI-mediated; #15 is a second-session review of #13, #16 is a producer self-review (a later-pass challenge is invited).
+
+**Actually executed:** full pytest (120 passed, Python 3.13.16 / NumPy 2.5.3); L32 gate re-run (raw `.npz` SHA-256 `57ae4ea0…` byte-identical, third execution); Wolff cross-check (16 chains, 188 s); burn-in replication locally (50 s) and twice on the GitHub runner ([38037948647](https://github.com/shaden7/emergence-lab/actions/runs/38037948647) on the preregistration commit `ad3bc54`, [38038206636](https://github.com/shaden7/emergence-lab/actions/runs/38038206636)). Nothing ran on Lightsail.
+
+**Evidence, by level**
+- *Known mathematics (not ours):* Kaufman's finite-torus partition function, now also checked against an independent transfer matrix on 32 × 6/9/10 tori (≤ 1.8e-12) and Z(M,N) = Z(N,M); exact 4 × 4 enumeration.
+- *Numerical observations:*
+  - L32/Tc, independent Wolff sampler vs checkerboard gate: E −1.433404 ± 0.000284 vs −1.433862 ± 0.000446 (z +0.87; Wolff vs exact z +0.90); |m| 0.653710 ± 0.000439 vs 0.655549 ± 0.001235 (z −1.40). Rule |z| ≤ 3 fixed before the run. [Review record](experiments/2026-10-10-l32-gate-later-pass-review.md).
+  - Burn-in replication (20 batches, seeds 2029061001–160, Bonferroni α = 0.00714): **replicated** P1 zero-burn |M| bias at T = 1.5 (−0.00381 ± 0.00049), P2 energy bias (+0.00826 ± 0.00134), P3/P4 paired 0 → 100 shifts at T = 1.5 (E −0.00840 ± 0.00089, |M| +0.00381 ± 0.00036). **Not replicated:** P5/P6 shifts at Tc (−0.00619 ± 0.00296, p = 0.050; +0.00368 ± 0.00135, p = 0.013 — same direction, below threshold); P7 burn-1600 energy anomaly (+0.00017 ± 0.00144; marginal, CI upper +0.00319 vs original +0.0033). [Result note](experiments/2026-10-10-burnin-replication.md).
+  - Byte-level reproduction localized: Monte-Carlo output identical local vs runner; only exact-enumeration reference floats differ at ULP level.
+- *Hypotheses:* a burn-in bias of order 0.005 at Tc on 4 × 4 (unresolved, not refuted); the earlier unexplained burn-in byte mismatch has the same reference-float cause (plausible, not verified).
+- *Proofs:* none.
+- *Methodological decision:* report priority 1 completed; **Phase-0 NO-GO stands** (coverage gate 4, finite-size gate 5, archival gate 6 open).
+
+**Limitations / counterarguments:** all reviews by the same model family; prospective power for P5–P7 was overestimated (scaled from noisy 10-batch SEs) — the replication SEs were 1.6–2.3× larger than predicted; 4 × 4 burn-in facts do not transfer to larger L; Wolff and checkerboard share lattice conventions and the PCG64 generator.
+
+**Deployment status:** unchanged; nothing deployed, no Lightsail runs, no paid APIs, EatSleepFeel untouched.
+
+**Open blockers:** coverage gate 4 and finite-size gate 5 (scientific); artifact archival location (operational, needs a reviewed decision); deployment of merged code (operational, separate reviewed decision).
+
+**Next single informative step:** preregister the many-batch coverage study (gate 4) at L = 16 and 32 near Tc using the exact finite-L energy, sized from the measured τ and with a pilot-variance allowance (lesson from P5–P7).
