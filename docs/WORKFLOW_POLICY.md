@@ -85,7 +85,7 @@ An upstream failure is not a reason to create another downstream PR. It is a rea
 
 1. Read `AGENTS.md`, `docs/RESEARCH_DIRECTOR.md`, this policy, `docs/RESEARCH_STATE.md`, and the scientific overview/README.
 2. Enumerate actual open PRs/issues; choose an unblock/review/integration step **before** new development while above WIP limit.
-3. Inspect the chosen branch/diff, run checks or experiment within resource limits, attempt a counterexample, record an evidence-level review.
+3. After acquiring the verified lease, perform the interrupted-session recovery audit in [RESEARCH_LOCK.md](RESEARCH_LOCK.md) when a session stopped unexpectedly or work is unverified: inspect exact PR/branch heads, workflow statuses and artifacts before resuming, merging or starting duplicate experiments. Then inspect the chosen diff, run checks within resource limits, attempt a counterexample, and record an evidence-level review.
 4. If the objective gates pass, **merge autonomously** using the available GitHub tool, respecting branch protection and no-auto-deploy safeguards; otherwise revise the existing PR or state exactly what fails.
 5. Keep `docs/RESEARCH_STATE.md` representative of `main`, using traceable commit/config/artifact IDs. Link to the review/merge decisions.
 6. Leave one short handoff describing **tested, reviewed, merged, merely proposed**, specific blockers and next discriminating action.
