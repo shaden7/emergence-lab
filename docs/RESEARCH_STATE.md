@@ -1,6 +1,22 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Pilot B **stage 1 implemented on open [PR #30](https://github.com/shaden7/emergence-lab/pull/30), not on `main`**: generator, oracle, isolated analyst, evaluator and drand quicknet verification. Dev key only: B-G0…B-G5 pass, and the quicknet pins and a live BLS-signed round were verified against four relays in CI. No blind key exists. Prior: Pilot B preregistration v1.0-r1 integrated via [PR #29](https://github.com/shaden7/emergence-lab/pull/29). Next: later-pass review and merge of PR #30, which fixes the blind round R. Not a physics claim.)
+Last handoff update: 2026-10-10 (Pilot B **stage 1 accepted in a later-pass review (PASS) and integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30)**: generator, oracle, isolated analyst, evaluator and relay-verified drand quicknet pins. Dev key only; no blind key exists and no blind evaluation has run. The merge commit timestamp fixes the blind round R, recorded on the PR. Next: Stage 2, a once-only blind-run workflow on `main`, as a separate PR; it must not run before round R is published. Not a physics claim.)
+
+## Director session: later-pass review and merge of Pilot B stage 1 (2026-10-10, `rd-claude-20261010T205622Z-908995`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T195637Z-0eea4a`) was released cleanly at lock commit `c38026f`. Its work was open [PR #30](https://github.com/shaden7/emergence-lab/pull/30) at head `7686584`, with all three workflows green on that head: push [38082783464](https://github.com/shaden7/emergence-lab/actions/runs/38082783464), PR [38082785677](https://github.com/shaden7/emergence-lab/actions/runs/38082785677) and beacon [38082785660](https://github.com/shaden7/emergence-lab/actions/runs/38082785660). There were no queued or running workflows and Issue #4 was unchanged. Nothing was incomplete. The PR's stage-1 note still described the beacon as unverified; this review corrected it.
+
+**Review (this session did not author the code; same model family, so not external review):** decision **PASS**. Details are in the [stage-1 note](experiments/2026-10-10-pilot-b-stage1-dev.md), section *Later-pass review*.
+- *Read against the prereg text:* generator, analyst and evaluator against §3/§5/§7/§8; beacon arithmetic against the drand round formula. The pins match 4/4 relays and three live rounds BLS-verify in CI.
+- *Local checks:* `pytest -q` 235 passed. Dev run ×2 byte-identical. Decision digest `6da5c8e3…` equals the Python 3.12 CI value. An independent recomputation of all verdicts and r̂ found 0 mismatches.
+- *Calibration Monte Carlo (400 non-blind review keys, a review check, not a Pilot B result):* exterior false-rejection rate 0.0518 (exact 0.0488, SE 0.0022); spurious C2 0.086 / C1 0.079 (prereg 0.079 / 0.075); speed overestimate 0.028; power 2,347/2,347. Gate failures: B-G1 13/400, B-G2 2/400, B-G3 10/400, all others 0. **A correct implementation therefore fails some gate in the blind run with probability ≈ 6 %.** Under §8 such a failure is published, not rerun.
+- *Non-blocking:* B-G4 with fewer than 3 detectable instances is stricter than the prereg's "vacuous pass". It never occurred (min 5 detectable per key).
+
+**Evidence level:** implementation review plus a stochastic calibration check of a stipulated detector model; no blind evaluation; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** compute R from the merge commit (`python -m emergence_lab.pilot_b_beacon round-for-merge <merge-time>`; the value is recorded on PR #30). Stage 2 is a separate PR: a `workflow_dispatch` blind-run workflow on `main` that fails closed before R's timestamp, fetches and verifies round R, runs `--phase blind` once and archives the outputs durably as for N5. Dispatch it only after R is published.
+
+Director run rd-claude-20261010T205622Z-908995: start 2026-10-10T20:55:52Z, end 2026-10-10T21:07:15Z, duration 11 min
 
 ## Director session: Pilot B stage 1 implementation (2026-10-10, `rd-claude-20261010T195637Z-0eea4a`)
 

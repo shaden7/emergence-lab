@@ -1,6 +1,6 @@
 # Pilot B stage 1 — implementation and development-set check (2026-10-10)
 
-**Status:** PROPOSED (open PR, not on `main`). Development key only; **no blind key exists and no blind evaluation has run.**
+**Status:** stage-1 code accepted in a later-pass review (PASS, session `rd-claude-20261010T205622Z-908995`, [record](https://github.com/shaden7/emergence-lab/pull/30)) and integrated via PR #30; the merge commit and the resulting blind round R are recorded on the PR. Development key only: **no blind evaluation has run.**
 **Session:** `rd-claude-20261010T195637Z-0eea4a` (producer of this code; a different session must do the later-pass review).
 **Frozen design:** [preregistration v1.0-r1](../PILOT_B_BLINDED_INTERVENTION_PREREGISTRATION.md) (Git blob `dd5dbefe950add3341366224b76ba179326282c8`), [config](../../configs/pilot_b.json) (SHA-256 `3fc24afa33c31c91eb0f96be8ac7b785a7abb13083725fd39d6df406640d6d2e`). Both are verified at run time; any change fails closed. Neither file is modified by this stage.
 **Scope:** methodology only. Every instance is a stipulated linear dynamics on a ring. Nothing here concerns physical spacetime, signalling or causality in nature.
@@ -65,11 +65,41 @@ The first PR head `f8af39b` ran green in CI ([push 38082297835](https://github.c
   - round arithmetic: round 1 at genesis, `round_time(R) = genesis + (R−1)·period`, and R is the first round with timestamp ≥ merge time + 24 h;
   - `randomness = SHA-256(signature)`;
   - BLS verification. A synthetic-keypair self-test accepts the valid signature and rejects a wrong round or wrong randomness.
-- **Not yet verified:**
-  - *Pinned quicknet values:* chain hash `52db9ba7…84e971`, public key `83cf0f28…ece45a`, period 3 s, genesis 1692803367, scheme `bls-unchained-g1-rfc9380`. These are typed from the model's prior knowledge, which is **not evidence**. The sandbox proxy blocks drand.
-  - *Real-chain BLS check:* `py_ecc`'s hash-to-G1 has not yet been checked against a real quicknet signature.
-- **How they will be checked:** the `Pilot B drand quicknet check` workflow on this PR does both. It compares the pins with the `/info` served by four relays (it requires ≥ 2 to match) and BLS-verifies the latest round. **If it fails, the pilot stays BLOCKED** (no substitute seed). The pins may then be corrected only from relay-served values, with the discrepancy recorded.
+- **Verified in CI (resolves the stage-1 chain-hash requirement of §6.3):** the `Pilot B drand quicknet check` workflow compared the pins (chain hash `52db9ba7…84e971`, public key `83cf0f28…ece45a`, period 3 s, genesis 1692803367, scheme `bls-unchained-g1-rfc9380`) with the `/info` served by four relays (api, api2, api3.drand.sh and drand.cloudflare.com): **4/4 match**. Live rounds verified with `randomness = SHA-256(signature)` and the BLS pairing check (py_ecc hash-to-G1): 32953113 (run [38082317982](https://github.com/shaden7/emergence-lab/actions/runs/38082317982)), 32953201 ([38082611228](https://github.com/shaden7/emergence-lab/actions/runs/38082611228)) and 32953256 ([38082785660](https://github.com/shaden7/emergence-lab/actions/runs/38082785660), final code head). Round 32953256 maps to 2026-10-10T20:12:12Z under `round_time`, consistent with that run's 20:11:49–20:12:20Z window (5 s behind). The pins were typed from model memory first; they are now relay-confirmed, not memory-based.
 - **Stage 2 gap:** a workflow that runs the blind phase exactly once on `main`, fetches round R via `fetch-round` and archives the outputs is **not** part of this PR. It belongs to stage 2 and must not run before R is published.
+
+## Later-pass review (session `rd-claude-20261010T205622Z-908995`; did not author the code; same model family, so not external review)
+
+**Decision: PASS.** Checked against prereg v1.0-r1 text:
+- §3 class definitions, parameter ranges and counts; S3 normalisation Σ|a_j| = 1; N3 symmetric base with w₀ ≥ 0.0244 > ε.
+- §5 rule in the analyst (z₁/z₂ Bonferroni, exterior r > 4t, r̂, exhaustive verdicts).
+- §7 seed streams; §8 gate logic in the evaluator; and the beacon arithmetic and BLS scheme.
+
+**Actually executed (local sandbox, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1, `OPENBLAS_NUM_THREADS=1`):**
+- `pytest -q`: 235 passed.
+- Dev run ×2 byte-identical (`rows.csv` `fa657d02…`, `result.json` `43d87373…`).
+- Decision digest `6da5c8e3…`, equal to the Python 3.12.15 CI value on head `7686584` ([38082785677](https://github.com/shaden7/emergence-lab/actions/runs/38082785677)).
+- A separate review script recomputed every z, detection, verdict and r̂ from `rows.csv`: 0 mismatches over 40 instances.
+
+**Calibration Monte Carlo (review check, not a Pilot B result):** the full pipeline ran on 400 non-blind review keys `SHA-256(b"pr30-review-mc-<i>")` (16,000 instances), with counts recomputed independently. Rates against expectations under exact calibration:
+
+| Quantity | Observed | Expected |
+| --- | --- | --- |
+| Exterior false rejection, H0 instances | 497/9,600 = 0.0518 | 1 − (1 − 0.05/12)¹² = 0.0488; binomial SE 0.0022 |
+| Speed overestimate, strict instances | 178/6,400 = 0.028 | bound 0.05 |
+| Spurious C2 | 0.086 | prereg 0.079; SE 0.007 |
+| Spurious C1 | 0.079 | prereg 0.075 |
+| B-G1 failure | 13/400 | prereg 0.030 |
+| B-G2 failure | 2/400 | prereg bound 0.007 |
+| B-G3 failure | 10/400 | prereg ≤ 0.020 |
+| B-G0, B-G4, B-G5 failure | 0/400 | — |
+| Power on detectable N | 2,347/2,347 rejected | ≥ 90 % required |
+
+Detectable N instances per key: min 5, mean 5.87. Per-instance rates agree with exact calibration within sampling error. Consequence to state before the blind run: **even a correct implementation fails some gate with probability ≈ 6 %** (sum of the B-G1/B-G2/B-G3 tails); a blind gate failure is then published as a failure per §8, not rerun.
+
+**Non-blocking notes:**
+- B-G4 with 1–2 detectable instances computes the fraction instead of the prereg's "vacuous pass". This is stricter than the text, but it never occurred in 400 keys (min 5 detectable, mostly N2).
+- The stage-1 note's beacon section was stale ("not yet verified"); this review corrected it from the CI annotations.
 
 ## Limitations
 
