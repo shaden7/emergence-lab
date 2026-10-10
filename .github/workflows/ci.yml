@@ -73,7 +73,7 @@ jobs:
           OMP_NUM_THREADS: 1
         run: |
           python -m emergence_lab.burnin_replication --config configs/exact4_burnin_replication.json --output results/burnin_replication.json | tee results/burnin_replication.txt
-          python -c "import json,hashlib; r=json.load(open('results/burnin_replication.json')); raw=json.dumps(r['raw'],sort_keys=True).encode(); print('::notice title=Burn-in replication raw::raw_sha256=' + hashlib.sha256(raw).hexdigest() + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy']); [print('::notice title=Burn-in %s::mean=%r se=%r t=%r p=%r verdict=%s' % (p['id'], p['mean'], p['stderr'], p['t'], p['p'], p['verdict'])) for p in r['analysis']['primary']]"
+          python -c "import json; r=json.load(open('results/burnin_replication.json')); print('::notice title=Burn-in replication raw::' + ' '.join('%s=%s' % kv for kv in r['raw_digests'].items()) + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy']); [print('::notice title=Burn-in %s::mean=%r se=%r t=%r p=%r verdict=%s' % (p['id'], p['mean'], p['stderr'], p['t'], p['p'], p['verdict'])) for p in r['analysis']['primary']]"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

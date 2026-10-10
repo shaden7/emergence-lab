@@ -7,6 +7,7 @@ arm have disjoint seeds and are the independent replicates; arm-to-arm
 contrasts are paired by batch.
 """
 import argparse
+import hashlib
 import json
 import math
 import platform
@@ -148,6 +149,21 @@ def evaluate(report: dict) -> dict:
     return {"primary": primary, "exploratory_uncorrected": exploratory, "coverage_secondary": coverage}
 
 
+def raw_digests(report: dict) -> dict:
+    """SHA-256 of the full raw report and of field groups, to localize cross-platform differences.
+
+    Reporting only (added after preregistration; it does not touch hypotheses or decisions).
+    """
+    def h(obj) -> str:
+        return hashlib.sha256(json.dumps(obj, sort_keys=True).encode()).hexdigest()
+    rows = [r for arm in report["arms"] for r in arm["batches"]]
+    return {"all": h(report), "batch_means": h([r["mean"] for r in rows]),
+            "references": h([r["reference"] for r in rows]),
+            "intervals": h([[r["lower"], r["upper"]] for r in rows]),
+            "aggregates": h([arm["aggregates"] for arm in report["arms"]]),
+            "paired_contrasts": h(report["paired_contrasts"])}
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="Preregistered 4x4 burn-in replication")
     p.add_argument("--config", type=Path, required=True)
@@ -157,7 +173,7 @@ def main() -> None:
     check_config(cfg)
     report = burnin_sensitivity(cfg)
     result = {"config": cfg, "environment": {"python": platform.python_version(), "numpy": np.__version__},
-              "analysis": evaluate(report), "raw": report}
+              "analysis": evaluate(report), "raw_digests": raw_digests(report), "raw": report}
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, indent=2) + "\n")
     for row in result["analysis"]["primary"]:
