@@ -195,6 +195,10 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.with_suffix(".npz").write_bytes(raw)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
+    print("raw_npz_sha256", report["raw_npz_sha256"])
+    for name, o in report["main"]["observables"].items():
+        print(name, "pooled_mean", repr(o["pooled_mean"]), "rhat_max", repr(o["rhat_max"]),
+              "chain_ess_min", repr(o["chain_ess_min"]))
     print("gate_pass", report["main"]["gate_pass"], json.dumps(report["main"]["checks"]))
     print("power_control", json.dumps(report["power_control"]["checks"]))
 
