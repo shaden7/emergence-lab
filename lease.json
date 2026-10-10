@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T165622Z-55e236",
+  "leaseId": "c4cde2a6-9618-4455-aa8f-cb870a8807a4",
+  "acquiredAt": "2026-10-10T16:56:33Z",
+  "heartbeatAt": "2026-10-10T16:56:33Z",
+  "expiresAt": "2026-10-10T18:56:33Z",
+  "task": "Director hourly run: recovery audit, backlog check, next preregistered step",
   "previousOwner": "rd-gpt6-20261010T153936Z-6b85701b"
 }
