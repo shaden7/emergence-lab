@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T215634Z-08323a",
+  "leaseId": "fa0703c3-3239-429b-9e91-deecaba59d06",
+  "acquiredAt": "2026-10-10T21:56:34Z",
+  "heartbeatAt": "2026-10-10T21:56:34Z",
+  "expiresAt": "2026-10-10T23:56:34Z",
+  "task": "hourly director run: review/integration per WORKFLOW_POLICY",
   "previousOwner": "rd-claude-20261010T205622Z-908995"
 }
