@@ -322,7 +322,7 @@ No research PRs remain open. Reviews are AI-mediated later-pass checks, not inde
 | PR | Content | Merge commit | Review decision |
 | --- | --- | --- | --- |
 | #14 | lock branch holds only `lease.json`; `push.branches-ignore` for it | `20603ea80a2ba89e4390f7fc58a5db6f27c22288` | PASS |
-| #13 | L32 gate: preregistration, exact finite-L energy, rank-normalized diagnostics, holdout result | see PR #13 merge record | PASS |
+| #13 | L32 gate: preregistration, exact finite-L energy, rank-normalized diagnostics, holdout result | `effba3e9d9ad68956623a6f21f9f14ca93f2bf23` | PASS |
 
 Reviews are AI-mediated self-reviews by the producing session, not independent review; a later-pass challenge of PR #13 by another session is invited.
 
