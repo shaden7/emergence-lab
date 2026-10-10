@@ -73,6 +73,18 @@ def validate_results(config_path: Path, results_dir: Path) -> dict:
     if len(measurements) != expected_count or len(summaries) != len(cfg["temperatures"]):
         raise ValueError("wrong number of chains or temperature summaries")
 
+    # Verify the preregistered producer schedule, not merely seed uniqueness.
+    # See cli.py: size -> temperature -> repeat, with rounded T*100.
+    expected_seeds = {
+        float(t): {
+            int(cfg["base_seed"]) + 100000 * 4 + 1000 * int(round(float(t) * 100)) + repeat
+            for repeat in range(cfg["repeats"])
+        }
+        for t in cfg["temperatures"]
+    }
+    if len(set().union(*expected_seeds.values())) != expected_count:
+        raise ValueError("configured seed schedule collides across temperatures")
+    expected_measurements = (cfg["sample_sweeps"] + cfg["sample_every"] - 1) // cfg["sample_every"]
     by_temperature = {}
     all_seeds = set()
     for row in measurements:
@@ -85,6 +97,11 @@ def validate_results(config_path: Path, results_dir: Path) -> dict:
         if seed in all_seeds:
             raise ValueError("duplicate RNG seed in measurements")
         all_seeds.add(seed)
+        for key in ("burn_sweeps", "sample_sweeps", "sample_every"):
+            if int(row[key]) != int(cfg[key]):
+                raise ValueError(f"measurement {key} disagrees with config")
+        if int(row["measurements"]) != expected_measurements:
+            raise ValueError("measurement count disagrees with config")
         by_temperature.setdefault(t, []).append(row)
 
     by_summary = {}
@@ -99,6 +116,8 @@ def validate_results(config_path: Path, results_dir: Path) -> dict:
     comparisons = []
     for t in cfg["temperatures"]:
         chain_rows = by_temperature.get(t, [])
+        if {int(row["seed"]) for row in chain_rows} != expected_seeds[float(t)]:
+            raise ValueError("measurement seeds disagree with preregistered schedule")
         if len(chain_rows) != cfg["repeats"] or t not in by_summary:
             raise ValueError("missing independent chains/summary")
         reference = exact_observables(t)
