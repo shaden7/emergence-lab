@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T081233Z-2bca3d",
+  "leaseId": "c6bb679dd186c64df99d48f2d274a8b4",
+  "acquiredAt": "2026-10-10T08:12:33Z",
+  "heartbeatAt": "2026-10-10T08:12:33Z",
+  "expiresAt": "2026-10-10T10:12:33Z",
+  "task": "Director run: recovery audit, later-pass review of PR #13, next gate (burn-in replication prereg)",
   "previousOwner": "rd-claude-20261010T073142Z-d6f71d"
 }
