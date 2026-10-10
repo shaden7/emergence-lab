@@ -1,0 +1,44 @@
+{
+  "parent_protocol": "docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md",
+  "parent_protocol_sha256": "c8061aed335bda61c9f35cc72b601aac8d1287436c49c83883ea5ec36b9e4c96",
+  "preregistration": "docs/PILOT_A_N5_NOISE_PREREGISTRATION.md",
+  "seed_base": 2027101005,
+  "replicates": 20,
+  "sites": [
+    0,
+    1,
+    2,
+    4,
+    6,
+    8,
+    12
+  ],
+  "sigmas": [
+    0,
+    0.000001,
+    0.0001
+  ],
+  "thresholds": [
+    0.001,
+    0.000001,
+    1e-9
+  ],
+  "models": {
+    "W": {
+      "t": 1
+    },
+    "H": {
+      "t": 1
+    },
+    "CA": {
+      "n": 2,
+      "L": 128
+    },
+    "Q": {
+      "t": 1,
+      "L": 128
+    }
+  },
+  "sentinel_r": 6,
+  "noise_model": "independent Gaussian per arm per cell; S_hat=abs(S_true+eps_do-eps_control)"
+}

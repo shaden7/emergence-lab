@@ -1,0 +1,122 @@
+name: Pilot A N5 durable raw-evidence archive
+
+# Separate, bounded release upload. Push trigger occurs only when this archive
+# workflow is first merged/changed on main; future regeneration is manual.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/archive-pilot-a-n5.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pilot-a-n5-evidence-2026-10-10-v1
+  cancel-in-progress: false
+
+jobs:
+  archive-n5:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GIT_SHA: ${{ github.sha }}
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+      TAG: pilot-a-n5-evidence-2026-10-10-v1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned NumPy and project
+        run: |
+          pip install -e '.[test]'
+          pip install 'numpy==2.5.3'
+          python -c "import numpy; assert numpy.__version__ == '2.5.3'"
+      - name: Reproduce frozen detector-noise data and verify preregistered gates
+        timeout-minutes: 2
+        run: |
+          python -m emergence_lab.pilot_a_noise --config configs/pilot_a_n5.json --output results/pilot_a_n5
+          echo 'af7ec7546f4fa62dabfb0bed29352702c984ab3618ce2e9af73d6e2d293d27fd  results/pilot_a_n5/rows.csv' | sha256sum --check
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          r = json.loads(Path('results/pilot_a_n5/result.json').read_text())
+          m = r['manifest']
+          assert all(r['gates'].values()), r['gates']
+          assert m['preregistration_commit'] == '8686ae276e6cb4892c8410874136ae2baf31c93e'
+          assert m['n5_prereg_git_blob_sha'] == '966a36a163033e62883bebb28ae3e27a21260ff'
+          assert m['config_sha256'] == 'a0a010508f15ff490b9a38eda9612607c5908bf00ce6320585d82017c3cc9884'
+          assert m['rows_csv_sha256'] == 'af7ec7546f4fa62dabfb0bed29352702c984ab3618ce2e9af73d6e2d293d27fd'
+          assert m['executing_commit'] == __import__('os').environ['GIT_SHA']
+          w = next(x for x in r['conditions'] if x['model']=='W' and x['sigma']==1e-6 and x['eta']==1e-6)
+          ca = next(x for x in r['conditions'] if x['model']=='CA' and x['sigma']==1e-6 and x['eta']==1e-6)
+          assert (w['sentinel_false_detection'],ca['sentinel_false_detection']) == (9,8)
+          print('PASS N5 archive prereg/gates/hash and sentinel counts 9/20 W, 8/20 CA')
+          PY
+      - name: Prepare digest-pinned archive and immutable metadata
+        run: |
+          mkdir -p results/release
+          cp results/pilot_a_n5/rows.csv results/release/n5_rows.csv
+          cp results/pilot_a_n5/result.json results/release/n5_result.json
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path('results/release')
+          hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (d/'n5_rows.csv',d/'n5_result.json')}
+          record={'schema':1,'release_tag':os.environ['TAG'],'source_main_sha':os.environ['GIT_SHA'],
+                  'preregistration_commit':'8686ae276e6cb4892c8410874136ae2baf31c93e',
+                  'n5_data_runner':'src/emergence_lab/pilot_a_noise.py',
+                  'source_ci_run':'38065322982',
+                  'source_csv_sha256':'af7ec7546f4fa62dabfb0bed29352702c984ab3618ce2e9af73d6e2d293d27fd',
+                  'release_files_sha256':hashes,'evidence_level':'reference/noise stress; no new physics'}
+          (d/'n5_archive_manifest.json').write_text(json.dumps(record,indent=2,sort_keys=True)+'\n')
+          print('Archive files:', hashes)
+          PY
+      - name: Create immutable release assets; reject existing digest conflicts
+        run: |
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "Pilot A N5: raw Gaussian-detector stress evidence" \
+              --notes-file docs/experiments/2026-10-10-pilot-a-n5.md --latest=false
+          fi
+          for file in results/release/n5_rows.csv results/release/n5_result.json results/release/n5_archive_manifest.json; do
+            name="${file##*/}"
+            digest="$(sha256sum "$file" | cut -d ' ' -f 1)"
+            remote="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+              --jq ".assets[] | select(.name == \"$name\") | .digest")"
+            if [ -n "$remote" ]; then
+              test "$remote" = "sha256:$digest" || { echo "Fail closed: release digest conflict on $name"; exit 1; }
+            else
+              gh release upload "$TAG" "$file" --repo "$GITHUB_REPOSITORY"
+            fi
+          done
+      - name: Download release and independently verify all published bytes
+        run: |
+          mkdir -p results/downloaded
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir results/downloaded
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          d=Path('results/downloaded')
+          m=json.loads((d/'n5_archive_manifest.json').read_text())
+          for name,expected in m['release_files_sha256'].items():
+            actual=hashlib.sha256((d/name).read_bytes()).hexdigest()
+            assert actual==expected, (name, actual, expected)
+          report=json.loads((d/'n5_result.json').read_text())
+          assert all(report['gates'].values())
+          assert hashlib.sha256((d/'n5_rows.csv').read_bytes()).hexdigest() == m['source_csv_sha256']
+          print('PASS downloaded immutable N5 data and manifest checksums; permanent GitHub Release')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: n5-archive-verification
+          path: |
+            results/release/n5_archive_manifest.json
+            results/downloaded/n5_archive_manifest.json
+          if-no-files-found: ignore

@@ -26,6 +26,15 @@ jobs:
         run: |
           emergence-lab --config configs/exact4_validation.json --output results/exact4
           python -m emergence_lab.exact4 --config configs/exact4_validation.json --results results/exact4
+      # Small, frozen development-fixture noise audit; the original holdout is never rerun.
+      - name: Preregistered Pilot A N5 measurement-noise stress
+        timeout-minutes: 2
+        env:
+          GIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.pilot_a_noise --config configs/pilot_a_n5.json --output results/pilot_a_n5
       - name: Pre-registered M4 interval coverage audit
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
         timeout-minutes: 20
