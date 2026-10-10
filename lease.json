@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T133045Z-45f458",
+  "leaseId": "ff7e4e92-38e0-4acc-8a6f-8b7884c0b388",
+  "acquiredAt": "2026-10-10T13:30:45Z",
+  "heartbeatAt": "2026-10-10T13:30:45Z",
+  "expiresAt": "2026-10-10T15:30:45Z",
+  "task": "Merge PR #22 on explicit user request",
   "previousOwner": "rd-claude-20261010T125630Z-693e0a"
 }
