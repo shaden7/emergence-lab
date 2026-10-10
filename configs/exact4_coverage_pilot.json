@@ -1,0 +1,13 @@
+{
+  "temperatures": [
+    1.5,
+    2.269185,
+    3.5
+  ],
+  "batches": 24,
+  "chains_per_batch": 6,
+  "base_seed": 2027010101,
+  "burn_sweeps": 400,
+  "sample_sweeps": 800,
+  "sample_every": 5
+}
