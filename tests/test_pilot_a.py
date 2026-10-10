@@ -205,3 +205,62 @@ def test_a4_detects_wrong_quantum_sign(monkeypatch):
     monkeypatch.setattr(pa, "qwalk_fourier", lambda L, t, J=1.0: pa.qwalk_numeric(L, 1.1 * t, J))
     r = pa.run(CFG, "development")
     assert r["a4_pass"] is False and r["no_mismatch"] is False
+
+
+# --- later-pass review additions (2026-10-10) -------------------------------
+
+@pytest.mark.parametrize("t", [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0])
+def test_wave_leapfrog_matches_dalembert_bit_for_bit(t):
+    # quarter-integer sites, includes front points and the gap between separated pulses
+    sites = [k / 4 for k in range(-64, 65)]
+    num = pa.wave_leapfrog(sites, t)
+    for s in sites:
+        assert num[s] == pa.wave_reference(s, t), (s, t)
+        if abs(s) > 0.5 + t:
+            assert num[s] == 0.0
+
+
+def test_wave_leapfrog_rejects_off_grid_input():
+    with pytest.raises(ValueError):
+        pa.wave_leapfrog([0.1], 1.0)
+    with pytest.raises(ValueError):
+        pa.wave_leapfrog([1.0], 0.3)
+
+
+def test_a2_detects_injected_wave_violation(monkeypatch):
+    orig = pa.wave_leapfrog
+
+    def leaky(sites, t, a=0.5, c=1.0, h=0.25):
+        out = orig(sites, t, a, c, h)
+        out[12.0] = 1e-300  # tiny nonzero outside the cone
+        return out
+
+    monkeypatch.setattr(pa, "wave_leapfrog", leaky)
+    assert pa.run(CFG, "development")["a2_pass"] is False
+
+
+def test_registered_witnesses_are_not_on_holdout_grid():
+    # Grid membership only; no holdout values are computed here.
+    hold = CFG["holdout"]
+    on_grid = [(t, r) for t, r in CFG["far_witnesses"]
+               if t in hold["continuum_times"] and r in hold["sites"]]
+    assert on_grid == []
+
+
+def test_a3_decision_is_never_vacuous():
+    m = {"model": "H", "precision_status": "match"}
+    c = {"model": "Q", "precision_status": "censored"}
+    bad = {"model": "Q", "precision_status": "mismatch"}
+    assert pa.a3_decision([], [], "development") is False
+    assert pa.a3_decision([m], [], "development") is True
+    assert pa.a3_decision([m], [], "holdout") is False          # no exterior witness
+    assert pa.a3_decision([m], [c], "holdout") is False         # censored only
+    assert pa.a3_decision([m], [m, c], "holdout") is True
+    assert pa.a3_decision([m], [m, bad], "holdout") is False
+    assert pa.a3_decision([bad], [m], "holdout") is False
+
+
+def test_registered_witnesses_evaluated_directly_on_development():
+    reg = pa._far_witness_registered(CFG, "development")
+    assert {(x["model"], x["L"]) for x in reg} == {("H", None), ("Q", 128), ("Q", 256)}
+    assert all(x["precision_status"] == "match" and x["S_ref"] > 1e-8 for x in reg)

@@ -56,6 +56,46 @@ def wave_reference(r: float, t: float, a: float = 0.5, c: float = 1.0) -> float:
     return 0.5 * (f(r - c * t) + f(r + c * t))
 
 
+def wave_leapfrog(sites, t: float, a: float = 0.5, c: float = 1.0, h: float = 0.25) -> dict:
+    """Independent numerical path for W: second-order leapfrog at Courant number 1.
+
+    Grid x_j = j h, time step dt = h / c. With u_t(x, 0) = 0 the first step is
+    u^1_j = (u^0_{j+1} + u^0_{j-1}) / 2 and then u^{n+1}_j = u^n_{j+1} + u^n_{j-1} - u^{n-1}_j.
+    At Courant number 1 this recursion is exact at grid points for sampled data
+    (its grid solutions are exactly F(j - n) + G(j + n)), so the values must agree
+    with d'Alembert bit for bit; with top-hat data all intermediate values are
+    in {0, 1/2, 1} and are exact in binary floating point.
+
+    This shares no code with wave_reference (no closed form, only the recursion).
+    Its numerical domain of dependence is the continuum cone, so a zero outside
+    |r| <= a + ct is a consistency check of the code path, not a proof of the
+    support theorem (which stays an input, see SUPPORT_CLASS).
+    """
+    n = int(round(c * t / h))
+    if not math.isclose(n * h, c * t, rel_tol=0, abs_tol=1e-12):
+        raise ValueError("c t must be an integer multiple of h")
+    for s in sites:
+        if not math.isclose(round(float(s) / h) * h, float(s), abs_tol=1e-12):
+            raise ValueError("site not on leapfrog grid")
+    rmax = max(abs(float(s)) for s in sites)
+    half = int(math.ceil((rmax + a) / h)) + n + 2
+    x = h * np.arange(-half, half + 1)
+    u0 = (np.abs(x) <= a + 1e-12).astype(float)
+    if n == 0:
+        u = u0
+    else:
+        prev = u0
+        cur = u0.copy()
+        cur[1:-1] = 0.5 * (u0[2:] + u0[:-2])
+        for _ in range(n - 1):
+            nxt = np.zeros_like(cur)
+            nxt[1:-1] = cur[2:] + cur[:-2] - prev[1:-1]
+            prev, cur = cur, nxt
+        u = cur
+    # boundary cells are never reached by the cone from the sampled sites (half has margin n + 2)
+    return {float(s): float(u[int(round(float(s) / h)) + half]) for s in sites}
+
+
 def wave_on_front(r: float, t: float, a: float = 0.5, c: float = 1.0) -> bool:
     """True where r lies on a discontinuity of the top-hat solution.
 
@@ -321,14 +361,16 @@ def _rows_for_phase(cfg: dict, phase: str):
 
     kw = dict(abs_floor=tol["abs_floor"], rel=tol["rel"], censor_below=tol["censor_below"])
     for t in g["continuum_times"]:
+        w_num = wave_leapfrog(g["sites"], t, a, c)
         for r in g["sites"]:
-            # W: the numerical value is the closed form itself (no PDE solver in this stage)
+            # W: S_num from the Courant-1 leapfrog recursion, S_ref from d'Alembert
             ref = wave_reference(r, t, a, c)
+            num = w_num[float(r)]
             outside = abs(r) > a + c * t
             # Zeros of the closed form are exact: outside the cone (support theorem) and,
             # for t > a, between the two separating pulses (|r| < t - a).
-            add("W", None, r, t, ref, ref,
-                precision_status("W", ref, ref, analytic_zero=(ref == 0.0),
+            add("W", None, r, t, num, ref,
+                precision_status("W", num, ref, analytic_zero=(ref == 0.0),
                                  on_front=wave_on_front(r, t, a, c), **kw),
                 outside_cone=outside)
             ref_h = heat_reference(r, t, a, kappa)
@@ -394,13 +436,68 @@ def _shortcut(cfg: dict):
     return out
 
 
+_WITNESS_KEYS = ("model", "L", "r", "t", "S_num", "S_ref", "precision_status")
+
+
 def _far_witness(cfg: dict, rows):
+    """Registered far witnesses (t, r) as they appear in this phase's grid (may be empty)."""
     out = []
     for t, r in cfg["far_witnesses"]:
         sel = [x for x in rows if x["model"] in ("W", "H", "Q") and x["t"] == t and x["r"] == r]
         for x in sel:
-            out.append({k: x[k] for k in ("model", "L", "r", "t", "S_num", "S_ref", "precision_status")})
+            out.append({k: x[k] for k in _WITNESS_KEYS})
     return out
+
+
+def _far_witness_registered(cfg: dict, phase: str):
+    """Registered witnesses evaluated directly, independent of whether the phase grid contains them.
+
+    H on the line; Q on every ring size of the phase. Same numerical paths and
+    tolerance rule as the grid rows.
+    """
+    p, tol = cfg["parameters"], cfg["tolerance"]
+    kw = dict(abs_floor=tol["abs_floor"], rel=tol["rel"], censor_below=tol["censor_below"])
+    out = []
+    for t, r in cfg["far_witnesses"]:
+        ref_h = heat_reference(r, t, p["a"], p["kappa"])
+        num_h = heat_quadrature(r, t, p["a"], p["kappa"])
+        out.append({"model": "H", "L": None, "r": r, "t": t, "S_num": num_h, "S_ref": ref_h,
+                    "precision_status": precision_status("H", num_h, ref_h, **kw)})
+        for L in cfg[phase]["ring_sizes"]:
+            num = float(qwalk_numeric(L, t, p["J"])[r])
+            ref = float(qwalk_fourier(L, t, p["J"])[r])
+            out.append({"model": "Q", "L": L, "r": r, "t": t, "S_num": num, "S_ref": ref,
+                        "precision_status": precision_status("Q", num, ref, **kw)})
+    return out
+
+
+def _cone_exterior_nonstrict(cfg: dict, rows):
+    """A3 on a grid without the registered (t, r): every H/Q cell strictly outside the W cone.
+
+    Cells with |r| > a + c t would be exactly zero under the strict-support
+    model W; H and Q are analytically positive there (up to isolated
+    interference zeros of Q, which the censoring threshold would catch). Cells
+    with S_ref below the censoring threshold are kept but reported as censored
+    and are not counted as witnesses.
+    """
+    a, c = cfg["parameters"]["a"], cfg["parameters"]["c"]
+    return [{k: x[k] for k in _WITNESS_KEYS} for x in rows
+            if x["model"] in ("H", "Q") and abs(x["r"]) > a + c * x["t"]]
+
+
+def a3_decision(registered, exterior, phase: str) -> bool:
+    """A3 pass rule; never vacuous.
+
+    - Every registered H/Q witness must be 'match' (and at least one must exist).
+    - Holdout: additionally, the cone-exterior H/Q cells with S_ref >= censoring
+      threshold (i.e. not 'censored') must be non-empty and all 'match'.
+    """
+    reg = [x for x in registered if x["model"] in ("H", "Q")]
+    ok = bool(reg) and all(x["precision_status"] == "match" for x in reg)
+    if phase == "holdout":
+        ext = [x for x in exterior if x["precision_status"] != "censored"]
+        ok = ok and bool(ext) and all(x["precision_status"] == "match" for x in ext)
+    return ok
 
 
 def run(cfg: dict, phase: str = "development") -> dict:
@@ -425,17 +522,20 @@ def run(cfg: dict, phase: str = "development") -> dict:
         },
     }
     result["far_witness_a3"] = _far_witness(cfg, rows)
+    result["far_witness_registered"] = _far_witness_registered(cfg, phase)
+    result["far_witness_cone_exterior"] = _cone_exterior_nonstrict(cfg, rows)
     statuses = [x["precision_status"] for x in rows]
     result["summary"] = {s: statuses.count(s) for s in sorted(set(statuses))}
     result["a1_pass"] = result["null_n1"]["a1_pass"]
     # A2: no theorem zero violated, and every W site outside |r| <= a + ct carries S = 0.
-    result["a2_pass"] = ("analytic_zero_violated" not in statuses
-                         and all(x["S_num"] == 0.0 for x in rows
-                                 if x["model"] == "W" and x.get("outside_cone")))
-    result["a3_pass"] = all(x["precision_status"] == "match" for x in result["far_witness_a3"]
-                            if x["model"] in ("H", "Q"))
+    w_out = [x for x in rows if x["model"] == "W" and x.get("outside_cone")]
+    result["a2_pass"] = ("analytic_zero_violated" not in statuses and bool(w_out)
+                         and all(x["S_num"] == 0.0 for x in w_out))
+    result["a3_pass"] = a3_decision(result["far_witness_registered"],
+                                    result["far_witness_cone_exterior"], phase)
     q_rows = [x for x in rows if x["model"] == "Q"]
-    result["a4_pass"] = (all(x["precision_status"] in ("match", "censored") for x in q_rows)
+    result["a4_pass"] = (bool(q_rows)
+                         and all(x["precision_status"] in ("match", "censored") for x in q_rows)
                          and max(x["norm_err"] for x in q_rows) < 1e-12)
     result["no_mismatch"] = "mismatch" not in statuses
     if result["shortcut_n2"] is not None:
@@ -462,7 +562,12 @@ def _manifest(cfg_path: Path, cfg_bytes: bytes, phase: str) -> dict:
         "time": {"W": "continuous t (c=1)", "H": "continuous t (kappa=1)",
                  "CA": "integer ticks", "Q": "continuous t (J=1)"},
         "deviations": [
-            "W has no independent PDE solver in this stage; S_num is the closed form.",
+            "W S_num comes from a Courant-1 leapfrog recursion (h = 0.25), exact at grid points; "
+            "its zeros outside the cone are a code-path check, not a proof of the support theorem.",
+            "A3 clarification (fixed before any holdout evaluation): the registered witnesses "
+            "(t, r) = (1, 4), (1, 6) are not on the holdout grid. They are evaluated directly in "
+            "every phase; on the holdout, A3 additionally requires every non-censored H/Q cell "
+            "with |r| > a + c t to match. An empty witness set fails A3.",
             "N2 shortcut times (0.5, 1, 2) are a development choice; the protocol fixes only eps and L.",
             "N4 Euler grid (dx=0.5, dt=0.1) is a demonstration choice; the protocol does not fix it.",
             "N5 measurement noise (optional in the protocol) is not implemented.",
