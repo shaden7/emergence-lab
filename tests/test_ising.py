@@ -25,6 +25,7 @@ def test_deterministic_and_bounded():
     assert 0 <= a["mean_abs_magnetization"] <= 1
     assert -2 <= a["mean_energy_per_spin"] <= 2
     assert 0 <= a["acceptance_rate"] <= 1
+    assert a["magnetization_effective_samples"] is None or 0 < a["magnetization_effective_samples"] <= 4
 
 
 def test_reject_invalid():

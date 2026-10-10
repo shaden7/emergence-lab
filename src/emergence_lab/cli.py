@@ -8,6 +8,7 @@ import platform
 from pathlib import Path
 import numpy as np
 from .ising import run_chain
+from .stats import summarize_replicates
 
 
 def main() -> None:
@@ -38,17 +39,31 @@ def main() -> None:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
+    summaries = summarize_replicates(rows)
+    with (output / "summary.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=summaries[0].keys())
+        writer.writeheader()
+        writer.writerows(summaries)
     manifest = {
         "created_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
         "config": cfg, "config_sha256": hashlib.sha256(config_bytes).hexdigest(),
         "commit": os.getenv("GIT_SHA"),
         "python": platform.python_version(), "numpy": np.__version__,
         "model": "2d-ferromagnetic-ising-metropolis-periodic-J1-kB1",
-        "result_rows": len(rows),
-        "caveats": ["Monte Carlo samples are autocorrelated", "No error bars or finite-size scaling inference in v0.1"],
+        "result_rows": len(rows), "summary_rows": len(summaries),
+        "uncertainty_method": {
+            "chain": "positive-lag integrated autocorrelation heuristic, stop at first nonpositive rho or window lag>=5*tau; n>=20 and nonconstant required",
+            "replicates": "independent-seed chain means; between-chain Student-t approximate 95% CI; conservative tabulated upper bounds for df>10",
+        },
+        "caveats": [
+            "Autocorrelation time may be underestimated for slow chains; constant/short traces return missing diagnostics",
+            "Independent-chain intervals assume approximately normal chain means and adequate equilibration; neither is verified",
+            "Small number of repeats and critical slowing down make these intervals exploratory",
+            "No finite-size scaling inference or phase-transition detection is claimed",
+        ],
     }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    print(f"Wrote {len(rows)} measurements to {output.resolve()}")
+    print(f"Wrote {len(rows)} measurements and {len(summaries)} summaries to {output.resolve()}")
 
 
 if __name__ == "__main__":
