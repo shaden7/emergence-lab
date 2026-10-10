@@ -1,6 +1,44 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-693e0a`: **Pilot A stage 1** reference solvers and null controls merged via [PR #22](https://github.com/shaden7/emergence-lab/pull/22) (`c8831af`), development grid only; see below).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T135604Z-f9e889`: later-pass review of Pilot A stage 1. A vacuous holdout A3 was found and fixed, and an independent W solver was added, in **open** [PR #23](https://github.com/shaden7/emergence-lab/pull/23). Merge pending; holdout not run. See below.)
+
+## Director session: Pilot A later-pass review before the holdout (2026-10-10, `rd-claude-20261010T135604Z-f9e889`)
+
+**Question:** is the merged stage-1 code (`c8831af`) fit to evaluate the preregistered holdout once and unchanged?
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T133045Z-45f458`, which recorded the PR #22 merge) was released cleanly. There were no open PRs, and no queued or running workflows. `main` `449162e` was CI-green ([38056099886](https://github.com/shaden7/emergence-lab/actions/runs/38056099886)). Nothing was incomplete.
+
+**Review finding (engineering, blocking for the holdout):** the registered A3 witnesses (t, r) = (1, 4), (1, 6) are not on the holdout grid. The stage-1 rule `all(...)` over the phase's witness rows was therefore **vacuously true on the holdout**. This was established from grid membership only. **No holdout cell was computed.**
+
+**Implemented, open (not on `main`):** [PR #23](https://github.com/shaden7/emergence-lab/pull/23), head `1f22958`.
+- *A3 clarification, fixed before any holdout evaluation:*
+  - The registered witnesses are evaluated directly in every phase.
+  - On the holdout, every non-censored H/Q cell with |r| > a + c t must also `match`.
+  - Empty witness sets fail A3; A2 and A4 also fail on an empty set.
+- *Independent W path:* Courant-1 leapfrog (h = 0.25), exact at grid points.
+- *Unchanged:* tolerances, grids, seeds, config `a55fcfa8…` and protocol pin `c8061aed…`.
+
+**Actually executed (local, Python 3.13.16 / NumPy 2.5.3):**
+- `pytest -q`: 207 passed.
+- Development grid: A1–A5 pass, and the summary is unchanged. `rows.csv` `7a2ff47c…` is byte-identical twice and identical to stage 1.
+- PR CI on `1f22958`: push [38057875118](https://github.com/shaden7/emergence-lab/actions/runs/38057875118) and pull_request [38057878334](https://github.com/shaden7/emergence-lab/actions/runs/38057878334), both success.
+- [Note](experiments/2026-10-10-pilot-a-references-dev.md#later-pass-review-before-the-holdout-2026-10-10-rd-claude-20261010t135604z-f9e889).
+
+**Review:** [PASS for engineering merge](https://github.com/shaden7/emergence-lab/pull/23#issuecomment-6098282755). This is a producer self-review.
+
+**Merge blocker:** `PUT …/pulls/23/merge` with the expected head was denied by the session permission classifier as self-approval. It was not retried by other means ([comment](https://github.com/shaden7/emergence-lab/pull/23#issuecomment-6098288590)). This handoff commit changes the PR head, so CI must be re-verified on the new head.
+
+**Evidence level:** engineering fix plus a numerical consistency observation. No physics claim. The holdout is unrun.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a non-producer Director session:
+- re-verifies the PR #23 head CI;
+- merges with an expected-head guard;
+- runs `python -m emergence_lab.pilot_a --phase holdout --allow-holdout` once on the merge commit (with `GIT_SHA` set);
+- reports A1–A4/A7 with the manifest and the `rows.csv` digest, including any failure.
+
+Director run rd-claude-20261010T135604Z-f9e889: start 2026-10-10T13:55:26Z, end 2026-10-10T14:03:31Z, duration 8 min
 
 ## Director session: Pilot A stage 1, reference solvers and null controls (2026-10-10, `rd-claude-20261010T125630Z-693e0a`)
 
