@@ -1,5 +1,6 @@
 """2D ferromagnetic Ising model, periodic boundaries, J=k_B=1."""
 import numpy as np
+from .stats import autocorrelation_diagnostics
 
 
 def energy(spins: np.ndarray) -> float:
@@ -35,6 +36,8 @@ def run_chain(size: int, temperature: float, burn_sweeps: int, sample_sweeps: in
         if sweep >= burn_sweeps and (sweep - burn_sweeps) % sample_every == 0:
             mags.append(magnetization(spins))
             energies.append(energy(spins) / n)
+    mag_diag = autocorrelation_diagnostics(mags)
+    energy_diag = autocorrelation_diagnostics(energies)
     return {
         "size": size, "temperature": temperature, "seed": seed,
         "burn_sweeps": burn_sweeps, "sample_sweeps": sample_sweeps,
@@ -42,4 +45,10 @@ def run_chain(size: int, temperature: float, burn_sweeps: int, sample_sweeps: in
         "mean_abs_magnetization": float(np.mean(mags)),
         "mean_energy_per_spin": float(np.mean(energies)),
         "acceptance_rate": accepted / total,
+        "magnetization_stderr_autocorr": mag_diag["stderr"],
+        "magnetization_tau_int": mag_diag["tau_int"],
+        "magnetization_effective_samples": mag_diag["effective_samples"],
+        "energy_stderr_autocorr": energy_diag["stderr"],
+        "energy_tau_int": energy_diag["tau_int"],
+        "energy_effective_samples": energy_diag["effective_samples"],
     }

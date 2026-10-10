@@ -102,7 +102,7 @@ Treat an emergent *spacetime* claim as a much higher bar: operational geometry, 
 ## Literature starting points (research context, not proof of our hypotheses)
 
 - Janotta & Hinrichsen, *Generalized Probability Theories*, 2014: https://arxiv.org/abs/1402.6562
-- Janotta et al., *General probabilistic theories: An introduction*, Physics Reports 2023: https://doi.org/10.1016/j.physrep.2023.09.001
+- Plávala, *General probabilistic theories: An introduction*, Physics Reports 2023: https://doi.org/10.1016/j.physrep.2023.09.001 (preprint https://arxiv.org/abs/2103.07469)
 - Einstein Online, *Geometry from order: causal sets*: https://www.einstein-online.info/en/spotlight/causal_sets/
 - Orús, *Tensor networks for complex quantum systems*, Nature Reviews Physics 2019: https://www.nature.com/articles/s42254-019-0086-7
 - Ge & Eisert, *Area laws and efficient descriptions of quantum many-body states*, 2014: https://arxiv.org/abs/1411.2995

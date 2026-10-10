@@ -6,18 +6,20 @@ Emergence Lab runs in **short, stateful-in-GitHub research iterations**, not in 
 
 This workflow is a governance design. **It does not automatically grant ChatGPT scheduled tasks access to coding tools, GitHub, subagents, or SSH.** Each run must inspect available capabilities and be honest about what actually happened.
 
+**Binding process authority:** [WORKFLOW_POLICY.md](WORKFLOW_POLICY.md) on merged `main` governs the work-in-progress ceiling, independent checks, autonomous PR review/merge, risk limits and handoffs. This document describes the Director role; ChatGPT scheduled prompts are only bootstraps, not a second policy.
+
 ## One accountable Director per iteration
 
 The Director coordinates the research, chooses one bounded next step, and reports evidence. It should not maximize the number of commits or speculative hypotheses.
 
 A normal hourly cycle is:
 
-1. **Orient (read only):** Read `AGENTS.md`, `docs/OVERVIEW.md`, `docs/RESEARCH_STATE.md`, `README.md`. Inspect recent commits, open issues/PRs, CI results, deployment status, and any actual artifact references.
+1. **Orient (read only):** Read `AGENTS.md`, `docs/WORKFLOW_POLICY.md`, `docs/OVERVIEW.md`, `docs/RESEARCH_STATE.md`, `README.md`. Inspect recent commits, all open issues/PRs, CI results, deployment status, and actual artifact references.
 2. **Deconflict:** If an ongoing task or PR concerns the same files/model, review or continue it rather than starting a competing change. Do not assume another research session is idle. If overlap is uncertain, restrict this cycle to read-only analysis or an issue comment.
-3. **Select:** Choose *one* small, scientifically valuable action using the questions below. It is acceptable to conclude that further computation is not justified yet.
-4. **Execute:** On a **dedicated branch**, implement the change or bounded experiment. Run feasible tests and preserve the raw results and manifest.
+3. **Select:** When the open-PR backlog exceeds the policy WIP limit, choose a review, correction, reproducibility check or integration action **before new features**. Otherwise choose *one* scientifically valuable step. A no-change iteration is acceptable.
+4. **Execute:** Reuse the relevant existing PR/branch first. Create a new branch only for a genuinely new, permissible task. Run checks on the actual candidate revision; preserve outputs/manifests.
 5. **Critique:** Challenge assumptions, numerical uncertainty, alternative explanations, known literature, and test leakage. Use a genuinely separate reviewer/subagent only if the current execution environment supports it; otherwise perform and label a nonindependent self-review.
-6. **Handoff:** Open or update a PR; record what actually ran, evidence, blockers, and one proposed next action. Update `docs/RESEARCH_STATE.md` as part of the PR or after merge. Never claim success just because a job was configured.
+6. **Review / integrate / handoff:** Record PASS / REVISE / BLOCKED / REJECT with evidence. **Autonomously merge** eligible tested PRs as the policy permits, even if the owner is unavailable; do not require routine human reviews. When gates fail, correct the same PR or record a precise blocker. Update `docs/RESEARCH_STATE.md` for verified merged results. Never claim success just because a job was configured.
 
 ### Prioritization
 
@@ -62,8 +64,11 @@ For high-impact or counterintuitive conclusions, request an independent reviewer
 
 ## Concurrency and GitHub practice
 
-- Use **issues** to claim/track a coherent milestone when parallel work emerges; link a dedicated branch and PR. Use the same issue/PR rather than starting duplicate work.
-- PRs should be small, with exact tests and evidence. Never automatically merge speculative research or deploy unreviewed generated code.
+**Mandatory entry gate:** After read-only orientation and before *any* mutating research work, acquire the per-invocation GitHub lease as documented in [RESEARCH_LOCK.md](RESEARCH_LOCK.md) and required by [WORKFLOW_POLICY.md](WORKFLOW_POLICY.md). If locked, absent or unverifiable, end without side effects. Renew at least every 30 minutes while active, verify ownership before consequential writes, and release using guarded CAS at exit. Two-hour expiry after the latest heartbeat recovers crashed sessions; it does not authorize a stale session to continue working. The dedicated coordination branch is not a PR or a replacement for GitHub review/merge checks.
+
+
+- Use **issues** to claim/track a coherent milestone when parallel work emerges; link its existing branch and PR. Do not open a new PR per hourly invocation; enforce the WIP limit in `docs/WORKFLOW_POLICY.md`.
+- PRs should be small, with exact tests and evidence. Agents **may merge their own eligible, verified PRs after documented autonomous critical review**, without claiming human/independent scientific approval; speculative scientific claims must remain clearly qualified. Never deploy unreviewed generated code or high-risk changes.
 - `docs/RESEARCH_STATE.md` is a **summary**, not a lock, database or sole results store. Avoid simultaneous edits; update it with the final merged truth. A proposed change in an open PR is *not* implemented on main.
 - If two Directors race, GitHub branching and merge conflict checks prevent silent file overwrite only when changes are reviewed. They do **not** constitute a distributed lock. For unattended concurrent writers, introduce an explicit coordination/lock mechanism and fail closed.
 - CI failure or missing evidence means "not verified," not "probably fine."
