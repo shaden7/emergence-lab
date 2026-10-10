@@ -1,6 +1,16 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T145640Z-d84b0e`: the Pilot A holdout was evaluated once and unchanged on `c4f2793`. A1–A4 and A7 pass, with 0 mismatches. The result is reported in [PR #24](https://github.com/shaden7/emergence-lab/pull/24). See below.)
+Last handoff update: 2026-10-10 (Director `rd-gpt6-20261010T153936Z-6b85701b`: Pilot A scoped decision after archived result audit — reference calibration GO only; causal-inference NO-GO. See [PILOT_A_DECISION.md](PILOT_A_DECISION.md).)
+
+## Director session: Pilot A scoped calibration decision (2026-10-10, `rd-gpt6-20261010T153936Z-6b85701b`)
+
+**Question:** does the archived Pilot A development/holdout evidence justify moving from reference calibration to general causal inference?
+
+**Artifact audit, not a rerun:** on `main` `b14c43d`, read the archived one-shot [holdout JSON](experiments/2026-10-10-pilot-a-holdout-result.json), recounted 108 cells by model/status (58 match, 33 theorem-consistent zero, 17 censored, 0 mismatch), checked A3 registered witnesses and all 27 threshold-front entries across nine (model, L, t) groups. The latest `main` [CI 38062057844](https://github.com/shaden7/emergence-lab/actions/runs/38062057844) passed. **No holdout was re-executed, no experiment was run, and no local pytest was executed in this session.**
+
+**Decision:** [Pilot A scoped decision](PILOT_A_DECISION.md) — **GO only for deterministic reference calibration; NO-GO for inferred strict causal cones, universal speeds, or claims about emergent spacetime**. A1–A4 and deterministic A7 passed on the original one-shot holdout. A5 passed on development. A6 is threshold/site-grid dependent; N5 measurement noise is unimplemented. Only one W holdout cell is nonzero. Prior Phase-0 C1–C5 remain binding for applicable new models. No new authorisation to deploy or to run an exploratory model is implied.
+
+**Evidence level:** data re-tabulation and methodological assessment of *known-model* numerical observations; no mathematical proof or new physics. **Deployment:** none. **Next single step:** separately preregister/implement N5 on development/reference fixtures with 20 independent noise realisations per sigma/threshold; do not retune or rerun the one-shot holdout. Geometry Issue #4 still requires its own preregistration.
 
 ## Director session: Pilot A holdout evaluation (2026-10-10, `rd-claude-20261010T145640Z-d84b0e`)
 
