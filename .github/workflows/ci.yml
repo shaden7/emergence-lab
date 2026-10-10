@@ -32,6 +32,22 @@ jobs:
         timeout-minutes: 20
         run: |
           python -m emergence_lab.burnin4 --config configs/exact4_burnin_sensitivity.json --output results/exact4_burnin.json
+      # Heavy fixed-seed pilots already have archived CI runs; rerun only by explicit dispatch.
+      - name: Bounded phase-0 finite-size and J=0 pilot
+        if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/phase0-director-audit-20261009' || github.ref == 'refs/heads/main')
+        timeout-minutes: 5
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          python -m emergence_lab.finite_size --config configs/fss_pilot.json --output results/finite_size_pilot.json
+          python scripts/autocorr_synthetic_audit.py --output results/autocorr_synthetic.json
+          python -m emergence_lab.equilibration4 --config configs/equilibration4_pilot.json --output results/equilibration4_pilot.json
+          python -m emergence_lab.mixing_pilot --config configs/mixing_pilot.json --output results/mixing_pilot.json
+          python scripts/mixing_diagnostics.py --mixing-json results/mixing_pilot.json --output results/mixing_diagnostics.json
+          python -m emergence_lab.ising_1d_control --config configs/ising_1d_control.json --output results/ising_1d_control.json
+          python -m emergence_lab.ising_1d_control --config configs/ising_1d_anomaly_followup.json --output results/ising_1d_anomaly_followup.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

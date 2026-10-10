@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "recorded_utc_date": "2026-10-09",
+  "source": "GitHub Actions workflow ZIP downloads checked locally with SHA-256 of uncompressed contained JSON; filenames are ZIP members",
+  "purpose": "Immutable lookup of what was actually analyzed for the Phase-0 NO-GO audit; not a raw-data replacement",
+  "artifact_retention_warning": "GitHub Actions artifacts expire under repository retention policy. These digests document provenance but do not make raw artifacts permanently retrievable. Archive independently before expiration.",
+  "verify": "Download the corresponding Actions run artifact. Extract the named JSON member. Compute SHA-256 of its exact bytes and compare against this manifest. Use the report's linked revision and configs to regenerate independently.",
+  "records": [
+    {
+      "experiment": "exact4_coverage_m4",
+      "run_id": 37994539424,
+      "artifact_id": 11646079121,
+      "commit": "d4169cffdb87dfd93aebefb5da2e4f27a13b292d",
+      "path": "exact4_coverage.json",
+      "sha256": "47aabe863ef512884ebdd0126eedbc3e703cac82997c46f659b521d8e05f4d6c"
+    },
+    {
+      "experiment": "exact4_burnin",
+      "run_id": 37995173975,
+      "artifact_id": 11647295336,
+      "commit": "7518f095e4776b3c8a751c354ada320350d80648",
+      "path": "exact4_burnin.json",
+      "sha256": "764aa41173e0edc455d6b029341a53044529c04d9c59d4006a971c8500423c9f"
+    },
+    {
+      "experiment": "ising2d_fss_and_j0",
+      "run_id": 37996248059,
+      "artifact_id": 11646539226,
+      "commit": "5d54156e6407a4f61006c28f3cbdef543712cd19",
+      "path": "finite_size_pilot.json",
+      "sha256": "5cd9cc1107639abccdbd48c42d1e9fe6da50cc72445ba80e448e5f5ac67b400e"
+    },
+    {
+      "experiment": "ar1_synthetic_tau",
+      "run_id": 37996395511,
+      "artifact_id": 11647447009,
+      "commit": "b678424e3e324470d785aafb9ff46afd8c59b24c",
+      "path": "autocorr_synthetic.json",
+      "sha256": "cccefaefb01d01715d231b7f58fbf648ea98dd5b62addd5ed7aaf533f163ff9f"
+    },
+    {
+      "experiment": "l4_stationary_random_ordered",
+      "run_id": 37996892064,
+      "artifact_id": 11647700495,
+      "commit": "bc5bf407764f022465ed1c14e4c2366198cb4e32",
+      "path": "equilibration4_pilot.json",
+      "sha256": "f7af1517b1ec255b39ceeabfd1f4b4dd793b1aa0816270b5558fc26449a04c72"
+    },
+    {
+      "experiment": "l16_l32_mixing_traces",
+      "run_id": 37997377758,
+      "artifact_id": 11648100844,
+      "commit": "e8ae9eb18ced369489cbb629fcb090f8fac2295e",
+      "path": "mixing_pilot.json",
+      "sha256": "34f21756c7e74ce64342923affe5a8172692ba0228bec6919af29350108d0243"
+    },
+    {
+      "experiment": "classic_split_rhat_and_ess",
+      "run_id": 37998097492,
+      "artifact_id": 11648136813,
+      "commit": "71f0f3c77e3006e54ee42a1f142335bb9d5c58a0",
+      "path": "mixing_diagnostics.json",
+      "sha256": "7097c7ebdee40afdea20a6e66238b054a18be721862567b467623de2bac6986d"
+    },
+    {
+      "experiment": "ising1d_interacting_null",
+      "run_id": 37998097492,
+      "artifact_id": 11648136813,
+      "commit": "71f0f3c77e3006e54ee42a1f142335bb9d5c58a0",
+      "path": "ising_1d_control.json",
+      "sha256": "72c46ebb31480f544c077b863bb30eb8857d991eff85aa54474a75a2e035668f"
+    },
+    {
+      "experiment": "ising1d_adaptive_anomaly_followup",
+      "run_id": 37998319268,
+      "artifact_id": 11648032310,
+      "commit": "4f5c434506b9517e8774d3cd35275aaa6df355da",
+      "path": "ising_1d_anomaly_followup.json",
+      "sha256": "85d4dd6cfe966c3a2b3aa2da97a5ffd47958f1eef74a32bcd93892756e58cfa6"
+    }
+  ]
+}
