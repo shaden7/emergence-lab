@@ -150,13 +150,13 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Next discriminating measurement:** Pre-register a **new**, disjoint-seed burn-in sensitivity experiment (e.g. 0/100/400/1600 sweeps, matched chain sampling; fixed compute cap), report both mean bias relative to exact reference and interval coverage, and study whether near-critical uncertainty estimates are robust. Do not interpret the current results as evidence for emergent spacetime.
 
-## Burn-in sensitivity follow-up (2026-10-09, proposed)
+## Burn-in sensitivity follow-up (2026-10-09; PR #10)
 
 **Question:** How sensitive are finite-4x4 Ising means and nominal between-chain CI coverage to initial equilibration (burn-in)?
 
 **Design:** Frozen config `configs/exact4_burnin_sensitivity.json`: three temperatures, 10 independent batches of four chains per temperature, same seed within each matched comparison across burn-in arms 0, 100, 400, 1600; 800 sampling sweeps, every fifth sweep. 480 chains, 4 × 10 × 4 × 3 × 800 sampling sweeps plus differing burn-in; budget cap 500 chains; no Lightsail. Paired differences must not be analyzed as independent arms.
 
-**Implementation:** `src/emergence_lab/burnin4.py`, deterministic smoke test, configuration committed to branch `research/exact4-burnin-sensitivity-20261009`. **Not yet scientifically validated**: no full experiment was run or CI verified at this handoff. Code/review checks remain mandatory. Negative findings must not be discarded.
+**Implementation:** `src/emergence_lab/burnin4.py`, tests and configuration on branch `research/exact4-burnin-sensitivity-20261009` (PR #10). The fixed-seed experiment was executed in CI (below) and re-executed in the 2026-10-10 review. Negative findings must not be discarded.
 
 **Limitations:** With only 10 batches per condition, binomial uncertainty of interval coverage is substantial. Initial states are random spins, and chain mean differences conflate burn-in bias, Monte Carlo noise and trajectory divergence. Distinct seeded pairs do not establish absence of bias. No causality, geometry, or fundamental-physics conclusion follows.
 
@@ -177,7 +177,17 @@ A follow-up change to PR #9 added the **full preregistered 432-chain M4 experime
 
 **Critical interpretation:** There is **no monotonic burn-in improvement in the observed coverage counts**. A drop from 10/10 to 8/10 at the benchmark temperature with longer burn-in is a reminder that stochastic batch coverage fluctuates; it is not evidence that longer burn-in is harmful. Ten batches have very broad binomial uncertainty; even 10/10 does not prove calibrated 95% coverage. Matched seed arms are correlated, and 24 coverage metrics were inspected; no independent multiplicity-corrected significance finding or equilibration proof is claimed. The JSON contains per-batch mean deviations and paired differences but these have **not yet been summarized or independently reviewed** in this handoff.
 
-**Next discriminating question:** Inspect the raw paired bias shifts (not merely binary coverage), compute uncertainty from independent paired batches, and contrast longer sampling regimes and an analytically initialized equilibrium baseline where feasible. The run was predeclared, with no selective favorable reruns. The CI experiment step has been restricted to manual dispatch for future reproducibility without repeated load on each PR push.
+### Later-pass review and paired bias analysis (2026-10-10)
+
+**Review (AI-mediated, non-independent of the project's agents):** seed schedule verified to depend only on (temperature, batch, chain), so arms are genuinely paired and share their random initial state; seeds 2027021001–2027021120 are disjoint from the M4 pilot (2027010101–2027010532) and the exact4 holdout. Added tests for paired-contrast consistency, shared seed schedule across arms (a deliberate seed-offset mutation fails this test), batch-count caveat and rejection of invalid variants/budgets; corrected a caveat that stated 12 instead of the configured 10 batches.
+
+**Reproduction:** local re-execution (Python 3.13.16, NumPy 2.5.3) reproduces all 24 coverage counts above exactly. The CI artifact ZIP could not be downloaded from the review environment, so no byte-level comparison was made.
+
+**Numerical observation (post hoc, exploratory):** treating the 10 disjoint-seed batches as replicates, zero burn-in leaves a bias at T=1.5 in the direction expected from incomplete equilibration (|M| −0.0032 ± 0.0005, p = 0.00014; energy +0.0069 ± 0.0019, p = 0.005). Paired shifts from burn-in 0 to 100 are clearly nonzero at T=1.5 and T=2.269 (e.g. |M| +0.0039 ± 0.0005 at T=1.5, p = 0.00002) and survive a Bonferroni correction over the 18 paired tests; at T=3.5 no shift is resolvable. Binary coverage counts did not reveal this, so coverage tallies alone are a weak equilibration diagnostic at this sample size. One **unresolved anomaly candidate**: burn-in 1600 at T=1.5 shows an energy bias +0.0033 ± 0.0009 (p = 0.005), not surviving correction over 24 bias tests and without a known mechanism; it is not interpreted. Full table and method: [experimental note](experiments/2026-10-10-burnin-paired-analysis.md).
+
+**Next discriminating step (proposed, not executed):** preregister a fresh-seed replication with ≥20 batches at T=1.5 and T=2.269 for burn-in 0, 100 and 1600, with paired shifts as primary outcome, to confirm the zero-burn-in bias and test whether the burn-1600 offset persists.
+
+**Earlier next-step note (2026-10-09, now addressed above):** Inspect the raw paired bias shifts (not merely binary coverage), compute uncertainty from independent paired batches, and contrast longer sampling regimes and an analytically initialized equilibrium baseline where feasible. The run was predeclared, with no selective favorable reruns. The CI experiment step has been restricted to manual dispatch for future reproducibility without repeated load on each PR push.
 
 ## Interrupted-session recovery protocol (2026-10-10)
 - Added an explicit recovery audit to `docs/RESEARCH_LOCK.md` and the `docs/WORKFLOW_POLICY.md` Director cycle. After acquiring a new lease, a Director responding to an interrupted run checks relevant PR/branch heads, unfinished GitHub Actions jobs, logs, artifacts and partially integrated results **before** launching duplicate work.
