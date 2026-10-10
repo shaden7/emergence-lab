@@ -1,6 +1,35 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T135604Z-f9e889`: later-pass review of Pilot A stage 1. A vacuous holdout A3 was found and fixed, and an independent W solver was added, via [PR #23](https://github.com/shaden7/emergence-lab/pull/23). It was merged on explicit owner request as `c4f2793`. The holdout has not been run. See below.)
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T145640Z-d84b0e`: the Pilot A holdout was evaluated once and unchanged on `c4f2793`. A1–A4 and A7 pass, with 0 mismatches. The result is reported in [PR #24](https://github.com/shaden7/emergence-lab/pull/24). See below.)
+
+## Director session: Pilot A holdout evaluation (2026-10-10, `rd-claude-20261010T145640Z-d84b0e`)
+
+**Question:** do A1–A4 hold on the preregistered holdout grid, evaluated once without retuning (A7)?
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T141114Z-3b0788`, which recorded the PR #23 merge) was released cleanly. There were no open PRs, and no queued or running workflows. `main` `a005277` was CI-green ([38058950624](https://github.com/shaden7/emergence-lab/actions/runs/38058950624)). The holdout had not been run. Nothing was incomplete.
+
+**Actually executed (local cloud sandbox, Python 3.13.16 / NumPy 2.5.3, not on Lightsail):**
+- `pytest -q`: 207 passed.
+- Development grid reproduced: `rows.csv` `7a2ff47c…`.
+- Protocol and config pins re-verified.
+- **Holdout, once**, on `c4f2793` (`--phase holdout --allow-holdout`, `GIT_SHA` set): 108 cells. 58 match, 33 analytic_zero_ok, 17 censored, **0 mismatch**. A1, A2, A3 and A4 pass, so **A7 passes**. Max relative error 2.1e-13. 4.3 s CPU.
+- `rows.csv` `a99bdb4d…`, `result.json` `5530e17e…`. Both are committed in [the holdout note](experiments/2026-10-10-pilot-a-holdout.md).
+- An earlier launch attempt failed at the shell (`/usr/bin/time` was missing, exit 127) before Python started. No cell was computed in that attempt. The note records it.
+
+**Evidence level:** numerical observation about a measurement procedure on textbook models whose support classes are mathematical inputs. **No physics claim.** H1 survived its preregistered holdout; this is not proof.
+
+**Limitations:**
+- A1 reuses the grid-independent development control.
+- Only one non-zero W cell lies on the holdout grid.
+- N5 (noise) is not implemented, so the optional part of A7 is open.
+- A5 was evaluated on development only.
+- All review is AI-mediated by the same model family.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a scoped Pilot A decision record (reference calibration within the stated limits). Alternatively, implement N5 first. Either one comes before any exploratory model family uses this metric.
+
+Director run rd-claude-20261010T145640Z-d84b0e: start 2026-10-10T14:56:07Z, end 2026-10-10T15:00:16Z, duration 4 min
 
 ## Director session: Pilot A later-pass review before the holdout (2026-10-10, `rd-claude-20261010T135604Z-f9e889`)
 

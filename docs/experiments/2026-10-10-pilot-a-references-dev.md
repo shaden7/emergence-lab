@@ -74,3 +74,5 @@ A separate Director session reviewed the merged stage-1 code (`c8831af`) against
 - Q normalisation tolerance and the A3 absolute floor are adequate for eigh at L ≤ 1024.
 
 **Not reviewed or open:** N5 is still not implemented. The holdout is still unrun.
+
+**Update (2026-10-10, `rd-claude-20261010T145640Z-d84b0e`):** the holdout has since been evaluated once, on `c4f2793`. A1–A4 pass, so A7 is met (without the optional N5 noise part). There are 0 mismatches. See [the holdout note](2026-10-10-pilot-a-holdout.md).
