@@ -1,6 +1,22 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T095628Z-d3ba3e`: preregistered finite-size gate, report gate 5, PR #18; see the final section).
+Last handoff update: 2026-10-10 (Director session `rd-gpt6-20261010T103425Z-a274c6dd`: gate-6 archive infrastructure merged, archive run pending; see below).
+
+## Director session: Phase-0 raw-data archival infrastructure (2026-10-10, `rd-gpt6-20261010T103425Z-a274c6dd`)
+
+**Question:** can we durably preserve the registered gate-4 and gate-5 raw Monte Carlo data, validate their identity after Actions artifact expiry and objectively clear report gate 6?
+
+**Recovery/orientation:** the prior Director released the lease cleanly (`d355c8f`), no PRs were open, and `main` at `1a17fb6` was CI-green. The finite-size gate in merged PR #18 was a local run only; no runner reproduction of its raw digest had yet occurred. No running external workflow was found before this session's work.
+
+**Implemented and integrated:** [PR #19](https://github.com/shaden7/emergence-lab/pull/19), merge commit `8d83d8e19f62356df1ba28e047b758f27b914b9c`, adds an archive verifier with independently fixed raw/config SHA-256 for gates 4/5, checks original report and negative-control status, per-array digests and source provenance; tamper/control tests; a GitHub Actions archival workflow; an [archive protocol](PHASE0_EVIDENCE_ARCHIVE.md); and an updated README.
+
+**Tests actually completed:** exact PR head `5b2d668c594eaf6325963a55fdce2611c5edc75c` [pull-request CI 38045738942](https://github.com/shaden7/emergence-lab/actions/runs/38045738942) **success** (pytest, smoke, exact4); matching push CI 38045735561 **success**; merged `main` [CI 38045856487](https://github.com/shaden7/emergence-lab/actions/runs/38045856487) **success**. PR review verdict **PASS for engineering merge, not for scientific gate 6**; the review is AI-mediated, not external peer review.
+
+**Actual archive job (still running as of 2026-10-10 10:45 UTC):** [Actions 38045856455](https://github.com/shaden7/emergence-lab/actions/runs/38045856455) on exact merge commit `8d83d8e`: environment setup succeeded, registered gate-4 raw archive successfully downloaded from reproducibility run `38042967864`; the 5.69e9-proposal finite-size gate-5 reproduction was in progress, with a 30-minute step and 45-minute job cap. **No gate-5 runner result, release publication, downloadable release, or gate-6 PASS was observed at this handoff.** Do not infer success from job dispatch. GitHub Release target if validated: `phase0-evidence-2026-10-10-v1`; original NPZ SHA-256 values are fixed in the protocol. No Lightsail deployment or new spending was performed.
+
+**Evidence level:** engineering implementation + passing CI; prior known gate-4/5 numerical observations remain scoped as recorded. **Scientific decision: Phase-0 NO-GO remains unchanged.** The gate-5 1/nu fit needs the preregistered tolerance; short-chain per-chain L32 ESS intervals under-cover.
+
+**Next:** audit the final status and jobs/logs of run `38045856455`; verify release assets exist and their downloaded raw bytes match the pinned digests before any gate-6 PASS. On mismatch/failure, repair without overwriting evidence or adjusting preregistered criteria. Independently assess whether other Phase-0 time series (e.g. critical L32 and burn-in replication) also need durable retention, then record a separate reviewed GO/NO-GO decision. The separate Phase-1 causal Pilot A remains design-only until that decision.
 
 ## Mission
 Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
