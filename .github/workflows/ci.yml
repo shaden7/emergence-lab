@@ -59,6 +59,8 @@ jobs:
           GIT_SHA: ${{ github.sha }}
         run: |
           python -m emergence_lab.critical_gate --config configs/l32_critical_gate.json --output results/l32_critical_gate.json --workers 2
+          # Surface key evidence as check annotations (readable via the REST API without log/artifact access).
+          python -c "import json; r=json.load(open('results/l32_critical_gate.json')); m=r['main']; o=m['observables']; print('::notice title=L32 gate raw::npz_sha256=' + r['raw_npz_sha256'] + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy'] + ' commit=' + str(r['environment']['commit'])); print('::notice title=L32 gate result::gate_pass=%s E=%r rhatE=%r essminE=%r cover=%d absm=%r rhatM=%r essminM=%r power_control_G3_pass=%s' % (m['gate_pass'], o['energy']['pooled_mean'], o['energy']['rhat_max'], o['energy']['chain_ess_min'], o['energy']['chains_covering_exact'], o['abs_magnetization']['pooled_mean'], o['abs_magnetization']['rhat_max'], o['abs_magnetization']['chain_ess_min'], r['power_control']['checks']['G3_chain_ess_abs_magnetization']))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
