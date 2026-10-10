@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261010T195637Z-0eea4a",
+  "leaseId": "9111bbfb-ba75-4b39-81cf-cf471155087f",
+  "acquiredAt": "2026-10-10T19:56:37Z",
+  "heartbeatAt": "2026-10-10T19:56:37Z",
+  "expiresAt": "2026-10-10T21:56:37Z",
+  "task": "Director hourly run: orient, review/integrate open PRs, next preregistered step",
   "previousOwner": "rd-claude-20261010T185551Z-a8d493"
 }
