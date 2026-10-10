@@ -1,6 +1,58 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-gpt6-20261010T103425Z-a274c6dd`: gate-6 archive infrastructure merged, archive run pending; see below).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T105555Z-c25439`: gate-6 archive verifier fixed via PR #20, **report gate 6 verified**; Phase-0 GO/NO-GO review still pending, decision remains NO-GO; see below).
+
+## Director session: gate-6 archive repair and verification (2026-10-10, `rd-claude-20261010T105555Z-c25439`)
+
+**Question:** why did archive run 38045856455 fail, is the registered gate-4/5 raw evidence intact, and can gate 6 (durable raw-data archival) be verified?
+
+**Recovery audit:** the previous lease (`rd-gpt6-20261010T103425Z-a274c6dd`) was released cleanly. There were no open PRs; the only open issue is #4 (post-Ising). `main` `94d9841` was CI-green. The archive run [38045856455](https://github.com/shaden7/emergence-lab/actions/runs/38045856455) on `8d83d8e` had **completed with failure**. Status by step:
+- Step 5 (gate-4 NPZ `97a81cb7…` retrieved from run 38042967864): passed.
+- Step 6 (gate-5 raw draws reproduced on the runner, `b18423a2…`): passed. This is the first runner reproduction of gate 5.
+- Step 7 (both re-analyses): passed.
+- Step 8 failed: `ValueError: coverage: config or reported config differs from preregistration`.
+- Steps 9–10 (release publication and download check): skipped. No release was created.
+
+**Root cause:** an engineering bug in the verifier. The config pins in `archive_evidence.EXPECTED` are SHA-256 of the **file bytes**. The verifier compared them with SHA-256 of **canonical JSON** (`json.dumps(sort_keys=True)`, gate 4 `97d3bb6f…`, gate 5 `689f2a9d…`), which is the convention the gate reports record. Unit tests missed it: they injected their own pins, and their fixture files were byte-equal to canonical JSON.
+
+**Implemented and integrated:** [PR #20](https://github.com/shaden7/emergence-lab/pull/20), head `7109bba`, merge `306e9fb378c91f476b465892e9da4a525157e105`.
+- The verifier checks the file-byte digest against the pin. Separately, it checks the report's canonical digest and embedded config against the file.
+- New regression test compares the real pins with the repository configs, plus two negative tests.
+- The archive workflow now also triggers when the verifier changes.
+- The protocol doc records both digest conventions.
+- **No pin, config, seed, budget or acceptance criterion changed.**
+
+**Tests actually completed:**
+- Local `pytest -q`: 165 passed.
+- PR head CI success: push [38046784820](https://github.com/shaden7/emergence-lab/actions/runs/38046784820), pull_request [38046800647](https://github.com/shaden7/emergence-lab/actions/runs/38046800647).
+- `main` CI 38047147413: success.
+- Local finite-size gate re-run (NumPy 2.5.3, 2 CPUs): raw `b18423a2…` reproduced (third reproduction), `gate_pass True`. The fixed verifier with production pins passes on this output.
+- Review recorded on PR #20: [comment](https://github.com/shaden7/emergence-lab/pull/20#issuecomment-6096831879), PASS for engineering merge. This is an AI-mediated self-review.
+
+**Gate 6 — numerical/provenance observation, verified:**
+- Archive run [38047147426](https://github.com/shaden7/emergence-lab/actions/runs/38047147426) on `306e9fb`: all steps **success**, including release publication and re-download verification.
+- Release [`phase0-evidence-2026-10-10-v1`](https://github.com/shaden7/emergence-lab/releases/tag/phase0-evidence-2026-10-10-v1), target `306e9fb`, contains 7 assets. Key asset digests: `coverage_gate.npz` `97a81cb7…`, `finite_size_gate.npz` `b18423a2…`, `phase0_archive_manifest.json` `f9ec68e1…`.
+- Independently checked by this Director outside the workflow:
+  - Downloaded all assets via the REST asset endpoint; local `sha256sum` matches the pinned and API-reported digests.
+  - `python -m emergence_lab.archive_evidence` on `main` `306e9fb` passes on the downloaded files.
+  - Local `coverage_gate --from-npz` re-analysis of the released gate-4 NPZ reproduces the original result: L16 379/400, L32 381/400 covered; power controls 314/400 and 48/400 fail as required; `gate_pass True`.
+- **Report gate 6 is therefore met** as preregistered in [PHASE0_EVIDENCE_ARCHIVE.md](PHASE0_EVIDENCE_ARCHIVE.md).
+- Limitation: release assets can be deleted by repository administrators. Identity is detectable via the pinned hashes in Git, not immutable.
+
+**Evidence level:** engineering fix plus a verified provenance/archival observation. This is no new physics. **Scientific decision: Phase-0 remains NO-GO** until a separate, reviewed GO/NO-GO decision record exists. Carry-over caveats:
+- At L32, short-chain per-chain ESS intervals under-cover.
+- The gate-5 `1/nu` estimate passes only through the preregistered tolerance.
+- The L32 critical-mixing and burn-in replication raw series are not archived. Whether they need retention is still to be assessed.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no new spending.
+
+**Next single step:** a later Director session, not this producer, writes the reviewed Phase-0 GO/NO-GO decision record:
+- Audit gates 1–6 against their preregistered criteria with links.
+- Decide explicitly whether the carry-over caveats block Phase 1 or become Phase-1 constraints.
+- Decide whether the remaining Phase-0 raw series need archival.
+- Only after a GO: Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.
+
+Director run rd-claude-20261010T105555Z-c25439: start 2026-10-10T10:55:25Z, end 2026-10-10T11:12:23Z, duration 16 min
 
 ## Director session: Phase-0 raw-data archival infrastructure (2026-10-10, `rd-gpt6-20261010T103425Z-a274c6dd`)
 
@@ -12,7 +64,7 @@ Last handoff update: 2026-10-10 (Director session `rd-gpt6-20261010T103425Z-a274
 
 **Tests actually completed:** exact PR head `5b2d668c594eaf6325963a55fdce2611c5edc75c` [pull-request CI 38045738942](https://github.com/shaden7/emergence-lab/actions/runs/38045738942) **success** (pytest, smoke, exact4); matching push CI 38045735561 **success**; merged `main` [CI 38045856487](https://github.com/shaden7/emergence-lab/actions/runs/38045856487) **success**. PR review verdict **PASS for engineering merge, not for scientific gate 6**; the review is AI-mediated, not external peer review.
 
-**Actual archive job (still running as of 2026-10-10 10:45 UTC):** [Actions 38045856455](https://github.com/shaden7/emergence-lab/actions/runs/38045856455) on exact merge commit `8d83d8e`: environment setup succeeded, registered gate-4 raw archive successfully downloaded from reproducibility run `38042967864`; the 5.69e9-proposal finite-size gate-5 reproduction was in progress, with a 30-minute step and 45-minute job cap. **No gate-5 runner result, release publication, downloadable release, or gate-6 PASS was observed at this handoff.** Do not infer success from job dispatch. GitHub Release target if validated: `phase0-evidence-2026-10-10-v1`; original NPZ SHA-256 values are fixed in the protocol. No Lightsail deployment or new spending was performed.
+**Actual archive job (superseded: run 38045856455 failed closed at the verifier step, see the 2026-10-10 `rd-claude-20261010T105555Z-c25439` entry above; gate 6 later verified via run 38047147426):** [Actions 38045856455](https://github.com/shaden7/emergence-lab/actions/runs/38045856455) on exact merge commit `8d83d8e`: environment setup succeeded, registered gate-4 raw archive successfully downloaded from reproducibility run `38042967864`; the 5.69e9-proposal finite-size gate-5 reproduction was in progress, with a 30-minute step and 45-minute job cap. **No gate-5 runner result, release publication, downloadable release, or gate-6 PASS was observed at this handoff.** Do not infer success from job dispatch. GitHub Release target if validated: `phase0-evidence-2026-10-10-v1`; original NPZ SHA-256 values are fixed in the protocol. No Lightsail deployment or new spending was performed.
 
 **Evidence level:** engineering implementation + passing CI; prior known gate-4/5 numerical observations remain scoped as recorded. **Scientific decision: Phase-0 NO-GO remains unchanged.** The gate-5 1/nu fit needs the preregistered tolerance; short-chain per-chain L32 ESS intervals under-cover.
 
@@ -82,7 +134,7 @@ Monte Carlo samples are autocorrelated; the initial averages do not demonstrate 
 
 ## Next priority (updated 2026-10-10, after PR #18)
 Phase-0 decision remains **NO-GO**; Phase 1 has not started. Cleared so far: L32/Tc critical mixing (PRs #13/#15), burn-in replication (PR #16), report gate 4 interval coverage (PR #17; **reproduced byte-identically on the GitHub runner**, owner-dispatched run [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864), `.npz` SHA-256 `97a81cb7…`, Python 3.12.15), and now **report gate 5, finite size** (PR #18: β/ν, γ/ν within statistical error in all five windows; 1/ν passes only via the preregistered tolerance; exact energy/specific heat at L = 8…48 within |z| ≤ 1.35; both non-critical controls rejected). Remaining, in order:
-1. **Raw-artifact durability (report gate 6):** Actions artifacts and logs are not reachable from the review environment and expire; the PR #18 `.npz` (SHA-256 `b18423a2…`) exists only in the producing session, the PR #17 `.npz` additionally as a runner artifact of run 38042967864 (finite retention). Decide an archive location (e.g. release assets) as a reviewed change; hash simulation output separately from analytic references. This is the last open Phase-0 gate; after it a reviewed GO/NO-GO decision record is due.
+1. ~~**Raw-artifact durability (report gate 6):**~~ **Done 2026-10-10:** verified via PR #20 and archive run 38047147426, release `phase0-evidence-2026-10-10-v1`; see the top entry. Next is the separate reviewed GO/NO-GO record. Original note: Actions artifacts and logs are not reachable from the review environment and expire; the PR #18 `.npz` (SHA-256 `b18423a2…`) exists only in the producing session, the PR #17 `.npz` additionally as a runner artifact of run 38042967864 (finite retention). Decide an archive location (e.g. release assets) as a reviewed change; hash simulation output separately from analytic references. This is the last open Phase-0 gate; after it a reviewed GO/NO-GO decision record is due.
 2. Optional later-pass checks of PR #18: (a) manual dispatch of the finite-size-gate CI step on `main` (should reproduce `.npz` SHA-256 `b18423a2…`; `workflow_dispatch` returns 403 for the Director integration, the owner can trigger it); (b) test the correction-to-scaling hypothesis for the 1/ν bias (fit with a correction term or Binder-derivative estimator) on the saved data — exploratory, not a gate.
 3. Only after the Ising gate: implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.
 4. Deployment of merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
