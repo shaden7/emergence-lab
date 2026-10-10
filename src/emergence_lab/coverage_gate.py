@@ -127,12 +127,12 @@ def evaluate_size(energy: np.ndarray, absm: np.ndarray, cfg: dict, reference: fl
     pooled = float(chain_means.mean())
     pooled_se = float(chain_means.std(ddof=1) / math.sqrt(chain_means.size))
     bias_z = (pooled - reference) / pooled_se
-    checks = {"C1_wilson_halfwidth": e_cov["wilson_halfwidth"] < crit["wilson_halfwidth_max"],
-              "C2_wilson_lower": e_cov["wilson95"][0] >= crit["wilson_lower_min"]}
+    checks = {"C1_wilson_halfwidth": bool(e_cov["wilson_halfwidth"] < crit["wilson_halfwidth_max"]),
+              "C2_wilson_lower": bool(e_cov["wilson95"][0] >= crit["wilson_lower_min"])}
     return {"draws_per_chain": int(e.shape[2]), "exact_energy": reference,
             "energy": e_cov, "abs_magnetization": m_cov,
-            "pooled_energy": pooled, "pooled_energy_stderr": pooled_se, "bias_z": bias_z,
-            "bias_flag": abs(bias_z) > crit["bias_z_flag"],
+            "pooled_energy": pooled, "pooled_energy_stderr": pooled_se, "bias_z": float(bias_z),
+            "bias_flag": bool(abs(bias_z) > crit["bias_z_flag"]),
             "checks": checks, "pass": bool(all(checks.values()))}
 
 
@@ -143,12 +143,11 @@ def _job(args):
 
 
 def run_gate(cfg: dict, workers: int = 1):
-    proposals = validate_config(cfg)
+    validate_config(cfg)
     T, nb, k, every = float(cfg["temperature"]), cfg["batches"], cfg["chains_per_batch"], cfg["sample_every"]
     sweeps = cfg["warmup_sweeps"] + cfg["sample_sweeps"]
-    w, pc = cfg["warmup_sweeps"] // every, cfg["power_control_sweeps"] // every
     t0, c0 = time.time(), time.process_time()
-    raw_arrays, results = {}, {}
+    raw_arrays = {}
     for si, L in enumerate(cfg["sizes"]):
         jobs = [(L, T, sweeps, every, seed_for(cfg, si, b, c)) for b in range(nb) for c in range(k)]
         if workers > 1:
@@ -156,10 +155,29 @@ def run_gate(cfg: dict, workers: int = 1):
                 out = list(ex.map(_job, jobs, chunksize=8))
         else:
             out = [_job(j) for j in jobs]
-        e_sum = np.stack([o[0] for o in out]).reshape(nb, k, -1)
-        m_sum = np.stack([o[1] for o in out]).reshape(nb, k, -1)
-        raw_arrays[f"energy_sum_L{L}"] = e_sum
-        raw_arrays[f"magnetization_sum_L{L}"] = m_sum
+        raw_arrays[f"energy_sum_L{L}"] = np.stack([o[0] for o in out]).reshape(nb, k, -1)
+        raw_arrays[f"magnetization_sum_L{L}"] = np.stack([o[1] for o in out]).reshape(nb, k, -1)
+    wall = time.time() - t0
+    buf = io.BytesIO()
+    np.savez_compressed(buf, **raw_arrays)
+    raw = buf.getvalue()
+    environment = {"python": platform.python_version(), "numpy": np.__version__,
+                   "commit": os.getenv("GIT_SHA"), "workers": workers,
+                   "wall_seconds": wall, "parent_cpu_seconds": time.process_time() - c0}
+    return analyze(cfg, raw_arrays, raw, environment), raw
+
+
+def analyze(cfg: dict, raw_arrays: dict, raw: bytes, environment: dict) -> dict:
+    """Apply the preregistered analysis to raw int16 sums (also usable on a saved .npz)."""
+    proposals = validate_config(cfg)
+    T, nb, k, every = float(cfg["temperature"]), cfg["batches"], cfg["chains_per_batch"], cfg["sample_every"]
+    w, pc = cfg["warmup_sweeps"] // every, cfg["power_control_sweeps"] // every
+    draws = (cfg["warmup_sweeps"] + cfg["sample_sweeps"]) // every
+    results = {}
+    for L in cfg["sizes"]:
+        e_sum, m_sum = raw_arrays[f"energy_sum_L{L}"], raw_arrays[f"magnetization_sum_L{L}"]
+        if e_sum.shape != (nb, k, draws) or m_sum.shape != (nb, k, draws):
+            raise ValueError(f"raw arrays for L={L} do not match the config")
         n = L * L
         energy, absm = e_sum / n, np.abs(m_sum) / n
         ref = exact_energy_per_spin(T, L)["energy_per_spin"]
@@ -170,16 +188,10 @@ def run_gate(cfg: dict, workers: int = 1):
             for key in ("batch_means", "batch_stderr", "covered_flags"):
                 control[part].pop(key, None)
         results[str(L)] = {"main": main, "power_control": control}
-    wall = time.time() - t0
-    buf = io.BytesIO()
-    np.savez_compressed(buf, **raw_arrays)
-    raw = buf.getvalue()
     report = {
         "config": cfg,
         "config_sha256": hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest(),
-        "environment": {"python": platform.python_version(), "numpy": np.__version__,
-                        "commit": os.getenv("GIT_SHA"), "workers": workers,
-                        "wall_seconds": wall, "parent_cpu_seconds": time.process_time() - c0},
+        "environment": environment,
         "proposals": proposals,
         "seed_rule": "base_seed + size_index*100000 + batch*10 + chain; random starts",
         "raw_npz_sha256": hashlib.sha256(raw).hexdigest(),
@@ -195,7 +207,7 @@ def run_gate(cfg: dict, workers: int = 1):
             "Independence of chains rests on distinct PCG64 seeds, not on a proof.",
         ],
     }
-    return report, raw
+    return report
 
 
 def main():
@@ -203,10 +215,21 @@ def main():
     p.add_argument("--config", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True, help="JSON report; raw .npz written alongside")
     p.add_argument("--workers", type=int, default=1)
+    p.add_argument("--from-npz", type=Path, help="re-analyze a saved raw .npz instead of simulating")
     args = p.parse_args()
-    report, raw = run_gate(json.loads(args.config.read_text()), args.workers)
+    cfg = json.loads(args.config.read_text())
+    if args.from_npz:
+        raw = args.from_npz.read_bytes()
+        with np.load(io.BytesIO(raw)) as z:
+            arrays = {name: z[name] for name in z.files}
+        report = analyze(cfg, arrays, raw, {"python": platform.python_version(), "numpy": np.__version__,
+                                             "commit": os.getenv("GIT_SHA"),
+                                             "reanalysis_of": str(args.from_npz.name)})
+    else:
+        report, raw = run_gate(cfg, args.workers)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.with_suffix(".npz").write_bytes(raw)
+    if not args.from_npz:
+        args.output.with_suffix(".npz").write_bytes(raw)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     print("raw_npz_sha256", report["raw_npz_sha256"])
     for L, r in report["sizes"].items():

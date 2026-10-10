@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T081233Z-2bca3d`: later-pass review of PR #13 and burn-in replication; see the final section).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T085643Z-4977d0`: preregistered many-batch coverage gate, report gate 4; see the final section).
 
 ## Mission
 Emergence Lab investigates whether the fundamental laws and structures of physical reality—including spacetime, matter, and interactions—can emerge from simpler underlying principles, relations, or computational processes.
@@ -49,7 +49,7 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 - Exact 4x4 enumeration reference and provenance-checked holdout validator (`exact4.py`); interval-coverage audit (`coverage4.py`); paired burn-in sensitivity (`burnin4.py`).
 - Phase-0 diagnostics: finite-size pilot with J=0 null (`finite_size.py`), exact-stationary start comparison (`equilibration4.py`), L16/L32 hot/cold mixing and ESS (`mixing_pilot.py`, `scripts/mixing_diagnostics.py`), interacting 1D Ising null (`ising_1d_control.py`), AR(1) autocorrelation controls.
 - CLI seed-collision check and 1e8 spin-proposal default budget before any output (`cli.py`).
-- Exact finite-torus energy (Kaufman/Beale) for any M x N periodic lattice (`exact_finite.py`), checked against 4x4 enumeration and an independent transfer matrix; rank-normalized/folded split-R̂, bulk/tail ESS and Geyer per-chain ESS (`convergence.py`, matches ArviZ 1.3.0 to ~1e-12); preregistered L32 critical-mixing gate runner (`critical_gate.py`, manual dispatch only); independent single-cluster Wolff cross-check (`scripts/wolff_crosscheck.py`); preregistered burn-in replication runner with exact Student-t p-values (`burnin_replication.py`, manual dispatch only).
+- Exact finite-torus energy (Kaufman/Beale) for any M x N periodic lattice (`exact_finite.py`), checked against 4x4 enumeration and an independent transfer matrix; rank-normalized/folded split-R̂, bulk/tail ESS and Geyer per-chain ESS (`convergence.py`, matches ArviZ 1.3.0 to ~1e-12); preregistered L32 critical-mixing gate runner (`critical_gate.py`, manual dispatch only); independent single-cluster Wolff cross-check (`scripts/wolff_crosscheck.py`); preregistered burn-in replication runner with exact Student-t p-values (`burnin_replication.py`, manual dispatch only). Preregistered many-batch coverage gate at L16/L32 with re-analysis from saved raw `.npz` (`coverage_gate.py`, manual dispatch only).
 - Heavy fixed-seed pilots run only on manual `workflow_dispatch`; ordinary pushes run pytest, smoke and the exact4 holdout.
 - Deterministic seeded CPU experiments with JSON configs.
 - CSV measurements and JSON manifest, basic pytest tests, Docker container capped at 0.5 vCPU and 1536 MB.
@@ -64,14 +64,13 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 ## Scientific cautions
 Monte Carlo samples are autocorrelated; the initial averages do not demonstrate a phase transition or novel physical findings. The infinite-lattice Ising benchmark critical temperature is 2/log(1+sqrt(2)) in units J=k_B=1.
 
-## Next priority (updated 2026-10-10, after PRs #15 and #16)
-Phase-0 decision remains **NO-GO**; Phase 1 has not started. The L32/Tc critical-mixing blocker is **cleared for the checkerboard sampler at the registered budget** (PR #13; later-pass review with an independent Wolff sampler confirmed it, PR #15). The **burn-in replication is done** (PR #16): the T = 1.5 zero-burn-in bias replicated, the Tc shifts were unresolved at 20 batches, the burn-1600 anomaly was not replicated. Remaining GO gates from `docs/ISING_CALIBRATION_REPORT.md` §D, in order:
-1. ~~Burn-in replication~~ — completed 2026-10-10, see final section. Practical consequence for later designs: use ≥ 100 sweeps burn-in from random starts; at Tc on 4×4 a bias of order 0.005 needs well over 20 batches of 4 chains to resolve.
-2. **Coverage gate (report gate 4):** with the exact finite-L energy now available for any L, preregister a many-batch coverage study (≈200 batches, Wilson half-width < 0.05) on new seeds, e.g. at L=16 and 32 near Tc; budget it against the measured τ (|m| τ ≈ 85 sweeps at L32).
-3. **Finite-size gate (report gate 5):** L = 8…32 with long, mixing-verified chains, hot/cold checks and fit-window stability; exponent estimates stay exploratory until then.
-4. **Raw-artifact durability (report gate 6):** Actions artifacts and logs are not reachable from the review environment (blob-storage egress) and expire; decide an archive location (e.g. release assets) as a reviewed change. Deterministic byte-identical regeneration (shown for PR #13; for PR #16 all Monte-Carlo output, with analytic reference floats differing at ULP level) mitigates but does not replace archival. Hash simulation output separately from analytic references.
-5. Only after the Ising gate: implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.
-6. Deployment of merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
+## Next priority (updated 2026-10-10, after PR #17)
+Phase-0 decision remains **NO-GO**; Phase 1 has not started. Cleared so far: L32/Tc critical mixing (PRs #13/#15), burn-in replication (PR #16), and now **report gate 4, interval coverage** (PR #17: 379/400 and 381/400 batches cover the exact energy at L16/L32, Wilson lower bounds 0.921/0.927 ≥ 0.90; power control failed as expected). Remaining, in order:
+1. **Finite-size gate (report gate 5):** L = 8…32 (optionally 48/64 if budget allows) with long, mixing-verified chains from both starts, hot/cold checks and stability against L_min and fit window; compare with exact 2D Ising exponents (ν = 1, γ/ν = 7/4, β/ν = 1/8) as known results, plus the J = 0 and 1D negative controls. Use between-chain intervals; the PR #17 secondary finding shows single-chain Geyer-ESS intervals undercover (0.90) for 750-draw chains at L32. Preregister before running.
+2. **Raw-artifact durability (report gate 6):** Actions artifacts and logs are not reachable from the review environment and expire; the PR #17 `.npz` (SHA-256 `97a81cb7…`) exists only in the producing session. Decide an archive location (e.g. release assets) as a reviewed change; hash simulation output separately from analytic references.
+3. Optional later-pass check of PR #17: manual dispatch of the coverage-gate CI step (should reproduce the `.npz` digest bit-identically); `workflow_dispatch` returned 403 for the Director integration.
+4. Only after the Ising gate: implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.
+5. Deployment of merged code to Lightsail: only as a separate, reviewed decision with EatSleepFeel impact check.
 
 ## Handoff requirements
 After each meaningful research iteration, record: question, exact commit and config, computational resource budget, observed results, uncertainty and negative controls, scientifically supported conclusion, limitations, and next experiment. Keep large raw result files in versioned artifact storage rather than bloating Git history.
@@ -383,3 +382,23 @@ Reviews are AI-mediated; #15 is a second-session review of #13, #16 is a produce
 **Open blockers:** coverage gate 4 and finite-size gate 5 (scientific); artifact archival location (operational, needs a reviewed decision); deployment of merged code (operational, separate reviewed decision).
 
 **Next single informative step:** preregister the many-batch coverage study (gate 4) at L = 16 and 32 near Tc using the exact finite-L energy, sized from the measured τ and with a pilot-variance allowance (lesson from P5–P7).
+
+## Director session: many-batch coverage gate, report gate 4 (2026-10-10, lease `rd-claude-20261010T085643Z-4977d0`)
+
+**Question:** do the project's nominal 95 % 4-chain Student-t intervals for the energy per spin cover the exact finite-torus value at close to the nominal rate at L = 16 and 32, T = 2.269185 (report gate 4)?
+
+**Recovery audit:** previous lease released cleanly by `rd-claude-20261010T081233Z-2bca3d`; no open PRs; no queued/running workflows; `main` green at `8b8bef4`. Nothing incomplete.
+
+**Work:** preregistration, config, runner and tests committed first (`8440df2`), then the holdout simulated locally (3,200 chains, 8.19e9 flips, ≈ 690 s on 2 workers, Python 3.13.16 / NumPy 2.5.3). Two disclosed analysis-only deviations (SciPy import removed; JSON serialization fix with re-analysis of the saved `.npz`; six chains re-simulated bit-identically). PR #17. Runner execution not possible (`workflow_dispatch` 403). Nothing on Lightsail.
+
+**Evidence, by level**
+- *Known mathematics (not ours):* Kaufman/Beale exact finite-torus energy (references E₁₆, E₃₂).
+- *Numerical observations* ([result note](experiments/2026-10-10-coverage-gate.md)): coverage 379/400 (L16, Wilson [0.921, 0.965]) and 381/400 (L32, [0.927, 0.969]) → **gate 4 PASS** by the preregistered rule; pooled energy bias z = +0.40 / −1.39 (resolution ≈ 3e-4); power control (first 40 sweeps, no warmup) 314/400 and 48/400, failing as predicted; per-chain Geyer-ESS intervals 0.951 (L16) but **0.903 [0.888, 0.917] at L32** (750 draws).
+- *Hypotheses:* Geyer τ is underestimated for some short chains near Tc at L32 (untested).
+- *Proofs:* none.
+- *Methodological decision:* report gate 4 met for E at this scope; **Phase-0 NO-GO stands** (gates 5 and 6 open).
+
+**Limitations:** energy-only reference; one T, one sampler, random starts; one execution environment; self-review by the producing session (later-pass challenge invited); raw `.npz` not archived.
+
+**Next single informative step:** preregister the finite-size gate 5 study (see Next priority 1).
+

@@ -100,3 +100,17 @@ def test_binomial_p_matches_scipy_rule():
 def test_binomial_p_sanity_without_scipy():
     assert cg.binomial_two_sided_p(5, 10, 0.5) == pytest.approx(1.0)
     assert cg.binomial_two_sided_p(0, 10, 0.5) == pytest.approx(2 * 0.5 ** 10)
+
+
+def test_report_is_json_serializable_and_reanalysis_reproduces_it():
+    import io
+    report, raw = cg.run_gate(_small())
+    text = json.dumps(report)
+    assert json.loads(text)["gate_pass"] in (True, False)
+    with np.load(io.BytesIO(raw)) as z:
+        arrays = {n: z[n] for n in z.files}
+    again = cg.analyze(_small(), arrays, raw, {})
+    assert again["sizes"] == json.loads(text)["sizes"] and again["raw_npz_sha256"] == report["raw_npz_sha256"]
+    arrays["energy_sum_L4"] = arrays["energy_sum_L4"][:, :, :-1]
+    with pytest.raises(ValueError):
+        cg.analyze(_small(), arrays, raw, {})
