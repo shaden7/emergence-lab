@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261010T225628Z-1ebe46",
-  "leaseId": "0faa5759-1245-4c49-89e9-91d5426e871c",
-  "acquiredAt": "2026-10-10T22:56:28Z",
-  "heartbeatAt": "2026-10-10T22:56:28Z",
-  "expiresAt": "2026-10-11T00:56:28Z",
-  "task": "Recovery audit and later-pass review of PR #31 (Pilot B stage 2 blind-run workflow)",
-  "previousOwner": "rd-claude-20261010T215634Z-08323a"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261010T225628Z-1ebe46"
 }
