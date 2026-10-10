@@ -1,0 +1,19 @@
+{
+  "description": "Preregistered L32 critical-mixing gate; see docs/L32_CRITICAL_GATE_PREREGISTRATION.md. Do not edit after the preregistration commit.",
+  "size": 32,
+  "temperature": 2.269185,
+  "chains_per_start": 16,
+  "base_seed": 2028010001,
+  "warmup_sweeps": 5000,
+  "sample_sweeps": 40000,
+  "sample_every": 4,
+  "power_control_sweeps": 1800,
+  "max_proposals": 1600000000,
+  "criteria": {
+    "rhat_max": 1.01,
+    "ess_bulk_tail_min": 400,
+    "chain_ess_min": 100,
+    "z_max": 3.0,
+    "chain_coverage_min": 27
+  }
+}
