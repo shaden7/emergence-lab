@@ -1,6 +1,34 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T105555Z-c25439`: gate-6 archive verifier fixed via PR #20, **report gate 6 verified**; Phase-0 GO/NO-GO review still pending, decision remains NO-GO; see below).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T115647Z-4e5855`: **Phase-0 decision GO (scoped, constraints C1–C5)** recorded in [PHASE0_DECISION.md](PHASE0_DECISION.md); G3 AR(1) addendum PASS; see below).
+
+## Director session: Phase-0 GO/NO-GO decision record (2026-10-10, `rd-claude-20261010T115647Z-4e5855`)
+
+**Question:** do gates G1–G6 of `ISING_CALIBRATION_REPORT.md` §D hold against their criteria, and do the carry-over caveats block Phase 1?
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T105555Z-c25439`) was released cleanly. No open PRs; only Issue #4 is open. No queued or running workflows. `main` `6b4fc6e` CI-green ([38047588399](https://github.com/shaden7/emergence-lab/actions/runs/38047588399)). Release `phase0-evidence-2026-10-10-v1` present with 7 assets. Nothing incomplete.
+
+**Actually executed (local, Python 3.13.16 / NumPy 2.5.3, nothing on Lightsail):**
+- *G3 addendum*, preregistered before execution (`96e886b`). The production `convergence.py` ESS was tested on stationary AR(1) at φ = 0.98 and 0.995 (exact τ = 99 / 399). **PASS 10/10.** τ recovered to ≈ 2–3 % at n = 500 τ; every chain at n = 20 τ is flagged (ESS ≤ 50 < 100). At n = 20 τ, τ̂ is biased low by ≈ 15 %, and bulk-ESS at φ = 0.995 is 13 % above nominal. [Note](experiments/2026-10-10-g3-ar1-stress.md).
+- *Gate-5 independent re-analysis* of the released `finite_size_gate.npz` (digest `b18423a2…` verified), without project code: β/ν = 0.1261 ± 0.0023, γ/ν = 1.7487 ± 0.0032. This agrees with the report (0.1256 ± 0.0021, 1.7499 ± 0.0030).
+- *L32 gate re-run*: raw `57ae4ea0…` byte-identical, for the fourth time.
+
+**Decision (methodological, not physics): GO for Phase 1, scoped and conditional on C1–C5** in [PHASE0_DECISION.md](PHASE0_DECISION.md):
+- C1: ≥ 4 independent replicates; per-chain ESS intervals only when n ≥ 100 τ̂.
+- C2: R̂/ESS/dispersed starts plus a power control.
+- C3: no exponent claim without window stability and a correction-to-scaling assessment.
+- C4: Phase-0 calibration does not transfer to Phase-1 models; each needs its own controls.
+- C5: raw arrays archived before a gate is met.
+
+The carry-over caveats (L32 short-chain under-coverage, 1/ν via tolerance, unarchived L32/burn-in series) are constraints, not blockers. GO authorizes only Pilot A as a separate reviewed code PR. It does not authorize deployment.
+
+**Limitations:** all reviews are AI-mediated by the same model family. Coverage is energy-only at one temperature. AR(1) has a single exponential mode, so that check is necessary rather than sufficient.
+
+**Deployment:** none. No EatSleepFeel interaction, no spending.
+
+**Next single step:** implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` under C1–C5 as one reviewed code PR. Start with its analytic reference solutions and null controls before any exploratory model run.
+
+Director run rd-claude-20261010T115647Z-4e5855: start 2026-10-10T11:56:09Z, end 2026-10-10T12:06:35Z, duration 10 min
 
 ## Director session: gate-6 archive repair and verification (2026-10-10, `rd-claude-20261010T105555Z-c25439`)
 
@@ -133,7 +161,7 @@ The Ising benchmark is a calibration step. The long-term question encompasses fo
 Monte Carlo samples are autocorrelated; the initial averages do not demonstrate a phase transition or novel physical findings. The infinite-lattice Ising benchmark critical temperature is 2/log(1+sqrt(2)) in units J=k_B=1.
 
 ## Next priority (updated 2026-10-10, after PR #18)
-Phase-0 decision remains **NO-GO**; Phase 1 has not started. Cleared so far: L32/Tc critical mixing (PRs #13/#15), burn-in replication (PR #16), report gate 4 interval coverage (PR #17; **reproduced byte-identically on the GitHub runner**, owner-dispatched run [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864), `.npz` SHA-256 `97a81cb7…`, Python 3.12.15), and now **report gate 5, finite size** (PR #18: β/ν, γ/ν within statistical error in all five windows; 1/ν passes only via the preregistered tolerance; exact energy/specific heat at L = 8…48 within |z| ≤ 1.35; both non-critical controls rejected). Remaining, in order:
+**Superseded 2026-10-10: Phase-0 decision is now GO (scoped, C1–C5), see [PHASE0_DECISION.md](PHASE0_DECISION.md).** Historical text: Phase-0 decision remains **NO-GO**; Phase 1 has not started. Cleared so far: L32/Tc critical mixing (PRs #13/#15), burn-in replication (PR #16), report gate 4 interval coverage (PR #17; **reproduced byte-identically on the GitHub runner**, owner-dispatched run [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864), `.npz` SHA-256 `97a81cb7…`, Python 3.12.15), and now **report gate 5, finite size** (PR #18: β/ν, γ/ν within statistical error in all five windows; 1/ν passes only via the preregistered tolerance; exact energy/specific heat at L = 8…48 within |z| ≤ 1.35; both non-critical controls rejected). Remaining, in order:
 1. ~~**Raw-artifact durability (report gate 6):**~~ **Done 2026-10-10:** verified via PR #20 and archive run 38047147426, release `phase0-evidence-2026-10-10-v1`; see the top entry. Next is the separate reviewed GO/NO-GO record. Original note: Actions artifacts and logs are not reachable from the review environment and expire; the PR #18 `.npz` (SHA-256 `b18423a2…`) exists only in the producing session, the PR #17 `.npz` additionally as a runner artifact of run 38042967864 (finite retention). Decide an archive location (e.g. release assets) as a reviewed change; hash simulation output separately from analytic references. This is the last open Phase-0 gate; after it a reviewed GO/NO-GO decision record is due.
 2. Optional later-pass checks of PR #18: (a) manual dispatch of the finite-size-gate CI step on `main` (should reproduce `.npz` SHA-256 `b18423a2…`; `workflow_dispatch` returns 403 for the Director integration, the owner can trigger it); (b) test the correction-to-scaling hypothesis for the 1/ν bias (fit with a correction term or Binder-derivative estimator) on the saved data — exploratory, not a gate.
 3. Only after the Ising gate: implement Pilot A per `docs/PILOT_A_CAUSAL_PROPAGATION_PREREGISTRATION.md` as a separate reviewed code PR.

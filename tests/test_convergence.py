@@ -30,6 +30,29 @@ def test_ar1_tau_matches_analytic_value(phi):
     assert abs(single["tau"] / tau_true - 1) < 0.35
 
 
+def test_ar1_high_phi_tau_and_short_chain_flag():
+    """G3 clause (phi >= 0.98); full preregistered check in scripts/g3_ar1_stress.py."""
+    phi, tau_true = 0.98, 99.0
+    long = _ar1(np.random.default_rng(15), 8, 49500, phi)
+    assert abs(cv.ess(long)["tau"] / tau_true - 1) < 0.15
+    short = _ar1(np.random.default_rng(16), 8, 1980, phi)
+    assert all(cv.chain_ess(row)["ess"] < 100 for row in short)
+
+
+def test_g3_ar1_stress_script_cell_logic():
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "scripts" / "g3_ar1_stress.py"
+    spec = importlib.util.spec_from_file_location("g3_ar1_stress", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.exact_tau(0.98) == pytest.approx(99.0)
+    cell = mod.run_cell("short_phi0.9", 0.9, 20, 7)
+    assert set(cell["checks"]) == {"S1_all_chains_ess_below_100", "S2_ess_bulk_below_400"}
+    assert cell["n"] == 380 and len(cell["chain_tau"]) == mod.CHAINS
+
+
 def test_location_shift_detected_by_bulk_rhat():
     rng = np.random.default_rng(13)
     a = np.vstack([_ar1(rng, 7, 2000, 0.5), _ar1(rng, 1, 2000, 0.5, mu=1.0)])
