@@ -1,6 +1,41 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T115647Z-4e5855`: **Phase-0 decision GO (scoped, constraints C1–C5)** recorded in [PHASE0_DECISION.md](PHASE0_DECISION.md); G3 AR(1) addendum PASS; see below).
+Last handoff update: 2026-10-10 (Director session `rd-claude-20261010T125630Z-693e0a`: **Pilot A stage 1** reference solvers and null controls in open [PR #22](https://github.com/shaden7/emergence-lab/pull/22), development grid only; see below).
+
+## Director session: Pilot A stage 1, reference solvers and null controls (2026-10-10, `rd-claude-20261010T125630Z-693e0a`)
+
+**Question:** do Pilot A's reference solutions, independent numerical paths and null controls behave as preregistered on the development grid, before any holdout or exploratory run?
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T115647Z-4e5855`) was released cleanly. There were no open PRs, and no queued or running workflows. `main` `5da5d00` was CI-green ([38050894924](https://github.com/shaden7/emergence-lab/actions/runs/38050894924)). Nothing was incomplete.
+
+**Implemented (on PR branch, not yet on `main`):** [PR #22](https://github.com/shaden7/emergence-lab/pull/22), head `fcbe14d`:
+- `src/emergence_lab/pilot_a.py`, `tests/test_pilot_a.py` and `configs/pilot_a.json`. The config pins the preregistration SHA-256 `c8061aed…`.
+- Paths compared: W (d'Alembert); H (erfc vs Gauss–Legendre kernel quadrature); CA (simulation vs induction); Q (eigh vs explicit Fourier sum vs Taylor, plus the Bessel limit).
+- The A3 classifier, with censoring below 1e-8.
+- Controls N1–N4.
+- The holdout is refused without `--allow-holdout`.
+
+**Actually executed (local, Python 3.13.16 / NumPy 2.5.3):**
+- `pytest -q`: 194 passed. PR CI on the exact head: push [38054211314](https://github.com/shaden7/emergence-lab/actions/runs/38054211314) and pull_request [38054230687](https://github.com/shaden7/emergence-lab/actions/runs/38054230687), both success.
+- Development grid (numerical observation): 81 match, 55 analytic_zero_ok, 16 censored, 2 front_excluded, 0 mismatch. A1–A5 pass. `rows.csv` `7a2ff47c…` byte-identical twice.
+- Far witnesses at t = 1 (r = 4 / 6): H 5.93e-3 / 4.82e-5, Q 1.16e-3 / 1.45e-6, W 0 by theorem.
+- N4: forward Euler gives exactly 0 at r = 6, where the continuum value is 4.8e-5. This is a solver artifact.
+- [Note](experiments/2026-10-10-pilot-a-references-dev.md).
+
+**Review:** [PASS for engineering merge](https://github.com/shaden7/emergence-lab/pull/22#issuecomment-6097810844). This is a self-review by the producer.
+
+**Not merged:** the merge attempt (`PUT …/pulls/22/merge` with the expected head SHA) was denied by the session's permission classifier. It was not retried by other means. A later session should review independently and merge. That also gives the independent pass the policy prefers.
+
+**Limitations:**
+- W has no independent solver, so its A2 check is tautological.
+- The N2 times and N4 grid are development choices. N5 is not implemented.
+- The development grid is not a holdout. No physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a later session reviews PR #22, optionally adds an independent W solver, merges, then runs the holdout once and unchanged (`--phase holdout --allow-holdout`) and reports A1–A4 and A7.
+
+Director run rd-claude-20261010T125630Z-693e0a: start 2026-10-10T12:55:50Z, end 2026-10-10T13:07:39Z, duration 11 min
 
 ## Director session: Phase-0 GO/NO-GO decision record (2026-10-10, `rd-claude-20261010T115647Z-4e5855`)
 
