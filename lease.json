@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261011T2005Z-941a1e38c53a",
-  "leaseId": "c529586d22c230498e97e5b0ca5944ae",
-  "acquiredAt": "2026-10-11T20:05:31Z",
-  "heartbeatAt": "2026-10-11T20:05:31Z",
-  "expiresAt": "2026-10-11T22:05:31Z",
-  "task": "hourly Director: review PR #38 (D2 CAY result) and backlog",
-  "previousOwner": "rd-claude-20261011T1805Z-b1af89b4a6bb"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261011T2005Z-941a1e38c53a"
 }
