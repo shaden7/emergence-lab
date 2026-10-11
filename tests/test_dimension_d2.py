@@ -197,6 +197,28 @@ def test_gate_logic_synthetic():
     bad = [dict(r) for r in res if r["family"] == d2.CAY]
     bad[-1].update(verdict=d1.NO_PLATEAU, d_hat=None)
     assert not d2.evaluate_gates(bad, {f"{d2.CAY}:{z}": {"admissible": []} for z in N}, CFG)["D2-G1"]["pass"]
+    # prereg §5: 8/8 PLATEAU only at the top size; one non-PLATEAU replicate at 2^20 still passes,
+    # the 2^20 mean then being over its 7 PLATEAU replicates; none PLATEAU at 2^20 fails
+    mid = [dict(r) for r in res if r["family"] == d2.CAY]
+    i_mid = [k for k, r in enumerate(mid) if r["size"] == N[1]]
+    mid[i_mid[0]].update(verdict=d1.NO_PLATEAU, d_hat=None)
+    g1 = d2.evaluate_gates(mid, {f"{d2.CAY}:{z}": {"admissible": []} for z in N}, CFG)["D2-G1"]
+    assert g1["pass"] and g1["by_size"][str(N[1])]["n_plateau"] == 7
+    for k in i_mid:
+        mid[k].update(verdict=d1.NO_PLATEAU, d_hat=None)
+    assert not d2.evaluate_gates(mid, {f"{d2.CAY}:{z}": {"admissible": []} for z in N}, CFG)["D2-G1"]["pass"]
+    # size drift > 0.10 between 2^20 and 2^22 fails G1
+    drift = [dict(r, d_hat=r["d_hat"] + 0.11) if r["size"] == N[1] else dict(r)
+             for r in res if r["family"] == d2.CAY]
+    assert not d2.evaluate_gates(drift, {f"{d2.CAY}:{z}": {"admissible": []} for z in N}, CFG)["D2-G1"]["pass"]
+    # UST: one non-PLATEAU replicate at L = 512 passes, at L = 1024 fails
+    u = [dict(r) for r in res if r["family"] == d2.UST]
+    j512 = next(k for k, r in enumerate(u) if r["size"] == Ls[1])
+    u[j512].update(verdict=d1.NO_PLATEAU, d_hat=None)
+    assert d2.evaluate_gates(u, {}, CFG)["D2-G2"]["pass"]
+    j1024 = next(k for k, r in enumerate(u) if r["size"] == Ls[2])
+    u[j1024].update(verdict=d1.NO_PLATEAU, d_hat=None)
+    assert not d2.evaluate_gates(u, {}, CFG)["D2-G2"]["pass"]
     # UST: level within 0.15 of 1.6 but the 95 % upper end >= 1.85 fails G2 (separation only)
     wide = [dict(r, d_hat=1.60 if r["i_rep"] % 2 else 1.88) for r in res if r["family"] == d2.UST]
     gg = d2.evaluate_gates(wide, {}, CFG)["D2-G2"]

@@ -22,6 +22,10 @@ Implementation choices not fixed verbatim by the prereg (flagged for review):
 * Sources: S distinct vertices, src_rng.choice(N, S, replace=False), sorted (as in D1).
 * D2-G0 CAY check: radii are the admissible scales of the pooled curve at each N; t uses the
   8 replicate means of B-bar(r), df = 7, two-sided Bonferroni over all (N, r) pairs at alpha 0.01.
+* G1/G2 size comparison: 8/8 PLATEAU is required at the largest size only (prereg §5 text); the
+  middle-size mean is over its PLATEAU replicates, as in the §5a power model (later-pass review fix;
+  the first version also required 8/8 there, which is not in the prereg and would have raised the
+  model's noise-only G1 failure probability from about 0.3 % to about 2.7 %).
 """
 from __future__ import annotations
 
@@ -328,10 +332,12 @@ def _family_stats(rs: list[dict]) -> dict:
     dh = [r["d_hat"] for r in rs if r["verdict"] == PLATEAU]
     st = {"n_rep": len(rs), "n_plateau": len(dh), "verdicts": [r["verdict"] for r in rs],
           "r_last": [r["admissible"][-1] if r["admissible"] else None for r in rs]}
+    if dh:
+        st["mean"] = float(np.mean(dh))
     if len(dh) >= 2:
-        m, s = float(np.mean(dh)), float(np.std(dh, ddof=1))
+        m, s = st["mean"], float(np.std(dh, ddof=1))
         hw = _t_crit(len(dh) - 1, 0.975) * s / math.sqrt(len(dh))
-        st.update(mean=m, sd=s, ci95=[m - hw, m + hw])
+        st.update(sd=s, ci95=[m - hw, m + hw])
     return st
 
 
@@ -350,11 +356,14 @@ def evaluate_gates(results: list[dict], pooled_res: dict, cfg: dict) -> dict:
     gates["D2-G0"] = g0
 
     def two_size(fam, target, extra=None):
+        # Prereg §5 (G1/G2) requires 8/8 PLATEAU only at the largest size; the middle-size
+        # "replicate mean" is the mean d_hat over its PLATEAU replicates, as in the §5a power
+        # model (nanmean). It is undefined, and the gate fails, if no replicate there is PLATEAU.
         zs = sizes(cfg, fam)
         stats = {str(z): _family_stats([r for r in by[fam] if r["size"] == z]) for z in zs}
         top, mid = stats[str(zs[2])], stats[str(zs[1])]
         ok = (top["n_rep"] == 8 and top["n_plateau"] == 8 and abs(top["mean"] - target) <= 0.15
-              and "mean" in mid and mid["n_plateau"] == mid["n_rep"]
+              and mid["n_rep"] == 8 and "mean" in mid
               and abs(mid["mean"] - top["mean"]) <= 0.10)
         if extra is not None and ok:
             ok = extra(top)
@@ -362,10 +371,12 @@ def evaluate_gates(results: list[dict], pooled_res: dict, cfg: dict) -> dict:
 
     if CAY in by:
         gates["D2-G1"] = two_size(CAY, 2.0)
-        gates["D2-G1"]["note"] = ("mean at 2^20 requires all 8 replicates PLATEAU for the size "
-                                   "comparison to be defined (as D1 D-G3)")
+        gates["D2-G1"]["note"] = ("8/8 PLATEAU is required at 2^22 only (prereg §5); the 2^20 mean is "
+                                   "over its PLATEAU replicates (prereg §5a model), n_plateau reported")
     if UST in by:
         gates["D2-G2"] = two_size(UST, 1.6, extra=lambda top: top["ci95"][1] < 1.85)
+        gates["D2-G2"]["note"] = ("8/8 PLATEAU is required at L=1024 only (prereg §5); the L=512 mean is "
+                                   "over its PLATEAU replicates, n_plateau reported")
     if RRT in by:
         rs = by[RRT]
         counts: dict = {}
