@@ -1,8 +1,8 @@
 {
   "name": "dimension_d2",
   "protocol": "docs/DIMENSION_D2_PREREGISTRATION.md",
-  "version": "1.0-r2",
-  "status": "proposed design (r2); no implementation",
+  "version": "1.0-r3",
+  "status": "frozen design (merged via PR #35); r3 errata only, no parameter change",
   "issue": 4,
   "estimator": "frozen D1 estimator, unchanged (configs/dimension_d1.json 'estimator'; emergence_lab.dimension_d1.verdict)",
   "estimator_parameters": {"r_min": 4, "saturation_guard": "8 * Bbar(2r) <= N", "plateau_epsilon": 0.15, "plateau_min_scales": 3, "sources": 256},
@@ -20,7 +20,7 @@
     "cayley_mean_curve_d_hat": {"262144": 1.9162, "1048576": 1.9247, "4194304": 1.9290},
     "ust_exponent": 1.6,
     "cayley_mean_curve_d_hat_by_rlast_2^22": {"256": 1.9747, "512": 1.9290},
-    "g1_noise_only_pass_probability_model": {"S32": 0.236, "S128": 0.947, "S256": ">0.999"}
+    "g1_noise_only_pass_probability_model": {"S32": 0.236, "S128": 0.947, "S256": 0.997}
   },
   "gates": {
     "D2-G0": "unit tests (Pruefer bijection N<=7, Wilson on the 3x3 torus: every one of the 11664 spanning trees seen and chi-square uniformity not rejected at alpha=1e-3, over >=3e5 draws, RRT parent order); per-instance structure; CAY pooled Bbar(r) vs exact formula, Student-t df=7, Bonferroni family-wise alpha=0.01",

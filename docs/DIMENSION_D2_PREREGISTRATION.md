@@ -1,8 +1,8 @@
-# D2 — out-of-sample test of the frozen D1 dimension estimator on graphs whose dimension is not built in (Issue #4), preregistration v1.0-r2
+# D2 — out-of-sample test of the frozen D1 dimension estimator on graphs whose dimension is not built in (Issue #4), preregistration v1.0-r3
 
-**Status:** PROPOSED DESIGN. No implementation exists, and no ball count, d_eff value or verdict has been computed on any sampled instance of a D2 family. The design freezes when it is merged to `main`; any later change to a preregistered parameter needs a new version and an explicit deviation note.
+**Status:** FROZEN DESIGN, merged to `main` via PR #35 (merge commit `505ab21`, design v1.0-r2); r3 is errata only (§12). No ball count, d_eff value or verdict has been computed on any sampled instance of a D2 family at the time of r3. Any later change to a preregistered parameter needs a new version and an explicit deviation note.
 **Date:** 2026-10-11. **Base:** `main` `65d2ce9` (D1 decision integrated via PR #34). **Issue:** [#4](https://github.com/shaden7/emergence-lab/issues/4). **Config:** [`configs/dimension_d2.json`](../configs/dimension_d2.json).
-**Author:** Director session `rd-claude-20261011T095635Z-d05fc0` (v1.0). **r1:** session `rd-claude-20261011T115603Z-1ed1ef`, applying the REVISE findings of the later-pass review by `rd-claude-20261011T105556Z-58dd0f` (see §10). **r2:** session `rd-claude-20261011T125558Z-220239`, a check of r1 that corrects one power figure in §5a (text and check scripts only; see §10). A check of r2 by a further session is required before merge.
+**Author:** Director session `rd-claude-20261011T095635Z-d05fc0` (v1.0). **r1:** session `rd-claude-20261011T115603Z-1ed1ef`, applying the REVISE findings of the later-pass review by `rd-claude-20261011T105556Z-58dd0f` (see §10). **r2:** session `rd-claude-20261011T125558Z-220239`, a check of r1 that corrects one power figure in §5a (text and check scripts only; see §10). r2 was checked (PASS) by session `rd-claude-20261011T140555Z-` and merged. **r3:** the same session, errata only (§12).
 
 ## 0. What this is and is not
 
@@ -163,3 +163,9 @@ Applied by session `rd-claude-20261011T125558Z-220239`, which checked r1 and aut
 - **Correction (§5a):** the r1 joint pass probability at S = 256 was a resolution artifact of a 4000-replicate pool; the corrected value is ≈ 0.997 (failure ≈ 3·10⁻³), from a 40 000-replicate pool. The S = 256 choice and every gate are unchanged.
 - **Added (§5a):** sensitivity of the G1 power to the design-effect input, and an independent design-effect measurement at non-grid sizes.
 - **Unchanged:** everything else, including S, families, sizes, replicates, seeds, ε, r_min, guard, d̂ rule, tolerances, thresholds and decision rule.
+
+## 12. Revision r3 (2026-10-11, errata only)
+
+Applied by session `rd-claude-20261011T140555Z-` after the merge of r2 and before any D2 implementation was run on a preregistered seed. It changes no parameter, seed, size, tolerance, gate or decision rule.
+- `configs/dimension_d2.json` `analytic_reference.g1_noise_only_pass_probability_model.S256` still read "> 0.999", the r1 value that r2 corrected in §5a only. It now reads 0.997, matching §5a. This entry is a model-based reference, not a gate input. The check of r2 missed it; it was found after the merge.
+- The status lines (header, config `status`) no longer say "proposed"; config `version` is `1.0-r3`.
