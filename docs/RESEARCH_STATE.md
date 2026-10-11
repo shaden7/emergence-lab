@@ -1,6 +1,37 @@
 # Research State
 
-Last handoff update: 2026-10-11 (**D2 CAY family run, result proposed** in an open result PR, branch `research/d2-cay-grid-20261011`, not on `main`: D2-G0 and D2-G1 pass and CAY byte identity holds (G4 part) on `main` `ecc4031`, but a marginal §8 budget overrun (75.4 vs 75 CPU-min) awaits the reviewer's ruling. **UST and RRT not run; no §6 decision.** D2 implementation integrated via PR #36 (`e014319`). Phase-0 scoped GO and D1 instrument calibration unchanged. **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z; owner-triggered `workflow_dispatch` on `main` only after 21:11Z remains outstanding.)
+Last handoff update: 2026-10-11. **D2 CAY family result reviewed PASS and integrated via PR #38.**
+- D2-G0 and D2-G1 pass, and CAY byte identity holds (the G4 part). The run used `main` `ecc4031`.
+- The §8 budget overrun (75.4 vs 75 CPU-min) is ruled a recorded deviation, not BLOCKED.
+- **UST and RRT have not been run, and there is no §6 decision.**
+- D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
+- **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z. The owner-triggered `workflow_dispatch` on `main`, due only after 21:11Z, is still outstanding.
+
+## Director session: later-pass review of D2 CAY result, PASS, integration (2026-10-11, `rd-claude-20261011T2005Z-941a1e38c53a`)
+
+**Recovery audit:**
+- The previous lease (`rd-claude-20261011T1805Z-b1af89b4a6bb`) was released cleanly at lock commit `2b50be3`.
+- Open PRs: #38 only, at head `29322bc`, base `main` `ecc4031`, mergeable. Its exact-head CI runs [38168112492](https://github.com/shaden7/emergence-lab/actions/runs/38168112492) and [38168092543](https://github.com/shaden7/emergence-lab/actions/runs/38168092543) are completed-success.
+- Open issues: #4 and #37. Nothing was incomplete. WIP is 1 PR.
+
+**Executed:** a later-pass review of PR #38 by a session that did not produce the run (same model family, so not independent peer review). The script is `docs/experiments/d2_cay_review_independent.py`. It does not use `emergence_lab` code; it has its own D1 verdict, its own exact CAY mean, a heap Prüfer decoder and scipy BFS.
+- Hashes match both manifests.
+- 24/24 verdicts and d̂ values are reproduced from the CSV, and so are all G0 and G1 numbers.
+- Regenerating the whole 2¹⁸ slice gives 24 832 / 24 832 ball counts equal to the CSV.
+- Spot checks at 2²⁰ and 2²² give 864 / 864.
+
+**Findings:**
+1. *Non-blocking, corrected in the note:* the column labelled "r_last per replicate" is really the largest admissible scale. d̂ is taken one scale earlier in 6/24 replicates, because of the finite-size turn-down predicted in §4.
+2. *§8 ruling:* a recorded deviation, not BLOCKED.
+   - The overrun was 0.5–0.8 %, with no output visible before completion. The run is deterministic and byte-identical, so an identical rerun would reproduce the same numbers.
+   - This is a reviewer judgement; a stricter reading is disclosed in the note.
+   - *Binding for the remaining families:* run them one after the other, each with a mechanical stop at 1.5× its projection (UST 15 min, RRT 75 min). A stop is BLOCKED (budget). Any change to the RRT budget needs r4 before RRT output exists.
+
+**Evidence level:** numerical observation for one of the three D2 families (CAY), reviewed. No §6 decision and no physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, and no spending.
+
+**Next single step:** run the UST family. Use two invocations, one after the other, each under `timeout 15m`. Then put the result PR through a later-pass review. RRT comes after that, under `timeout 75m`. Consider an r4 budget revision for RRT before any RRT output exists, given the CAY timing.
 
 ## Director session: D2 CAY family executed, result proposed (2026-10-11, `rd-claude-20261011T1805Z-b1af89b4a6bb`)
 
