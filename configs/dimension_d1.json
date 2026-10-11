@@ -1,0 +1,41 @@
+{
+  "name": "dimension_d1",
+  "protocol": "docs/DIMENSION_ESTIMATOR_PREREGISTRATION.md",
+  "version": "1.0",
+  "status": "proposed design; no implementation",
+  "issue": 4,
+  "estimator": {
+    "observable": "dyadic volume-growth d_eff(r) = log2(Bbar(2r)/Bbar(r))",
+    "scales": "r = 4, 8, 16, ... (powers of two)",
+    "r_min": 4,
+    "saturation_guard": "8 * Bbar(2r) <= N (giant component size)",
+    "plateau_epsilon": 0.15,
+    "plateau_min_scales": 3,
+    "run_selection": "largest r_last, then longest",
+    "d_hat": "d_eff at r_last",
+    "sources_random_graphs": 32,
+    "sources_lattices": 1
+  },
+  "families": {
+    "lattice_Z1": {"L": [1024, 4096, 16384]},
+    "lattice_Z2": {"L": [256, 512, 1024]},
+    "lattice_Z3": {"L": [144, 168, 192]},
+    "rgg_2d_torus": {"N": [131072, 524288, 2097152], "mean_degree": 12, "replicates": 8},
+    "random_4_regular": {"N": [65536, 262144, 1048576], "replicates": 8, "multi_edges_and_self_loops": "dropped, counted"},
+    "subdivided_binary_tree": {"depth": [14, 16, 18], "subdivision": 4, "source_draws": 8},
+    "newman_watts_2d": {"L": 512, "p": [1e-4, 1e-3, 1e-2], "replicates": 8}
+  },
+  "family_index_order": ["lattice_Z1", "lattice_Z2", "lattice_Z3", "rgg_2d_torus", "random_4_regular", "subdivided_binary_tree", "newman_watts_2d"],
+  "seed_base": 2035101101,
+  "seed_rule": "np.random.SeedSequence([seed_base, i_family, i_size, i_rep]) with PCG64",
+  "gates": {
+    "D-G0": "lattice ball counts equal closed form; verdicts/windows/d_hat equal analytic table to 1e-12; generator checks",
+    "D-G1": "all 9 lattices PLATEAU with |d_hat - d| <= 0.10",
+    "D-G2": "no PLATEAU for random 4-regular (24 replicates) or subdivided tree (24 source draws)",
+    "D-G3": "RGG N=2^21: 8/8 PLATEAU, |mean d_hat - 2| <= 0.15; |mean(2^19) - mean(2^21)| <= 0.10; Student-t 95% over replicates",
+    "D-G4": "NW p=1e-2: no PLATEAU with 2*r_last > 32; other p descriptive",
+    "D-G5": "full count tables + manifest; same-environment byte identity; >5 MiB goes to a release asset"
+  },
+  "sensitivity_not_gated": {"plateau_epsilon": [0.10, 0.20], "r_min": [2, 8], "saturation_guard_fraction": [0.25, 0.0625]},
+  "budget": {"cpu_cores": 1, "max_memory_gib": 1.5, "max_wall_minutes": 30, "lightsail": false, "network_during_run": false}
+}

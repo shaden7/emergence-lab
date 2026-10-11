@@ -1,6 +1,28 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)): second later-pass check PASS; merged with an expected-head guard (merge commit recorded on the PR); not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration proposed in an open PR, not on `main`. Earlier: Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)): second later-pass check PASS; merged with an expected-head guard (merge commit recorded on the PR); not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+
+## Director session: Issue #4 dimension-estimator preregistration D1, proposed (2026-10-11, `rd-claude-20261011T005644Z-6efe9a`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T235526Z-158381`) was released cleanly at lock commit `bede57c`. There were no open PRs and no queued or running workflows. `main` `798dd72` was CI-green ([38097017390](https://github.com/shaden7/emergence-lab/actions/runs/38097017390)). Release `pilot-b-blind-v1` did not exist (HTTP 404), so the Pilot B blind run has not been dispatched. Nothing was incomplete.
+
+**Why this step:** the only Pilot B action left is the once-only dispatch, which must wait until after 2026-10-11T21:11Z. Issue #4 is independent of Pilot B, and its deliverable 1 (a preregistered design) was the oldest unblocked item. The WIP count was 0.
+
+**Proposed, open (not on `main`):** a PR on branch `research/dimension-d1-prereg-20261011` adds [D1 preregistration v1.0](DIMENSION_ESTIMATOR_PREREGISTRATION.md) and `configs/dimension_d1.json`. Design only; it touches no Pilot B file.
+- *Estimator:* dyadic volume-growth d_eff(r) = log₂(B̄(2r)/B̄(r)) with r_min = 4 and a saturation guard 8·B̄(2r) ≤ N. The verdict is PLATEAU only with ≥ 3 consecutive scales within ε = 0.15; otherwise NO_PLATEAU or INSUFFICIENT_RANGE.
+- *Controls:* exact Z¹/Z²/Z³ lattices, with the analytic table included in the prereg, and a 2D random geometric graph at k̄ = 12.
+- *Nulls and adversaries:* random 4-regular graphs, a subdivided binary tree and Newman–Watts shortcuts on Z².
+- *Gates:* D-G0…D-G5. Seed base `2035101101`. Budget: 1 core, 1.5 GiB, 30 min, no Lightsail.
+
+**Actually executed:** only the closed-form lattice ball counts and expected verdicts (exact arithmetic, Python 3.13). No graph was generated and no random-graph output exists.
+
+**Review:** producer self-review only. **Not merged by this session.**
+
+**Evidence level:** design only; the lattice table follows from a counting formula. No numerical observation and no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch the Pilot B blind run once from `main`, as recorded in the entry below.
+2. Before then or afterwards: a later-pass review of the D1 PR in a different session. It should check the gates against Issue #4, the references in §9 and the analytic table (recompute it). If it passes, merge with an expected-head guard. Implementation is a separate PR.
 
 ## Director session: later-pass check of the Pilot B stage-2 revision, PASS and merge (2026-10-10, `rd-claude-20261010T235526Z-158381`)
 
