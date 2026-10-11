@@ -82,12 +82,14 @@ Z³ fails ε at r ∈ {4, 8, 16} (range 0.238), so its window starts at 8. This 
   - for the RGG, mean degree within 3 standard errors of the Poisson expectation k̄ = 12.
 - **D-G1, positive control: lattices.** All 9 lattices are `PLATEAU` with |d̂ − d| ≤ 0.10. Given D-G0, this follows from §4; it is the declared tolerance, not an independent test.
 - **D-G2, nulls (H-null).** No replicate of random 4-regular (24 replicates) or of the subdivided tree (24 source draws) returns `PLATEAU`. `INSUFFICIENT_RANGE` and `NO_PLATEAU` both pass. The tree is the stronger null: at r ≫ ℓ, d_eff grows roughly like r/ℓ, so the expected verdict is `NO_PLATEAU` rather than a trivial `INSUFFICIENT_RANGE`. Any `PLATEAU` here is a failure of the estimator, not a property of the null.
+  - *Decisive mechanism (pre-merge review clarification r1; no parameter changed):* for the random 4-regular null the verdict is expected to be `INSUFFICIENT_RANGE` at every size, **by the saturation guard alone**. Maximum degree 4 gives |B(v, r)| ≤ 2·3ʳ − 1, and the tree-like count is close to this bound for r ≪ log₃ N. So r = 4 is admissible only from N ≈ 2¹⁷ on (8·B̄(8) ≈ 1.05·10⁵). r = 16 would need B̄(32) ≤ N/8, but the giant component's diameter (≈ log₃ N ≈ 10–13) is far below 32. Hence |A| ≤ 2. This family therefore tests the guard, not the ε-plateau criterion. Among the gated nulls, only the subdivided tree can exercise the plateau criterion (`NO_PLATEAU` versus `PLATEAU`). The result note must state, per family, which verdict decided the gate.
 - **D-G3, non-lattice positive control (H-pos).**
   - At N = 2²¹, all 8 replicates are `PLATEAU`, and the replicate mean of d̂ has |mean − 2| ≤ 0.15.
   - The replicate means at N = 2¹⁹ and 2²¹ differ by ≤ 0.10.
   - Uncertainty is a Student-t 95 % interval over the 8 independent replicate d̂ values (C1: ≥ 4 independent replicates). A source bootstrap within each replicate is reported only descriptively.
   - The N = 2¹⁷ result is reported but not gated, because its admissible range is marginal.
 - **D-G4, crossover adversary (H-SW).** At p = 1e-2 (ξ ≈ 7), no replicate returns a `PLATEAU` whose window upper end 2·r_last exceeds 32. At p ∈ {1e-4, 1e-3}, the full d_eff(r) curves, verdicts, windows and post-window drift are reported descriptively. If a plateau appears beyond 4ξ, it is reported as a counterexample to H-SW, not as a dimension.
+  - *Decisive mechanism (r1 clarification; no parameter changed):* the gate forbids r_last ≥ 32, which requires 8·B̄(64) ≤ N = 262144. At p = 1e-2, r = 64 ≈ 9ξ, and mean-field small-world growth is roughly exponential beyond ξ [NMW00]. B̄(64) is therefore expected (heuristically, not computed) to be close to N, so this gate is most likely decided by the saturation guard as well. The informative H-SW evidence is the descriptive p ∈ {1e-4, 1e-3} curves.
 - **D-G5, provenance and determinism (C5).**
   - Outputs: full per-replicate, per-source |B(v, r)| tables (CSV) and a JSON manifest. The manifest records the prereg blob SHA, config SHA-256, executing commit, Python/NumPy/SciPy versions, seed tuples, runtime, peak memory and file hashes.
   - Two invocations in the same environment are byte-identical except for timestamps and runtime.
@@ -96,7 +98,7 @@ Z³ fails ε at r ∈ {4, 8, 16} (range 0.238), so its window starts at 8. This 
 
 ## 6. Decision rule
 
-- **D0–D5 pass:** the estimator is *calibrated for* vertex-transitive lattices (exact) and 2D RGG at k̄ = 12 in the reported windows, and it rejects the tested nulls. This permits its use as a Phase-1 instrument with controls. It says nothing about emergent geometry.
+- **D0–D5 pass:** the estimator is *calibrated for* vertex-transitive lattices (exact) and 2D RGG at k̄ = 12 in the reported windows, and it rejects the tested nulls. The decision record must say which rejections came from the saturation guard (`INSUFFICIENT_RANGE`; expected for random 4-regular and NW p = 1e-2) and which from the plateau criterion (`NO_PLATEAU`; expected for the subdivided tree). This permits its use as a Phase-1 instrument with controls. It says nothing about emergent geometry.
 - **D-G3 fails, others pass:** the estimator is validated only for lattices. Dimension statements about non-lattice graphs stay blocked until a corrected estimator or the spectral method is preregistered and calibrated.
 - **D-G2 or D-G4 fails:** the estimator is rejected for dimension claims. A redesign is a new version.
 - **D-G0 fails:** STOP. Fix the implementation, then rerun with the same seeds; this is not a design change.
@@ -118,7 +120,7 @@ Z³ fails ε at r ∈ {4, 8, 16} (range 0.238), so its window starts at 8. This 
 
 ## 8. Budget
 
-- Single core, ≤ 1.5 GiB RAM, ≤ 30 min wall for the full grid (the largest graph is the Z³ torus at 7.08M vertices; BFS via `scipy.sparse.csgraph`).
+- Single core, ≤ 1.5 GiB RAM, ≤ 30 min wall for the full grid (the largest graph is the Z³ torus at 7.08M vertices; BFS via `scipy.sparse.csgraph`). Memory note (r1): CSR adjacency for Z³ L = 192 has ≈ 4.25·10⁷ stored entries, about 0.5 GiB with int32 indices and float64 data. Build it directly without int64 COO intermediates, or use radius-truncated BFS, to stay under 1.5 GiB. Measured peak memory goes in the manifest.
 - No Lightsail deployment, no background job, no network access during the run, no spending.
 - Implementation, tests and the run are a separate PR after this design is merged. CI pytest plus a deterministic local run are required before any result is reported.
 
@@ -128,4 +130,5 @@ Z³ fails ε at r ∈ {4, 8, 16} (range 0.238), so its window starts at 8. This 
 - [WS98] D. J. Watts, S. H. Strogatz, "Collective dynamics of 'small-world' networks", *Nature* 393, 440 (1998).
 - [Pen03] M. Penrose, *Random Geometric Graphs*, Oxford University Press (2003).
 - [DMPP16] J. Díaz, D. Mitsche, G. Perarnau, X. Pérez-Giménez, "On the relation between graph distance and Euclidean distance in random geometric graphs", *Adv. Appl. Probab.* 48(3), 848–864 (2016).
+- [NMW00] M. E. J. Newman, C. Moore, D. J. Watts, "Mean-field solution of the small-world network model", *Phys. Rev. Lett.* 84, 3201 (2000).
 - [Bar98] M. T. Barlow, "Diffusions on fractals", *Lectures on Probability Theory and Statistics (Saint-Flour 1995)*, LNM 1690, Springer (1998).
