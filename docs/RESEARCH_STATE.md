@@ -1,13 +1,13 @@
 # Research State
 
-Last handoff update: 2026-10-11. **D2 CAY family result reviewed PASS in PR #38, merge pending.** The Director's merge call was refused by the session's permission layer, so the PR is not on `main` until it is merged.
+Last handoff update: 2026-10-11. **D2 CAY family result reviewed PASS and integrated:** PR #38 was merged into `main` at `becfcdfa252b7bebf97487bac2e533152599d0a6`, from the reviewed head `020c1f3`, whose CI is green. The owner requested the merge after the scheduled run's merge call was refused by its permission layer.
 - D2-G0 and D2-G1 pass, and CAY byte identity holds (the G4 part). The run used `main` `ecc4031`.
 - The §8 budget overrun (75.4 vs 75 CPU-min) is ruled a recorded deviation, not BLOCKED.
 - **UST and RRT have not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z. The owner-triggered `workflow_dispatch` on `main`, due only after 21:11Z, is still outstanding.
 
-## Director session: later-pass review of D2 CAY result, PASS, merge blocked (2026-10-11, `rd-claude-20261011T2005Z-941a1e38c53a`)
+## Director session: later-pass review of D2 CAY result, PASS, integration (2026-10-11, `rd-claude-20261011T2005Z-941a1e38c53a`)
 
 **Recovery audit:**
 - The previous lease (`rd-claude-20261011T1805Z-b1af89b4a6bb`) was released cleanly at lock commit `2b50be3`.
@@ -31,10 +31,16 @@ Last handoff update: 2026-10-11. **D2 CAY family result reviewed PASS in PR #38,
 
 **Deployment:** none. No Lightsail or EatSleepFeel interaction, and no spending.
 
-**Merge blocker:** after CI was green on `50d55c5`, the expected-head merge (`PUT /pulls/38/merge`, sha `50d55c5`) was refused by this session's tool permission classifier. It was not retried through another tool. The next Director, or the owner, should merge PR #38 with an expected-head guard once it has confirmed that the head is still the reviewed one and that CI is green.
+**Merge blocker (resolved; see the merge follow-up):** after CI was green on `50d55c5`, the expected-head merge (`PUT /pulls/38/merge`, sha `50d55c5`) was refused by this session's tool permission classifier. It was not retried through another tool. The next Director, or the owner, should merge PR #38 with an expected-head guard once it has confirmed that the head is still the reviewed one and that CI is green.
 
-**Next single step:** merge PR #38. Then run the UST family. Use two invocations, one after the other, each under `timeout 15m`. Then put the result PR through a later-pass review. RRT comes after that, under `timeout 75m`. Consider an r4 budget revision for RRT before any RRT output exists, given the CAY timing.
+**Merge follow-up (session `rd-claude-20261011T2020Z-3f2bf2a82e36`, owner-requested):**
+- The session took a fresh lease and confirmed the head was `020c1f3`, which is docs-only on top of the reviewed `50d55c5`.
+- CI on that head is green: [38171607549](https://github.com/shaden7/emergence-lab/actions/runs/38171607549) and [38171604310](https://github.com/shaden7/emergence-lab/actions/runs/38171604310).
+- It merged PR #38 with the expected-head guard, giving `becfcdf`.
 
+**Next single step:** run the UST family. Use two invocations, one after the other, each under `timeout 15m`. Then put the result PR through a later-pass review. RRT comes after that, under `timeout 75m`. Consider an r4 budget revision for RRT before any RRT output exists, given the CAY timing.
+
+Director run rd-claude-20261011T2020Z-3f2bf2a82e36: start 2026-10-11T20:20:25Z, end 2026-10-11T20:21:59Z, duration 1 min
 Director run rd-claude-20261011T2005Z-941a1e38c53a: start 2026-10-11T20:04:52Z, end 2026-10-11T20:17:48Z, duration 12 min
 
 ## Director session: D2 CAY family executed, result proposed (2026-10-11, `rd-claude-20261011T1805Z-b1af89b4a6bb`)
