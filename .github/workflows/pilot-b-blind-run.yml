@@ -1,0 +1,122 @@
+name: Pilot B stage-2 blind run (once only)
+
+# Prereg v1.0-r1 section 6.4: the blind evaluation runs exactly once, on main, in GitHub Actions.
+# Manual dispatch only. Guards (pilot_b_blind.py) fail closed before drand round R = 32983212
+# (2026-10-11T21:10:00Z) is published, if any frozen stage-1 file changed, if the development
+# decision digest moved, or if the beacon does not verify. A failed beacon fetch may be retried
+# on the same R only. Once the release tag exists, every further dispatch fails closed.
+# A failing B-gate is a result: it is archived and published, never rerun on another key.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pilot-b-blind-v1
+  cancel-in-progress: false
+
+jobs:
+  blind:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GIT_SHA: ${{ github.sha }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+      TAG: pilot-b-blind-v1
+      ROUND: '32983212'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project, beacon extra and pinned NumPy
+        run: |
+          pip install -e '.[beacon]'
+          pip install 'numpy==2.5.3'
+          python -c "import numpy; assert numpy.__version__ == '2.5.3'"
+      - name: Once-only guard (release tag must not exist)
+        run: |
+          # Proceed only on a definite HTTP 404; any other API error fails closed.
+          set +e
+          out=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" 2>&1); rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            echo "::error::Fail closed: release $TAG already exists; the blind run is once-only. Reconcile manually."
+            exit 1
+          elif ! printf '%s' "$out" | grep -q 'HTTP 404'; then
+            echo "::error::Fail closed: could not establish that release $TAG is absent: $out"
+            exit 1
+          fi
+          echo "Release $TAG absent (HTTP 404); proceeding."
+      - name: Preflight (round pin, frozen stage-1 code, prereg/config pins, time >= R + margin)
+        run: python -m emergence_lab.pilot_b_blind preflight
+      - name: Development set must reproduce the stage-1 decision digest
+        timeout-minutes: 3
+        run: |
+          python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev
+          # Prereg B-G6: development outputs byte-identical on two invocations in this environment.
+          python -m emergence_lab.pilot_b --phase dev --output results/pilot_b_dev_repeat
+          cmp results/pilot_b_dev/rows.csv results/pilot_b_dev_repeat/rows.csv
+          cmp results/pilot_b_dev/result.json results/pilot_b_dev_repeat/result.json
+      - name: Fetch and verify drand quicknet round R (same R on any retry)
+        timeout-minutes: 3
+        run: |
+          set -o pipefail
+          python -m emergence_lab.pilot_b_beacon fetch-round "$ROUND" | tee results/beacon_R.json
+      - name: Blind evaluation (frozen rule, executed once)
+        timeout-minutes: 3
+        run: |
+          python -m emergence_lab.pilot_b_blind execute --beacon results/beacon_R.json \
+            --dev-output results/pilot_b_dev --output results/pilot_b_blind
+          cp results/beacon_R.json results/pilot_b_blind/beacon_R.json
+      - name: Keep a run artifact before publishing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-b-blind-v1
+          path: |
+            results/beacon_R.json
+            results/pilot_b_dev/manifest.json
+            results/pilot_b_blind/
+          retention-days: 90
+          if-no-files-found: ignore
+      - name: Publish immutable release assets
+        run: |
+          d=results/pilot_b_blind
+          python - <<'PY'
+          import json
+          a = json.load(open('results/pilot_b_blind/blind_archive_manifest.json'))
+          lines = ["Pilot B stage-2 blind run (prereg v1.0-r1). One-shot, frozen rule.",
+                   "", f"Executing commit: {a['executing_commit']}", f"Workflow run: {a['workflow_run']}",
+                   f"drand quicknet round {a['beacon']['round']}, randomness {a['beacon']['randomness']}",
+                   f"Source: {a['beacon']['source_url']} (SHA-256 and BLS verified)",
+                   f"Blind key: {a['key_hex']}", f"Decision digest: {a['blind_decisions_sha256']}",
+                   "", "Gates: " + ", ".join(f"{k} {'PASS' if v else 'FAIL'}" for k, v in sorted(a['gates'].items())),
+                   "", "Evidence level: " + a['evidence_level'] + ". A gate failure is published, not rerun."]
+          open('results/release_notes.md', 'w').write("\n".join(lines) + "\n")
+          PY
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Pilot B blind run (round $ROUND)" --notes-file results/release_notes.md --latest=false \
+            "$d/rows.csv" "$d/result.json" "$d/manifest.json" "$d/blind_archive_manifest.json" "$d/beacon_R.json"
+      - name: Download release and verify published bytes
+        run: |
+          mkdir -p results/downloaded
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir results/downloaded
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          d = Path('results/downloaded')
+          m = json.loads((d / 'blind_archive_manifest.json').read_text())
+          for name, expected in m['files_sha256'].items():
+              actual = hashlib.sha256((d / name).read_bytes()).hexdigest()
+              assert actual == expected, (name, actual, expected)
+          r = json.loads((d / 'result.json').read_text())
+          assert r['decisions_sha256'] == m['blind_decisions_sha256']
+          assert int(m['beacon']['round']) == 32983212
+          print('::notice title=Pilot B blind::' + json.dumps({'gates': m['gates'], 'decisions_sha256': m['blind_decisions_sha256'], 'files': m['files_sha256']}))
+          PY
