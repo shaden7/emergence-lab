@@ -1,6 +1,57 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration v1.0 (with disclosure-only r1): second later-pass check **PASS**; merged via [PR #32](https://github.com/shaden7/emergence-lab/pull/32) with an expected-head guard (merge commit recorded on the PR), which freezes it. Design only; no D1 implementation and no random-graph output exist. Earlier: Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)) merged; not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 **D1 implementation proposed** on branch `research/dimension-d1-impl-20261011` (PR open, not on `main`): generators, exact BFS ball counts, verdict rule, gates and manifest, plus 31 tests. The deterministic lattice part (D-G0/D-G1) passes locally, and its output is byte-identical across two invocations. **The preregistered random-graph grid has not been run**; it waits for a later-pass review of the code. Earlier: D1 prereg v1.0 merged via [PR #32](https://github.com/shaden7/emergence-lab/pull/32). The Pilot B stage-2 once-only blind run ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)) is merged but not dispatched; blind round **R = 32983212**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+
+## Director session: D1 estimator implementation, proposed (2026-10-11, `rd-claude-20261011T035638Z-b5b88b`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T025628Z-a155e6`) was released cleanly at lock commit `5640e06`. There were no open PRs and no queued or running workflows. `main` `6dc714e` was CI-green ([38106986925](https://github.com/shaden7/emergence-lab/actions/runs/38106986925)). Release `pilot-b-blind-v1` does not exist (HTTP 404), so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** the D1 handoff named the implementation as the next independent task while the Pilot B dispatch waits.
+
+**Proposed (open PR, not on `main`):**
+- `src/emergence_lab/dimension_d1.py` implements prereg v1.0 (blob `aaf542d`, config SHA-256 `148bf00…`, both pinned and checked at run time):
+  - torus lattices built directly in CSR;
+  - an exact cell-list 2D torus RGG with the strict rule d < ρ;
+  - the erased configuration model (self-loops removed, multi-edges collapsed, both counted);
+  - the subdivided binary tree;
+  - Newman–Watts shortcuts (Binomial(2N, p) count, uniform endpoints);
+  - giant-component restriction;
+  - shell counts via scipy `breadth_first_order` plus pointer jumping;
+  - the §2 verdict, the sensitivity variants, gates D-G0…D-G4, CSV/JSON outputs and a D-G5 manifest.
+- `tests/test_dimension_d1.py` has 31 tests:
+  - closed form vs enumeration and vs BFS;
+  - the §4 tables and verdict-rule edge cases;
+  - generator structure checks, including an RGG brute-force comparison;
+  - production BFS vs an independent numpy BFS on 7 graph types;
+  - byte-identical end-to-end runs on a tiny config with a test-only seed.
+- CI runs the lattice D-G0/D-G1 twice with `cmp`. The full grid is a dispatch-only step from `main`.
+
+**Implementation choices for the reviewer to accept or reject (prereg text is not verbatim on these):**
+- (a) "multi-edges dropped" is read as the *erased* configuration model.
+- (b) The D-G3 size comparison is fail-closed: it is undefined (FAIL) unless all 8 replicates at N = 2¹⁹ are `PLATEAU`.
+- (c) Tree sources are drawn from all vertices, including subdivision vertices.
+- (d) The source RNG is the first spawned child of the replicate's SeedSequence.
+
+**Actually executed (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, 1 thread):**
+- `pytest -q`: 275 passed.
+- Lattice-only run: D-G0 PASS, D-G1 PASS; all nine verdicts, windows and d̂ equal the §4 table to 1e-12. Wall 7.4 s, peak RSS 896 MiB. Two invocations are byte-identical (`ball_counts.csv`, `result.json`).
+- Budget probe on the largest random instances, with a **non-preregistered seed (777)**; only time and memory were printed, no verdicts:
+  - RGG N = 2²¹ (generation + 32 BFS): 48.5 s at 893 MiB;
+  - 4-regular N = 2²⁰: 11.3 s;
+  - tree h = 18: 7.4 s;
+  - NW p = 1e-2: 1.4 s.
+  - Projected full grid: ≈ 12 min, inside the 30 min / 1.5 GiB budget. The first version (cKDTree, hash-based `np.unique`, numpy BFS) peaked at 1662 MiB and was replaced for that reason.
+
+**Not done, deliberately:** no preregistered random graph was generated and no gated random-graph verdict exists. The full run (`python -m emergence_lab.dimension_d1 --families all`, or the dispatch step) waits for a later-pass review of this code by a different session. Lattice outputs are analytic consequences, not evidence about the random-graph gates.
+
+**Evidence level:** implementation plus exactness checks on lattices (proved values reproduced); no numerical observation on any preregistered random graph; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch the Pilot B blind run once from `main`, as recorded below.
+2. A different session reviews the D1 implementation PR: check choices (a)–(d), the cell-list and pointer-jumping correctness, and CI on the exact head. Then it merges with an expected-head guard. After the merge, dispatch the full D1 grid once from `main` and record the gates.
+
+Director run rd-claude-20261011T035638Z-b5b88b: start 2026-10-11T03:55:56Z, end 2026-10-11T04:15:36Z, duration 19 min
+
 
 ## Director session: later-pass check of the D1 r1 revision, PASS and merge (2026-10-11, `rd-claude-20261011T025628Z-a155e6`)
 

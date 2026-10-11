@@ -48,6 +48,30 @@ jobs:
           cmp results/pilot_b_dev/rows.csv results/pilot_b_dev_repeat/rows.csv
           cmp results/pilot_b_dev/result.json results/pilot_b_dev_repeat/result.json
           python -c "import json; m=json.load(open('results/pilot_b_dev/manifest.json')); print('::notice title=Pilot B dev::' + json.dumps(m['outputs']) + ' decisions_sha256=' + m['decisions_sha256'] + ' gates_pass=' + str(m['gates_pass_B_G0_to_G5']) + ' cpu=' + str(m['cpu_seconds']) + ' python=' + m['python'] + ' numpy=' + m['numpy'])"
+      # D1 (Issue #4): deterministic lattice part only (D-G0/D-G1, no random graph), twice, byte-identical.
+      - name: D1 dimension estimator lattice exactness (D-G0/D-G1, twice)
+        timeout-minutes: 3
+        env:
+          GIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.dimension_d1 --families lattices --output results/d1_lattices > /dev/null
+          python -m emergence_lab.dimension_d1 --families lattices --output results/d1_lattices_repeat > /dev/null
+          cmp results/d1_lattices/ball_counts.csv results/d1_lattices_repeat/ball_counts.csv
+          cmp results/d1_lattices/result.json results/d1_lattices_repeat/result.json
+          python -c "import json; m=json.load(open('results/d1_lattices/manifest.json')); assert all(m['gates_pass'].values()), m['gates_pass']; print('::notice title=D1 lattices::' + json.dumps(m['gates_pass']) + ' ' + json.dumps(m['outputs']) + ' peak_rss_mib=' + str(m['peak_rss_mib']))"
+      # D1 full preregistered grid: manual dispatch from main only, after the implementation's later-pass review.
+      - name: D1 full preregistered grid (dispatch only)
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        timeout-minutes: 45
+        env:
+          GIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.dimension_d1 --families all --output results/d1_full | tee results/d1_full_manifest.txt
+          python -c "import json; m=json.load(open('results/d1_full/manifest.json')); print('::notice title=D1 full grid::' + json.dumps(m['gates_pass']) + ' ' + json.dumps(m['outputs']) + ' wall=' + str(m['wall_seconds']) + ' peak_rss_mib=' + str(m['peak_rss_mib']) + ' commit=' + str(m['commit']))"
       - name: Pre-registered M4 interval coverage audit
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
         timeout-minutes: 20
