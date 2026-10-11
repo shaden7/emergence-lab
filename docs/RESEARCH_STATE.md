@@ -3,9 +3,42 @@
 Last handoff update: 2026-10-11. **D2 CAY family result reviewed PASS and integrated:** PR #38 was merged into `main` at `becfcdfa252b7bebf97487bac2e533152599d0a6`, from the reviewed head `020c1f3`, whose CI is green. The owner requested the merge after the scheduled run's merge call was refused by its permission layer.
 - D2-G0 and D2-G1 pass, and CAY byte identity holds (the G4 part). The run used `main` `ecc4031`.
 - The §8 budget overrun (75.4 vs 75 CPU-min) is ruled a recorded deviation, not BLOCKED.
-- **UST and RRT have not been run, and there is no §6 decision.**
+- **UST:** run and proposed in [PR #39](https://github.com/shaden7/emergence-lab/pull/39) (G0/G2 pass); not yet reviewed or integrated. **RRT has not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z. The owner-triggered `workflow_dispatch` on `main`, due only after 21:11Z, is still outstanding.
+
+## Director session: D2 UST family executed, result proposed (2026-10-11, `rd-claude-20261011T2205Z-fa3ffc55355f`)
+
+**Recovery audit:**
+- The previous lease (`rd-claude-20261011T2020Z-3f2bf2a82e36`) was released cleanly at lock commit `4fd3289`.
+- There were no open PRs. Open issues: #4 and #37.
+- The latest runs are all completed-success, including the `main` `0048198` push run [38171905106](https://github.com/shaden7/emergence-lab/actions/runs/38171905106). Nothing was queued and nothing was incomplete.
+- The owner-triggered Pilot B dispatch has still not run. It is not this session's action.
+
+**Why this step:** it is the next step named in the previous handoff.
+
+**Actually executed (Director cloud sandbox, Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1; code `main` `0048198`):**
+- `pytest -q`: 293 passed.
+- `--families ust_2d_torus` ran twice, one after the other, each under `timeout 15m` on one pinned vCPU.
+  - CPU: 10.7 / 11.1 min against a projection of 10. Peak RSS ≤ 488 MiB.
+  - Outputs are byte-identical: `ball_counts.csv` `1ab481e8…`, `result.json` `6a77925b…`.
+
+**Numerical observations (proposed; `docs/experiments/2026-10-11-d2-ust.md` in PR #39):**
+- D2-G0 (UST structural) **PASS**.
+- **D2-G2 PASS:** at L = 1024, 8/8 `PLATEAU`, mean d̂ 1.5668, 95 % CI [1.526, 1.608]. The L = 512 mean is 1.5595.
+- No sensitivity flips.
+- All means are 0.03–0.05 below 8/5. *Hypothesis:* a finite-size/torus correction; not tested.
+- Producer checks (not independent): CSV re-verdict gives 0/24 mismatches; networkx BFS matches 208/208.
+
+**Evidence level:** numerical observation for a second D2 family. Unreviewed. No §6 decision and no physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. A later-pass review of PR #39 by a different session, including an independent regeneration of the L = 256 slice. Merge with an expected-head guard if PASS.
+2. Then RRT under `timeout 75m`, with an r4 budget decision before any RRT output exists.
+
+Director run rd-claude-20261011T2205Z-fa3ffc55355f: start 2026-10-11T22:05:05Z, end 2026-10-11T22:32:08Z, duration 27 min
 
 ## Director session: later-pass review of D2 CAY result, PASS, integration (2026-10-11, `rd-claude-20261011T2005Z-941a1e38c53a`)
 
