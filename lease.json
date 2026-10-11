@@ -4,8 +4,8 @@
   "owner": "rd-claude-20261011T1805Z-b1af89b4a6bb",
   "leaseId": "2d2bf782-a4bd-4b0e-a9d1-50d89a5aa2ad",
   "acquiredAt": "2026-10-11T18:05:06Z",
-  "heartbeatAt": "2026-10-11T18:27:51Z",
-  "expiresAt": "2026-10-11T20:27:51Z",
+  "heartbeatAt": "2026-10-11T18:57:51Z",
+  "expiresAt": "2026-10-11T20:57:51Z",
   "task": "hourly RD: review open PRs/issues after PR #36 merge; next preregistered step",
   "previousOwner": "rd-gpt6-20261011T1645Z-1ard95ai"
 }
