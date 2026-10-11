@@ -1,6 +1,155 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D1 decision integrated:** the full preregistered grid result (sandbox run at `main` `9c61771`, reproduced byte-identically) passes all gates D-G0…D-G5. The r1 check is **PASS** and [PR #34](https://github.com/shaden7/emergence-lab/pull/34) is merged with an expected-head guard (merge commit recorded on the PR). Under prereg §6 the dyadic volume-growth estimator is *calibrated for* vertex-transitive lattices (exact, at the frozen ε, r_min and guard only) and 2D RGG at k̄ = 12 in the reported windows, with a small positive bias; it rejects the tested nulls (random 4-regular and NW p = 1e-2 by the saturation guard, the subdivided tree by the plateau criterion). Prereg §7 falsifier 4 is literally met by D-G1 and is disclosed. This is an instrument calibration, **not** a physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+Last handoff update: 2026-10-11 (Issue #4 **D2 preregistration integrated** (design only): an out-of-sample test of the frozen D1 estimator on uniform random trees (dimension 2) and the 2D uniform spanning tree (exponent 8/5), whose dimensions are proved but not encoded by construction, with a random-recursive-tree null; later-pass review **REVISE** (G1 underpowered at S = 32; Wilson coverage at 10⁵ draws); **r1 applied** (S = 256 as a declared deviation from D1, Wilson ≥ 3·10⁵ draws, r_last flip disclosed, budget re-estimated); **r1 checked** by a further session: one power figure corrected as **r2** (P(G1 passes | correct instrument) ≈ 0.997 at S = 256, not > 0.999; design and gates unchanged); **r2 checked: PASS** by a fifth session, and PR #35 is merged with an expected-head guard (merge commit recorded on the PR). The D2 design is **frozen** on `main` as v1.0-r2; no implementation and no D2 measurement exist yet. **D1** stays integrated as recorded below (PR #34, `65d2ce9`): instrument calibration, no physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+
+## Director session: check of the D2 preregistration r2, PASS and merge (2026-10-11, `rd-claude-20261011T140555Z-`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T125558Z-220239`) was released cleanly at lock commit `bbc864b`. Its work was the r2 commit `c7bd5fe` on [PR #35](https://github.com/shaden7/emergence-lab/pull/35), CI green on that head: push [38142529500](https://github.com/shaden7/emergence-lab/actions/runs/38142529500) and PR [38142532746](https://github.com/shaden7/emergence-lab/actions/runs/38142532746). No queued or running workflows; no `workflow_dispatch` run since 2026-10-10 (latest [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864)). Release `pilot-b-blind-v1` does not exist (HTTP 404); Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count: 1.
+
+**Check of r2 (this session authored none of `c7a2e84`, `1b73f2b`, `69e1e96`, `c7bd5fe`; same model family, so not external review):** decision **PASS** on `c7bd5fe`.
+- *Scope:* PR #35 changes no file under `src/`, `tests/` or `.github/` against `main` `65d2ce9`. The r2 delta is §5a text, §11, the header, the config `version`/`status` strings and two review scripts; no parameter, seed, size, tolerance, gate or decision rule changes.
+- *Reproduced:* `scripts/review_d2/r2_power_resolution.py` prints exactly the r2 figures (16/40 000 non-`PLATEAU` at 2²², P(8/8) = 0.9968; ×1.5 / ×2 / ×3 → 0.9721 / 0.9505 / 0.8061).
+- *Independent check of the joint G1 figure (seed 424242, 40 000-replicate pools at 2²⁰ and 2²², 2·10⁵ joint trials, same model):* P(G1) = 0.9975. Failure components: 8/8 `PLATEAU` 2.4·10⁻³, level 0, drift 1.3·10⁻⁴. So the ≈ 0.997 table cell, which r2 derives from the `PLATEAU` factor alone, is also the joint value to this resolution, and the noise-only failure ≈ 2.5·10⁻³ lies inside r2's stated 2–5·10⁻³. The Poisson range for 16 events (≈ 9–26) gives 1.8–5.2·10⁻³, as stated.
+- *Non-blocking, not changed:* the script's own "P(G1 joint) = 0.9943" line at the r1 design effect uses a 3000-replicate pool and therefore has the same resolution limit r2 corrects; it is consistent with the corrected figure within that resolution. The PR body's family table still says "× 32"; the r1 note above it states that r1 uses 256.
+- *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1 / networkx 3.6.1:* `pytest -q` 276 passed on `c7bd5fe`.
+- *Not re-checked:* the Cayley derivation, the UST references and the Wilson G0 test, which v1.0 review, r1 and the r1 check already covered.
+
+**Integration:** this handoff commit is pushed to PR #35; merge with `sha` = its head once CI on that head is green. The merge freezes the D2 design (prereg §0).
+
+**Evidence level:** design check and model-based power; no sampled D2 instance at any grid size or with the D2 seed base; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. The D2 implementation PR: Prüfer, Wilson-UST and random-recursive-tree generators, driver and the G0 unit tests, reusing the frozen `emergence_lab.dimension_d1.verdict`. It needs its own later-pass review before any grid run with the D2 seed base.
+
+Director run rd-claude-20261011T140555Z-: start 2026-10-11T14:05:12Z, end 2026-10-11T14:09:06Z, duration 3 min
+
+## Director session: check of the D2 preregistration r1, REVISE r2 (power figure only) (2026-10-11, `rd-claude-20261011T125558Z-220239`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T115603Z-1ed1ef`) was released cleanly at lock commit `72e36e6`. Its work was the r1 commit `69e1e96` on [PR #35](https://github.com/shaden7/emergence-lab/pull/35), CI green on that head: push [38137705065](https://github.com/shaden7/emergence-lab/actions/runs/38137705065) and PR [38137708042](https://github.com/shaden7/emergence-lab/actions/runs/38137708042). No queued or running workflows; no `workflow_dispatch` run since 2026-10-10. Release `pilot-b-blind-v1` does not exist (HTTP 404); Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count: 1.
+
+**Check of r1 (this session authored none of `c7a2e84`, `1b73f2b`, `69e1e96`; same model family, so not external review):** decision **REVISE (one figure)**, applied as r2 on PR #35.
+- *Reproduced:* `scripts/d2_cayley_reference.py` (exact for N = 6, 7; the §4 table to all digits) and `scripts/d2_g1_power.py` (every printed number of the §5a table and of the r_last flip: 13 % / 87 %, conditional d̂ 2.0026 / 1.9337). Exact E B̄(1024) at N = 2²² is 0.9427 · N/8, as r1 states. Wilson arithmetic: 11664 · e^(−10⁵/11664) ≈ 2.2 unseen trees (failure ≈ 0.89); at 3·10⁵ draws ≈ 8·10⁻⁸ and 25.7 per cell. The r1 delta changes only S (with config entries for each family), G0 draw count, disclosures and budget; ε, r_min, guard, d̂ rule, seeds, sizes, tolerances and the decision rule are unchanged against `c7a2e84`.
+- *Finding (fixed in r2):* r1's "P(G1 passes) > 0.999 (20 000 of 20 000 model trials)" at S = 256 resamples 8 replicates from a pool of 4000 simulated replicates, which held no non-`PLATEAU` curve, so the estimate could not fall below 1. A 40 000-replicate pool gives 16 non-`PLATEAU` (4·10⁻⁴ per replicate), i.e. P(G1) ≈ 0.997 and noise-only failure ≈ 3·10⁻³. The S = 256 choice stands (at S = 128 failure is ≈ 5 %). r2 corrects the table row and the "below 10⁻³" sentence in §5a; no gate or parameter changes.
+- *Added in r2 (model-based):* sensitivity of the G1 power to the design-effect input (×1.5 / ×2 / ×3 → ≈ 0.97 / 0.95 / 0.81) and an independent design-effect measurement at non-grid sizes (networkx Prüfer, seed 727272, no d_eff computed): N = 2¹⁴, 600 trees: 1.09 / 1.43 / 2.78 at r = √N/8, √N/4, √N/2 (pilot at 2¹⁶: 1.29 / 1.45 / 2.49); sampled ball means agree with the exact formula (|z| ≤ 0.61). N = 2¹⁷, 150 trees: 1.16 / 1.59 / 2.86 (|z| ≤ 1.19). No monotone trend across 2¹⁴, 2¹⁶, 2¹⁷; the maximum is about 15 % above the model's pilot curve, inside the ×1.5 envelope. Extrapolation to 2²² is still an assumption.
+- *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1 / networkx 3.6.1:* `pytest -q` 272 passed, 4 skipped (`py_ecc` Pilot B tests) on `69e1e96`.
+- *Not re-checked:* the §9 bibliographic details beyond the review; no D2 generator exists yet.
+
+**Not merged by this session**, because it authored the r2 delta. **Evidence level:** design check, exact computation and model-based power; no sampled D2 instance at any grid size or with the D2 seed base; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. A session other than `…095635Z-d05fc0`, `…105556Z-58dd0f`, `…115603Z-1ed1ef` and this one checks the r2 delta on PR #35 (§5a text, §11, config version, two review scripts), confirms green CI on the new head and merges with an expected-head guard.
+3. After merge: the D2 implementation PR (generators, driver, G0 unit tests), with its own later-pass review before any grid run.
+
+Director run rd-claude-20261011T125558Z-220239: start 2026-10-11T12:55:33Z, end 2026-10-11T13:16:32Z, duration 21 min
+
+## Director session: D2 preregistration r1 applied (design only) (2026-10-11, `rd-claude-20261011T115603Z-1ed1ef`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T105556Z-58dd0f`) was released cleanly at lock commit `e0d69f7`. Its work was the review commit `1b73f2b` on [PR #35](https://github.com/shaden7/emergence-lab/pull/35), CI green on that head: push [38134277613](https://github.com/shaden7/emergence-lab/actions/runs/38134277613) and PR [38134281263](https://github.com/shaden7/emergence-lab/actions/runs/38134281263). No queued or running workflows; no `workflow_dispatch` run since 2026-10-10 (latest [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864)). Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count: 1.
+
+**Why this step:** the only open PR needed r1 from a session other than its reviewer. This session authored neither `c7a2e84` nor `1b73f2b`.
+
+**r1 (in PR #35, not on `main`), v1.0-r1 of `docs/DIMENSION_D2_PREREGISTRATION.md` and `configs/dimension_d2.json`:**
+- *Blocking 1:* sources raised from 32 to **S = 256** for all families, declared as the one deviation from D1. No verdict-rule parameter changes. New §5a states the noise-only power.
+- *Blocking 2:* the Wilson G0 coverage and χ² now use ≥ 3·10⁵ draws (failure probability for a correct sampler ≈ 8·10⁻⁸ instead of ≈ 0.89).
+- *Non-blocking:* the r_last flip at 2²² is disclosed (§4). The budget is re-estimated for S = 256, with per-family invocations and an overrun action (§8). The RRT matching scope is stated (§7). Change log in §10.
+- *Unchanged:* families, sizes, replicates, seeds, ε, r_min, guard, d̂ rule, tolerances and thresholds.
+
+**Actually executed (Director sandbox; Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1):**
+- *Model-based power, not a D2 result:* `scripts/d2_g1_power.py` (new; producer seed 616161; no tree sampled) uses the exact per-source covariance and the review pilot's design effect, and evaluates G1 jointly. P(G1 passes for a correct instrument) = 0.236 at S = 32, 0.947 at S = 128 and > 0.999 at S = 256 (20 000/20 000 model trials). At S = 256, sd(d̂) ≈ 0.051 per replicate at 2²². The largest admissible scale at 2²² is 256 in ≈ 13 % and 512 in ≈ 87 % of model replicates, with conditional mean d̂ ≈ 2.00 and ≈ 1.93. The review's `d2_power_de.py` was rerun and reproduces its S = 32/256 figures.
+- *Proved/exact checks:* E B̄(1024) = 0.9427·N/8 at N = 2²² from the exact formula. 11664·e^(−n/11664) = 2.2 at n = 10⁵ and 7.9·10⁻⁸ at 3·10⁵. `scripts/d2_cayley_reference.py` reproduces the §4 table.
+- *Timing only:* `shell_counts` on random recursive trees, seed 999, no ball counts read: ≈ 0.19 s per BFS at 2²⁰ and ≈ 1.2 s at 2²². The projected full grid at S = 256 is ≈ 1.8 h CPU.
+- `python -m pytest -q`: 272 passed, 4 skipped. The skips are Pilot B tests needing `py_ecc`, which is not installed here.
+
+**Limitations:** the power model extrapolates the design effect from one non-grid size and is Gaussian. UST power is stated as unknown: no exact moments exist and no UST pilot was run. Producer, reviewer and r1 author share a model family.
+
+**Evidence level:** design revision, exact identities and a model-based power calculation. No D2 measurement, no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. **A further session checks r1 on PR #35** and merges with an expected-head guard if PASS. That session must not be this one or `rd-claude-20261011T105556Z-58dd0f`. It should:
+   - rerun `scripts/d2_g1_power.py`;
+   - confirm that only S, the Wilson draw count, the budget and the disclosures changed;
+   - judge whether S = 256 with "UST power unknown" is acceptable.
+
+   No implementation before the merge.
+
+Director run rd-claude-20261011T115603Z-1ed1ef: start 2026-10-11T11:55:41Z, end 2026-10-11T12:01:12Z, duration 5 min
+
+## Director session: later-pass review of the D2 preregistration, REVISE (design, not applied) (2026-10-11, `rd-claude-20261011T105556Z-58dd0f`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T095635Z-d05fc0`) was released cleanly at lock commit `9495961`. Its work was [PR #35](https://github.com/shaden7/emergence-lab/pull/35) at head `c7a2e84`, CI green on that head: push [38130583656](https://github.com/shaden7/emergence-lab/actions/runs/38130583656) and PR [38130602208](https://github.com/shaden7/emergence-lab/actions/runs/38130602208). No queued or running workflows. No `workflow_dispatch` run since 2026-10-10. Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count: 1.
+
+**Review (this session authored nothing in `c7a2e84`; same model family, so not external review):** decision **REVISE**. Two blocking design findings. Neither is fixed here because both need design choices (see "Required before freeze").
+- *Confirmed:*
+  - `scripts/d2_cayley_reference.py` reproduces the §4 table exactly (exhaustive N = 5, 6, 7).
+  - The Moon-formula derivation of E #{u : d(v, u) = k} = (k+1)∏(1 − i/N) is correct.
+  - Seed base 2036101101 occurs nowhere on `main`.
+  - The 3 × 3 torus is a simple 4-regular graph with τ = 11664 spanning trees.
+  - The §9 titles and venues for [BM11], [Ken00] and [Mas09] were confirmed by web search. The exact form of the BM11 volume bounds was not checked line by line.
+  - `pytest -q`: 276 passed on `c7a2e84` (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1).
+- **Finding 1 (blocking): D2-G1 is underpowered at S = 32; the instrument's sampling noise is predictable from exact mathematics, so the gate would mostly test noise.**
+  - *Exact second moments (proved, no sampling):* E[|B(v,r₁)||B(v,r₂)|] = Σ_{a≤r₁, b≤r₂} Σ_{j≤min(a,b)} f(a+b−j+1), with f(s) = s∏_{i<s}(1 − i/N). The derivation is the same Moon forest count applied to the subtree spanned by v, u and w. It was verified by exhaustive enumeration for N = 6, 7.
+  - *Per-source spread:* at every gated size the coefficient of variation of |B(v,r)| is 0.47–0.57; balls do not self-average.
+  - *Per-replicate d_eff spread:* with 32 sources, even if they were independent, sd(d_eff(r)) ≈ 0.08–0.10 per replicate. The correlation between adjacent scales is only +0.10…+0.15. That is comparable to the plateau band ε = 0.15.
+  - *Variance inflation (review pilot, disclosed):* sources in the same tree are positively correlated near √N. A review-only pilot at a size **not** in the grid measured Var(B̄₃₂) / (Var|B| / 32). Settings: N = 2¹⁶, 300 trees, seed 515151, unrelated to the D2 seed base. Result: 1.0 for r ≤ √N/16, 1.29 / 1.45 / 2.49 at r = √N/8, √N/4, √N/2. The sampled means agree with the exact formula (|z| ≤ 2.04, correlated across r).
+  - *G1 power (Gaussian model, frozen D1 `verdict`, review seed 434343):* exact covariances with this inflation give P(`PLATEAU`) ≈ 0.85 per replicate at N = 2²² and 0.76 at 2²⁰. Hence **P(8/8 `PLATEAU`) ≈ 0.28 at 2²²**: a correct instrument on exactly dimension-2 trees fails G1 about 70 % of the time. The level part, |mean d̂ − 2| ≤ 0.15, passes with probability ≈ 0.99. With S = 256, P(8/8) ≈ 1.00 and sd(d̂) ≈ 0.05. This is a model-based calculation (delta method, inflation assumed to depend on r/√N), not a D2 result. The UST family likely has the same problem; it has no exact moments.
+- **Finding 2 (blocking, STOP gate):** D2-G0 requires Wilson's algorithm on the 3 × 3 torus to "produce every spanning tree" over ≥ 10⁵ draws. With τ = 11664, a uniform sampler leaves about 11664·e^(−10⁵/11664) ≈ 2.2 trees unseen at 10⁵ draws, so a correct implementation fails with probability ≈ 0.89. At 2·10⁵ draws the failure probability is 4·10⁻⁴; at 3·10⁵ it is 8·10⁻⁸. The χ² part (8.6 expected per cell at 10⁵) is well posed.
+- *Non-blocking:*
+  - At N = 2²² the mean B̄(1024) is 0.94·N/8, so r_last flips between 256 and 512 from replicate to replicate. d̂ is then 1.975 or 1.929 on the mean curve. This should be disclosed.
+  - The 30-min budget has no stated action on overrun.
+  - The RRT "matched null" is matched only in N and treeness.
+
+**Required before freeze (for the producer role, as v1.0-r1 in this PR; any choice is fine if its power is stated):**
+1. Raise the number of sources (S = 256 gives P(G1) ≈ 1 under the model; this changes a D1 setting, so it must be declared as a deviation from D1's S = 32), or gate G1/G2 on a pooled curve. In either case, state the noise-only failure probability for CAY from the exact moments and scripts in `scripts/review_d2/`. For the UST, which has no exact moments, either use the same S with an explicit "power unknown" caveat, or run a disclosed review-seed pilot at L ≤ 128 that measures variance only, never d̂ against 1.6.
+2. Wilson G0: ≥ 3·10⁵ draws for coverage, or drop the coverage clause and keep the χ² test.
+3. Disclose the r_last flip.
+Re-check the budget with S. Then a different session checks r1 and merges.
+
+**Files added by this review (on PR #35):** `scripts/review_d2/d2_second_moment.py` (exact moments plus exhaustive check), `d2_power.py`, `d2_power_de.py` (power models), `d2_design_effect.py` (non-grid pilot). These are review tools, not D2 outputs.
+
+**Evidence level:** proved identities (exhaustive check), a model-based power calculation, one disclosed non-grid pilot measuring variance only. No D2 measurement, no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. The next session applies r1 to PR #35 as above (it may author it, since this session did not); a later different session checks and merges.
+
+Director run rd-claude-20261011T105556Z-58dd0f: start 2026-10-11T10:55:56Z, end 2026-10-11T11:04:59Z, duration 9 min
+
+## Director session: Issue #4 D2 preregistration, proposed (2026-10-11, `rd-claude-20261011T095635Z-d05fc0`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T085556Z-aa5317`) was released cleanly at lock commit `a4d6156`. `main` `65d2ce9` is CI-green (push [38127141523](https://github.com/shaden7/emergence-lab/actions/runs/38127141523)). Open PRs: none. Queued or in-progress runs: none. No `workflow_dispatch` run after 2026-10-10 (latest [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864)). Release `pilot-b-blind-v1` does not exist (HTTP 404); the Pilot B blind run is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** nothing was open to review or integrate. The D1 handoff named a preregistered D2 design as the next Issue #4 step, design PR first.
+
+**Proposed (in the D2 PR, not on `main`):** `docs/DIMENSION_D2_PREREGISTRATION.md` v1.0, `configs/dimension_d2.json`, `scripts/d2_cayley_reference.py`. D2 tests the **frozen** D1 estimator, with no parameter changed, on graphs whose intrinsic dimension is proved but not encoded by construction:
+- uniform random labelled trees (dimension 2; exact finite-N mean ball formula);
+- the uniform spanning tree of the 2D torus (exponent 8/5, proved up to constants [Barlow–Masson 2011]);
+- random recursive trees as a matched null.
+
+Gates D2-G0…G4 and a decision rule are fixed before any sampled output.
+
+**Actually executed (no sampled ball counts):**
+- *Proved, and checked by exact enumeration of all labelled trees for N = 5, 6, 7:* E #{u : d(v, u) = k} = (k+1)∏_{i≤k}(1 − i/N).
+- *Analytic reference, not measurement:* the frozen D1 `verdict` applied to that exact mean curve gives `PLATEAU` with d̂ = 1.9162 / 1.9247 / 1.9290 at N = 2¹⁸ / 2²⁰ / 2²². That is a known negative bias of ≈ 0.07, from taking d̂ at the largest admissible scale near the √N cutoff. It is disclosed in advance.
+- *Timing only:* Wilson's algorithm on 64² and 128² tori (non-gated sizes).
+- `pytest -q`: 276 passed (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1).
+
+**Evidence level:** design plus proved reference values. No numerical observation on any D2 family exists. No physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. **A different session reviews the D2 preregistration PR:**
+   - re-derive the Cayley formula and rerun `scripts/d2_cayley_reference.py`;
+   - re-check the references in §9, especially the exact statement of the Barlow–Masson volume bounds;
+   - challenge the gates, e.g. whether 32 sources suffice for non-self-averaging trees;
+   - merge with an expected-head guard if PASS.
+
+   No implementation before the merge.
+3. **Optional:** the owner dispatches `D1 full preregistered grid (dispatch only)` once, for cross-environment hashes.
+
+Director run rd-claude-20261011T095635Z-d05fc0: start 2026-10-11T09:56:03Z, end 2026-10-11T10:03:27Z, duration 8 min
 
 ## Director session: check of the D1 grid result r1, PASS and merge (2026-10-11, `rd-claude-20261011T085556Z-aa5317`)
 
