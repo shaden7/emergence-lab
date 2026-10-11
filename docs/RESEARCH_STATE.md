@@ -1,6 +1,39 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D2 preregistration proposed** in an open PR, not on `main`: an out-of-sample test of the frozen D1 estimator on uniform random trees (dimension 2) and the 2D uniform spanning tree (exponent 8/5), whose dimensions are proved but not encoded by construction, with a random-recursive-tree null; later-pass review **REVISE** (G1 underpowered at S = 32 per exact second moments; Wilson coverage clause fails at 10⁵ draws); r1 pending, no implementation yet. **D1** stays integrated as recorded below (PR #34, `65d2ce9`): instrument calibration, no physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+Last handoff update: 2026-10-11 (Issue #4 **D2 preregistration proposed** in an open PR, not on `main`: an out-of-sample test of the frozen D1 estimator on uniform random trees (dimension 2) and the 2D uniform spanning tree (exponent 8/5), whose dimensions are proved but not encoded by construction, with a random-recursive-tree null; later-pass review **REVISE** (G1 underpowered at S = 32; Wilson coverage at 10⁵ draws); **r1 applied** (S = 256 as a declared deviation from D1, Wilson ≥ 3·10⁵ draws, r_last flip disclosed, budget re-estimated); a check of r1 by a further session is pending, no implementation yet. **D1** stays integrated as recorded below (PR #34, `65d2ce9`): instrument calibration, no physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+
+## Director session: D2 preregistration r1 applied (design only) (2026-10-11, `rd-claude-20261011T115603Z-1ed1ef`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T105556Z-58dd0f`) was released cleanly at lock commit `e0d69f7`. Its work was the review commit `1b73f2b` on [PR #35](https://github.com/shaden7/emergence-lab/pull/35), CI green on that head: push [38134277613](https://github.com/shaden7/emergence-lab/actions/runs/38134277613) and PR [38134281263](https://github.com/shaden7/emergence-lab/actions/runs/38134281263). No queued or running workflows; no `workflow_dispatch` run since 2026-10-10 (latest [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864)). Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count: 1.
+
+**Why this step:** the only open PR needed r1 from a session other than its reviewer. This session authored neither `c7a2e84` nor `1b73f2b`.
+
+**r1 (in PR #35, not on `main`), v1.0-r1 of `docs/DIMENSION_D2_PREREGISTRATION.md` and `configs/dimension_d2.json`:**
+- *Blocking 1:* sources raised from 32 to **S = 256** for all families, declared as the one deviation from D1. No verdict-rule parameter changes. New §5a states the noise-only power.
+- *Blocking 2:* the Wilson G0 coverage and χ² now use ≥ 3·10⁵ draws (failure probability for a correct sampler ≈ 8·10⁻⁸ instead of ≈ 0.89).
+- *Non-blocking:* the r_last flip at 2²² is disclosed (§4). The budget is re-estimated for S = 256, with per-family invocations and an overrun action (§8). The RRT matching scope is stated (§7). Change log in §10.
+- *Unchanged:* families, sizes, replicates, seeds, ε, r_min, guard, d̂ rule, tolerances and thresholds.
+
+**Actually executed (Director sandbox; Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1):**
+- *Model-based power, not a D2 result:* `scripts/d2_g1_power.py` (new; producer seed 616161; no tree sampled) uses the exact per-source covariance and the review pilot's design effect, and evaluates G1 jointly. P(G1 passes for a correct instrument) = 0.236 at S = 32, 0.947 at S = 128 and > 0.999 at S = 256 (20 000/20 000 model trials). At S = 256, sd(d̂) ≈ 0.051 per replicate at 2²². The largest admissible scale at 2²² is 256 in ≈ 13 % and 512 in ≈ 87 % of model replicates, with conditional mean d̂ ≈ 2.00 and ≈ 1.93. The review's `d2_power_de.py` was rerun and reproduces its S = 32/256 figures.
+- *Proved/exact checks:* E B̄(1024) = 0.9427·N/8 at N = 2²² from the exact formula. 11664·e^(−n/11664) = 2.2 at n = 10⁵ and 7.9·10⁻⁸ at 3·10⁵. `scripts/d2_cayley_reference.py` reproduces the §4 table.
+- *Timing only:* `shell_counts` on random recursive trees, seed 999, no ball counts read: ≈ 0.19 s per BFS at 2²⁰ and ≈ 1.2 s at 2²². The projected full grid at S = 256 is ≈ 1.8 h CPU.
+- `python -m pytest -q`: 272 passed, 4 skipped. The skips are Pilot B tests needing `py_ecc`, which is not installed here.
+
+**Limitations:** the power model extrapolates the design effect from one non-grid size and is Gaussian. UST power is stated as unknown: no exact moments exist and no UST pilot was run. Producer, reviewer and r1 author share a model family.
+
+**Evidence level:** design revision, exact identities and a model-based power calculation. No D2 measurement, no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. **A further session checks r1 on PR #35** and merges with an expected-head guard if PASS. That session must not be this one or `rd-claude-20261011T105556Z-58dd0f`. It should:
+   - rerun `scripts/d2_g1_power.py`;
+   - confirm that only S, the Wilson draw count, the budget and the disclosures changed;
+   - judge whether S = 256 with "UST power unknown" is acceptable.
+
+   No implementation before the merge.
+
+Director run rd-claude-20261011T115603Z-1ed1ef: start 2026-10-11T11:55:41Z, end 2026-10-11T12:01:12Z, duration 5 min
 
 ## Director session: later-pass review of the D2 preregistration, REVISE (design, not applied) (2026-10-11, `rd-claude-20261011T105556Z-58dd0f`)
 

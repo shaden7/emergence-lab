@@ -1,17 +1,17 @@
-# D2 — out-of-sample test of the frozen D1 dimension estimator on graphs whose dimension is not built in (Issue #4), preregistration v1.0
+# D2 — out-of-sample test of the frozen D1 dimension estimator on graphs whose dimension is not built in (Issue #4), preregistration v1.0-r1
 
 **Status:** PROPOSED DESIGN. No implementation exists, and no ball count, d_eff value or verdict has been computed on any sampled instance of a D2 family. The design freezes when it is merged to `main`; any later change to a preregistered parameter needs a new version and an explicit deviation note.
 **Date:** 2026-10-11. **Base:** `main` `65d2ce9` (D1 decision integrated via PR #34). **Issue:** [#4](https://github.com/shaden7/emergence-lab/issues/4). **Config:** [`configs/dimension_d2.json`](../configs/dimension_d2.json).
-**Author:** Director session `rd-claude-20261011T095635Z-d05fc0`. Producer self-review only. A later-pass review by a different session is required before merge.
+**Author:** Director session `rd-claude-20261011T095635Z-d05fc0` (v1.0). **r1:** session `rd-claude-20261011T115603Z-1ed1ef`, applying the REVISE findings of the later-pass review by `rd-claude-20261011T105556Z-58dd0f` (see §10). A check of r1 by a further session is required before merge.
 
 ## 0. What this is and is not
 
-- **It is** an out-of-sample test of the D1 instrument (the dyadic volume-growth estimator of [DIMENSION_ESTIMATOR_PREREGISTRATION.md](DIMENSION_ESTIMATOR_PREREGISTRATION.md) §2, frozen at ε = 0.15, r_min = 4, guard N/8, S = 32 sources). It uses two graph families whose large-scale intrinsic dimension is **not put in by an embedding or a lattice**, but is a **proved** property of the random structure:
+- **It is** an out-of-sample test of the D1 instrument (the dyadic volume-growth estimator of [DIMENSION_ESTIMATOR_PREREGISTRATION.md](DIMENSION_ESTIMATOR_PREREGISTRATION.md) §2, frozen at ε = 0.15, r_min = 4, guard N/8; D1 used S = 32 sources, D2 uses **S = 256** (declared deviation, §2 and §5a)). It uses two graph families whose large-scale intrinsic dimension is **not put in by an embedding or a lattice**, but is a **proved** property of the random structure:
   - the uniform random labelled tree on N vertices, intrinsic volume-growth dimension 2;
   - the uniform spanning tree (UST) of the 2D torus, intrinsic volume-growth exponent 8/5.
 - **It is not** a discovery of emergent space. Both exponents are established mathematics (§4). Recovering them tests the instrument; it says nothing about nature. Trees are a relational test bed, not an ontological proposal ([REPRESENTATION_STRATEGY.md](REPRESENTATION_STRATEGY.md)).
 - **Why this is the right next step:** D1 calibrated the estimator only on graphs whose dimension is encoded (lattices, a torus-embedded RGG) and on nulls with no finite dimension. Before the instrument is used on dynamically generated graphs (Phase 1), it must be shown to return a dimension that the construction does not hand it, including a **non-integer** one, and to cope with **non-self-averaging** ball-size fluctuations (balls in random trees do not concentrate: |B(v, r)|/r² has a non-degenerate limit law).
-- **No estimator parameter is changed.** The D1 code path (`emergence_lab.dimension_d1.verdict`, `shell_counts`, `ball_sizes`, `mean_balls`) is reused unchanged; only generators and a driver are new.
+- **No parameter of the verdict rule is changed** (ε, r_min, guard, minimum run length, d̂ rule). The D1 code path (`emergence_lab.dimension_d1.verdict`, `shell_counts`, `ball_sizes`, `mean_balls`) is reused unchanged; only generators and a driver are new. **The one declared deviation is the number of sources, S = 256 instead of 32** (§5a): at S = 32 the test would mostly measure sampling noise, which is predictable from exact mathematics. D2 therefore tests the verdict rule at S = 256; it does not show that S = 32 suffices on non-self-averaging graphs, and a later application must choose S by the same power argument.
 
 ## 1. Question and hypotheses
 
@@ -23,17 +23,17 @@
 
 ## 2. Observable and estimator
 
-Identical to D1 §2, applied to the **tree's own** graph distance. Sources: S = 32 distinct vertices drawn uniformly without replacement from each instance (every instance is connected). B̄(r) is the mean of |B(v, r)| over the 32 sources; d_eff(r) = log₂(B̄(2r)/B̄(r)); admissible scales A = {r ∈ {4, 8, 16, …} : 8·B̄(2r) ≤ N}; verdict, run selection, d̂ = d_eff(r_last) and post-window drift exactly as in D1 §2.
+Identical to D1 §2, applied to the **tree's own** graph distance. Sources: S = 256 distinct vertices drawn uniformly without replacement from each instance (every instance is connected). B̄(r) is the mean of |B(v, r)| over the 256 sources; d_eff(r) = log₂(B̄(2r)/B̄(r)); admissible scales A = {r ∈ {4, 8, 16, …} : 8·B̄(2r) ≤ N}; verdict, run selection, d̂ = d_eff(r_last) and post-window drift exactly as in D1 §2.
 
-**Pooled curve (reported, gated only in D2-G0):** for each family and size, B̄_pool(r) is the mean over all 8 × 32 sources. The verdict of the pooled curve is reported descriptively; per-replicate verdicts are what the gates use, as in D1.
+**Pooled curve (reported, gated only in D2-G0):** for each family and size, B̄_pool(r) is the mean over all 8 × 256 sources. The verdict of the pooled curve is reported descriptively; per-replicate verdicts are what the gates use, as in D1.
 
 ## 3. Families, sizes and seeds
 
 | Family | Role | Generator | Sizes | Replicates × sources |
 | --- | --- | --- | --- | --- |
-| **CAY**: uniform random labelled tree on [N] | positive control, dimension 2 not encoded | uniform Prüfer sequence in [N]^(N−2), decoded in linear time; this is exactly uniform over the N^(N−2) labelled trees (Cayley/Prüfer bijection) | N ∈ {2¹⁸, 2²⁰, 2²²} | 8 × 32 |
-| **UST**: uniform spanning tree of the L × L periodic square lattice | positive control, non-integer exponent 8/5 not encoded | Wilson's algorithm [Wil96], root vertex 0, vertices processed in a uniform random order from the replicate stream (Wilson's algorithm is exact for any root and order) | L ∈ {256, 512, 1024} (N = L²) | 8 × 32 |
-| **RRT**: random recursive tree on [N] | matched null (random tree, no finite dimension) | vertex i ≥ 1 attaches to a uniform vertex in {0, …, i−1} | N ∈ {2¹⁸, 2²⁰, 2²²} | 8 × 32 |
+| **CAY**: uniform random labelled tree on [N] | positive control, dimension 2 not encoded | uniform Prüfer sequence in [N]^(N−2), decoded in linear time; this is exactly uniform over the N^(N−2) labelled trees (Cayley/Prüfer bijection) | N ∈ {2¹⁸, 2²⁰, 2²²} | 8 × 256 |
+| **UST**: uniform spanning tree of the L × L periodic square lattice | positive control, non-integer exponent 8/5 not encoded | Wilson's algorithm [Wil96], root vertex 0, vertices processed in a uniform random order from the replicate stream (Wilson's algorithm is exact for any root and order) | L ∈ {256, 512, 1024} (N = L²) | 8 × 256 |
+| **RRT**: random recursive tree on [N] | matched null (random tree, no finite dimension) | vertex i ≥ 1 attaches to a uniform vertex in {0, …, i−1} | N ∈ {2¹⁸, 2²⁰, 2²²} | 8 × 256 |
 
 - **Seeds:** `seed_base = 2036101101`, disjoint from all seed constants in `configs/`, `docs/` and `src/` (checked with grep at `65d2ce9`). Each (family index, size index, replicate index) gets `np.random.SeedSequence([seed_base, i_family, i_size, i_rep])` with PCG64, family order CAY, UST, RRT. Source draws use a child of the same sequence, as in D1. Independence of pseudorandom streams is a modelling assumption.
 - **Torus UST vs. planar UST:** the theorems in §4 are for the UST of Z². The torus UST is a finite-volume approximation that agrees with it on scales small compared with L; its finite-size effects are part of what the saturation guard and the size-stability gate test.
@@ -56,6 +56,8 @@ Hence E|B(v, r)| = Σ_{k=0}^{r} (k+1)∏_{i≤k}(1 − i/N) ≈ (r+1)(r+2)/2 for
 
 Two features are known in advance: d_eff approaches 2 **from below** at small r (lattice-like O(1/r) correction, as for Z²), and **turns down** at the largest admissible scale because of the finite-size factor ∏(1 − i/N) ≈ exp(−k²/2N). Because D1 takes d̂ at the largest admissible scale, the frozen estimator has a negative bias of about 0.07–0.08 on the mean curve. This is inside the tolerance and is stated now so that it cannot be rationalised afterwards. Per-replicate d̂ will differ from the mean-curve value (sampling fluctuation and Jensen gap); the size of that difference is not predicted.
 
+**Known r_last flip (disclosed in r1).** At N = 2²² the exact mean is E B̄(1024) ≈ 0.94·N/8, i.e. just below the saturation guard, so whether 512 is admissible changes from replicate to replicate. On the exact mean curve, d̂ = 1.9747 when the largest admissible scale is 256 and 1.9290 when it is 512. Under the §5a model at S = 256 the largest admissible scale is 256 in ≈ 13 % and 512 in ≈ 87 % of replicates, with conditional mean d̂ ≈ 2.00 and ≈ 1.93. Both are inside the G1 tolerance. The result note reports r_last per replicate; this spread is a property of the frozen d̂ rule, not a generator fault.
+
 **UST, proved exponent (up to constants).** For the UST of Z², intrinsic balls satisfy c r^(8/5) ≤ E|B_int(0, r)| ≤ C r^(8/5), with matching high-probability bounds [BM11], resting on the planar loop-erased random walk growth exponent 5/4 [Ken00, Mas09, BM10]. **Caveat that matters for the gate:** a two-sided bound up to constants proves that log|B|/log r → 8/5, but it does **not** prove that the dyadic ratio log₂(B(2r)/B(r)) converges, nor bound its finite-r corrections. A `NO_PLATEAU` on the UST therefore does not contradict the theorem; it means the instrument is not usable on this family at these sizes. No finite-N UST reference curve is available.
 
 **RRT.** The height of a random recursive tree is ≈ e·log N and typical distances are ≈ 2 ln N (≈ 30 at N = 2²²; height ≈ 41) [Dev87, Pit94]. Balls therefore reach a positive fraction of N within a few dyadic scales. **Expected decisive mechanism (heuristic, not computed):** the saturation guard (`INSUFFICIENT_RANGE`), as for the random 4-regular null in D1. This null tests the guard, not the plateau criterion; the result note must state which verdict decided it.
@@ -63,7 +65,7 @@ Two features are known in advance: d_eff approaches 2 **from below** at small r 
 ## 5. Gates (fixed before any sampled output)
 
 - **D2-G0, generator exactness (STOP on failure).**
-  - *Unit tests (tiny graphs, exhaustive or exact):* Prüfer decoding is a bijection for N ≤ 7 and reproduces the §4 formula exactly. Wilson's algorithm on a small graph with a known spanning-tree count (matrix-tree theorem; e.g. the 3 × 3 torus) produces every spanning tree, and a χ² test against uniformity over ≥ 10⁵ draws does not reject at α = 10⁻³. RRT parent indices satisfy parent(i) < i.
+  - *Unit tests (tiny graphs, exhaustive or exact):* Prüfer decoding is a bijection for N ≤ 7 and reproduces the §4 formula exactly. Wilson's algorithm on a small graph with a known spanning-tree count (matrix-tree theorem; e.g. the 3 × 3 torus) produces every spanning tree over ≥ 3·10⁵ draws, and a χ² test against uniformity over the same draws does not reject at α = 10⁻³. (r1: v1.0 required coverage at 10⁵ draws; with τ = 11664 a uniform sampler leaves ≈ 11664·e^(−10⁵/11664) ≈ 2.2 trees unseen, so a correct implementation would fail with probability ≈ 0.89. At 3·10⁵ draws that probability is ≈ 8·10⁻⁸, and the expected count per cell is ≈ 25.7.) RRT parent indices satisfy parent(i) < i.
   - *Structural checks on every instance:* N − 1 edges and connected; for UST, every edge is a lattice edge; for RRT, the root's subtree is everything.
   - *CAY distributional check at gated sizes:* for each N and each admissible r of the pooled curve, the 8 replicate means of B̄(r) give a Student-t statistic against the §4 formula. All |t| must be below the two-sided Bonferroni critical value at family-wise α = 0.01 over all (N, r) pairs tested (df = 7). This checks the generator and the BFS against exact mathematics on non-embedded graphs. It does not involve d_eff.
 - **D2-G1, H-tree.** At N = 2²², all 8 replicates are `PLATEAU`, the replicate mean of d̂ has |mean − 2| ≤ 0.15, and the replicate means at 2²⁰ and 2²² differ by ≤ 0.10. Uncertainty: Student-t 95 % interval over the 8 replicate d̂ values. N = 2¹⁸ is reported, not gated. The difference between the replicate mean and the mean-curve d̂ (§4 table) is reported descriptively.
@@ -75,13 +77,34 @@ Two features are known in advance: d_eff approaches 2 **from below** at small r 
 **Design disclosure.**
 - Tolerances 0.15 (level) and 0.10 (size stability) are copied from D1 D-G3 unchanged. The UST target 8/5 and the separation threshold 1.85 were fixed from the theorem, before any UST output.
 - The only computations done while writing this document were: (a) exact enumeration of all labelled trees for N ≤ 7; (b) the §4 table, obtained by applying the frozen D1 `verdict` function to the exact formula; (c) a **timing-only** run of a pure-Python Wilson implementation on 64 × 64 and 128 × 128 tori (non-gated sizes; 4.5 and 7.6 walk steps per vertex, ≈ 2.5·10⁶ steps/s). No ball count, d_eff or verdict was computed on any sampled tree.
+- **r1 computations:** (d) the exact-moment power model of §5a (`scripts/d2_g1_power.py`, no tree sampled); (e) timing-only BFS on random recursive trees at N = 2²⁰ and 2²² (§8; seed 999, no ball count read). The review's N = 2¹⁶ variance pilot (§5a) is the only sampled-tree computation so far; it is at a non-grid size, used a non-D2 seed, and did not compute d_eff.
 - Sizes were chosen so that the CAY mean curve has ≥ 6 admissible dyadic scales and the UST, whose intrinsic diameter grows like L^(5/4), has comparable range; they were not tuned on outputs.
+
+## 5a. Power: noise-only failure probability (added in r1)
+
+Ball sizes in random trees do not self-average, so the gates must be checked against the sampling noise of a **correct** instrument before any sampled output exists.
+
+- **Proved inputs (no sampling):** the exact per-source covariance of |B(v, r)| for uniform labelled trees, E[|B(v,r₁)||B(v,r₂)|] = Σ_{a≤r₁, b≤r₂} Σ_{j≤min(a,b)} f(a+b−j+1) with f(s) = s∏_{i<s}(1 − i/N) (Moon's forest count on the subtree spanned by v, u, w; exhaustive check for N = 6, 7 in `scripts/review_d2/d2_second_moment.py`). The per-source coefficient of variation is 0.47–0.57 at the gated sizes.
+- **Disclosed empirical input:** the within-tree variance inflation of B̄ (sources in one tree are positively correlated near √N), measured in a review-only pilot at N = 2¹⁶ (not a grid size; review seed 515151; `scripts/review_d2/d2_design_effect.py`): ×1.0 for r ≤ √N/16 and ×1.29 / 1.45 / 2.49 at r = √N/8, √N/4, √N/2. It is assumed to depend on r/√N only. That pilot computed ball means and variances, never d_eff or d̂ against 2.
+- **Model (not a D2 result):** log B̄_S(r) Gaussian with that covariance divided by S and inflated as above; each simulated replicate curve goes through the frozen D1 `verdict`; G1 is evaluated jointly (8/8 `PLATEAU` at 2²², level at 2²², drift between 2²⁰ and 2²²). Script: `scripts/d2_g1_power.py` (producer seed 616161, unrelated to `seed_base`; no tree is sampled). Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1.
+
+| S | P(`PLATEAU`) per replicate at 2²⁰ / 2²² | P(G1 passes) for a correct instrument | sd of d̂ per replicate at 2²² |
+| --- | --- | --- | --- |
+| 32 (v1.0) | 0.755 / 0.845 | 0.236 | 0.093 |
+| 128 | 0.977 / 0.994 | 0.947 | 0.062 |
+| **256 (r1)** | 0.998 / 1.000 | > 0.999 (20 000 of 20 000 model trials) | 0.051 |
+
+**Choice:** S = 256 for all three families. The noise-only failure probability of G1 is then below 10⁻³ under the model; at S = 128 it would be ≈ 5 %. The model's limits: the inflation factor is extrapolated from one non-grid size, and the Gaussian/delta-method approximation is not checked in the tails. A G1 failure is therefore still evidence against transfer, but the result note must report the pooled curve and the per-replicate verdicts so that a noise-driven failure can be told apart from a level or drift failure.
+
+**UST: power unknown.** No exact moments are available for the UST, and no UST pilot was run. D2 uses the same S = 256 with an explicit caveat: if per-source fluctuations on the UST are larger than on CAY, G2 can fail through noise alone. A G2 failure whose pooled curve is a `PLATEAU` within tolerance is recorded as "inconclusive at this S", not as a level failure; it still counts as a G2 failure under §6.
+
+**RRT:** more sources cannot create a plateau where the mean curve has none; G3 is expected to be decided by the saturation guard, so S does not affect its power materially (heuristic).
 
 ## 6. Decision rule
 
 - **G0–G4 pass:** the frozen estimator is *calibrated for* two families whose intrinsic dimension is not encoded by construction, including a non-integer exponent, at the reported sizes and windows. This is the precondition for applying it, with controls, to dynamically generated graphs in Phase 1. It is still an instrument statement, not a statement about emergent geometry.
 - **G1 passes, G2 fails:** the instrument is validated only for dimension-2 tree/CRT-class graphs and for the D1 classes. Non-integer dimension statements stay blocked until a revised estimator (new version) or the spectral method is preregistered and calibrated. The failure mode (no plateau, wrong level, or size drift) is recorded.
-- **G1 fails:** the D1 calibration does not transfer to non-embedded graphs. Likely causes to be distinguished in the result note, not fixed after the fact: non-self-averaging fluctuations with 32 sources, or the largest-scale d̂ rule interacting with the √N cutoff. A redesign (e.g. pooled sources or a different d̂ rule) is a new version with new seeds.
+- **G1 fails:** the D1 calibration does not transfer to non-embedded graphs. Likely causes to be distinguished in the result note, not fixed after the fact: residual non-self-averaging fluctuations at S = 256 (the §5a model says this should be rare), or the largest-scale d̂ rule interacting with the √N cutoff (§4 r_last flip). A redesign (e.g. pooled sources or a different d̂ rule) is a new version with new seeds.
 - **G3 fails:** the estimator is rejected for dimension claims on small-world trees.
 - **G0 fails:** STOP; fix the implementation and rerun with the same seeds (not a design change).
 - A failed gate is published. No ε, window, size, tolerance or seed may change after any sampled output exists.
@@ -95,10 +118,15 @@ Two features are known in advance: d_eff approaches 2 **from below** at small r 
 - The UST exponent is proved only up to constants; finite-size corrections to the dyadic ratio are unknown.
 - Volume-growth dimension is not spectral dimension (4/3 for the CRT, 16/13 for the 2D UST [BM11]). A spectral cross-check on the same frozen instances is a natural later design, not part of D2.
 - Same software stack and model family for producer and later-pass reviewer, as in D1.
+- The RRT is a "matched" null only in N and in being a tree; it is not matched in degree distribution or diameter. It tests the saturation guard, not a near-miss alternative.
+- S = 256 is a deviation from D1's S = 32 (§0, §5a). The D1 calibration of RGG and the nulls was at S = 32; D2 does not re-test S = 32.
 
 ## 8. Budget
 
-- Single core, ≤ 1.5 GiB RAM, ≤ 30 min wall for the full grid. Largest instances: CAY and RRT with N = 2²² ≈ 4.2·10⁶ vertices (CSR adjacency ≈ 8.4·10⁶ entries); UST L = 1024 (N ≈ 1.05·10⁶). Generation: Prüfer decoding O(N); Wilson's algorithm, expected O(N log N) walk steps in 2D; RRT O(N). BFS via the D1 `shell_counts`.
+- Single core, ≤ 2 GiB RAM. Largest instances: CAY and RRT with N = 2²² ≈ 4.2·10⁶ vertices (CSR adjacency ≈ 8.4·10⁶ entries); UST L = 1024 (N ≈ 1.05·10⁶). Generation: Prüfer decoding O(N); Wilson's algorithm, expected O(N log N) walk steps in 2D; RRT O(N). BFS via the D1 `shell_counts` (one full BFS per source).
+- **r1 re-estimate with S = 256** (2048 BFS per family and size). Timing-only measurement of `shell_counts` on random recursive trees (seed 999, no ball counts inspected; Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1): ≈ 0.19 s per BFS at N = 2²⁰ and ≈ 1.2 s at N = 2²². Projection: CAY ≈ 50 min, RRT ≈ 50 min, UST ≈ 10 min, so ≈ 1.8 h CPU for one invocation of the grid (v1.0 assumed ≤ 30 min at S = 32).
+- **Wall limit:** ≤ 3 h single-core CPU per full invocation. The driver must accept `--families` so that the grid can run as one invocation per family (each ≤ 75 min), which fits inside one Director lease with heartbeats. Outputs are concatenated in the fixed family order; per-family seeds make this identical to a single invocation. D2-G4 byte identity may likewise be shown per family.
+- **Overrun action:** if an invocation exceeds 1.5× its projection, or 90 min for one family, it is stopped and recorded as BLOCKED (budget) in the result PR. It is not replaced by fewer sources, replicates or sizes; a smaller design is a new version with new seeds, decided before any sampled output is inspected.
 - No Lightsail deployment, no background job, no network access during the run, no spending.
 - Implementation, tests and the run are a separate PR after this design is merged, and only after its later-pass review. CI pytest plus a deterministic local run are required before any result is reported.
 
@@ -116,3 +144,11 @@ Two features are known in advance: d_eff approaches 2 **from below** at small r 
 - [Moo70] J. W. Moon, *Counting Labelled Trees*, Canadian Mathematical Monographs 1 (1970).
 - [Pit94] B. Pittel, "Note on the heights of random recursive trees and random m-ary search trees", *Random Struct. Algorithms* 5(2), 337–347 (1994).
 - [Wil96] D. B. Wilson, "Generating random spanning trees more quickly than the cover time", *Proc. 28th ACM STOC*, 296–303 (1996).
+
+## 10. Revision r1 (2026-10-11)
+
+Applied by session `rd-claude-20261011T115603Z-1ed1ef` before any implementation or sampled D2 output exists. It addresses the later-pass review on [PR #35](https://github.com/shaden7/emergence-lab/pull/35) (REVISE, session `rd-claude-20261011T105556Z-58dd0f`).
+- **Blocking 1 (G1 underpowered at S = 32):** S raised to 256 for all families, declared as a deviation from D1 (§0, §2, §3); power table and model limits in §5a; UST power stated as unknown, with how a noise-only G2 failure is recorded.
+- **Blocking 2 (Wilson coverage at 10⁵ draws):** coverage and χ² now use ≥ 3·10⁵ draws (§5, D2-G0).
+- **Non-blocking:** r_last flip at 2²² disclosed (§4); budget re-estimated for S = 256 with an overrun action (§8); RRT matching scope stated (§7).
+- **Unchanged:** families, sizes, replicates, seeds and seed rule, ε, r_min, guard, d̂ rule, all tolerances and thresholds, decision rule structure.
