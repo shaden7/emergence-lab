@@ -61,17 +61,8 @@ jobs:
           cmp results/d1_lattices/ball_counts.csv results/d1_lattices_repeat/ball_counts.csv
           cmp results/d1_lattices/result.json results/d1_lattices_repeat/result.json
           python -c "import json; m=json.load(open('results/d1_lattices/manifest.json')); assert all(m['gates_pass'].values()), m['gates_pass']; print('::notice title=D1 lattices::' + json.dumps(m['gates_pass']) + ' ' + json.dumps(m['outputs']) + ' peak_rss_mib=' + str(m['peak_rss_mib']))"
-      # D1 full preregistered grid: manual dispatch from main only, after the implementation's later-pass review.
-      - name: D1 full preregistered grid (dispatch only)
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-        timeout-minutes: 45
-        env:
-          GIT_SHA: ${{ github.sha }}
-          OPENBLAS_NUM_THREADS: 1
-          OMP_NUM_THREADS: 1
-        run: |
-          python -m emergence_lab.dimension_d1 --families all --output results/d1_full | tee results/d1_full_manifest.txt
-          python -c "import json; m=json.load(open('results/d1_full/manifest.json')); print('::notice title=D1 full grid::' + json.dumps(m['gates_pass']) + ' ' + json.dumps(m['outputs']) + ' wall=' + str(m['wall_seconds']) + ' peak_rss_mib=' + str(m['peak_rss_mib']) + ' commit=' + str(m['commit']))"
+      # The D1 full preregistered grid runs only in .github/workflows/d1-full-grid.yml (dispatch, main),
+      # so that dispatching it does not rerun the main-gated Phase-0 steps below.
       - name: Pre-registered M4 interval coverage audit
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/research/exact4-coverage-pilot-20261009'
         timeout-minutes: 20

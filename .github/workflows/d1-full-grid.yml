@@ -1,0 +1,52 @@
+name: D1 full preregistered grid (dispatch only)
+
+# Issue #4, D1 preregistration v1.0 (docs/DIMENSION_ESTIMATOR_PREREGISTRATION.md, frozen via PR #32).
+# Manual dispatch from main only. Kept separate from ci.yml so that a dispatch does not also rerun
+# the main-gated Phase-0 gate steps there. The grid is fully seeded, so a rerun reproduces it; the
+# run is still recorded once, and a failed gate is published, never rerun with other seeds.
+# D-G5: two invocations in the same environment must be byte-identical; all outputs are uploaded.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: d1-full-grid
+  cancel-in-progress: false
+
+jobs:
+  grid:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GIT_SHA: ${{ github.sha }}
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e '.[test]'
+      - run: pytest -q tests/test_dimension_d1.py
+      - name: D1 full grid, first invocation
+        timeout-minutes: 40
+        run: |
+          mkdir -p results
+          python -m emergence_lab.dimension_d1 --families all --output results/d1_full > results/d1_full_stdout.json
+      - name: D1 full grid, second invocation (D-G5 determinism)
+        timeout-minutes: 40
+        run: python -m emergence_lab.dimension_d1 --families all --output results/d1_full_repeat > results/d1_full_repeat_stdout.json
+      - name: D-G5 byte identity and summary
+        run: |
+          cmp results/d1_full/ball_counts.csv results/d1_full_repeat/ball_counts.csv
+          cmp results/d1_full/result.json results/d1_full_repeat/result.json
+          python -c "import json; m=json.load(open('results/d1_full/manifest.json')); print('::notice title=D1 full grid::' + json.dumps(m['gates_pass']) + ' D-G5_byte_identical=true ' + json.dumps(m['outputs']) + ' output_bytes=' + str(m['output_bytes']) + ' wall=' + str(m['wall_seconds']) + ' peak_rss_mib=' + str(m['peak_rss_mib']) + ' commit=' + str(m['commit']) + ' python=' + m['python'] + ' numpy=' + m['numpy'] + ' scipy=' + m['scipy'])"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: d1-full-grid-${{ github.sha }}
+          path: results/
+          retention-days: 90

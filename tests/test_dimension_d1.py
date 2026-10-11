@@ -264,3 +264,20 @@ def test_production_bfs_equals_reference(make):
     g = make()
     for s in np.random.default_rng([TEST_SEED, 99]).choice(g.n, size=5, replace=False):
         assert np.array_equal(d1.shell_counts(g, int(s)), d1.bfs_shell_counts(g, int(s)))
+
+
+# --------------------------------------------------------------- full-grid workflow (later-pass review r1)
+def test_full_grid_workflow_dispatch_only_main_twice_and_uploaded():
+    text = (ROOT / ".github/workflows/d1-full-grid.yml").read_text()
+    on_block = text.split("\non:", 1)[1].split("\npermissions:", 1)[0]
+    assert "workflow_dispatch" in on_block
+    for trigger in ("push", "pull_request", "schedule"):
+        assert trigger not in on_block, trigger
+    assert "github.ref == 'refs/heads/main'" in text and "contents: read" in text
+    # D-G5: two invocations, byte-compared, outputs uploaded even on failure
+    assert text.count("python -m emergence_lab.dimension_d1 --families all") == 2
+    assert "cmp results/d1_full/ball_counts.csv results/d1_full_repeat/ball_counts.csv" in text
+    assert "cmp results/d1_full/result.json results/d1_full_repeat/result.json" in text
+    assert "actions/upload-artifact" in text and "if: always()" in text
+    # ci.yml must not run the full grid (a main dispatch there also reruns the Phase-0 gates)
+    assert "--families all" not in (ROOT / ".github/workflows/ci.yml").read_text()
