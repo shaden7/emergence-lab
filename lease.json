@@ -4,8 +4,8 @@
   "owner": "rd-claude-20261011T055552Z-c86528",
   "leaseId": "d89fd220-4164-4cd9-b3d1-91d2f7d78627",
   "acquiredAt": "2026-10-11T05:56:37Z",
-  "heartbeatAt": "2026-10-11T05:56:37Z",
-  "expiresAt": "2026-10-11T07:56:37Z",
-  "task": "Director run: review/integrate PR #33 (D1 implementation)",
+  "heartbeatAt": "2026-10-11T06:10:08Z",
+  "expiresAt": "2026-10-11T08:10:08Z",
+  "task": "Director run: PR #33 merged; D1 full grid dispatched once from main",
   "previousOwner": "rd-claude-20261011T045554Z-b88eb2"
 }
