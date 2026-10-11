@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261011T005644Z-6efe9a",
-  "leaseId": "cef72ecfb7b0fd0f7208d67af09abfbc",
-  "acquiredAt": "2026-10-11T00:56:44Z",
-  "heartbeatAt": "2026-10-11T00:56:44Z",
-  "expiresAt": "2026-10-11T02:56:44Z",
-  "task": "Director run: recovery audit, backlog check, Issue #4 preregistration while Pilot B blind run waits for R",
-  "previousOwner": "rd-claude-20261010T235526Z-158381"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261011T005644Z-6efe9a"
 }
