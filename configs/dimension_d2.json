@@ -1,0 +1,31 @@
+{
+  "name": "dimension_d2",
+  "protocol": "docs/DIMENSION_D2_PREREGISTRATION.md",
+  "version": "1.0",
+  "status": "proposed design; no implementation",
+  "issue": 4,
+  "estimator": "frozen D1 estimator, unchanged (configs/dimension_d1.json 'estimator'; emergence_lab.dimension_d1.verdict)",
+  "estimator_parameters": {"r_min": 4, "saturation_guard": "8 * Bbar(2r) <= N", "plateau_epsilon": 0.15, "plateau_min_scales": 3, "sources": 32},
+  "families": {
+    "cayley_uniform_tree": {"N": [262144, 1048576, 4194304], "replicates": 8, "generator": "uniform Pruefer sequence, linear-time decode"},
+    "ust_2d_torus": {"L": [256, 512, 1024], "replicates": 8, "generator": "Wilson's algorithm, root 0, uniform vertex order from the replicate stream", "distance": "intrinsic tree distance"},
+    "random_recursive_tree": {"N": [262144, 1048576, 4194304], "replicates": 8, "generator": "parent(i) uniform in {0..i-1}"}
+  },
+  "family_index_order": ["cayley_uniform_tree", "ust_2d_torus", "random_recursive_tree"],
+  "seed_base": 2036101101,
+  "seed_rule": "np.random.SeedSequence([seed_base, i_family, i_size, i_rep]) with PCG64; sources from a child of the same sequence",
+  "analytic_reference": {
+    "cayley_shell_mean": "(k+1) * prod_{i=1..k} (1 - i/N)",
+    "cayley_mean_curve_d_hat": {"262144": 1.9162, "1048576": 1.9247, "4194304": 1.9290},
+    "ust_exponent": 1.6
+  },
+  "gates": {
+    "D2-G0": "unit tests (Pruefer bijection N<=7, Wilson uniformity on a small torus by chi-square at alpha=1e-3 over >=1e5 draws, RRT parent order); per-instance structure; CAY pooled Bbar(r) vs exact formula, Student-t df=7, Bonferroni family-wise alpha=0.01",
+    "D2-G1": "CAY N=2^22: 8/8 PLATEAU, |mean d_hat - 2| <= 0.15; |mean(2^20) - mean(2^22)| <= 0.10",
+    "D2-G2": "UST L=1024: 8/8 PLATEAU, |mean d_hat - 1.6| <= 0.15, Student-t 95% upper end < 1.85; |mean(512) - mean(1024)| <= 0.10",
+    "D2-G3": "RRT: no PLATEAU in 24 replicates",
+    "D2-G4": "count tables + manifest; same-environment byte identity; >5 MiB to a release asset"
+  },
+  "sensitivity_not_gated": {"plateau_epsilon": [0.10, 0.20], "r_min": [2, 8], "saturation_guard_fraction": [0.25, 0.0625], "pooled_curve": true},
+  "budget": {"cpu_cores": 1, "max_memory_gib": 1.5, "max_wall_minutes": 30, "lightsail": false, "network_during_run": false}
+}

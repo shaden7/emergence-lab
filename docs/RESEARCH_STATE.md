@@ -1,6 +1,40 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D1 decision integrated:** the full preregistered grid result (sandbox run at `main` `9c61771`, reproduced byte-identically) passes all gates D-G0…D-G5. The r1 check is **PASS** and [PR #34](https://github.com/shaden7/emergence-lab/pull/34) is merged with an expected-head guard (merge commit recorded on the PR). Under prereg §6 the dyadic volume-growth estimator is *calibrated for* vertex-transitive lattices (exact, at the frozen ε, r_min and guard only) and 2D RGG at k̄ = 12 in the reported windows, with a small positive bias; it rejects the tested nulls (random 4-regular and NW p = 1e-2 by the saturation guard, the subdivided tree by the plateau criterion). Prereg §7 falsifier 4 is literally met by D-G1 and is disclosed. This is an instrument calibration, **not** a physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+Last handoff update: 2026-10-11 (Issue #4 **D2 preregistration proposed** in an open PR, not on `main`: an out-of-sample test of the frozen D1 estimator on uniform random trees (dimension 2) and the 2D uniform spanning tree (exponent 8/5), whose dimensions are proved but not encoded by construction, with a random-recursive-tree null; later-pass review required before merge, no implementation yet. **D1** stays integrated as recorded below (PR #34, `65d2ce9`): instrument calibration, no physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+
+## Director session: Issue #4 D2 preregistration, proposed (2026-10-11, `rd-claude-20261011T095635Z-d05fc0`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T085556Z-aa5317`) was released cleanly at lock commit `a4d6156`. `main` `65d2ce9` is CI-green (push [38127141523](https://github.com/shaden7/emergence-lab/actions/runs/38127141523)). Open PRs: none. Queued or in-progress runs: none. No `workflow_dispatch` run after 2026-10-10 (latest [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864)). Release `pilot-b-blind-v1` does not exist (HTTP 404); the Pilot B blind run is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** nothing was open to review or integrate. The D1 handoff named a preregistered D2 design as the next Issue #4 step, design PR first.
+
+**Proposed (in the D2 PR, not on `main`):** `docs/DIMENSION_D2_PREREGISTRATION.md` v1.0, `configs/dimension_d2.json`, `scripts/d2_cayley_reference.py`. D2 tests the **frozen** D1 estimator, with no parameter changed, on graphs whose intrinsic dimension is proved but not encoded by construction:
+- uniform random labelled trees (dimension 2; exact finite-N mean ball formula);
+- the uniform spanning tree of the 2D torus (exponent 8/5, proved up to constants [Barlow–Masson 2011]);
+- random recursive trees as a matched null.
+
+Gates D2-G0…G4 and a decision rule are fixed before any sampled output.
+
+**Actually executed (no sampled ball counts):**
+- *Proved, and checked by exact enumeration of all labelled trees for N = 5, 6, 7:* E #{u : d(v, u) = k} = (k+1)∏_{i≤k}(1 − i/N).
+- *Analytic reference, not measurement:* the frozen D1 `verdict` applied to that exact mean curve gives `PLATEAU` with d̂ = 1.9162 / 1.9247 / 1.9290 at N = 2¹⁸ / 2²⁰ / 2²². That is a known negative bias of ≈ 0.07, from taking d̂ at the largest admissible scale near the √N cutoff. It is disclosed in advance.
+- *Timing only:* Wilson's algorithm on 64² and 128² tori (non-gated sizes).
+- `pytest -q`: 276 passed (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1).
+
+**Evidence level:** design plus proved reference values. No numerical observation on any D2 family exists. No physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. **A different session reviews the D2 preregistration PR:**
+   - re-derive the Cayley formula and rerun `scripts/d2_cayley_reference.py`;
+   - re-check the references in §9, especially the exact statement of the Barlow–Masson volume bounds;
+   - challenge the gates, e.g. whether 32 sources suffice for non-self-averaging trees;
+   - merge with an expected-head guard if PASS.
+
+   No implementation before the merge.
+3. **Optional:** the owner dispatches `D1 full preregistered grid (dispatch only)` once, for cross-environment hashes.
+
+Director run rd-claude-20261011T095635Z-d05fc0: start 2026-10-11T09:56:03Z, end 2026-10-11T10:03:27Z, duration 8 min
 
 ## Director session: check of the D1 grid result r1, PASS and merge (2026-10-11, `rd-claude-20261011T085556Z-aa5317`)
 
