@@ -1,8 +1,8 @@
-# D2 — out-of-sample test of the frozen D1 dimension estimator on graphs whose dimension is not built in (Issue #4), preregistration v1.0-r1
+# D2 — out-of-sample test of the frozen D1 dimension estimator on graphs whose dimension is not built in (Issue #4), preregistration v1.0-r2
 
 **Status:** PROPOSED DESIGN. No implementation exists, and no ball count, d_eff value or verdict has been computed on any sampled instance of a D2 family. The design freezes when it is merged to `main`; any later change to a preregistered parameter needs a new version and an explicit deviation note.
 **Date:** 2026-10-11. **Base:** `main` `65d2ce9` (D1 decision integrated via PR #34). **Issue:** [#4](https://github.com/shaden7/emergence-lab/issues/4). **Config:** [`configs/dimension_d2.json`](../configs/dimension_d2.json).
-**Author:** Director session `rd-claude-20261011T095635Z-d05fc0` (v1.0). **r1:** session `rd-claude-20261011T115603Z-1ed1ef`, applying the REVISE findings of the later-pass review by `rd-claude-20261011T105556Z-58dd0f` (see §10). A check of r1 by a further session is required before merge.
+**Author:** Director session `rd-claude-20261011T095635Z-d05fc0` (v1.0). **r1:** session `rd-claude-20261011T115603Z-1ed1ef`, applying the REVISE findings of the later-pass review by `rd-claude-20261011T105556Z-58dd0f` (see §10). **r2:** session `rd-claude-20261011T125558Z-220239`, a check of r1 that corrects one power figure in §5a (text and check scripts only; see §10). A check of r2 by a further session is required before merge.
 
 ## 0. What this is and is not
 
@@ -92,9 +92,13 @@ Ball sizes in random trees do not self-average, so the gates must be checked aga
 | --- | --- | --- | --- |
 | 32 (v1.0) | 0.755 / 0.845 | 0.236 | 0.093 |
 | 128 | 0.977 / 0.994 | 0.947 | 0.062 |
-| **256 (r1)** | 0.998 / 1.000 | > 0.999 (20 000 of 20 000 model trials) | 0.051 |
+| **256 (r1)** | 0.998 / 1.000 | ≈ 0.997 (r2; see below) | 0.051 |
 
-**Choice:** S = 256 for all three families. The noise-only failure probability of G1 is then below 10⁻³ under the model; at S = 128 it would be ≈ 5 %. The model's limits: the inflation factor is extrapolated from one non-grid size, and the Gaussian/delta-method approximation is not checked in the tails. A G1 failure is therefore still evidence against transfer, but the result note must report the pooled curve and the per-replicate verdicts so that a noise-driven failure can be told apart from a level or drift failure.
+**r2 correction.** r1 reported "> 0.999 (20 000 of 20 000 model trials)" at S = 256. That figure resamples 8 replicates from a pool of only 4000 simulated replicates, which at S = 256 happened to contain no non-`PLATEAU` curve, so the estimate could not fall below 1. With a pool of 40 000 (`scripts/review_d2/r2_power_resolution.py`, seed 939393) the per-replicate non-`PLATEAU` rate at 2²² is 16/40 000 = 4·10⁻⁴, so P(8/8 `PLATEAU`) ≈ 0.997 and the noise-only failure probability of G1 is ≈ 3·10⁻³ (Poisson 95 % range ≈ 2–5·10⁻³), not below 10⁻³. The S = 32 and S = 128 rows are not affected in substance, because their pools contain many failures.
+
+**Sensitivity to the design-effect input (r2, model-based).** Multiplying the whole pilot design-effect curve by 1.5, 2 or 3 gives P(G1 passes) ≈ 0.97, ≈ 0.95 and ≈ 0.81 at S = 256 (pools of 3000; Monte-Carlo error about ±0.01). An independent measurement at N = 2¹⁴ (not a grid size; networkx Prüfer decoding, seed 727272, 600 trees, no d_eff computed; `scripts/review_d2/r2_design_effect_sizes.py`) gives a design effect of 1.09 / 1.43 / 2.78 at r = √N/8, √N/4, √N/2, against the pilot's 1.29 / 1.45 / 2.49 at N = 2¹⁶. That is consistent with dependence on r/√N only, to within about 10–20 %, well inside the factor-of-2 range that keeps G1's noise-only failure probability near 5 %. At N = 2¹⁷ (150 trees, same script and seed) it is 1.16 / 1.59 / 2.86 (90 % intervals [0.97, 1.42], [1.33, 1.94], [2.39, 3.50]). Across 2¹⁴, 2¹⁶ and 2¹⁷ there is no monotone trend, and the largest value is about 15 % above the pilot curve used in the model, so a ×1.5 envelope (P(G1) ≈ 0.97) covers the measured range. The extrapolation from 2¹⁷ to 2²² remains an assumption.
+
+**Choice:** S = 256 for all three families. The noise-only failure probability of G1 is then ≈ 3·10⁻³ under the model (r2; r1 stated below 10⁻³); at S = 128 it would be ≈ 5 %. The model's limits: the inflation factor is extrapolated from one non-grid size, and the Gaussian/delta-method approximation is not checked in the tails. A G1 failure is therefore still evidence against transfer, but the result note must report the pooled curve and the per-replicate verdicts so that a noise-driven failure can be told apart from a level or drift failure.
 
 **UST: power unknown.** No exact moments are available for the UST, and no UST pilot was run. D2 uses the same S = 256 with an explicit caveat: if per-source fluctuations on the UST are larger than on CAY, G2 can fail through noise alone. A G2 failure whose pooled curve is a `PLATEAU` within tolerance is recorded as "inconclusive at this S", not as a level failure; it still counts as a G2 failure under §6.
 
@@ -152,3 +156,10 @@ Applied by session `rd-claude-20261011T115603Z-1ed1ef` before any implementation
 - **Blocking 2 (Wilson coverage at 10⁵ draws):** coverage and χ² now use ≥ 3·10⁵ draws (§5, D2-G0).
 - **Non-blocking:** r_last flip at 2²² disclosed (§4); budget re-estimated for S = 256 with an overrun action (§8); RRT matching scope stated (§7).
 - **Unchanged:** families, sizes, replicates, seeds and seed rule, ε, r_min, guard, d̂ rule, all tolerances and thresholds, decision rule structure.
+
+## 11. Revision r2 (2026-10-11)
+
+Applied by session `rd-claude-20261011T125558Z-220239`, which checked r1 and authored none of `c7a2e84`, `1b73f2b` or `69e1e96`. Still before any implementation or sampled D2 output.
+- **Correction (§5a):** the r1 joint pass probability at S = 256 was a resolution artifact of a 4000-replicate pool; the corrected value is ≈ 0.997 (failure ≈ 3·10⁻³), from a 40 000-replicate pool. The S = 256 choice and every gate are unchanged.
+- **Added (§5a):** sensitivity of the G1 power to the design-effect input, and an independent design-effect measurement at non-grid sizes.
+- **Unchanged:** everything else, including S, families, sizes, replicates, seeds, ε, r_min, guard, d̂ rule, tolerances, thresholds and decision rule.

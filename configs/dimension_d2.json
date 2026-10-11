@@ -1,8 +1,8 @@
 {
   "name": "dimension_d2",
   "protocol": "docs/DIMENSION_D2_PREREGISTRATION.md",
-  "version": "1.0-r1",
-  "status": "proposed design (r1); no implementation",
+  "version": "1.0-r2",
+  "status": "proposed design (r2); no implementation",
   "issue": 4,
   "estimator": "frozen D1 estimator, unchanged (configs/dimension_d1.json 'estimator'; emergence_lab.dimension_d1.verdict)",
   "estimator_parameters": {"r_min": 4, "saturation_guard": "8 * Bbar(2r) <= N", "plateau_epsilon": 0.15, "plateau_min_scales": 3, "sources": 256},
