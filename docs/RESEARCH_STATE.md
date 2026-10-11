@@ -1,6 +1,40 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check of r1 **PASS**; merged via [PR #33](https://github.com/shaden7/emergence-lab/pull/33) with an expected-head guard (merge commit recorded on the PR). **The D1 grid has NOT been dispatched:** the dispatch attempt (REST and connector) was refused with HTTP 403 "Resource not accessible by integration", because the Claude GitHub integration lacks `actions: write`. **The same blocker applies to the Pilot B blind-run dispatch.** Every past `workflow_dispatch` run was triggered by the owner account. Pilot B: blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 **D1 full preregistered grid executed once in the Director sandbox** at `main` `9c61771`, because the workflow dispatch is still blocked (HTTP 403, no `actions: write`). All gates D-G0…D-G5 pass; the result note and proposed decision are in an **open PR, not on `main`**, pending later-pass review. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+
+## Director session: D1 full grid executed in the sandbox, result proposed (2026-10-11, `rd-claude-20261011T065531Z-34f501`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T055552Z-c86528`) was released cleanly at lock commit `4fcea2e`. Open PRs: none. Queued or in-progress runs: none. `main` `9c61771` is CI-green ([38117254912](https://github.com/shaden7/emergence-lab/actions/runs/38117254912)). No `workflow_dispatch` run exists after 2026-10-10, so neither the D1 grid nor the Pilot B blind run has been dispatched. Release `pilot-b-blind-v1` does not exist; Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** the D1 grid was the only unblocked research step. Its workflow dispatch is blocked by permissions, but prereg §8 requires only "CI pytest plus a deterministic local run". The grid is fully seeded with no free parameter, so a sandbox run selects nothing. This does not touch the Pilot B blind run: it stays an owner dispatch, and this session does not work around it.
+
+**Actually executed (Director cloud sandbox; Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, 1 thread; `main` `9c61771`, code unchanged):**
+- `pytest -q`: 276 passed.
+- `python -m emergence_lab.dimension_d1 --families all` ran twice, 9.6 and 9.3 min wall, peak RSS 896 MiB.
+- **D-G5:** `ball_counts.csv` (`897ffde5…a4b1`) and `result.json` (`fc4d219d…84ba`) are byte-identical across the two invocations.
+
+**Numerical observations (proposed, in the open PR; see `docs/experiments/2026-10-11-d1-grid.md` there):** D-G0…D-G5 all pass.
+- **D-G2:** random 4-regular 24/24 `INSUFFICIENT_RANGE` (decided by the saturation guard); subdivided tree 24/24 `NO_PLATEAU` (decided by the plateau criterion).
+- **D-G3:** at N = 2²¹, 8/8 `PLATEAU`, mean d̂ = 2.0172, 95 % CI [2.0150, 2.0194]. That is a small, significant **positive** bias, inside tolerance. The mean at 2¹⁹ is 2.0272.
+- **D-G4:** NW p = 1e-2 8/8 `INSUFFICIENT_RANGE` (guard). Descriptively, p = 1e-4 and 1e-3 show no plateau.
+- **Sensitivity:** D-G1 is fragile (it flips at ε = 0.10, r_min = 8 and guard N/16; analytic). D-G2, D-G3 and D-G4 never flip.
+- **Producer checks:** CSV → verdict reproduces all 105 entries; an independent networkx BFS matches the CSV on 4 production instances × 8 sources.
+
+**Proposed decision (prereg §6):** the estimator is calibrated for lattices and for 2D RGG at k̄ = 12 (with the quoted bias), and it rejects the tested nulls. This is a tool-readiness statement; **no physics claim**.
+
+**Limitations:** this is a single-environment run. An owner-dispatched workflow run would add a cross-environment reproduction; if hashes differ, that is recorded, not chosen between. Producer and reviewer share a model family.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. **Later-pass review of the D1 result PR by a different session:**
+   - re-run the grid, or at least `d1_sensitivity_gates.py` and the CSV → verdict check, on the committed outputs;
+   - spot-check one RGG instance's generator independently, e.g. a periodic `cKDTree` edge set;
+   - merge with an expected-head guard if PASS.
+3. **Optional:** the owner dispatches `D1 full preregistered grid (dispatch only)` once, for cross-environment hashes.
+
+Director run rd-claude-20261011T065531Z-34f501: start 2026-10-11T06:55:31Z, end 2026-10-11T07:22:54Z, duration 27 min
 
 ## Director session: later-pass check of the D1 implementation r1, PASS and merge (2026-10-11, `rd-claude-20261011T055552Z-c86528`)
 
