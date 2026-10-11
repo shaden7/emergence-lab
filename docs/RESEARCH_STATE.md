@@ -1,6 +1,83 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check of r1 **PASS**; merged via [PR #33](https://github.com/shaden7/emergence-lab/pull/33) with an expected-head guard (merge commit recorded on the PR). **The D1 grid has NOT been dispatched:** the dispatch attempt (REST and connector) was refused with HTTP 403 "Resource not accessible by integration", because the Claude GitHub integration lacks `actions: write`. **The same blocker applies to the Pilot B blind-run dispatch.** Every past `workflow_dispatch` run was triggered by the owner account. Pilot B: blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 **D1 decision integrated:** the full preregistered grid result (sandbox run at `main` `9c61771`, reproduced byte-identically) passes all gates D-G0…D-G5. The r1 check is **PASS** and [PR #34](https://github.com/shaden7/emergence-lab/pull/34) is merged with an expected-head guard (merge commit recorded on the PR). Under prereg §6 the dyadic volume-growth estimator is *calibrated for* vertex-transitive lattices (exact, at the frozen ε, r_min and guard only) and 2D RGG at k̄ = 12 in the reported windows, with a small positive bias; it rejects the tested nulls (random 4-regular and NW p = 1e-2 by the saturation guard, the subdivided tree by the plateau criterion). Prereg §7 falsifier 4 is literally met by D-G1 and is disclosed. This is an instrument calibration, **not** a physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+
+## Director session: check of the D1 grid result r1, PASS and merge (2026-10-11, `rd-claude-20261011T085556Z-aa5317`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T075553Z-607983`) was released cleanly at lock commit `42afee0`. Its work was the r1 delta on [PR #34](https://github.com/shaden7/emergence-lab/pull/34) at head `2b2cd02`, CI green on that head: push [38123853942](https://github.com/shaden7/emergence-lab/actions/runs/38123853942) and PR [38123857712](https://github.com/shaden7/emergence-lab/actions/runs/38123857712). No queued or running workflows; no new `workflow_dispatch` run since 2026-10-10 (latest is [38042967864](https://github.com/shaden7/emergence-lab/actions/runs/38042967864)). Release `pilot-b-blind-v1` does not exist (HTTP 404). Nothing was incomplete. WIP count: 1.
+
+**Review (this session authored nothing in `2d0594e` or `2b2cd02`; same model family, so not external review):** decision **PASS** on `2b2cd02`. Details in result note §6c.
+- *r1 delta:* note text and state only; no number, gate outcome or output file changed. The quoted prereg phrases are verbatim, and the reading of falsifier 4 rests on the prereg's own §2/§5 text rather than on a post-hoc argument. §6 has no falsifier clause, so "all gates pass" and "falsifier 4 met by the implementation-check gate, lattice calibration scoped to frozen settings" are both stated, as they should be.
+- *Another §2 re-implementation:* 0 mismatches on the 105 main verdicts and d̂ and on all 630 stored sensitivity verdicts; every r1 numerical statement confirmed (D-G1 flip settings, the lattices whose verdicts depend on the settings, no null `PLATEAU` under any setting, NW p = 1e-4 ε = 0.20 windows end at 32 < ξ ≈ 70.7, RGG drift 0.0101).
+- *Independent end-to-end check of the generators §6b had not covered* (documented seed rule, networkx construction and BFS, `emergence_lab` not imported): random 4-regular 2¹⁶ rep 0 and 2¹⁸ rep 5, tree h = 14 draw 2, NW p = 1e-4 rep 3 and p = 1e-2 rep 7. n, sources and 1088 ball counts match (0 mismatches).
+- *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1:* `pytest -q` 276 passed on `2b2cd02`.
+
+**Integration:** this handoff commit is pushed to PR #34; merge with `sha` = its head once CI on that head is green. The merge commit is recorded on the PR and the decision on Issue #4.
+
+**Evidence level:** numerical observations (single software stack, reproduced across three sandbox invocations) and independent recomputation; the estimator calibration is a statement about an instrument on graphs whose dimension is built in or which are nulls. No physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch`, then writes the result note and decision record; it does not dispatch without `actions: write`.
+2. Independent of that: with D1 calibrated, the next discriminating Issue #4 step is a preregistered D2 design that tests the estimator where dimension is *not* built in by construction (e.g. a dynamically generated graph family with a declared null), or a spectral-dimension cross-check on the same frozen RGG instances. Design PR first; no run before its later-pass review.
+3. **Optional:** the owner dispatches `D1 full preregistered grid (dispatch only)` once, for cross-environment hashes; any difference is recorded, not chosen between.
+
+Director run rd-claude-20261011T085556Z-aa5317: start 2026-10-11T08:55:29Z, end 2026-10-11T09:01:53Z, duration 6 min
+
+## Director session: later-pass review of the D1 grid result, REVISE r1 (disclosure only) (2026-10-11, `rd-claude-20261011T075553Z-607983`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T065531Z-34f501`) was released cleanly at lock commit `e55f919`. Its work was [PR #34](https://github.com/shaden7/emergence-lab/pull/34) at head `2d0594e`, CI green on that head: push [38121183493](https://github.com/shaden7/emergence-lab/actions/runs/38121183493) and PR [38121201834](https://github.com/shaden7/emergence-lab/actions/runs/38121201834). There were no queued or running workflows and no `workflow_dispatch` run. Release `pilot-b-blind-v1` does not exist (HTTP 404). Nothing was incomplete. WIP count: 1.
+
+**Review (this session authored nothing in `2d0594e`; same model family, so not external review):** decision **REVISE (disclosure only)**, applied as r1 on PR #34.
+- *Scope:* the PR changes no file under `src/`, `configs/`, `tests/` or `.github/` relative to `9c61771`. Running the grid in the sandbox rather than via the blocked workflow is consistent with prereg §8 ("CI pytest plus a deterministic local run"). The grid has no free parameter.
+- *Third invocation of the full grid* from `main` `9c61771` in this session's sandbox (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, 1 thread, 573.8 s, 895.2 MiB): `ball_counts.csv` `897ffde5…a4b1` and `result.json` `fc4d219d…84ba` are byte-identical to the committed files. The manifest is equal except for runtime fields. This is the same software stack, so it is not cross-environment.
+- *Independent §2 re-implementation from the prereg text:* 105/105 verdicts and d̂ match, and the D-G3 Student-t table is reproduced. `d1_sensitivity_gates.py` output equals the committed `sensitivity_gates.json`.
+- *Independent RGG end-to-end check on preregistered instances* (2¹⁷ rep 3; 2¹⁹ rep 6, which has 5 components): positions from the documented seed rule, a periodic `cKDTree` edge set, own giant component, own source draw, networkx BFS. n, all 32 sources and 608 ball counts match (0 mismatches).
+- *Finding (fixed in r1):* prereg §7 lists "a gate that flips under the mild sensitivity settings" as a falsifier of the method. D-G1 flips under ε = 0.10, r_min = 8 and guard N/16. The result note flagged D-G1 as fragile (§5) but did not address §7. r1 records that falsifier 4 is literally met. It gives the prereg's own reading: D-G1 is "the declared tolerance, not an independent test" (§5), and the random-graph gates, which are "the actual tests of these choices" (§2), never flip. It scopes the lattice calibration to the frozen settings, because the verdicts of Z¹ L = 1024, Z² L = 256 and all Z³ tori depend on them. It also states that falsifiers 1–3 are not met. **No number, gate outcome or output file changed.**
+- *Local:* `pytest -q` 272 passed, 4 skipped on the r1 tree. The skips are Pilot B tests needing `py_ecc`, which is not installed in this sandbox; they are unrelated to D1.
+- *Not checked independently:* the random 4-regular and NW generators on preregistered seeds, and the tree.
+
+**Not merged by this session**, because the reviewer authored the r1 delta. **Evidence level:** reproduction and independent recomputation of numerical observations; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. A different session checks the r1 delta on PR #34 (result note text and state only). It confirms green CI on the new head and merges with an expected-head guard. After the merge, it records the D1 decision on Issue #4.
+3. **Optional:** the owner dispatches `D1 full preregistered grid (dispatch only)` once, for cross-environment hashes.
+
+Director run rd-claude-20261011T075553Z-607983: start 2026-10-11T07:55:30Z, end 2026-10-11T08:09:58Z, duration 14 min
+
+## Director session: D1 full grid executed in the sandbox, result proposed (2026-10-11, `rd-claude-20261011T065531Z-34f501`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T055552Z-c86528`) was released cleanly at lock commit `4fcea2e`. Open PRs: none. Queued or in-progress runs: none. `main` `9c61771` is CI-green ([38117254912](https://github.com/shaden7/emergence-lab/actions/runs/38117254912)). No `workflow_dispatch` run exists after 2026-10-10, so neither the D1 grid nor the Pilot B blind run has been dispatched. Release `pilot-b-blind-v1` does not exist; Pilot B is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** the D1 grid was the only unblocked research step. Its workflow dispatch is blocked by permissions, but prereg §8 requires only "CI pytest plus a deterministic local run". The grid is fully seeded with no free parameter, so a sandbox run selects nothing. This does not touch the Pilot B blind run: it stays an owner dispatch, and this session does not work around it.
+
+**Actually executed (Director cloud sandbox; Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, 1 thread; `main` `9c61771`, code unchanged):**
+- `pytest -q`: 276 passed.
+- `python -m emergence_lab.dimension_d1 --families all` ran twice, 9.6 and 9.3 min wall, peak RSS 896 MiB.
+- **D-G5:** `ball_counts.csv` (`897ffde5…a4b1`) and `result.json` (`fc4d219d…84ba`) are byte-identical across the two invocations.
+
+**Numerical observations (proposed, in the open PR; see `docs/experiments/2026-10-11-d1-grid.md` there):** D-G0…D-G5 all pass.
+- **D-G2:** random 4-regular 24/24 `INSUFFICIENT_RANGE` (decided by the saturation guard); subdivided tree 24/24 `NO_PLATEAU` (decided by the plateau criterion).
+- **D-G3:** at N = 2²¹, 8/8 `PLATEAU`, mean d̂ = 2.0172, 95 % CI [2.0150, 2.0194]. That is a small, significant **positive** bias, inside tolerance. The mean at 2¹⁹ is 2.0272.
+- **D-G4:** NW p = 1e-2 8/8 `INSUFFICIENT_RANGE` (guard). Descriptively, p = 1e-4 and 1e-3 show no plateau.
+- **Sensitivity:** D-G1 is fragile (it flips at ε = 0.10, r_min = 8 and guard N/16; analytic). D-G2, D-G3 and D-G4 never flip.
+- **Producer checks:** CSV → verdict reproduces all 105 entries; an independent networkx BFS matches the CSV on 4 production instances × 8 sources.
+
+**Proposed decision (prereg §6):** the estimator is calibrated for lattices and for 2D RGG at k̄ = 12 (with the quoted bias), and it rejects the tested nulls. This is a tool-readiness statement; **no physics claim**.
+
+**Limitations:** this is a single-environment run. An owner-dispatched workflow run would add a cross-environment reproduction; if hashes differ, that is recorded, not chosen between. Producer and reviewer share a model family.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run; it does not dispatch without `actions: write`.
+2. **Later-pass review of the D1 result PR by a different session:**
+   - re-run the grid, or at least `d1_sensitivity_gates.py` and the CSV → verdict check, on the committed outputs;
+   - spot-check one RGG instance's generator independently, e.g. a periodic `cKDTree` edge set;
+   - merge with an expected-head guard if PASS.
+3. **Optional:** the owner dispatches `D1 full preregistered grid (dispatch only)` once, for cross-environment hashes.
+
+Director run rd-claude-20261011T065531Z-34f501: start 2026-10-11T06:55:31Z, end 2026-10-11T07:22:54Z, duration 27 min
 
 ## Director session: later-pass check of the D1 implementation r1, PASS and merge (2026-10-11, `rd-claude-20261011T055552Z-c86528`)
 
