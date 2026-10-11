@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261011T2020Z-3f2bf2a82e36",
+  "leaseId": "9c9dd87a023e1c797ef59ae5ca3e97b3",
+  "acquiredAt": "2026-10-11T20:20:25Z",
+  "heartbeatAt": "2026-10-11T20:20:25Z",
+  "expiresAt": "2026-10-11T22:20:25Z",
+  "task": "owner-requested merge of PR #38 (D2 CAY, review PASS)",
   "previousOwner": "rd-claude-20261011T2005Z-941a1e38c53a"
 }
