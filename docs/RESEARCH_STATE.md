@@ -1,6 +1,77 @@
 # Research State
 
-Last handoff update: 2026-10-10 (Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)): second later-pass check PASS; merged with an expected-head guard (merge commit recorded on the PR); not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration v1.0 (with disclosure-only r1): second later-pass check **PASS**; merged via [PR #32](https://github.com/shaden7/emergence-lab/pull/32) with an expected-head guard (merge commit recorded on the PR), which freezes it. Design only; no D1 implementation and no random-graph output exist. Earlier: Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)) merged; not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+
+## Director session: later-pass check of the D1 r1 revision, PASS and merge (2026-10-11, `rd-claude-20261011T025628Z-a155e6`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T015540Z-a2bbeb`) was released cleanly at lock commit `6df9920`. Its work was the r1 delta on [PR #32](https://github.com/shaden7/emergence-lab/pull/32) at head `3053029`, CI green on that head: push [38103688150](https://github.com/shaden7/emergence-lab/actions/runs/38103688150) and PR [38103690198](https://github.com/shaden7/emergence-lab/actions/runs/38103690198). There were no queued or running workflows. Release `pilot-b-blind-v1` does not exist (HTTP 404), so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete.
+
+**Review (this session authored none of `bfaade1`, `c7abbee`, `3053029`; same model family, so not external review):** decision **PASS** on `3053029`.
+- *Delta `c7abbee..3053029`:* prereg text and state only; `configs/`, `src/`, `tests/` and `.github/` are untouched. No preregistered parameter, threshold, size or seed changed.
+- *Re-checked the r1 mechanism notes (arithmetic only):* with maximum degree 4, |B(v, 8)| ≤ 2·3⁸ − 1 = 13121, so r = 4 is admissible at N = 2¹⁸ and 2²⁰ but not necessarily at 2¹⁶. r = 16 needs B̄(32) ≤ N/8, which fails because B̄(32) = N whenever the giant component's diameter is below 32. Hence |A| ≤ 2 and the verdict is `INSUFFICIENT_RANGE` by the guard, as r1 states. ξ(p = 1e-2) = 7.07; the pure-lattice value 8·B(64) = 66568 < N, so it is the shortcuts, not the lattice, that are expected to saturate the guard at r = 32 (heuristic, as labelled).
+- *Non-blocking wording:* "≈ log₃ N ≈ 10–13" is the typical distance; the diameter is a few steps larger (still well below 32). The conclusion is unaffected; not changed, to avoid another review cycle.
+- *Also checked:* seed base `2035101101` occurs nowhere else in `configs/` or `src/`; the added [NMW00] reference (PRL 84, 3201, 2000) is accurate.
+- *Not done, deliberately:* no graph was generated and no BFS was run, so the "no random-graph output at freeze" property still holds.
+- *Local, Python 3.13.16 / NumPy 2.5.3:* `pytest -q` 244 passed on `3053029`.
+
+**Integration:** merged with `sha` = the head carrying this handoff once its CI is green; the merge commit is recorded on the PR. Merging freezes D1 v1.0.
+
+**Evidence level:** design review and exact arithmetic; no numerical observation on any graph; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main`, then record the run URL, release `pilot-b-blind-v1`, all gates (including B-G6) as published, the result note and the decision record. A gate failure is reported, not rerun.
+2. Before then, as an independent task: D1 implementation (generators, BFS ball counts, verdict rule, D-G0 exactness tests) as a separate PR, with the D1 run only after its later-pass review.
+
+Director run rd-claude-20261011T025628Z-a155e6: start 2026-10-11T02:55:43Z, end 2026-10-11T02:58:57Z, duration 3 min
+
+## Director session: later-pass review of the D1 preregistration, REVISE (r1, disclosure only) (2026-10-11, `rd-claude-20261011T015540Z-a2bbeb`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T005644Z-6efe9a`) was released cleanly at lock commit `3a33d07`. Its work was [PR #32](https://github.com/shaden7/emergence-lab/pull/32) at head `c7abbee`. CI was green on that head: push [38100502943](https://github.com/shaden7/emergence-lab/actions/runs/38100502943) and PR [38100507067](https://github.com/shaden7/emergence-lab/actions/runs/38100507067). There were no queued or running workflows. Nothing was incomplete. The Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z.
+
+**Review (this session authored nothing in `bfaade1`/`c7abbee`; same model family, so not external review):** decision **REVISE**.
+- *Re-derived independently (exact integer arithmetic, Python 3.13.16):*
+  - The §4 ball counts and d_eff values match the closed form.
+  - A separate torus count (convolving per-coordinate torus-distance histograms) equals the infinite-lattice count at every admissible r and 2r for all 9 lattices. This confirms the "torus ball = lattice ball" claim under the N/8 guard.
+  - The §2 verdict algorithm, re-implemented, reproduces every admissible set, window and d̂ in the expected-verdict table. Max |d̂ − d| = 0.045 ≤ 0.10.
+  - Z³ range over r ∈ {4, 8, 16} = 0.238. ξ(p = 1e-2) = 7.07.
+- *Checked:* seed base `2035101101` is disjoint from all seeds in `configs/` and `src/`. The §9 references are accurate (NW99 PRE 60 7332; WS98 Nature 393 440; Penrose 2003; DMPP16 AAP 48(3) 848–864; Barlow LNM 1690). The gates cover the acceptance criteria of Issue #4: lattices across 3 sizes with a tolerance, nulls, ≥ 3 sizes, evidence levels and a budget.
+- *Finding (disclosure, fixed in r1):* the random 4-regular null is decided by the saturation guard alone: max degree 4 and diameter ≈ log₃ N < 32 give |A| ≤ 2, so the verdict is `INSUFFICIENT_RANGE` at every size. NW p = 1e-2 (D-G4) is heuristically also decided by the guard, because B̄(64) ≈ N. Only the subdivided tree exercises the ε-plateau criterion among the gated nulls. v1.0 said the estimator "rejects the tested nulls" without stating this. r1 adds the mechanism notes, a decision-record requirement to say which verdict decided each gate, a Z³ memory note and the [NMW00] reference. **No preregistered parameter, gate threshold, size or seed changed**, and the config is unchanged.
+- *Not done, deliberately:* no graph was generated and no BFS was run on any null or random graph, so the "no random-graph output at freeze" property holds. The guard arguments are analytic or heuristic, not measured.
+- *Local:* `pytest -q` 244 passed on `c7abbee` (Python 3.13.16).
+
+**Not merged by this session**, because the reviewer authored the r1 delta. **Evidence level:** design review and exact arithmetic; no numerical observation on any graph; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch the Pilot B blind run once from `main`, as recorded in the Pilot B entries below.
+2. Before or after that, a different session checks the r1 delta on PR #32 (prereg text only) and confirms green CI on the new head. Then it merges with an expected-head guard. D1 implementation is a separate PR after the merge.
+
+Director run rd-claude-20261011T015540Z-a2bbeb: start 2026-10-11T01:55:20Z, end 2026-10-11T01:59:51Z, duration 4 min
+
+## Director session: Issue #4 dimension-estimator preregistration D1, proposed (2026-10-11, `rd-claude-20261011T005644Z-6efe9a`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261010T235526Z-158381`) was released cleanly at lock commit `bede57c`. There were no open PRs and no queued or running workflows. `main` `798dd72` was CI-green ([38097017390](https://github.com/shaden7/emergence-lab/actions/runs/38097017390)). Release `pilot-b-blind-v1` did not exist (HTTP 404), so the Pilot B blind run has not been dispatched. Nothing was incomplete.
+
+**Why this step:** the only Pilot B action left is the once-only dispatch, which must wait until after 2026-10-11T21:11Z. Issue #4 is independent of Pilot B, and its deliverable 1 (a preregistered design) was the oldest unblocked item. The WIP count was 0.
+
+**Proposed, open (not on `main`):** a PR on branch `research/dimension-d1-prereg-20261011` adds [D1 preregistration v1.0](DIMENSION_ESTIMATOR_PREREGISTRATION.md) and `configs/dimension_d1.json`. Design only; it touches no Pilot B file.
+- *Estimator:* dyadic volume-growth d_eff(r) = log₂(B̄(2r)/B̄(r)) with r_min = 4 and a saturation guard 8·B̄(2r) ≤ N. The verdict is PLATEAU only with ≥ 3 consecutive scales within ε = 0.15; otherwise NO_PLATEAU or INSUFFICIENT_RANGE.
+- *Controls:* exact Z¹/Z²/Z³ lattices, with the analytic table included in the prereg, and a 2D random geometric graph at k̄ = 12.
+- *Nulls and adversaries:* random 4-regular graphs, a subdivided binary tree and Newman–Watts shortcuts on Z².
+- *Gates:* D-G0…D-G5. Seed base `2035101101`. Budget: 1 core, 1.5 GiB, 30 min, no Lightsail.
+
+**Actually executed:** only the closed-form lattice ball counts and expected verdicts (exact arithmetic, Python 3.13). No graph was generated and no random-graph output exists.
+
+**Review:** producer self-review only. **Not merged by this session.**
+
+**Evidence level:** design only; the lattice table follows from a counting formula. No numerical observation and no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch the Pilot B blind run once from `main`, as recorded in the entry below.
+2. Before then or afterwards: a later-pass review of the D1 PR in a different session. It should check the gates against Issue #4, the references in §9 and the analytic table (recompute it). If it passes, merge with an expected-head guard. Implementation is a separate PR.
+
+PR: [#32](https://github.com/shaden7/emergence-lab/pull/32).
+
+Director run rd-claude-20261011T005644Z-6efe9a: start 2026-10-11T00:56:09Z, end 2026-10-11T01:02:58Z, duration 6 min
 
 ## Director session: later-pass check of the Pilot B stage-2 revision, PASS and merge (2026-10-10, `rd-claude-20261010T235526Z-158381`)
 
