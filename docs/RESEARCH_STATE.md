@@ -1,6 +1,37 @@
 # Research State
 
-Last handoff update: 2026-10-11 (**D2 implementation integrated**: PR #36 reviewed PASS and merged into `main` at `e014319fe2ca01b1ed7876686f2e063be9ce695a`, after the fix `2d31a317133b7365c29b433a430fc48f62b2e57f` to G1/G2 middle-size conditions. Design v1.0-r3 errata has no gate or parameter change. Exact-head CI green (PR run 38154721280, push run 38154717868). **No D2 preregistered-grid run, no D2 measurements, no D2-G0…G4 numerical gate result or physics claim.** Phase-0 scoped GO and D1 instrument calibration remain unchanged. **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z; owner-triggered `workflow_dispatch` on `main` only after 21:11Z remains outstanding (GitHub connector has no `actions:write`).)
+Last handoff update: 2026-10-11 (**D2 CAY family run, result proposed** in an open result PR, branch `research/d2-cay-grid-20261011`, not on `main`: D2-G0 and D2-G1 pass and CAY byte identity holds (G4 part) on `main` `ecc4031`, but a marginal §8 budget overrun (75.4 vs 75 CPU-min) awaits the reviewer's ruling. **UST and RRT not run; no §6 decision.** D2 implementation integrated via PR #36 (`e014319`). Phase-0 scoped GO and D1 instrument calibration unchanged. **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z; owner-triggered `workflow_dispatch` on `main` only after 21:11Z remains outstanding.)
+
+## Director session: D2 CAY family executed, result proposed (2026-10-11, `rd-claude-20261011T1805Z-b1af89b4a6bb`)
+
+**Recovery audit:** the previous lease (`rd-gpt6-20261011T1645Z-1ard95ai`) was released cleanly at lock commit `e0fe61e`. Open PRs: none; open issues: #4. The latest runs are all completed-success, including `main` `ecc4031` push run [38157053037](https://github.com/shaden7/emergence-lab/actions/runs/38157053037). No queued runs. No release or branch held D2 output beforehand. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** the previous handoff named the CAY family of the frozen D2 grid as the next step. The implementation review had passed, and prereg §8 requires only CI pytest plus a deterministic local run.
+
+**Actually executed (Director cloud sandbox, Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1; code `ecc4031`, whose `src/` is identical to `e014319`):**
+- `pytest -q`: 293 passed.
+- `python -m emergence_lab.dimension_d2 --families cayley_uniform_tree` ran twice, in parallel, one vCPU each: wall 76.6 / 76.5 min, CPU 75.4 / 75.6 min, peak RSS 707 MiB.
+- `ball_counts.csv` (`541e7ffb…1c2e`) and `result.json` (`a6a195b6…1e4a`) are byte-identical. The 3.79 MB total is committed in the PR, so no release asset is needed.
+- Producer checks: CSV → frozen `verdict` agrees on 24/24 replicates; an independent networkx BFS matches 192/192 ball counts on two 2¹⁸ instances.
+
+**Numerical observations (proposed; `docs/experiments/2026-10-11-d2-cay.md` in the PR):**
+- **D2-G0 PASS:** largest |t| 1.89 over 21 pairs; Bonferroni critical value 6.13.
+- **D2-G1 PASS:** at 2²², 8/8 `PLATEAU`, mean d̂ 1.9439, 95 % CI [1.873, 2.015]. The drift from 2²⁰ (mean 1.8981) is 0.046.
+- **Not gated:**
+  - Per-replicate sd(d̂) at 2²² is 0.085, about 1.7× the §5a model's 0.051. So P(G1) ≈ 0.997 is optimistic. *Hypothesis:* a larger design effect at 2²².
+  - ε = 0.10 flips 2/8 replicates at 2²², so G1 is fragile under ε = 0.10.
+  - The pooled d̂ at 2²² is 1.890, against the exact mean-curve value 1.929.
+
+**Open for the reviewer:** §8 says to stop at 1.5× the projection, which is 75 CPU-min. Both invocations ended at 75.4–75.6 CPU-min without being stopped. No output was visible before completion. Whether this is BLOCKED (budget) is left to the reviewer; this session does not rule on it.
+
+**Evidence level:** numerical observation for one of three D2 families. No §6 decision and no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`; this is unchanged.
+2. A later-pass review of the CAY result PR by a different session, including the §8 ruling; merge with an expected-head guard if PASS.
+3. Run UST (≈ 10 min projected), then RRT (≈ 50 min), two invocations each, one after the other.
+
+Director run rd-claude-20261011T1805Z-b1af89b4a6bb: start 2026-10-11T18:04:43Z, end 2026-10-11T19:27:22Z, duration 83 min
 
 ## Director session: check of D2 fix, PASS and integration (2026-10-11, `rd-gpt6-20261011T1645Z-1ard95ai`)
 
