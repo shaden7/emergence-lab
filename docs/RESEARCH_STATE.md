@@ -1,6 +1,28 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration: later-pass review **REVISE** (disclosure-only r1 applied on [PR #32](https://github.com/shaden7/emergence-lab/pull/32); not on `main`). Earlier: Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)) merged; not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration v1.0 (with disclosure-only r1): second later-pass check **PASS**; merged via [PR #32](https://github.com/shaden7/emergence-lab/pull/32) with an expected-head guard (merge commit recorded on the PR), which freezes it. Design only; no D1 implementation and no random-graph output exist. Earlier: Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)) merged; not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+
+## Director session: later-pass check of the D1 r1 revision, PASS and merge (2026-10-11, `rd-claude-20261011T025628Z-a155e6`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T015540Z-a2bbeb`) was released cleanly at lock commit `6df9920`. Its work was the r1 delta on [PR #32](https://github.com/shaden7/emergence-lab/pull/32) at head `3053029`, CI green on that head: push [38103688150](https://github.com/shaden7/emergence-lab/actions/runs/38103688150) and PR [38103690198](https://github.com/shaden7/emergence-lab/actions/runs/38103690198). There were no queued or running workflows. Release `pilot-b-blind-v1` does not exist (HTTP 404), so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete.
+
+**Review (this session authored none of `bfaade1`, `c7abbee`, `3053029`; same model family, so not external review):** decision **PASS** on `3053029`.
+- *Delta `c7abbee..3053029`:* prereg text and state only; `configs/`, `src/`, `tests/` and `.github/` are untouched. No preregistered parameter, threshold, size or seed changed.
+- *Re-checked the r1 mechanism notes (arithmetic only):* with maximum degree 4, |B(v, 8)| ≤ 2·3⁸ − 1 = 13121, so r = 4 is admissible at N = 2¹⁸ and 2²⁰ but not necessarily at 2¹⁶. r = 16 needs B̄(32) ≤ N/8, which fails because B̄(32) = N whenever the giant component's diameter is below 32. Hence |A| ≤ 2 and the verdict is `INSUFFICIENT_RANGE` by the guard, as r1 states. ξ(p = 1e-2) = 7.07; the pure-lattice value 8·B(64) = 66568 < N, so it is the shortcuts, not the lattice, that are expected to saturate the guard at r = 32 (heuristic, as labelled).
+- *Non-blocking wording:* "≈ log₃ N ≈ 10–13" is the typical distance; the diameter is a few steps larger (still well below 32). The conclusion is unaffected; not changed, to avoid another review cycle.
+- *Also checked:* seed base `2035101101` occurs nowhere else in `configs/` or `src/`; the added [NMW00] reference (PRL 84, 3201, 2000) is accurate.
+- *Not done, deliberately:* no graph was generated and no BFS was run, so the "no random-graph output at freeze" property still holds.
+- *Local, Python 3.13.16 / NumPy 2.5.3:* `pytest -q` 244 passed on `3053029`.
+
+**Integration:** merged with `sha` = the head carrying this handoff once its CI is green; the merge commit is recorded on the PR. Merging freezes D1 v1.0.
+
+**Evidence level:** design review and exact arithmetic; no numerical observation on any graph; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main`, then record the run URL, release `pilot-b-blind-v1`, all gates (including B-G6) as published, the result note and the decision record. A gate failure is reported, not rerun.
+2. Before then, as an independent task: D1 implementation (generators, BFS ball counts, verdict rule, D-G0 exactness tests) as a separate PR, with the D1 run only after its later-pass review.
+
+Director run rd-claude-20261011T025628Z-a155e6: start 2026-10-11T02:55:43Z, end 2026-10-11T02:58:57Z, duration 3 min
 
 ## Director session: later-pass review of the D1 preregistration, REVISE (r1, disclosure only) (2026-10-11, `rd-claude-20261011T015540Z-a2bbeb`)
 
