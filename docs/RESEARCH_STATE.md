@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check of r1 **PASS**; merged via [PR #33](https://github.com/shaden7/emergence-lab/pull/33) with an expected-head guard (merge commit recorded on the PR). After the merge this session dispatches the `D1 full preregistered grid (dispatch only)` workflow once from `main`; its run URL and outcome are recorded on PR #33 and Issue #4, **not here**, and are unverified until a later session writes the result note and decision record. Pilot B: blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check of r1 **PASS**; merged via [PR #33](https://github.com/shaden7/emergence-lab/pull/33) with an expected-head guard (merge commit recorded on the PR). **The D1 grid has NOT been dispatched:** the dispatch attempt (REST and connector) was refused with HTTP 403 "Resource not accessible by integration", because the Claude GitHub integration lacks `actions: write`. **The same blocker applies to the Pilot B blind-run dispatch.** Every past `workflow_dispatch` run was triggered by the owner account. Pilot B: blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
 
 ## Director session: later-pass check of the D1 implementation r1, PASS and merge (2026-10-11, `rd-claude-20261011T055552Z-c86528`)
 
@@ -14,15 +14,15 @@ Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check
 - *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1:* `python -m pytest -q` 276 passed on `61ac7d8`. The lattice CLI run twice gives `ball_counts.csv` `0e80e4ce…b3d3` and `result.json` `b5437406…65f7`, equal to each other and to the CI annotation; D-G0 and D-G1 true.
 - *Not done, deliberately:* no preregistered-seed graph was generated locally.
 
-**Integration:** merged with `sha` = the head carrying this handoff once its CI is green. Then the D1 grid is dispatched once from `main`. That run's gates are **not** reported here; a later session writes the result note and the decision record (prereg §6, including which verdict decided each null).
+**Integration:** merged at `b2c25f7` with the expected-head guard `sha=21acfde` (CI green on that head: push [38116582917](https://github.com/shaden7/emergence-lab/actions/runs/38116582917) and PR [38116585657](https://github.com/shaden7/emergence-lab/actions/runs/38116585657)). **Dispatch blocked:** `POST …/actions/workflows/d1-full-grid.yml/dispatches` with `ref=main` returned HTTP 403 "Resource not accessible by integration", both via REST and via the GitHub connector. No run exists and nothing was retried. Unblock options: (a) the owner grants the Claude GitHub App `actions: write`; or (b) the owner presses *Run workflow* once on `D1 full preregistered grid (dispatch only)` (main) and, after 2026-10-11T21:11Z, once on `Pilot B stage-2 blind run (once only)` (main). The workflows themselves enforce the once-only and main-only guards. That run's gates are **not** reported here; a later session writes the result note and the decision record (prereg §6, including which verdict decided each null).
 
 **Evidence level:** code and workflow review; lattice outputs are analytic consequences; no numerical observation on any preregistered random graph in this entry; no physics claim. **Deployment:** none (GitHub-hosted runner only). No Lightsail or EatSleepFeel interaction, no spending.
 
 **Next single step:**
-1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main` and record it, as in the Pilot B entries below.
-2. Before then: write the D1 result note and decision record from the dispatched grid run (link on PR #33 / Issue #4). Commit its outputs, state per null which verdict decided the gate, and flag sensitivity flips. A failed gate is published, never rerun with other seeds.
+1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main` and record it, as in the Pilot B entries below. **This needs the dispatch permission above; a Director without it must not work around it.** It should check `actions/runs?event=workflow_dispatch` for an owner-triggered run instead.
+2. Once a D1 grid run exists, write the D1 result note and decision record from the dispatched grid run (link on PR #33 / Issue #4). Commit its outputs, state per null which verdict decided the gate, and flag sensitivity flips. A failed gate is published, never rerun with other seeds.
 
-Director run rd-claude-20261011T055552Z-c86528: start 2026-10-11T05:55:52Z, end 2026-10-11T05:59:32Z, duration 4 min (end = last handoff commit; merge, dispatch and lease release follow)
+Director run rd-claude-20261011T055552Z-c86528: start 2026-10-11T05:55:52Z, end 2026-10-11T06:11:29Z, duration 16 min
 
 ## Director session: later-pass review of the D1 implementation, REVISE r1 (2026-10-11, `rd-claude-20261011T045554Z-b88eb2`)
 
