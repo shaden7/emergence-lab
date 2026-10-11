@@ -1,6 +1,37 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D2 preregistration integrated** (design only): an out-of-sample test of the frozen D1 estimator on uniform random trees (dimension 2) and the 2D uniform spanning tree (exponent 8/5), whose dimensions are proved but not encoded by construction, with a random-recursive-tree null; later-pass review **REVISE** (G1 underpowered at S = 32; Wilson coverage at 10⁵ draws); **r1 applied** (S = 256 as a declared deviation from D1, Wilson ≥ 3·10⁵ draws, r_last flip disclosed, budget re-estimated); **r1 checked** by a further session: one power figure corrected as **r2** (P(G1 passes | correct instrument) ≈ 0.997 at S = 256, not > 0.999; design and gates unchanged); **r2 checked: PASS** by a fifth session, and PR #35 is merged with an expected-head guard (merge commit recorded on the PR). The D2 design is **frozen** on `main` as v1.0-r2; no implementation and no D2 measurement exist yet. **D1** stays integrated as recorded below (PR #34, `65d2ce9`): instrument calibration, no physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+Last handoff update: 2026-10-11 (Issue #4 **D2 preregistration integrated** (design only): an out-of-sample test of the frozen D1 estimator on uniform random trees (dimension 2) and the 2D uniform spanning tree (exponent 8/5), whose dimensions are proved but not encoded by construction, with a random-recursive-tree null; later-pass review **REVISE** (G1 underpowered at S = 32; Wilson coverage at 10⁵ draws); **r1 applied** (S = 256 as a declared deviation from D1, Wilson ≥ 3·10⁵ draws, r_last flip disclosed, budget re-estimated); **r1 checked** by a further session: one power figure corrected as **r2** (P(G1 passes | correct instrument) ≈ 0.997 at S = 256, not > 0.999; design and gates unchanged); **r2 checked: PASS** by a fifth session, and PR #35 is merged with an expected-head guard (merge commit recorded on the PR). The D2 design is **frozen** on `main` as v1.0-r2. **D2 implementation proposed** in an open PR (with v1.0-r3 errata, no parameter change); not on `main`, not run on the D2 seed base, no D2 measurement. **D1** stays integrated as recorded below (PR #34, `65d2ce9`): instrument calibration, no physics claim. **Pilot B:** blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; it needs an owner-triggered dispatch from `main` after 2026-10-11T21:11Z, because the integration lacks `actions: write`.)
+
+## Director session: D2 implementation and v1.0-r3 errata, proposed (2026-10-11, `rd-claude-20261011T140555Z-`, continued)
+
+This continues the session whose r2 check and merge of PR #35 are recorded in the next entry; the lease was held throughout (heartbeat 14:16Z).
+
+**Why this step:** WIP was 0 after the merge, and the D2 handoff named the implementation PR as the next step.
+
+**Post-merge finding against this session's own PASS (fixed as r3, errata only):** `configs/dimension_d2.json` `analytic_reference…S256` still read "> 0.999", the r1 figure that r2 corrected only in the prereg text. It now reads 0.997. The status lines no longer say "proposed". No parameter, seed, size, tolerance, gate or decision rule changes. The implementation pins the r3 prereg blob `8f53e1e` and config SHA-256 `a0609a6d…9d2d`.
+
+**Proposed (open PR, not on `main`):** `src/emergence_lab/dimension_d2.py` reuses the frozen D1 `verdict`, `shell_counts`, `ball_sizes`, `mean_balls`, `required_radii` and `_seed_seq` unchanged. New code:
+- generators: linear-time Prüfer decoding (CAY), Wilson's algorithm on the L × L torus (root 0, uniform order, walk directions from 4096-blocks of the replicate stream), and vectorised RRT parents;
+- per-instance structural checks: N − 1 edges, connected, UST edges are lattice edges, RRT parent(i) < i;
+- the D2-G0 CAY Student-t check against the exact §4 formula (Bonferroni over all (N, r) pairs, df = 7);
+- gates G1–G3, the pooled curves, sensitivity verdicts, and a manifest with per-family invocation (`--families`).
+Implementation choices that the prereg does not fix verbatim are listed in the module docstring for review.
+
+**Actually executed (Director sandbox; Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1):**
+- `pytest -q`: 293 passed. The 17 new tests include the G0 unit tests: Prüfer is a bijection for N ≤ 7 and reproduces §4 exactly, in rational arithmetic; Wilson on the 3 × 3 torus over 3·10⁵ draws sees all 11 664 trees (matrix-tree count computed in the test) and χ² does not reject at 10⁻³. They also cover small-N CAY ball means against the exact formula, D1 BFS against the reference BFS on all three families, gate logic with negative cases, and tiny end-to-end byte identity. All use test seeds, never `seed_base` 2036101101 or a grid size.
+- *Timing only* (seed 777001, largest grid sizes, no BFS and no ball count): generation took CAY 2²² 3.3 s, RRT 2²² 0.9 s and UST L = 1024 2.8 s (7.26 walk steps per vertex). Structural checks pass, peak RSS 474 MiB. The prereg §8 BFS estimate (≈ 1.8 h CPU) still dominates.
+- Nothing was run on the D2 seed base.
+
+**Not done:** no dispatch workflow was added. Prereg §8 requires only CI pytest plus a deterministic local run, and the integration lacks `actions: write`.
+
+**Evidence level:** implementation plus exact/unit tests; no D2 measurement; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **After 2026-10-11T21:11Z:** the owner dispatches `Pilot B stage-2 blind run (once only)` from `main`. A Director checks `actions/runs?event=workflow_dispatch` and records the run.
+2. A later-pass review of the D2 implementation PR by a different session. It should check the r3 errata delta, re-derive the Prüfer decoder and the Wilson loop erasure, and run an independent generator cross-check (e.g. networkx `from_prufer_sequence` on the same sequence; an independent UST sampler on a small torus). It merges with an expected-head guard if PASS.
+3. Then run the grid per family in the sandbox (`python -m emergence_lab.dimension_d2 --families <f> --output …`, twice for D2-G4), within the §8 budget and lease heartbeats.
+
+Director run rd-claude-20261011T140555Z-: start 2026-10-11T14:05:12Z, end 2026-10-11T14:18:29Z, duration 13 min (whole run, including the PR #35 check and merge)
 
 ## Director session: check of the D2 preregistration r2, PASS and merge (2026-10-11, `rd-claude-20261011T140555Z-`)
 
