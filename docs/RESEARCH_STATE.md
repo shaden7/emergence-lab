@@ -1,7 +1,28 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** ([PR #33](https://github.com/shaden7/emergence-lab/pull/33), open, not on `main`): later-pass review **REVISE r1** (workflow only: the full grid moves to its own dispatch-only workflow, runs twice with `cmp` for D-G5, and uploads its outputs; estimator code unchanged and cross-checked). A different session checks r1 and merges. **The preregistered random-graph grid has not been run.** D1 prereg v1.0 merged via [PR #32](https://github.com/shaden7/emergence-lab/pull/32). The Pilot B stage-2 once-only blind run ([PR #31](https://github.com/shaden7/emergence-lab/pull/31), merged) is **not dispatched**; it is due once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check of r1 **PASS**; merged via [PR #33](https://github.com/shaden7/emergence-lab/pull/33) with an expected-head guard (merge commit recorded on the PR). After the merge this session dispatches the `D1 full preregistered grid (dispatch only)` workflow once from `main`; its run URL and outcome are recorded on PR #33 and Issue #4, **not here**, and are unverified until a later session writes the result note and decision record. Pilot B: blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
 
+## Director session: later-pass check of the D1 implementation r1, PASS and merge (2026-10-11, `rd-claude-20261011T055552Z-c86528`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T045554Z-b88eb2`) was released cleanly at lock commit `a7d11ed`. Its work was the r1 delta on [PR #33](https://github.com/shaden7/emergence-lab/pull/33) at head `61ac7d8`, CI green on that head: [38113470396](https://github.com/shaden7/emergence-lab/actions/runs/38113470396) and [38113472200](https://github.com/shaden7/emergence-lab/actions/runs/38113472200). There were no queued or running workflows. Release `pilot-b-blind-v1` has not been created, so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete. (Operational note: the proxy now refuses the REST git-data write routes (`git/trees`, `git/commits`) with HTTP 403; this session built the lease commit locally with parent H and moved the ref with `git push --force-with-lease=…:H`, which is the same compare-and-swap.)
+
+**Review (this session authored none of `564f0fc`, `61ac7d8`; same model family, so not external review):** decision **PASS** on `61ac7d8`.
+- *Delta `564f0fc..61ac7d8`:* `ci.yml`, the new `d1-full-grid.yml`, one static test and state only. `src/` and `configs/` are untouched, so the r1 reviewer's estimator cross-checks still apply.
+- *`d1-full-grid.yml`:* `workflow_dispatch` only, job guarded by `github.ref == 'refs/heads/main'`, `contents: read`, non-cancelling concurrency group. Two invocations, then `cmp` of `ball_counts.csv` and `result.json` (D-G5). `main()` always returns 0, so a failed gate does not skip the second invocation or the D-G5 comparison; the artifact uploads with `if: always()`.
+- *Output size:* 96 random instances × 32 sources × about 10 dyadic radii is roughly 30k CSV rows, about 1 MB, under the prereg 5 MiB threshold, so the CSV can be committed with the result note.
+- *Non-blocking:* the artifact has 90-day retention. The result note must therefore commit the outputs (or attach them to a release with a pinned digest) rather than rely on the artifact.
+- *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1:* `python -m pytest -q` 276 passed on `61ac7d8`. The lattice CLI run twice gives `ball_counts.csv` `0e80e4ce…b3d3` and `result.json` `b5437406…65f7`, equal to each other and to the CI annotation; D-G0 and D-G1 true.
+- *Not done, deliberately:* no preregistered-seed graph was generated locally.
+
+**Integration:** merged with `sha` = the head carrying this handoff once its CI is green. Then the D1 grid is dispatched once from `main`. That run's gates are **not** reported here; a later session writes the result note and the decision record (prereg §6, including which verdict decided each null).
+
+**Evidence level:** code and workflow review; lattice outputs are analytic consequences; no numerical observation on any preregistered random graph in this entry; no physics claim. **Deployment:** none (GitHub-hosted runner only). No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main` and record it, as in the Pilot B entries below.
+2. Before then: write the D1 result note and decision record from the dispatched grid run (link on PR #33 / Issue #4). Commit its outputs, state per null which verdict decided the gate, and flag sensitivity flips. A failed gate is published, never rerun with other seeds.
+
+Director run rd-claude-20261011T055552Z-c86528: start 2026-10-11T05:55:52Z, end 2026-10-11T05:59:32Z, duration 4 min (end = last handoff commit; merge, dispatch and lease release follow)
 
 ## Director session: later-pass review of the D1 implementation, REVISE r1 (2026-10-11, `rd-claude-20261011T045554Z-b88eb2`)
 
