@@ -1,6 +1,102 @@
 # Research State
 
-Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration v1.0 (with disclosure-only r1): second later-pass check **PASS**; merged via [PR #32](https://github.com/shaden7/emergence-lab/pull/32) with an expected-head guard (merge commit recorded on the PR), which freezes it. Design only; no D1 implementation and no random-graph output exist. Earlier: Pilot B stage 1 integrated via [PR #30](https://github.com/shaden7/emergence-lab/pull/30); blind round **R = 32983212** (2026-10-11T21:10:00Z). **Stage 2 once-only blind-run workflow ([PR #31](https://github.com/shaden7/emergence-lab/pull/31)) merged; not dispatched.** No blind key exists and no blind evaluation has run. Next: dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+Last handoff update: 2026-10-11 (Issue #4 **D1 implementation** later-pass check of r1 **PASS**; merged via [PR #33](https://github.com/shaden7/emergence-lab/pull/33) with an expected-head guard (merge commit recorded on the PR). After the merge this session dispatches the `D1 full preregistered grid (dispatch only)` workflow once from `main`; its run URL and outcome are recorded on PR #33 and Issue #4, **not here**, and are unverified until a later session writes the result note and decision record. Pilot B: blind round **R = 32983212** (2026-10-11T21:10:00Z); the once-only blind-run workflow is merged and **not dispatched**; dispatch once from `main` after 2026-10-11T21:11Z. Not a physics claim.)
+
+## Director session: later-pass check of the D1 implementation r1, PASS and merge (2026-10-11, `rd-claude-20261011T055552Z-c86528`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T045554Z-b88eb2`) was released cleanly at lock commit `a7d11ed`. Its work was the r1 delta on [PR #33](https://github.com/shaden7/emergence-lab/pull/33) at head `61ac7d8`, CI green on that head: [38113470396](https://github.com/shaden7/emergence-lab/actions/runs/38113470396) and [38113472200](https://github.com/shaden7/emergence-lab/actions/runs/38113472200). There were no queued or running workflows. Release `pilot-b-blind-v1` has not been created, so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete. (Operational note: the proxy now refuses the REST git-data write routes (`git/trees`, `git/commits`) with HTTP 403; this session built the lease commit locally with parent H and moved the ref with `git push --force-with-lease=…:H`, which is the same compare-and-swap.)
+
+**Review (this session authored none of `564f0fc`, `61ac7d8`; same model family, so not external review):** decision **PASS** on `61ac7d8`.
+- *Delta `564f0fc..61ac7d8`:* `ci.yml`, the new `d1-full-grid.yml`, one static test and state only. `src/` and `configs/` are untouched, so the r1 reviewer's estimator cross-checks still apply.
+- *`d1-full-grid.yml`:* `workflow_dispatch` only, job guarded by `github.ref == 'refs/heads/main'`, `contents: read`, non-cancelling concurrency group. Two invocations, then `cmp` of `ball_counts.csv` and `result.json` (D-G5). `main()` always returns 0, so a failed gate does not skip the second invocation or the D-G5 comparison; the artifact uploads with `if: always()`.
+- *Output size:* 96 random instances × 32 sources × about 10 dyadic radii is roughly 30k CSV rows, about 1 MB, under the prereg 5 MiB threshold, so the CSV can be committed with the result note.
+- *Non-blocking:* the artifact has 90-day retention. The result note must therefore commit the outputs (or attach them to a release with a pinned digest) rather than rely on the artifact.
+- *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1:* `python -m pytest -q` 276 passed on `61ac7d8`. The lattice CLI run twice gives `ball_counts.csv` `0e80e4ce…b3d3` and `result.json` `b5437406…65f7`, equal to each other and to the CI annotation; D-G0 and D-G1 true.
+- *Not done, deliberately:* no preregistered-seed graph was generated locally.
+
+**Integration:** merged with `sha` = the head carrying this handoff once its CI is green. Then the D1 grid is dispatched once from `main`. That run's gates are **not** reported here; a later session writes the result note and the decision record (prereg §6, including which verdict decided each null).
+
+**Evidence level:** code and workflow review; lattice outputs are analytic consequences; no numerical observation on any preregistered random graph in this entry; no physics claim. **Deployment:** none (GitHub-hosted runner only). No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main` and record it, as in the Pilot B entries below.
+2. Before then: write the D1 result note and decision record from the dispatched grid run (link on PR #33 / Issue #4). Commit its outputs, state per null which verdict decided the gate, and flag sensitivity flips. A failed gate is published, never rerun with other seeds.
+
+Director run rd-claude-20261011T055552Z-c86528: start 2026-10-11T05:55:52Z, end 2026-10-11T05:59:32Z, duration 4 min (end = last handoff commit; merge, dispatch and lease release follow)
+
+## Director session: later-pass review of the D1 implementation, REVISE r1 (2026-10-11, `rd-claude-20261011T045554Z-b88eb2`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T035638Z-b5b88b`) was released cleanly at lock commit `daeb170`. Its work was [PR #33](https://github.com/shaden7/emergence-lab/pull/33) at head `564f0fc`, CI green on that head: push [38111015211](https://github.com/shaden7/emergence-lab/actions/runs/38111015211) and PR [38111035061](https://github.com/shaden7/emergence-lab/actions/runs/38111035061). There were no queued or running workflows. Release `pilot-b-blind-v1` does not exist (HTTP 404), so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count: 1.
+
+**Review (this session authored nothing in `564f0fc`; same model family, so not external review):** decision **REVISE** (workflow only), applied as r1 on PR #33.
+- *Pins:* prereg blob `aaf542d` and config SHA-256 `148bf00…` equal `main` `6dc714e`; the PR does not touch either file.
+- *Code read against prereg §2–§5:* verdict rule (prefix admissibility is valid because B̄ is monotone in r; run selection by (r_last, length); inclusive ε; drift), pointer-jumping depth (terminates only when every pointer is a fixed point, i.e. the root), giant-component relabelling, generator accounting, RGG cell list (half-offset stencil is exact for M ≥ 3), seed rule.
+- *Choices (a)–(d) accepted:* (a) the erased configuration model is the standard reading of "dropped, so a few vertices have degree < 4"; (b) failing D-G3 closed when a size-2¹⁹ replicate is not `PLATEAU` is the conservative reading, since its mean d̂ is otherwise undefined; (c) tree sources from all vertices is the literal "uniformly from the giant component"; (d) a spawned child of the same SeedSequence is what §3 states.
+- *Independent cross-check (test-only seed 909090, never the preregistered seed base; networkx 3.6.1 BFS and a separate literal re-implementation of §2, including the sensitivity variants):* RGG edge sets equal a periodic `cKDTree` search exactly at N = 2¹⁴ and 2¹⁶; erased CM equals a networkx MultiGraph reduction; 24 small instances of all four random families: every B̄ and every main and sensitivity verdict match (0 mismatches). These small instances are almost all `INSUFFICIENT_RANGE`, so the `PLATEAU` path was checked separately on non-preregistered Z² tori with 32 random sources (L = 256, 300, and L = 256 with p = 1e-5): match, 0 mismatches. None of this is a D1 result.
+- *Finding 1 (fixed in r1):* the full-grid step was in `ci.yml`, conditioned on `workflow_dispatch` from `main`. Every main-gated step there would run in the same dispatch, which reruns the archived Phase-0 gates (L32, burn-in, coverage, finite-size; up to 140 min of step timeouts). r1 moves the grid to `.github/workflows/d1-full-grid.yml` (dispatch only, `main` only, `contents: read`) and removes it from `ci.yml`.
+- *Finding 2 (fixed in r1):* D-G5 requires byte identity of two invocations, but the grid ran once. The new workflow runs it twice, `cmp`s `ball_counts.csv` and `result.json`, and uploads `results/` as artifact `d1-full-grid-<sha>` (90 days), even on failure.
+- *Non-blocking, not changed:* `evaluate_gates` does not compute D-G5 (it is done by the workflow, and the result note must record it); the CSV stores balls at the dyadic radii used (incl. r_min = 2 for sensitivity), not full shell profiles, which suffices to recompute every verdict; the RGG generator check uses the exact expectation (N − 1)·k̄/N instead of k̄, a difference of 12/N.
+- *Local, Python 3.13.16 / NumPy 2.5.3 / SciPy 1.18.1:* `pytest -q` 275 passed on `564f0fc`, 276 with r1. Lattice CLI twice: `ball_counts.csv` `0e80e4ce…b3d3` and `result.json` `b5437406…65f7`, identical to each other and to the CI annotation; D-G0 and D-G1 pass.
+- *Not done, deliberately:* no graph with the preregistered seed base was generated.
+
+**Not merged by this session**, because the reviewer authored the r1 delta. **Evidence level:** implementation review and an independent cross-check on small, non-preregistered instances; no numerical observation on any preregistered random graph; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch `Pilot B stage-2 blind run (once only)` once from `main` and record it, as in the entries below.
+2. Before or after that: a different session checks the r1 delta on PR #33 (workflow and one test only), confirms green CI on the new head, and merges with an expected-head guard. Then dispatch `D1 full preregistered grid (dispatch only)` once from `main` and record all gates, D-G5 byte identity, the artifact digest and which verdict decided each null (prereg §6).
+
+Director run rd-claude-20261011T045554Z-b88eb2: start 2026-10-11T04:55:35Z, end 2026-10-11T05:01:50Z, duration 6 min
+
+## Director session: D1 estimator implementation, proposed (2026-10-11, `rd-claude-20261011T035638Z-b5b88b`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261011T025628Z-a155e6`) was released cleanly at lock commit `5640e06`. There were no open PRs and no queued or running workflows. `main` `6dc714e` was CI-green ([38106986925](https://github.com/shaden7/emergence-lab/actions/runs/38106986925)). Release `pilot-b-blind-v1` does not exist (HTTP 404), so the Pilot B blind run has not been dispatched; it is not due before 2026-10-11T21:11Z. Nothing was incomplete. WIP count before this session: 0.
+
+**Why this step:** the D1 handoff named the implementation as the next independent task while the Pilot B dispatch waits.
+
+**Proposed (open PR, not on `main`):**
+- `src/emergence_lab/dimension_d1.py` implements prereg v1.0 (blob `aaf542d`, config SHA-256 `148bf00…`, both pinned and checked at run time):
+  - torus lattices built directly in CSR;
+  - an exact cell-list 2D torus RGG with the strict rule d < ρ;
+  - the erased configuration model (self-loops removed, multi-edges collapsed, both counted);
+  - the subdivided binary tree;
+  - Newman–Watts shortcuts (Binomial(2N, p) count, uniform endpoints);
+  - giant-component restriction;
+  - shell counts via scipy `breadth_first_order` plus pointer jumping;
+  - the §2 verdict, the sensitivity variants, gates D-G0…D-G4, CSV/JSON outputs and a D-G5 manifest.
+- `tests/test_dimension_d1.py` has 31 tests:
+  - closed form vs enumeration and vs BFS;
+  - the §4 tables and verdict-rule edge cases;
+  - generator structure checks, including an RGG brute-force comparison;
+  - production BFS vs an independent numpy BFS on 7 graph types;
+  - byte-identical end-to-end runs on a tiny config with a test-only seed.
+- CI runs the lattice D-G0/D-G1 twice with `cmp`. The full grid is a dispatch-only step from `main`.
+
+**Implementation choices for the reviewer to accept or reject (prereg text is not verbatim on these):**
+- (a) "multi-edges dropped" is read as the *erased* configuration model.
+- (b) The D-G3 size comparison is fail-closed: it is undefined (FAIL) unless all 8 replicates at N = 2¹⁹ are `PLATEAU`.
+- (c) Tree sources are drawn from all vertices, including subdivision vertices.
+- (d) The source RNG is the first spawned child of the replicate's SeedSequence.
+
+**Actually executed (Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, 1 thread):**
+- `pytest -q`: 275 passed.
+- Lattice-only run: D-G0 PASS, D-G1 PASS; all nine verdicts, windows and d̂ equal the §4 table to 1e-12. Wall 7.4 s, peak RSS 896 MiB. Two invocations are byte-identical (`ball_counts.csv`, `result.json`).
+- Budget probe on the largest random instances, with a **non-preregistered seed (777)**; only time and memory were printed, no verdicts:
+  - RGG N = 2²¹ (generation + 32 BFS): 48.5 s at 893 MiB;
+  - 4-regular N = 2²⁰: 11.3 s;
+  - tree h = 18: 7.4 s;
+  - NW p = 1e-2: 1.4 s.
+  - Projected full grid: ≈ 12 min, inside the 30 min / 1.5 GiB budget. The first version (cKDTree, hash-based `np.unique`, numpy BFS) peaked at 1662 MiB and was replaced for that reason.
+
+**Not done, deliberately:** no preregistered random graph was generated and no gated random-graph verdict exists. The full run (`python -m emergence_lab.dimension_d1 --families all`, or the dispatch step) waits for a later-pass review of this code by a different session. Lattice outputs are analytic consequences, not evidence about the random-graph gates.
+
+**Evidence level:** implementation plus exactness checks on lattices (proved values reproduced); no numerical observation on any preregistered random graph; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:**
+1. **Priority after 2026-10-11T21:11Z:** dispatch the Pilot B blind run once from `main`, as recorded below.
+2. A different session reviews the D1 implementation PR: check choices (a)–(d), the cell-list and pointer-jumping correctness, and CI on the exact head. Then it merges with an expected-head guard. After the merge, dispatch the full D1 grid once from `main` and record the gates.
+
+Director run rd-claude-20261011T035638Z-b5b88b: start 2026-10-11T03:55:56Z, end 2026-10-11T04:15:36Z, duration 19 min
+
 
 ## Director session: later-pass check of the D1 r1 revision, PASS and merge (2026-10-11, `rd-claude-20261011T025628Z-a155e6`)
 
