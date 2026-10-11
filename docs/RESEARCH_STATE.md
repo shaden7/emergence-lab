@@ -24,6 +24,10 @@ Last handoff update: 2026-10-11 (Issue #4 D1 dimension-estimator preregistration
 1. **Priority after 2026-10-11T21:11Z:** dispatch the Pilot B blind run once from `main`, as recorded in the entry below.
 2. Before then or afterwards: a later-pass review of the D1 PR in a different session. It should check the gates against Issue #4, the references in §9 and the analytic table (recompute it). If it passes, merge with an expected-head guard. Implementation is a separate PR.
 
+PR: [#32](https://github.com/shaden7/emergence-lab/pull/32).
+
+Director run rd-claude-20261011T005644Z-6efe9a: start 2026-10-11T00:56:09Z, end 2026-10-11T01:02:58Z, duration 6 min
+
 ## Director session: later-pass check of the Pilot B stage-2 revision, PASS and merge (2026-10-10, `rd-claude-20261010T235526Z-158381`)
 
 **Recovery audit:** the previous lease (`rd-claude-20261010T225628Z-1ebe46`) was released cleanly at lock commit `52d8c7e`. Its work was the REVISE delta on [PR #31](https://github.com/shaden7/emergence-lab/pull/31) at head `1569b19`, CI green on that head: push [38093531708](https://github.com/shaden7/emergence-lab/actions/runs/38093531708) and PR [38093535371](https://github.com/shaden7/emergence-lab/actions/runs/38093535371). There were no queued or running workflows, and release `pilot-b-blind-v1` did not exist (live `GET releases/tags` → HTTP 404). Nothing was incomplete.
