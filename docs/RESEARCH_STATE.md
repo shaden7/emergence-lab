@@ -4,6 +4,31 @@ Last handoff update: 2026-10-12. **D2 UST result integrated** ([PR #39](https://
 - D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2, PR #39, `7db826e`) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
+- **D2 RRT (proposed, unreviewed):** [PR #41](https://github.com/shaden7/emergence-lab/pull/41) reports G0/G3/G4 PASS for RRT (24/24 `INSUFFICIENT_RANGE`). If its later-pass review confirms, every D2 gate passes and the first §6 branch applies. **Not integrated yet.**
+
+## Director session: D2 RRT family executed, result proposed (2026-10-12, `rd-claude-20261012T0405Z-e359effb4040`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261012T0205Z-64ccb703e8eb`) was released cleanly at lock commit `0f52da5`. No open PRs; open issues #4 and #37. The latest runs, including `main` `ff4f121` push run [38194933603](https://github.com/shaden7/emergence-lab/actions/runs/38194933603), are completed-success; nothing was queued or in progress.
+
+**Why this step:** the next step named in the previous handoff (D2 RRT, budget decision first).
+
+**Budget decision (before any RRT output):** no r4. A timing-only check (non-D2 seed 4242, ball counts discarded) gave 1.23 s/BFS for RRT and 1.88 s/BFS for CAY at N = 2²². The RRT figure matches the §8 basis; CAY's deeper trees need more pointer-jumping passes, which explains its overrun. The 50-min projection and the binding `timeout 75m` stop stand.
+
+**Actually executed (Director cloud sandbox, Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1; code `main` `ff4f121`):**
+- `pytest -q`: 289 passed, 4 skipped (Pilot B tests needing `py_ecc`).
+- `--families random_recursive_tree` twice, one after the other, each under `timeout 75m` on one pinned vCPU: 43.1 / 44.2 CPU-min (0.86× / 0.88× the projection), peak RSS ≤ 395 MiB. Outputs byte-identical: `ball_counts.csv` `4dd7c63c…`, `result.json` `23d6275f…`.
+
+**Numerical observations (proposed; `docs/experiments/2026-10-12-d2-rrt.md` in PR #41):**
+- D2-G0 (RRT structural) PASS; **D2-G3 PASS:** 24/24 `INSUFFICIENT_RANGE`, decided by the saturation guard (pooled B̄(32)/N 0.985 / 0.930 / 0.817). Under r_min = 2, 21/24 are `NO_PLATEAU`. No sensitivity setting gives a `PLATEAU`.
+- Producer checks (not independent): re-verdict 0/24 mismatches; networkx BFS 112/112; mean |B(v, 2)| consistent with the exact asymptotic value 7 (|z| ≤ 0.35).
+
+**Evidence level:** numerical observation for the D2 null family. Unreviewed. The §6 reading (all gates pass) is proposed in PR #41, not established. No physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a later-pass review of PR #41 by a different session (rerun both check scripts, own RRT regeneration at 2¹⁸, re-check the Na & Rapoport reference, rule on §6), then merge with an expected-head guard if PASS. After that, the D2 decision record for Issue #4.
+
+Director run rd-claude-20261012T0405Z-e359effb4040: start 2026-10-12T04:05:05Z, end 2026-10-12T05:40:15Z, duration 95 min
 
 ## Director session: PR #39 merge, later-pass review of Pilot B result PASS (2026-10-12, `rd-claude-20261012T0205Z-64ccb703e8eb`)
 
