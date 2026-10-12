@@ -1,11 +1,32 @@
 # Research State
 
-Last handoff update: 2026-10-11. **D2 CAY family result reviewed PASS and integrated:** PR #38 was merged into `main` at `becfcdfa252b7bebf97487bac2e533152599d0a6`, from the reviewed head `020c1f3`, whose CI is green. The owner requested the merge after the scheduled run's merge call was refused by its permission layer.
-- D2-G0 and D2-G1 pass, and CAY byte identity holds (the G4 part). The run used `main` `ecc4031`.
-- The §8 budget overrun (75.4 vs 75 CPU-min) is ruled a recorded deviation, not BLOCKED.
-- **UST:** run and proposed in [PR #39](https://github.com/shaden7/emergence-lab/pull/39) (G0/G2 pass); not yet reviewed or integrated. **RRT has not been run, and there is no §6 decision.**
+Last handoff update: 2026-10-12. **D2 UST family result reviewed PASS** (later-pass review, session `rd-claude-20261012T0005Z-915e474a3b7b`) in [PR #39](https://github.com/shaden7/emergence-lab/pull/39). Integration is recorded below once merged.
+- D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
-- **Pilot B:** blind round R=32983212 at 2026-10-11T21:10Z. The owner-triggered `workflow_dispatch` on `main`, due only after 21:11Z, is still outstanding.
+- **Pilot B:** the owner dispatched `Pilot B stage-2 blind run (once only)` on `main` `0048198`. The run is [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016), started 2026-10-11T22:36:42Z, completed-success. Its artifact `pilot-b-blind-v1` (id 11718330257, 46 808 B) expires 2027-01-09. **The result note and the prereg §6 decision record have not been written yet.**
+
+## Director session: later-pass review of D2 UST result, PASS (2026-10-12, `rd-claude-20261012T0005Z-915e474a3b7b`)
+
+**Recovery audit:**
+- The previous lease (`rd-claude-20261011T2205Z-fa3ffc55355f`) was released cleanly at lock commit `4fc3400`.
+- Open PRs: #39 only, head `85f81a8`, base `main` `0048198`, mergeable and clean. Its exact-head CI runs [38180822587](https://github.com/shaden7/emergence-lab/actions/runs/38180822587) and [38180825167](https://github.com/shaden7/emergence-lab/actions/runs/38180825167) are completed-success.
+- Open issues: #4 and #37. Nothing was queued or in progress.
+- New since the last handoff: the owner's Pilot B blind dispatch ran (see the header). It has not been evaluated yet.
+- WIP is 1 PR.
+
+**Executed:** a later-pass review of PR #39, recorded in full in the note's review section. The script is `docs/experiments/d2_ust_review_independent.py`. It was written by a different session from the producer, but by the same model family.
+- Hashes match both manifests.
+- An own verdict reproduces 24/24 replicate results and all G2 and pooled numbers from the CSV.
+- The full L = 256 slice was regenerated and every ball count recomputed with scipy BFS: 26 368 / 26 368 match.
+- An **independent Aldous–Broder sampler** was run with fresh seeds (16 trees at L = 256, 8 at L = 512). Its B̄(r) shows no Bonferroni rejection against the CSV replicates (smallest p 0.042 and 0.119). Its d̂ level is the same: 1.557 and 1.572, so the offset of about 0.04 below 8/5 is not a Wilson artifact.
+- The leaf fraction is 0.2944–0.2946 against the exact Z² value 0.2945.
+- The budget is within the §8 stop, so there is no deviation.
+
+**Decision:** PASS, with no findings that need correction.
+
+**Evidence level:** reviewed numerical observation for the second of three D2 families. There is no §6 decision and no physics claim. Volume-growth dimension is not spectral dimension.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
 
 ## Director session: D2 UST family executed, result proposed (2026-10-11, `rd-claude-20261011T2205Z-fa3ffc55355f`)
 
