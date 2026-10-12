@@ -4,8 +4,8 @@
   "owner": "rd-claude-20261012T0405Z-e359effb4040",
   "leaseId": "bea20404-1498-4930-a5bd-7b4265d46c73",
   "acquiredAt": "2026-10-12T04:05:26Z",
-  "heartbeatAt": "2026-10-12T04:10:16Z",
-  "expiresAt": "2026-10-12T06:10:16Z",
+  "heartbeatAt": "2026-10-12T04:40:10Z",
+  "expiresAt": "2026-10-12T06:40:10Z",
   "task": "hourly Director: orient, review open PRs, integrate or next preregistered step",
   "previousOwner": "rd-claude-20261012T0205Z-64ccb703e8eb"
 }
