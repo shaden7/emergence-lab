@@ -115,3 +115,18 @@ def is_saturated(q_t: float, stationary_even_floor: float, *, tolerance: float =
     if not (0.0 <= q_t <= 1.0 + 1e-10 and math.isfinite(q_t)):
         raise ValueError("invalid return probability")
     return q_t <= (1.0 + tolerance) * stationary_even_floor
+
+
+def has_powerlaw_headroom(q_t: float, stationary_even_floor: float, *, ratio: float = 10.0) -> bool:
+    """Censor q(t) when it is too close to its vertex-specific even-time floor.
+
+    This is a necessary finite-size guard, not a positive scaling verdict.
+    Callers must establish period and stationary vertex weight independently.
+    """
+    if not (math.isfinite(stationary_even_floor) and 0 < stationary_even_floor <= 1):
+        raise ValueError("invalid stationary even-time floor")
+    if not (math.isfinite(q_t) and 0 <= q_t <= 1 + 1e-10):
+        raise ValueError("invalid return probability")
+    if not (math.isfinite(ratio) and ratio >= 1):
+        raise ValueError("invalid headroom ratio")
+    return q_t > ratio * stationary_even_floor
