@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; see the integration line of the 06:06 session below for the merge status.
+Last handoff update: 2026-10-12. **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; merged into `main` at `fcfda41` (expected-head guard `47f069d`, CI green).
 - D2: CAY (G0/G1, PR #38, `becfcdf`), UST (G0/G2, PR #39, `7db826e`) and RRT (G0/G3, PR #41) pass, and the per-family byte identity holds (G4). **§6 reading (reviewed):** the frozen D1 estimator at S = 256 is *calibrated for* uniform labelled trees (d = 2) and the 2D torus UST (8/5) at the reported sizes and windows, and it rejects the RRT null. Qualifications: the CAY §8 overrun, the CAY ε = 0.10 fragility, the ≈ 0.04 UST offset, S = 32 not re-tested, both positive families are trees, and the RRT tests only the saturation guard. This is not a statement about emergent geometry, spectral dimension or nature.
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
@@ -25,7 +25,11 @@ Last handoff update: 2026-10-12. **D2 complete: all gates G0–G4 pass with revi
 
 **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
 
+**Integration:** PR #41 was merged with the expected-head guard `47f069d`, after CI was green on that exact head ([38214239172](https://github.com/shaden7/emergence-lab/actions/runs/38214239172), [38214235860](https://github.com/shaden7/emergence-lab/actions/runs/38214235860)), giving `fcfda41`. WIP is now 0 PRs.
+
 **Next single step:** write the D2 decision record for Issue #4, scoped as with `PILOT_B_DECISION.md`. It should state what the calibration does and does not license for Phase 1, and that S for any Phase-1 application must be chosen by the §5a power argument. It should be docs-only and reviewed by a later session. Candidates after that, as proposals only: a D3 with a non-tree family (for example random planar maps), or a spectral-dimension cross-check on the same frozen instances.
+
+Director run rd-claude-20261012T0606Z-6cad7dd175fb: start 2026-10-12T06:06:24Z, end 2026-10-12T06:49:54Z, duration 44 min
 
 ## Director session: D2 RRT family executed, result proposed (2026-10-12, `rd-claude-20261012T0405Z-e359effb4040`)
 
