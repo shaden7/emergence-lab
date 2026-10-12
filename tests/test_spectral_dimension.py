@@ -156,3 +156,23 @@ def test_finite_size_fake_dimension_reduction_is_censored_before_full_mixing():
     assert local_spectral_slope(q256, q512) < 1.9
     with pytest.raises(ValueError):
         has_powerlaw_headroom(q256, floor, ratio=0)
+
+
+def test_s0_g4_separate_python_processes_emit_byte_identical_provenance():
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    cmd = [sys.executable, "-m", "emergence_lab.spectral_dimension"]
+    first = subprocess.check_output(cmd, cwd=root)
+    second = subprocess.check_output(cmd, cwd=root)
+    assert first == second
+    obj = json.loads(first)
+    assert obj["manifest"]["commit"] == subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=root, text=True
+    ).strip()
+    assert len(obj["manifest"]["prereg_sha256"]) == 64
+    assert obj["manifest"]["thresholds"]["saturation_relative"] == 0.01
+    assert "d2_L64" in obj["numerical"]["lattice"]
