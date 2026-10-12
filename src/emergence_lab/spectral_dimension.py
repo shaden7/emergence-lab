@@ -130,3 +130,58 @@ def has_powerlaw_headroom(q_t: float, stationary_even_floor: float, *, ratio: fl
     if not (math.isfinite(ratio) and ratio >= 1):
         raise ValueError("invalid headroom ratio")
     return q_t > ratio * stationary_even_floor
+
+
+def s0_reference_payload() -> dict:
+    """Reproducible small exact reference output; no random samples or wall clock."""
+    import hashlib
+    import json
+    import platform
+    import subprocess
+    from pathlib import Path
+
+    import scipy
+
+    root = Path(__file__).resolve().parents[2]
+    design = root / "docs" / "SPECTRAL_S0_PREREGISTRATION.md"
+    commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=root, text=True
+    ).strip()
+    lattice = {}
+    for d, L in ((1, 256), (2, 64)):
+        lattice[f"d{d}_L{L}"] = {
+            str(t): {
+                "finite": torus_even_return_fourier(d, L, t),
+                "infinite": infinite_lattice_even_return(d, t),
+            }
+            for t in (32, 64, 128, 256)
+        }
+    return {
+        "manifest": {
+            "commit": commit,
+            "prereg_sha256": hashlib.sha256(design.read_bytes()).hexdigest(),
+            "python": platform.python_version(),
+            "numpy": np.__version__,
+            "scipy": scipy.__version__,
+            "time_units": "half_steps_2t",
+            "thresholds": {"lattice_relative": 0.01, "slope_absolute": 0.03,
+                           "saturation_relative": 0.01, "max_transitions": MAX_TRANSITION_OPS},
+        },
+        "numerical": {
+            "lattice": lattice,
+            "torus_saturation": {
+                f"d{d}_L{L}": {
+                    str(t): torus_even_return_fourier(d, L, t)
+                    for t in (4096, 8192)
+                } for d, L in ((1, 32), (2, 16))
+            },
+            "complete_K32": {str(t): complete_graph_even_return(32, t)
+                             for t in (4, 8)},
+        },
+    }
+
+
+if __name__ == "__main__":
+    import json
+
+    print(json.dumps(s0_reference_payload(), sort_keys=True, separators=(",", ":")))
