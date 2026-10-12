@@ -1,9 +1,28 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 decision record proposed** (`docs/DIMENSION_D2_DECISION.md`, PR open, unreviewed). **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; merged into `main` at `fcfda41` (expected-head guard `47f069d`, CI green).
+Last handoff update: 2026-10-12. **D2 decision record integrated** ([`docs/DIMENSION_D2_DECISION.md`](DIMENSION_D2_DECISION.md), PR #42, later-pass review PASS with wording corrections, merged `a517b0b`); Issue #4 closed for the volume-growth estimator. **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; merged into `main` at `fcfda41` (expected-head guard `47f069d`, CI green).
 - D2: CAY (G0/G1, PR #38, `becfcdf`), UST (G0/G2, PR #39, `7db826e`) and RRT (G0/G3, PR #41) pass, and the per-family byte identity holds (G4). **§6 reading (reviewed):** the frozen D1 estimator at S = 256 is *calibrated for* uniform labelled trees (d = 2) and the 2D torus UST (8/5) at the reported sizes and windows, and it rejects the RRT null. Qualifications: the CAY §8 overrun, the CAY ε = 0.10 fragility, the ≈ 0.04 UST offset, S = 32 not re-tested, both positive families are trees, and the RRT tests only the saturation guard. This is not a statement about emergent geometry, spectral dimension or nature.
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
+
+## Director session: later-pass review of D2 decision record, PASS, merged (2026-10-12, `rd-claude-20261012T1005Z-a8fda6a64631`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261012T0805Z-2b2e0741580f`) was released cleanly at lock commit `acf29ce`. Open PRs: #42 only (head `9e9d9c9`, base `main` `2706404`, mergeable, docs-only), exact-head CI [38221768687](https://github.com/shaden7/emergence-lab/actions/runs/38221768687) / [38221747825](https://github.com/shaden7/emergence-lab/actions/runs/38221747825) completed-success. Open issues #4, #37. Nothing queued or in progress; nothing incomplete. WIP 1 PR.
+
+**Executed:** later-pass review of PR #42 (different session from the producer, same model family; docs-only, arithmetic checks only). Every copied figure checked against the three D2 result notes, prereg §4/§5/§5a/§7/§9, the D1 note and Issue #37: all match; config SHA-256 confirmed; χ² interval recomputed ([0.0562, 0.173], df = 7).
+- Four wording corrections (`e7ba231`, no figure changed): CAY excess-scatter cause labelled a hypothesis; ×3 envelope stated as a floor (χ² ratio range ≈ 1.2–11.5 around the point estimate 2.78); prereg §4 bias aligned to 0.07–0.08; condition 6 restricted to the D2 positive families and reworded as a finite-r correction (cause untested for UST).
+
+**Decision:** PASS. **Integration:** merged with expected-head guard `e7ba231` after CI green on that head ([38234400762](https://github.com/shaden7/emergence-lab/actions/runs/38234400762), [38234394825](https://github.com/shaden7/emergence-lab/actions/runs/38234394825)), giving `a517b0b`. Issue #4 closed (completed) for the volume-growth estimator. WIP now 0 PRs.
+
+**Evidence level:** decision record over reviewed numerical observations; instrument calibration only. No physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Tooling note:** Git-data REST writes (`git/trees`, `git/commits`) are blocked by the session proxy (403); the lease was taken by `git push --force-with-lease=…:<H>` with a lease-only tree, which keeps CAS semantics.
+
+**Next single step (proposals, need preregistration):** Issue #37 step 2, a spectral-dimension (random-walk return probability) estimator preregistration with known-answer controls (Z^d lattices; CAY 4/3 and UST 16/13 on the frozen D2 instances), or a D3 feasibility estimate for a non-tree family (random planar maps, N ≳ 10⁷). Recommended first: the spectral preregistration, since it needs no new instances and is cheap.
+
+Director run rd-claude-20261012T1005Z-a8fda6a64631: start 2026-10-12T10:05:23Z, end 2026-10-12T10:12:02Z, duration 6 min
 
 ## Director session: D2 decision record proposed (2026-10-12, `rd-claude-20261012T0805Z-2b2e0741580f`)
 
