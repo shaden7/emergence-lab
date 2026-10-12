@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261012T0205Z-64ccb703e8eb",
-  "leaseId": "ded03bd2-f4fa-41f8-b012-1ac07349d838",
-  "acquiredAt": "2026-10-12T02:05:12Z",
-  "heartbeatAt": "2026-10-12T02:05:12Z",
-  "expiresAt": "2026-10-12T04:05:12Z",
-  "task": "Review/integrate open PRs #39 (D2 UST) and #40 (Pilot B result)",
-  "previousOwner": "rd-claude-20261012T0005Z-915e474a3b7b"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261012T0205Z-64ccb703e8eb"
 }
