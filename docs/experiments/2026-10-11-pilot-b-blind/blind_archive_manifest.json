@@ -1,0 +1,50 @@
+{
+ "all_gates_pass": true,
+ "beacon": {
+  "chain_hash": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+  "randomness": "f4ecbbbcd6100fcd8c7c62f7c2420f443baa05444b83b0ad22ec6c5e9549d60a",
+  "randomness_is_sha256_signature": true,
+  "round": 32983212,
+  "signature": "ab533dfe7fd5bddc83c1a0ad2ab6f388a6a5f9b9dab5f4f58cd5014b6eed3701a90125e9de3f3a7745cd62397b6ddd02",
+  "signature_verified": true,
+  "source_url": "https://api.drand.sh/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/32983212"
+ },
+ "blind_decisions_sha256": "c9129efce6a7f025519ba29d0d11cf8565dfa57302cb7dbd92b7e585c4c19bb1",
+ "dev_decisions_sha256": "6da5c8e328ffad3be6172bebf9c0a7a016db88a9abc943e958636724a5fd9f50",
+ "evidence_level": "one-shot blinded calibration of a frozen noise-aware bounded-speed test on stipulated linear ring dynamics; not a physics result",
+ "executing_commit": "0048198a8245687902edeef50cc230a50fe42c7b",
+ "files_sha256": {
+  "manifest.json": "c046b81d9791042c913b7d84a9b6103b09a667722555d6e7331fb537ef24e183",
+  "result.json": "fc3d78d95e6a9cb43dd88a32bee7e3f1fc2280cb9bb8169e93c93dff16c8a382",
+  "rows.csv": "bf2dc2c187e67d7cd828bd7de2391180bf7c3b323766350af794d15c0ebe124f"
+ },
+ "frozen_blobs": {
+  "configs/pilot_b.json": "cf08823f550b761300ce3ff539bb7ad2dc4d78ba",
+  "docs/PILOT_B_BLINDED_INTERVENTION_PREREGISTRATION.md": "dd5dbefe950add3341366224b76ba179326282c8",
+  "src/emergence_lab/pilot_b.py": "ddbd434dbf2b46d550859d2c8e55fb18909f1b94",
+  "src/emergence_lab/pilot_b_analyst.py": "8ec4da28b9ab1d79a85c93ef9c183f954ec847fa",
+  "src/emergence_lab/pilot_b_beacon.py": "2421bab1a22f7d0c5e17ce19b2e8e2d68da1e386"
+ },
+ "gates": {
+  "B_G0": true,
+  "B_G1": true,
+  "B_G2": true,
+  "B_G3": true,
+  "B_G4": true,
+  "B_G5": true
+ },
+ "key_hex": "faa3949bbe56a3d14abb2bb8fb0ffdcb91622a39da03ddde6a6a844d841c5c8d",
+ "phase": "blind",
+ "release_tag": "pilot-b-blind-v1",
+ "round": {
+  "merge_time": "2026-10-10T21:09:59Z",
+  "round": 32983212,
+  "round_unix": 1791753000,
+  "round_utc": "2026-10-11T21:10:00+00:00",
+  "target_unix": 1791752999
+ },
+ "schema": 1,
+ "stage1_merge_commit": "7780fc16a650d6be4a5bb49b755ff078a1568942",
+ "stage1_merge_time": "2026-10-10T21:09:59Z",
+ "workflow_run": "https://github.com/shaden7/emergence-lab/actions/runs/38181108016"
+}

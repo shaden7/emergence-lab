@@ -1,9 +1,30 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 UST family result reviewed PASS** (later-pass review, session `rd-claude-20261012T0005Z-915e474a3b7b`) in [PR #39](https://github.com/shaden7/emergence-lab/pull/39). **Merge pending:** the expected-head merge was refused by this session's permission layer (see the session entry).
-- D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
+Last handoff update: 2026-10-12. **D2 UST result integrated** ([PR #39](https://github.com/shaden7/emergence-lab/pull/39), merge `7db826e`). **Pilot B blind result reviewed PASS** in [PR #40](https://github.com/shaden7/emergence-lab/pull/40); its integration is recorded in the session entry below.
+- D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2, PR #39, `7db826e`) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
-- **Pilot B:** the owner dispatched `Pilot B stage-2 blind run (once only)` on `main` `0048198`. The run is [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016), started 2026-10-11T22:36:42Z, completed-success. Its artifact `pilot-b-blind-v1` (id 11718330257, 46 808 B) expires 2027-01-09. The result note and the decision record are proposed in [PR #40](https://github.com/shaden7/emergence-lab/pull/40): B-G0 to B-G6 pass, with a proposed GO only as a noise-aware calibration instrument. **They are not reviewed or integrated yet.**
+- **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
+
+## Director session: PR #39 merge, later-pass review of Pilot B result PASS (2026-10-12, `rd-claude-20261012T0205Z-64ccb703e8eb`)
+
+**Recovery audit:**
+- The previous lease (`rd-claude-20261012T0005Z-915e474a3b7b`) was released cleanly at lock commit `9d9114a`. Its handoff was on the PR #39 branch, not on `main`.
+- Open PRs: #39 (head `c774f6e`, docs-only on top of the reviewed `2b84a3a`) and #40 (head `fa01b33`). Both have completed-success CI on their exact heads: #39 [38187678413](https://github.com/shaden7/emergence-lab/actions/runs/38187678413) and [38187674772](https://github.com/shaden7/emergence-lab/actions/runs/38187674772); #40 [38187652455](https://github.com/shaden7/emergence-lab/actions/runs/38187652455) and [38187634094](https://github.com/shaden7/emergence-lab/actions/runs/38187634094).
+- Nothing was queued or in progress. `pilot-b-blind-run.yml` has exactly one run. Nothing was incomplete.
+
+**Integrated:** PR #39 was merged with the expected-head guard `c774f6e`, giving `7db826e`. The review was PASS by `rd-claude-20261012T0005Z-915e474a3b7b`.
+
+**Executed:** a later-pass review of PR #40 by a session that produced none of it (same model family). The details are in the review section of `docs/experiments/2026-10-11-pilot-b-blind.md`. The script is `docs/experiments/pilot_b_review_independent.py`, which does not use `emergence_lab`.
+- Release digests, beacon, key and round arithmetic all check out, and so do the frozen blobs and the single workflow run.
+- A frozen-code rerun reproduces the dev and blind decision digests, with local BLS verification.
+- An own re-derivation reproduces all flags, verdicts, r̂ and gate counts.
+- Own propagators reproduce S_true for all 40 instances (max |ΔS| 1.3·10⁻¹⁵), exterior zeros for all P instances, and the B-G4 detectable set.
+
+**Findings:** the claim "immutable release" was wrong, because GitHub reports `immutable: false`. It is corrected in the note and the decision record (wording only). The integrity of the release rests on the digests pinned in Git.
+
+**Decision:** PASS. **Evidence level:** reviewed numerical observation of a methodological calibration on stipulated models; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** D2 RRT. Decide the r4 budget before any RRT output exists. CAY took about 75 CPU-min against a projection of 50; the current stop is 75 min. Then make one invocation under the binding stop, then the repeat. Pilot B follow-ups (unknown σ, correlated noise, N3 grid coverage) are proposals only.
 
 ## Director session: later-pass review of D2 UST result, PASS (2026-10-12, `rd-claude-20261012T0005Z-915e474a3b7b`)
 
