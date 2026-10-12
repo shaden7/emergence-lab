@@ -111,7 +111,7 @@ def test_s0_g0_invalid_inputs_and_bounded_work():
     with pytest.raises(ValueError):
         graph_even_returns(_from_edges(3, np.array([0]), np.array([1])), 0, [1])
     asymmetric = _graph(3, [(0, 1), (1, 2)])
-    asymmetric.indices[asymmetric.indptr[1]] = 0  # corrupt undirected adjacency
+    asymmetric.indices[asymmetric.indptr[2]] = 0  # corrupt source-2 neighbour (1 -> 0)
     with pytest.raises(ValueError):
         graph_even_returns(asymmetric, 0, [1])
 
