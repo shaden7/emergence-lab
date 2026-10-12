@@ -1,6 +1,6 @@
 # Pilot B stage-2 blind run: result (prereg v1.0-r1), proposed
 
-**Status:** one-shot blinded calibration result, **proposed and awaiting a later-pass review**. This is methodology on stipulated linear ring dynamics, **not a physics result** and not a statement about signalling or causality in nature. The decision record is [PILOT_B_DECISION.md](../PILOT_B_DECISION.md).
+**Status:** one-shot blinded calibration result, **later-pass review PASS** (2026-10-12, see the review section at the end). This is methodology on stipulated linear ring dynamics, **not a physics result** and not a statement about signalling or causality in nature. The decision record is [PILOT_B_DECISION.md](../PILOT_B_DECISION.md).
 
 ## What ran
 
@@ -14,7 +14,7 @@
   - A preflight checked the round pin, the frozen code, the prereg and config pins, and that the time was ≥ R plus margin.
   - The dev set reproduced the stage-1 decision digest `6da5c8e3…`, and two dev invocations were byte-identical (B-G6).
   - The blind evaluation ran exactly once.
-  - The outputs were published as the immutable release [`pilot-b-blind-v1`](https://github.com/shaden7/emergence-lab/releases/tag/pilot-b-blind-v1) and re-verified after download. Byte copies are committed in `2026-10-11-pilot-b-blind/`.
+  - The outputs were published as the release [`pilot-b-blind-v1`](https://github.com/shaden7/emergence-lab/releases/tag/pilot-b-blind-v1) and re-verified after download. *(Review correction: GitHub reports this release as `immutable: false`, so its assets are not platform-immutable; integrity rests on the SHA-256 digests pinned in Git, which all five assets match.)* Byte copies are committed in `2026-10-11-pilot-b-blind/`.
 - Decision digest: `c9129efc…9bb1`.
 
 ## Director checks (this session, not the producer of the run; the same model family wrote the design and the code)
@@ -79,7 +79,39 @@ Detection by class, with Wilson 95 % intervals (descriptive):
 - Known σ and Gaussian white noise are stipulated. Unknown-σ and correlated noise are untested.
 - The blinding covers the specific instances, not the family design. Generator, analyst, workflow and this check were all written by the same AI model family (§6.5).
 
+## Later-pass review (2026-10-12, `rd-claude-20261012T0205Z-64ccb703e8eb`)
+
+This session produced neither the run, the result note nor the decision record. It is the same model family that designed, implemented and checked Pilot B, so this is an AI-mediated later-pass review, not independent peer review.
+
+Script: [`pilot_b_review_independent.py`](pilot_b_review_independent.py). It does not import `emergence_lab`. Environment: Director sandbox, Python 3.13.16, NumPy 2.5.3, SciPy 1.18.1, py_ecc 8.0.0.
+
+- **Provenance.**
+  - All five release assets' GitHub SHA-256 digests equal the committed copies.
+  - `randomness` = SHA-256(`signature`), and the key is recomputed per §6.3.
+  - Quicknet arithmetic (genesis 1692803367, period 3 s): round 32983212 is at 1791753000 = 2026-10-11T21:10:00Z. It is the first round at or after the stage-1 merge (`7780fc1`, 2026-10-10T21:09:59Z) plus 24 h.
+  - The frozen blobs of prereg, config, `pilot_b.py`, `pilot_b_analyst.py` and `pilot_b_beacon.py` are identical at `7780fc1`, `0048198` and current `main`.
+  - `pilot-b-blind-run.yml` has exactly one run (38181108016, `workflow_dispatch` by the owner, success).
+- **Frozen-code rerun** (not independent):
+  - The dev digest `6da5c8e3…` is reproduced.
+  - `pilot_b_blind execute` with the committed beacon verifies the BLS signature locally (`signature_verified: true`) and reproduces the blind decision digest `c9129efc…`.
+  - The gate blocks differ from CI only in last-ulp `max_abs_exterior_S` for four N1 instances (`expm`).
+- **Own re-derivation from `rows.csv`:**
+  - z = D/SE, z₁ = 2.8653 and z₂ = 3.1718 are recomputed.
+  - All detection flags (0 mismatches), all 40 verdicts and all r̂(t) are reproduced.
+  - The class counts match §3.
+  - B-G1 gives {37}, B-G2 gives {35, 37}, B-G3 gives C1 r = 0 detected and 0 spurious, and B-G5 gives the same 11 undetected N instances.
+- **Own propagators from the logged parameters:**
+  - Direct circular convolution for S1/S3/C2, the leapfrog recursion for S2, the Fourier heat kernel for N1, the FFT power-law stencil for N2 and a dense matrix power for N3 reproduce every logged S_true (max |ΔS| 1.3·10⁻¹⁵).
+  - Every exterior cell of every P instance is exactly 0.0.
+  - The B-G4 detectable set is {6, 15, 17, 18, 20} with the prereg bar 2 × 5.73·10⁻⁵. The code's bar of 2 × 5.7306·10⁻⁵ gives the same set, since no instance lies between the two.
+  - Limitation: the instance parameters themselves are re-derived from the key only by the frozen-code rerun, not by an independent generator.
+
+**Findings:**
+1. *Corrected in this note and in the decision record (wording only):* "immutable release" was replaced by a statement of the actual `immutable: false` status and the Git-pinned digests.
+2. *Non-blocking:* B-G2 compares r̂(t) with k·t, as preregistered. For S3 this is the radius bound, not the true support, which interference zeros can make smaller. It is conservative for the overestimate gate, so it is not a problem.
+
+**Decision: PASS.** The gates and decision rule were applied as preregistered. The GO is scoped exactly as in the decision record. There is no physics claim.
+
 ## Next
 
-1. A later-pass review of this note and of the decision record by a different session. Merge if PASS.
-2. Possible follow-ups, *proposals only, not authorised by this result*: an unknown-σ or correlated-noise variant, and a grid-coverage design for sparse shortcuts. Each needs its own preregistration.
+1. Possible follow-ups, *proposals only, not authorised by this result*: an unknown-σ or correlated-noise variant, and a grid-coverage design for sparse shortcuts. Each needs its own preregistration.

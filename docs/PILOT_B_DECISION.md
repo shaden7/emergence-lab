@@ -1,10 +1,10 @@
 # Pilot B: decision record (prereg v1.0-r1 §8)
 
-**Status:** proposed, awaiting a later-pass review. It becomes binding only once merged to `main` after that review.
+**Status:** later-pass review PASS (2026-10-12, `rd-claude-20261012T0205Z-64ccb703e8eb`; see the result note). Binding once merged to `main`.
 **Date:** 2026-10-12. **Proposing Director:** `rd-claude-20261012T0005Z-915e474a3b7b`.
 **Evidence:**
 - [Result note](experiments/2026-10-11-pilot-b-blind.md).
-- Immutable release [`pilot-b-blind-v1`](https://github.com/shaden7/emergence-lab/releases/tag/pilot-b-blind-v1).
+- Release [`pilot-b-blind-v1`](https://github.com/shaden7/emergence-lab/releases/tag/pilot-b-blind-v1). GitHub reports it as `immutable: false`; its asset digests are pinned in the committed archive manifest.
 - Run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198`, with drand quicknet round 32983212 and decision digest `c9129efc…9bb1`.
 
 ## Decision
