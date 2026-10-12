@@ -1,9 +1,9 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 UST family result reviewed PASS** (later-pass review, session `rd-claude-20261012T0005Z-915e474a3b7b`) in [PR #39](https://github.com/shaden7/emergence-lab/pull/39). Integration is recorded below once merged.
+Last handoff update: 2026-10-12. **D2 UST family result reviewed PASS** (later-pass review, session `rd-claude-20261012T0005Z-915e474a3b7b`) in [PR #39](https://github.com/shaden7/emergence-lab/pull/39). **Merge pending:** the expected-head merge was refused by this session's permission layer (see the session entry).
 - D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
-- **Pilot B:** the owner dispatched `Pilot B stage-2 blind run (once only)` on `main` `0048198`. The run is [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016), started 2026-10-11T22:36:42Z, completed-success. Its artifact `pilot-b-blind-v1` (id 11718330257, 46 808 B) expires 2027-01-09. **The result note and the prereg §6 decision record have not been written yet.**
+- **Pilot B:** the owner dispatched `Pilot B stage-2 blind run (once only)` on `main` `0048198`. The run is [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016), started 2026-10-11T22:36:42Z, completed-success. Its artifact `pilot-b-blind-v1` (id 11718330257, 46 808 B) expires 2027-01-09. The result note and the decision record are proposed in [PR #40](https://github.com/shaden7/emergence-lab/pull/40): B-G0 to B-G6 pass, with a proposed GO only as a noise-aware calibration instrument. **They are not reviewed or integrated yet.**
 
 ## Director session: later-pass review of D2 UST result, PASS (2026-10-12, `rd-claude-20261012T0005Z-915e474a3b7b`)
 
@@ -27,6 +27,23 @@ Last handoff update: 2026-10-12. **D2 UST family result reviewed PASS** (later-p
 **Evidence level:** reviewed numerical observation for the second of three D2 families. There is no §6 decision and no physics claim. Volume-growth dimension is not spectral dimension.
 
 **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Merge blocker:** CI was green on the reviewed head `2b84a3a` (push [38187264874](https://github.com/shaden7/emergence-lab/actions/runs/38187264874), PR [38187267889](https://github.com/shaden7/emergence-lab/actions/runs/38187267889)). The expected-head merge (`PUT /pulls/39/merge`, sha `2b84a3a`) was then refused by this session's tool permission classifier, as happened with PR #38. It was not retried through another tool. This handoff commit is docs-only on top of `2b84a3a`. The next Director or the owner should merge PR #39 with an expected-head guard, after confirming that the head is this handoff commit and that its CI is green.
+
+**Pilot B (also this session):**
+- The blind release was downloaded through the REST asset API. Its hashes match the archive manifest.
+- The key was recomputed from the beacon.
+- A local rerun of the frozen code reproduces the dev digest `6da5c8e3…` and the blind decision digest `c9129efc…`.
+- On zero-signal cells, z is consistent with N(0,1).
+- The result note, the decision record and the check script are proposed in [PR #40](https://github.com/shaden7/emergence-lab/pull/40), head `fa01b33`. A different session must review them.
+- WIP after this session: PRs #39 and #40.
+
+**Next single step:**
+1. Merge PR #39 once CI is green on its head; the review is PASS.
+2. A later-pass review of PR #40 by a different session.
+3. D2 RRT under `timeout 75m`, with the r4 budget decision before any RRT output exists.
+
+Director run rd-claude-20261012T0005Z-915e474a3b7b: start 2026-10-12T00:05:17Z, end 2026-10-12T00:21:07Z, duration 15 min
 
 ## Director session: D2 UST family executed, result proposed (2026-10-11, `rd-claude-20261011T2205Z-fa3ffc55355f`)
 
