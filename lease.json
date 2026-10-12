@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261012T1005Z-a8fda6a64631",
+  "leaseId": "b20725ab-e474-40d1-b45b-f27e0901c157",
+  "acquiredAt": "2026-10-12T10:05:56Z",
+  "heartbeatAt": "2026-10-12T10:05:56Z",
+  "expiresAt": "2026-10-12T12:05:56Z",
+  "task": "later-pass review of PR #42 (D2 decision record)",
   "previousOwner": "rd-claude-20261012T0805Z-2b2e0741580f"
 }
