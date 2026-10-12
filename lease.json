@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261012T2102Z-f9c07b65",
-  "leaseId": "f9c07b651fa4e669bfcd8c45ac9c1622",
-  "acquiredAt": "2026-10-12T21:02:08Z",
-  "heartbeatAt": "2026-10-12T21:02:08Z",
-  "expiresAt": "2026-10-12T23:02:08Z",
-  "task": "Issue #37 spectral-dimension estimator preregistration",
-  "previousOwner": "rd-claude-20261012T1005Z-a8fda6a64631"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261012T2102Z-f9c07b65"
 }
