@@ -1,0 +1,20 @@
+{
+ "budget": {
+  "cpu_seconds_max": 120,
+  "lightsail": false,
+  "output_mib_max": 5,
+  "ram_mib_max": 512
+ },
+ "code_commit": "0048198a8245687902edeef50cc230a50fe42c7b",
+ "cpu_seconds": 0.652,
+ "decisions_sha256": "c9129efce6a7f025519ba29d0d11cf8565dfa57302cb7dbd92b7e585c4c19bb1",
+ "gates_pass_B_G0_to_G5": true,
+ "numpy": "2.5.3",
+ "outputs": {
+  "result.json": "fc3d78d95e6a9cb43dd88a32bee7e3f1fc2280cb9bb8169e93c93dff16c8a382",
+  "rows.csv": "bf2dc2c187e67d7cd828bd7de2391180bf7c3b323766350af794d15c0ebe124f"
+ },
+ "phase": "blind",
+ "python": "3.12.15",
+ "scipy": "1.18.1"
+}

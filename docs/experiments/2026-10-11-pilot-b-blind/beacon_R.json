@@ -1,0 +1,9 @@
+{
+ "chain_hash": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+ "randomness": "f4ecbbbcd6100fcd8c7c62f7c2420f443baa05444b83b0ad22ec6c5e9549d60a",
+ "randomness_is_sha256_signature": true,
+ "round": 32983212,
+ "signature": "ab533dfe7fd5bddc83c1a0ad2ab6f388a6a5f9b9dab5f4f58cd5014b6eed3701a90125e9de3f3a7745cd62397b6ddd02",
+ "signature_verified": true,
+ "source_url": "https://api.drand.sh/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/32983212"
+}
