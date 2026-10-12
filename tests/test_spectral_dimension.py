@@ -8,6 +8,7 @@ from emergence_lab.dimension_d1 import _from_edges, torus_lattice
 from emergence_lab.spectral_dimension import (
     complete_graph_even_return,
     graph_even_returns,
+    has_powerlaw_headroom,
     infinite_lattice_even_return,
     is_saturated,
     local_spectral_slope,
@@ -140,3 +141,18 @@ def test_s0_g4_numeric_output_byte_deterministic():
     b = np.array(list(graph_even_returns(g, 0, [1, 2, 4]).values()),
                  dtype=np.float64).tobytes()
     assert a == b
+
+def test_finite_size_fake_dimension_reduction_is_censored_before_full_mixing():
+    # On the *same known-2D lattice*, d_s,eff has already fallen well below 2.
+    # This is not a discovery of a new short-scale dimension.
+    floor = 2.0 / (64 * 64)  # even-time stationary limit for bipartite torus
+    q32 = torus_even_return_fourier(2, 64, 32)
+    q256 = torus_even_return_fourier(2, 64, 256)
+    q512 = torus_even_return_fourier(2, 64, 512)
+    assert has_powerlaw_headroom(q32, floor)
+    assert not has_powerlaw_headroom(q256, floor)
+    assert not has_powerlaw_headroom(q256, floor, ratio=5)
+    assert not is_saturated(q256, floor)  # not yet within 1% of stationarity
+    assert local_spectral_slope(q256, q512) < 1.9
+    with pytest.raises(ValueError):
+        has_powerlaw_headroom(q256, floor, ratio=0)
