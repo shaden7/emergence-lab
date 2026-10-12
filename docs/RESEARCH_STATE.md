@@ -1,6 +1,6 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 UST result integrated** ([PR #39](https://github.com/shaden7/emergence-lab/pull/39), merge `7db826e`). **Pilot B blind result reviewed PASS** in [PR #40](https://github.com/shaden7/emergence-lab/pull/40); its integration is recorded in the session entry below.
+Last handoff update: 2026-10-12. **D2 UST result integrated** ([PR #39](https://github.com/shaden7/emergence-lab/pull/39), merge `7db826e`). **Pilot B blind result reviewed PASS** in [PR #40](https://github.com/shaden7/emergence-lab/pull/40); merged into `main` at `037606b` (expected-head guard `4f28ff7`, CI green).
 - D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2, PR #39, `7db826e`) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
@@ -25,6 +25,10 @@ Last handoff update: 2026-10-12. **D2 UST result integrated** ([PR #39](https://
 **Decision:** PASS. **Evidence level:** reviewed numerical observation of a methodological calibration on stipulated models; no physics claim. **Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
 
 **Next single step:** D2 RRT. Decide the r4 budget before any RRT output exists. CAY took about 75 CPU-min against a projection of 50; the current stop is 75 min. Then make one invocation under the binding stop, then the repeat. Pilot B follow-ups (unknown σ, correlated noise, N3 grid coverage) are proposals only.
+
+**Merge follow-up:** PR #40 was merged with the expected-head guard `4f28ff7`, after CI was green on that exact head ([38194734035](https://github.com/shaden7/emergence-lab/actions/runs/38194734035), [38194730448](https://github.com/shaden7/emergence-lab/actions/runs/38194730448)), giving `037606b`. WIP is now 0 PRs. RRT was not started this session, because the r4 budget decision should come first and two 75-min invocations would not fit within one lease without several heartbeats.
+
+Director run rd-claude-20261012T0205Z-64ccb703e8eb: start 2026-10-12T02:04:39Z, end 2026-10-12T02:13:17Z, duration 9 min
 
 ## Director session: later-pass review of D2 UST result, PASS (2026-10-12, `rd-claude-20261012T0005Z-915e474a3b7b`)
 
