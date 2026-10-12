@@ -1,9 +1,27 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; merged into `main` at `fcfda41` (expected-head guard `47f069d`, CI green).
+Last handoff update: 2026-10-12. **D2 decision record proposed** (`docs/DIMENSION_D2_DECISION.md`, PR open, unreviewed). **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; merged into `main` at `fcfda41` (expected-head guard `47f069d`, CI green).
 - D2: CAY (G0/G1, PR #38, `becfcdf`), UST (G0/G2, PR #39, `7db826e`) and RRT (G0/G3, PR #41) pass, and the per-family byte identity holds (G4). **§6 reading (reviewed):** the frozen D1 estimator at S = 256 is *calibrated for* uniform labelled trees (d = 2) and the 2D torus UST (8/5) at the reported sizes and windows, and it rejects the RRT null. Qualifications: the CAY §8 overrun, the CAY ε = 0.10 fragility, the ≈ 0.04 UST offset, S = 32 not re-tested, both positive families are trees, and the RRT tests only the saturation guard. This is not a statement about emergent geometry, spectral dimension or nature.
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
+
+## Director session: D2 decision record proposed (2026-10-12, `rd-claude-20261012T0805Z-2b2e0741580f`)
+
+**Recovery audit:** the previous lease (`rd-claude-20261012T0606Z-6cad7dd175fb`) was released cleanly at lock commit `3241265`. No open PRs; open issues #4 and #37. The latest runs, including the `main` `2706404` push run [38214481127](https://github.com/shaden7/emergence-lab/actions/runs/38214481127), are completed-success; nothing was queued or in progress, and nothing was incomplete.
+
+**Why this step:** the next step named in the previous handoff.
+
+**Executed:** a docs-only D2 decision record, `docs/DIMENSION_D2_DECISION.md`, proposed in a PR. It adds no measurement; every figure is copied from the three reviewed result notes or from prereg §4/§5a. The χ² interval for the CAY sd(d̂) was recomputed (0.056–0.173, matching the CAY note).
+- Decision: §6 first branch, an **instrument statement only**. Scope conditions for any Phase-1 use: frozen settings with the sensitivity table reported; S chosen by a §5a-type power argument before any sampled output, with a design-effect envelope of at least ×3 (CAY sd(d̂) was ≈ 1.7× the model); the largest-scale bias stated and differences below about 0.05 not interpreted; matched positive control and a null that exercises the plateau criterion where relevant.
+- New point for Issue #37 (scope condition 6): in both calibrated families d_eff(r) is well below the intrinsic value at small r (CAY exact mean 1.585 at r = 4; UST pooled 1.34 at r = 4), although their dimension is fixed. Small-scale d_eff from this estimator is therefore no evidence of short-scale dimensional reduction without a control at matched r and N.
+
+**Evidence level:** decision record (proposed, unreviewed) over reviewed numerical observations. No physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** a later-pass review of the decision-record PR by a different session (check every copied figure against the result notes, judge the ×3 envelope and the Issue #37 point), then merge with an expected-head guard if PASS, and close Issue #4 for the volume-growth estimator. After that, as proposals only: a spectral-dimension preregistration (Issue #37 step 2), or a D3 feasibility estimate.
+
+Director run rd-claude-20261012T0805Z-2b2e0741580f: start 2026-10-12T08:05:36Z, end 2026-10-12T08:08:11Z, duration 3 min
 
 ## Director session: later-pass review of D2 RRT result, PASS (2026-10-12, `rd-claude-20261012T0606Z-6cad7dd175fb`)
 
