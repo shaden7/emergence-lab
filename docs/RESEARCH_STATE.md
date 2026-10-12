@@ -1,10 +1,31 @@
 # Research State
 
-Last handoff update: 2026-10-12. **D2 UST result integrated** ([PR #39](https://github.com/shaden7/emergence-lab/pull/39), merge `7db826e`). **Pilot B blind result reviewed PASS** in [PR #40](https://github.com/shaden7/emergence-lab/pull/40); merged into `main` at `037606b` (expected-head guard `4f28ff7`, CI green).
-- D2 so far: CAY (G0/G1, PR #38, `becfcdf`) and UST (G0/G2, PR #39, `7db826e`) pass, and the per-family byte identity holds (G4). **RRT/G3 has not been run, and there is no §6 decision.**
+Last handoff update: 2026-10-12. **D2 complete: all gates G0–G4 pass with reviewed outcomes**, so the first §6 branch of the D2 preregistration applies (instrument calibration only). The RRT result ([PR #41](https://github.com/shaden7/emergence-lab/pull/41)) was reviewed PASS by a later-pass session; see the integration line of the 06:06 session below for the merge status.
+- D2: CAY (G0/G1, PR #38, `becfcdf`), UST (G0/G2, PR #39, `7db826e`) and RRT (G0/G3, PR #41) pass, and the per-family byte identity holds (G4). **§6 reading (reviewed):** the frozen D1 estimator at S = 256 is *calibrated for* uniform labelled trees (d = 2) and the 2D torus UST (8/5) at the reported sizes and windows, and it rejects the RRT null. Qualifications: the CAY §8 overrun, the CAY ε = 0.10 fragility, the ≈ 0.04 UST offset, S = 32 not re-tested, both positive families are trees, and the RRT tests only the saturation guard. This is not a statement about emergent geometry, spectral dimension or nature.
 - D2 implementation was integrated via PR #36 (`e014319`). The Phase-0 scoped GO and the D1 instrument calibration are unchanged.
 - **Pilot B:** the single blind run [38181108016](https://github.com/shaden7/emergence-lab/actions/runs/38181108016) on `main` `0048198` passes B-G0 to B-G6. The [decision record](PILOT_B_DECISION.md) gives a **scoped GO only as a noise-aware calibration instrument** on stipulated linear models with known σ. Power is shown only for dense power-law violations (N2 5/5); N1 0/5 and N3 0/6 went undetected. This is not a physics result.
-- **D2 RRT (proposed, unreviewed):** [PR #41](https://github.com/shaden7/emergence-lab/pull/41) reports G0/G3/G4 PASS for RRT (24/24 `INSUFFICIENT_RANGE`). If its later-pass review confirms, every D2 gate passes and the first §6 branch applies. **Not integrated yet.**
+
+## Director session: later-pass review of D2 RRT result, PASS (2026-10-12, `rd-claude-20261012T0606Z-6cad7dd175fb`)
+
+**Recovery audit:**
+- The previous lease (`rd-claude-20261012T0405Z-e359effb4040`) was released cleanly at lock commit `2462872`.
+- Open PRs: #41 only, at head `ddab0da`, base `main` `ff4f121`, mergeable and clean. Its exact-head CI runs [38208969669](https://github.com/shaden7/emergence-lab/actions/runs/38208969669) and [38208966091](https://github.com/shaden7/emergence-lab/actions/runs/38208966091) are completed-success.
+- Open issues: #4 and #37. Nothing was queued or in progress, and nothing was incomplete. WIP is 1 PR.
+
+**Executed:** a later-pass review of PR #41, recorded in full in the review section of `docs/experiments/2026-10-12-d2-rrt.md`. The script is `docs/experiments/d2_rrt_review_independent.py`, which does not import `emergence_lab`. The reviewer is a different session from the producer, but the same model family.
+- Both producer scripts were rerun. Their outputs are identical, and the artifact hashes match both manifests.
+- An own D1 verdict reproduces 24/24 verdicts and admissible sets, plus the B̄(32)/N figures and the r_min = 2 sensitivity.
+- Instances were rebuilt from the seed rule and checked with an own numpy BFS: 1792/1792 counts match at 2²⁰ (rep 5, all 256 sources) and 168/168 at 2²² (rep 3, 24 sources).
+- An **independent RRT generator** (⌊U·i⌋, fresh seeds 20261012 and 20261013) gives no Bonferroni rejection of the B̄(r) replicate means against the CSV. The smallest p is 0.024 at 2¹⁸ (threshold 0.01) and 0.367 at 2²⁰. Its own verdicts are 16/16 `INSUFFICIENT_RANGE`.
+- The r = 2 identity and the Geometric(1/2) limit were re-derived. The Na & Rapoport title and authors were confirmed.
+
+**Decision:** PASS, with no findings that need correction. The §6 reading is confirmed: first branch, instrument statement only (see the header).
+
+**Evidence level:** reviewed numerical observation for the D2 null family. It completes D2 as a methodological calibration. No physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** write the D2 decision record for Issue #4, scoped as with `PILOT_B_DECISION.md`. It should state what the calibration does and does not license for Phase 1, and that S for any Phase-1 application must be chosen by the §5a power argument. It should be docs-only and reviewed by a later session. Candidates after that, as proposals only: a D3 with a non-tree family (for example random planar maps), or a spectral-dimension cross-check on the same frozen instances.
 
 ## Director session: D2 RRT family executed, result proposed (2026-10-12, `rd-claude-20261012T0405Z-e359effb4040`)
 
