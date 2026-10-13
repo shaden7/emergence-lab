@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261013T200856Z-v489wv2o",
+  "leaseId": "lg0t5yxkeyk-y9lnibg8fiq-swplr32sr4p",
+  "acquiredAt": "2026-10-13T20:08:56.463Z",
+  "heartbeatAt": "2026-10-13T20:08:56.463Z",
+  "expiresAt": "2026-10-13T22:08:56.463Z",
+  "task": "Validate GitHub research-lock commit flow",
   "previousOwner": "rd-claude-20261013T0704Z-325a097e3638"
 }
