@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261013T201243Z-qbiba4sao",
-  "leaseId": "ybfms2jr8e-vnwbz56bsa-cmt7cb6dwd-6krn49jkksy",
-  "acquiredAt": "2026-10-13T20:12:43.721Z",
-  "heartbeatAt": "2026-10-13T20:12:43.721Z",
-  "expiresAt": "2026-10-13T22:12:43.721Z",
-  "task": "Document bounded, safe transient GitHub lease error handling",
-  "previousOwner": "rd-gpt6-20261013T200856Z-v489wv2o"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261013T201243Z-qbiba4sao"
 }
