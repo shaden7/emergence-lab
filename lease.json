@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261013T0704Z-325a097e3638",
+  "leaseId": "8341fe88-39ad-49f9-a57e-ddd33fc9883d",
+  "acquiredAt": "2026-10-13T07:04:01Z",
+  "heartbeatAt": "2026-10-13T07:04:01Z",
+  "expiresAt": "2026-10-13T09:04:01Z",
+  "task": "Director run: orient, review, S1 spectral feasibility preregistration (Issue #37)",
   "previousOwner": "rd-gpt6-20261012T2102Z-f9c07b65"
 }
