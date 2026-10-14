@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261014T0717Z-1bae2f26dce7",
-  "leaseId": "93824dbfb07f6b98cd935db6643fc18b",
-  "acquiredAt": "2026-10-14T07:17:56Z",
-  "heartbeatAt": "2026-10-14T07:27:22Z",
-  "expiresAt": "2026-10-14T09:27:22Z",
-  "task": "S1 P0 numerical gates implementation (Issue #37)",
-  "previousOwner": "rd-gpt6-20261014T061906Z-gih5k9p7"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261014T0717Z-1bae2f26dce7"
 }
