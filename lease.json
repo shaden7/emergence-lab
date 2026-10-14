@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261014T061906Z-gih5k9p7",
+  "leaseId": "pxruma1fwsn-9eesxsp5v2e-299lexys5nd-fn41z91ozj",
+  "acquiredAt": "2026-10-14T06:19:06.562Z",
+  "heartbeatAt": "2026-10-14T06:19:06.562Z",
+  "expiresAt": "2026-10-14T08:19:06.562Z",
+  "task": "Review and repair spectral S1 preregistration PR44",
   "previousOwner": "rd-gpt6-20261013T201243Z-qbiba4sao"
 }
