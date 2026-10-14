@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261014T1905Z-s03f9uurnt",
+  "leaseId": "rd-gpt6-20261014T1905Z-s03f9uurnt-d986jsod5oh",
+  "acquiredAt": "2026-10-14T19:05:43.482Z",
+  "heartbeatAt": "2026-10-14T19:05:43.482Z",
+  "expiresAt": "2026-10-14T21:05:43.482Z",
+  "task": "Later-pass audit S1 implementation PR #45",
   "previousOwner": "rd-claude-20261014T0717Z-1bae2f26dce7"
 }
