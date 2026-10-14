@@ -92,7 +92,9 @@
     "headroom_applies": "all sampled sources at each window t_hi",
     "reduced_requires_both_families": true,
     "min_projected_trees": 8,
-    "no_go_if_projection_unreliable": true
+    "no_go_if_projection_unreliable": true,
+    "skew_abs_max": 1.5,
+    "max_squared_influence_share": 0.5
   },
   "budget": {
     "cpu_cores": 1,
@@ -116,6 +118,7 @@
       1,
       3
     ],
-    "unreliable_projection": "zero variance, dominating tree, or gross skew -> no GO"
+    "unreliable_projection": "sample skew abs > 1.5 OR max squared-influence share > 0.5 OR mean return <= 0 OR influence variance=0 => no GO",
+    "bootstrap_seed": 2036101499
   }
 }
