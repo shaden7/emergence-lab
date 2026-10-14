@@ -1,6 +1,31 @@
 # Research State
 
-Last handoff update: 2026-10-12. **S0 spectral-dimension analytical instrument calibration merged**, PR [#43](https://github.com/shaden7/emergence-lab/pull/43), merge `fd91bfb`, review PASS (producer self-review, not independent); exact-head push/PR CI both green. The new [preregistration](SPECTRAL_S0_PREREGISTRATION.md) and updated [research plan](research-plan.md) implement Issue [#37](https://github.com/shaden7/emergence-lab/issues/37) step 2's **first analytical stage only**; CAY and UST spectral calibration (S1) and model comparisons remain unstarted. The previously reviewed D2 result is unchanged.
+Last handoff update: 2026-10-13. **S1 spectral feasibility/power pilot preregistration under later-pass correction** (v0.2 design only, PR #44; no pilot data, integration subject to CI and review). Previous: **S0 spectral-dimension analytical instrument calibration merged**, PR [#43](https://github.com/shaden7/emergence-lab/pull/43), merge `fd91bfb`, review PASS (producer self-review, not independent); exact-head push/PR CI both green. The new [preregistration](SPECTRAL_S0_PREREGISTRATION.md) and updated [research plan](research-plan.md) implement Issue [#37](https://github.com/shaden7/emergence-lab/issues/37) step 2's **first analytical stage only**; CAY and UST spectral calibration (S1) and model comparisons remain unstarted. The previously reviewed D2 result is unchanged.
+
+## Later-pass S1 preregistration review (2026-10-14; design-only correction, PR #44)
+
+**Scope:** second-session critical review of the v0.1 proposal; no S1 tree random walk has been measured, no model calibration verdict. Known reference values CAY 4/3 and 2D UST 16/13 remain literature targets. The primary annealed slope (log of mean return probabilities) differs nonlinearly from an average of tree-specific slopes, so the original power projection did not target the declared observable. The proposed equivalence and reduced-GO rules also needed correction. A scaling-only finite-size illustration at N=65536, t=4096 and degree 2 gives headroom about 128 for unit return-probability prefactor (not ≥10000). Runtime estimates lacked evidence.
+
+**Revision:** proposed v0.2 in the existing PR: approximate tree-cluster delta-method variance and fixed S=32, descriptive whole-tree bootstrap and 3× variance sensitivity, prospective ±0.03 size-equivalence gate requiring its 90% CI to fit entirely inside the margin, unambiguous two-family GO, explicit drift/headroom conditions, no unmeasured wall-time claims. The choice of ±0.03 is an engineering threshold, not literature. No pilot seeds drawn; CI/merge status to be verified before claiming integration. See `docs/experiments/2026-10-14-s1-prereg-review.md`.
+
+**Next step:** exact-head CI plus independent file/content audit; only merge if final design is consistent. Then implement P0 numerical gates separately before sampling pilot seeds. No Lightsail activity or additional spending.
+
+## Director session: S1 spectral feasibility/power pilot preregistration, proposed (2026-10-13, `rd-claude-20261013T0704Z-325a097e3638`)
+
+**Recovery audit:** previous lease `rd-gpt6-20261012T2102Z-f9c07b65` released cleanly (lock head `39ee2d8`, idle). No open PRs; open issue #37 only. `main` `d05ffbe`, push CI [38309453767](https://github.com/shaden7/emergence-lab/actions/runs/38309453767) completed-success; the last 8 runs all completed-success, nothing queued or in progress. Nothing incomplete. WIP 0 → 1 PR.
+
+**Why this step:** the next step named in the S0 handoff (S0 prereg §5): an S1 feasibility/power preregistration on non-gated seeds before any spectral measurement on CAY/UST.
+
+**Executed (design only):** `docs/SPECTRAL_S1_PREREGISTRATION.md` v0.1 and `configs/spectral_s1_pilot.json`, proposed in a PR. Key choices: killed-ball kernel with a certified bracket q_R ≤ q ≤ q_R + killed mass (η = 1e-4), because the S0 full-graph kernel's 10⁸-operation cap cannot reach N ≳ 2¹⁸, T = 2¹²; pilot CAY N ∈ {2¹⁶, 2¹⁸}, UST L ∈ {128, 256}, 8 trees × 32 sources each, RRT null, Z² torus and exact N = 5–7 enumeration controls; fresh `seed_base 2036101301` (D2 instances not reused); STOP gates P0a–P0d (engineering only), no tolerance on measured d_s; a fixed GO / reduced / NO-GO rule on the projected 95 % half-width (0.03 / 0.05) within 180 CPU-min per family for a later gated S2. Precision is the core issue: 4/3 − 16/13 ≈ 0.103, four times smaller than the volume-growth gap.
+- Checks run: config parses; seed base unique by grep; existing tests `test_dimension_d2`, `test_spectral_dimension`, `test_archive_evidence` pass locally (50 passed, Python 3, NumPy 2.5.3, SciPy 1.18.1). The bracket inequality and even-time monotonicity were sanity-checked on a deterministic path graph only (no tree sampled). Cost figures in §6 are order-of-magnitude projections, not measurements.
+
+**Evidence level:** proposed, unreviewed design. Literature targets (Kesten 1986; Barlow & Kumagai 2006; Barlow & Masson 2011) are cited, not measured. No physics claim.
+
+**Deployment:** none. No Lightsail or EatSleepFeel interaction, no spending.
+
+**Next single step:** later-pass review of the S1 PR by a different session (check the bracket argument, the variance projection, the seed rule, the references and whether the decision thresholds are sensible), merge with an expected-head guard if PASS; then a separate implementation PR (`spectral_s1.py`, P0 tests) before any pilot seed is drawn.
+
+Director run rd-claude-20261013T0704Z-325a097e3638: start 2026-10-13T07:03:30Z, end 2026-10-13T07:09:38Z, duration 6 min
 
 ## Director session: S0 spectral instrument, reviewed PASS and merged (2026-10-12, rd-gpt6-20261012T2102Z-f9c07b65)
 

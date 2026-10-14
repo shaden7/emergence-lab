@@ -1,0 +1,124 @@
+{
+  "name": "spectral_s1_pilot",
+  "protocol": "docs/SPECTRAL_S1_PREREGISTRATION.md",
+  "version": "0.2",
+  "status": "later-pass corrected design; no seed drawn",
+  "issue": 37,
+  "observable": "q_v(t) = [P^(2t)]_vv, simple random walk, uniform sources without replacement, annealed mean before logs (S0 section 2)",
+  "half_times": "dyadic 1..T",
+  "T_default": 4096,
+  "T_ladder": [
+    4096,
+    2048,
+    1024
+  ],
+  "kernel": {
+    "type": "killed ball, certified bracket",
+    "R_start": 64,
+    "R_rule": "double until killed mass at 2T <= eta * q_R(2T) or R >= 2T",
+    "eta": 0.0001,
+    "per_source_edge_step_cap": 2000000000
+  },
+  "families": {
+    "cayley_uniform_tree": {
+      "N": [
+        65536,
+        262144
+      ],
+      "trees": 8,
+      "sources": 32
+    },
+    "ust_2d_torus": {
+      "L": [
+        128,
+        256
+      ],
+      "trees": 8,
+      "sources": 32
+    },
+    "random_recursive_tree": {
+      "N": [
+        65536
+      ],
+      "trees": 4,
+      "sources": 32
+    }
+  },
+  "controls": {
+    "z2_torus": {
+      "L": 64,
+      "sources": 32,
+      "max_half_time": 256
+    },
+    "cayley_exact_enumeration": {
+      "N": [
+        5,
+        6,
+        7
+      ],
+      "half_times": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  },
+  "family_index_order": [
+    "cayley_uniform_tree",
+    "ust_2d_torus",
+    "random_recursive_tree"
+  ],
+  "seed_base": 2036101301,
+  "seed_rule": "np.random.SeedSequence([seed_base, i_family, i_size, i_rep]) with PCG64; sources from a child of the same sequence (as D2)",
+  "stop_gates": {
+    "P0a": "exact enumeration <= 1e-12",
+    "P0b": "killed-ball vs S0 full kernel <= 1e-12; bracket contains exact",
+    "P0c": "Z2 torus within certified bracket of S0 Fourier",
+    "P0d": "manifest + byte-identical CSV rerun"
+  },
+  "decision_rule": {
+    "window_min_slopes": 3,
+    "t_lo_min": 8,
+    "headroom": 10,
+    "go_full_halfwidth": 0.03,
+    "go_reduced_halfwidth": 0.05,
+    "s2_budget_cpu_min_per_family": 180,
+    "variance_projection": "tree-level influence variance of annealed slope; chi-square df=7 approximate upper 95% limit; S=32 fixed",
+    "size_equivalence_margin": 0.03,
+    "size_equivalence_ci_level": 0.9,
+    "size_equivalence_rule": "CI fully within [-0.03, 0.03], NOT merely containing zero",
+    "max_adjacent_dyadic_slope_difference": 0.1,
+    "headroom_applies": "all sampled sources at each window t_hi",
+    "reduced_requires_both_families": true,
+    "min_projected_trees": 8,
+    "no_go_if_projection_unreliable": true,
+    "skew_abs_max": 1.5,
+    "max_squared_influence_share": 0.5
+  },
+  "budget": {
+    "cpu_cores": 1,
+    "max_memory_gib": 2,
+    "max_cpu_minutes_total": 120,
+    "ladder_trigger_cpu_min_per_family": 45,
+    "hard_stop": "1.5x projection or 120 CPU-min",
+    "lightsail": false,
+    "network_during_run": false,
+    "timing_projection": "unknown until measured; edge-step operation count is not a wall-time benchmark"
+  },
+  "statistics": {
+    "primary": "slope_of_mean_q_at_two_times",
+    "independent_unit": "tree",
+    "sources_per_tree_fixed": 32,
+    "tree_delta_influence": "ratio-of-means log-slope influence",
+    "variance_upper_method": "chi2_normal_theory_95pct_df_7_approximation",
+    "bootstrap_tree_resamples": 4096,
+    "bootstrap_diagnostic_only": true,
+    "variance_sensitivity_multipliers": [
+      1,
+      3
+    ],
+    "unreliable_projection": "sample skew abs > 1.5 OR max squared-influence share > 0.5 OR mean return <= 0 OR influence variance=0 => no GO",
+    "bootstrap_seed": 2036101499
+  }
+}
