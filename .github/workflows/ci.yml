@@ -110,6 +110,16 @@ jobs:
         run: |
           python -m emergence_lab.burnin_replication --config configs/exact4_burnin_replication.json --output results/burnin_replication.json | tee results/burnin_replication.txt
           python -c "import json; r=json.load(open('results/burnin_replication.json')); print('::notice title=Burn-in replication raw::' + ' '.join('%s=%s' % kv for kv in r['raw_digests'].items()) + ' python=' + r['environment']['python'] + ' numpy=' + r['environment']['numpy']); [print('::notice title=Burn-in %s::mean=%r se=%r t=%r p=%r verdict=%s' % (p['id'], p['mean'], p['stderr'], p['t'], p['p'], p['verdict'])) for p in r['analysis']['primary']]"
+      # S1 (Issue #37): P0a-P0d engineering gates only, engineering seed base; no pilot seed drawn.
+      - name: S1 spectral P0 engineering gates (P0a-P0d)
+        timeout-minutes: 5
+        env:
+          GIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.spectral_s1 --output results/spectral_s1_p0.json
+          python -c "import json; r=json.load(open('results/spectral_s1_p0.json')); print('::notice title=S1 P0::' + json.dumps({k: r[k]['pass'] for k in ('P0a','P0b','P0c','P0d')}) + ' p0a_max_err=' + json.dumps({n: c['max_abs_error'] for n, c in r['P0a']['cases'].items()}) + ' p0d_sha=' + r['P0d']['csv_sha256'][0] + ' python=' + r['manifest']['python'] + ' numpy=' + r['manifest']['numpy'])"
       - name: Preregistered many-batch coverage gate (report gate 4)
         if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/coverage-gate-20261010' || github.ref == 'refs/heads/main')
         timeout-minutes: 45
