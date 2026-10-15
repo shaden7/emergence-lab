@@ -638,10 +638,16 @@ def run_pilot(design: dict, outdir: Path, root: Path = Path("."), families=None,
         fr = next((r for r in runs if r.family == fam), None)
         fam_dec[fam] = (decide_family(design, fr, analyses[fam]) if fr is not None else
                         {"family": fam, "h": None, "failures": {"family": "not run"}})
+    # Record the exact SeedSequence tuples of trees actually generated, including
+    # tree 0 of a blocked or partially completed family. Do not claim planned trees ran.
+    seed_tuples = sorted({
+        (design["seed_base"], s1.FAMILY_ORDER.index(fr.family), r.i_size, r.i_rep)
+        for fr in runs for r in fr.records
+    })
     report = {
         "mode": design["mode"],
         "design": design,
-        "manifest": s1.manifest(root, seeds=[[design["seed_base"], "i_family", "i_size", "i_rep"]]),
+        "manifest": s1.manifest(root, seeds=[list(seed) for seed in seed_tuples]),
         "families": analyses,
         "P6_null_note": "RRT is a null without finite dimension; reported, not gated",
         "family_decisions": fam_dec,
