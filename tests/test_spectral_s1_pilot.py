@@ -229,3 +229,66 @@ def test_exhausted_budget_before_families_is_no_go(cfg, tmp_path):
     rep = sp.run_pilot(tiny(cfg, total_cpu_s=0.0), tmp_path, controls=False)
     assert all(a["status"] == "PARTIAL" for a in rep["families"].values())
     assert rep["decision"]["verdict"] == "NO-GO (scoped)" and not rep["budget"]["within_total"]
+
+
+def test_numeric_csv_is_rectangular_across_ladder_horizons():
+    import csv
+    import io
+
+    def family(fam, T, size):
+        res = s1.KilledBallResult(0, 1, 4, T, 3, 4, np.full(T, 0.25), np.zeros(T))
+        rec = sp.SourceRecord(fam, size, 0, 0, T, 10, res, 0, 0, 0)
+        return sp.FamilyRun(fam, T=T, records=[rec])
+
+    rows = list(csv.reader(io.StringIO(sp.numeric_csv([
+        family(CAY, 8, 256), family(UST, 4, 16), family(RRT, 2, 256)
+    ]).decode())))
+    header = rows[0]
+    assert len(rows) == 4 and sum(row[0] == "family" for row in rows) == 1
+    assert len({len(row) for row in rows}) == 1
+    assert header[-4:] == ["q_t1", "q_t2", "q_t4", "q_t8"]
+    assert [row[header.index("T")] for row in rows[1:]] == ["8", "4", "2"]
+    assert rows[2][-1] == "" and rows[3][-2:] == ["", ""]
+    assert rows[1][-1] == "0.25"
+
+
+def test_exceeding_budget_on_final_tree_marks_partial(cfg, monkeypatch):
+    d = tiny(cfg)
+    original = sp._run_tree
+    calls = {"n": 0}
+
+    def counted(*args, **kwargs):
+        result = original(*args, **kwargs)
+        calls["n"] += 1
+        return result
+
+    monkeypatch.setattr(sp, "_run_tree", counted)
+    budget = sp.Budget(1000.0)
+    monkeypatch.setattr(budget, "exceeded", lambda: calls["n"] >= 16)
+    fr = sp.run_family(d, CAY, budget)
+    assert calls["n"] == 16 and fr.status == "PARTIAL"
+    assert any("final tree" in reason for reason in fr.notes)
+
+
+def test_control_stop_vetoes_positive_decision(cfg, tmp_path, monkeypatch):
+    d = tiny(cfg)
+    monkeypatch.setattr(sp.s1, "p0a", lambda: {"pass": False})
+    monkeypatch.setattr(sp.s1, "p0c", lambda: {"pass": True})
+    monkeypatch.setattr(sp, "p0d_pilot_tree", lambda *args, **kwargs: {"pass": True})
+    monkeypatch.setattr(sp, "decision", lambda *args, **kwargs: {"verdict": "GO (full S2)"})
+    report = sp.run_pilot(d, tmp_path, controls=True)
+    assert report["decision"]["verdict"] == "FAIL (P0 STOP)"
+    assert "P0_STOP:P0a" in report["decision"]["stop_reasons"]
+
+
+def test_excess_total_budget_vetoes_positive_decision(cfg, tmp_path, monkeypatch):
+    d = tiny(cfg, total_cpu_s=0.0)
+    monkeypatch.setattr(sp, "decision", lambda *args, **kwargs: {"verdict": "GO (full S2)"})
+    report = sp.run_pilot(d, tmp_path, controls=False)
+    assert report["decision"]["verdict"] == "NO-GO (scoped)"
+    assert "total_cpu_budget_exceeded" in report["decision"]["stop_reasons"]
+
+
+def test_pilot_mode_does_not_allow_skipping_stop_controls(cfg, tmp_path):
+    with pytest.raises(ValueError, match="P0 STOP"):
+        sp.run_pilot(sp.pilot_design(cfg), tmp_path, controls=False)
