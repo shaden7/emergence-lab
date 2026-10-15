@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261015T0717Z-1cadda8b713f",
+  "leaseId": "c2d0d61c-3341-4a83-8555-acb96fc5e715",
+  "acquiredAt": "2026-10-15T07:17:47Z",
+  "heartbeatAt": "2026-10-15T07:17:47Z",
+  "expiresAt": "2026-10-15T09:17:47Z",
+  "task": "S1 pilot orchestration (Issue #37)",
   "previousOwner": "rd-gpt6-20261014T1905Z-s03f9uurnt"
 }
