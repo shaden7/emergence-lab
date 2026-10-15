@@ -130,9 +130,16 @@ class Budget:
     def __init__(self, total_cpu_s: float):
         self.total = total_cpu_s
         self.t0 = time.process_time()
+        children = resource.getrusage(resource.RUSAGE_CHILDREN)
+        self.children_t0 = children.ru_utime + children.ru_stime
+
+    def child_used(self) -> float:
+        children = resource.getrusage(resource.RUSAGE_CHILDREN)
+        return children.ru_utime + children.ru_stime - self.children_t0
 
     def used(self) -> float:
-        return time.process_time() - self.t0
+        # P0d uses a separate Python process; its CPU must count towards §6 as well.
+        return time.process_time() - self.t0 + self.child_used()
 
     def exceeded(self) -> bool:
         return self.used() > self.total
@@ -242,6 +249,14 @@ def run_family(design: dict, fam: str, budget: Budget) -> FamilyRun:
         if fr.status == "PARTIAL":
             break
     fr.cpu_s = time.process_time() - c_fam
+    # The final tree can cross either limit without another loop iteration. Never mark
+    # that family COMPLETE (or allow a §7 GO) just because no next tree was scheduled.
+    if fr.status == "COMPLETE" and fr.cpu_s > hard_stop:
+        fr.status = "PARTIAL"
+        fr.notes.append(f"family hard stop 1.5x projection ({hard_stop:.1f} s) exceeded on final tree")
+    if fr.status == "COMPLETE" and budget.exceeded():
+        fr.status = "PARTIAL"
+        fr.notes.append(f"global CPU budget {budget.total:.0f} s exceeded on final tree")
     return fr
 
 
@@ -513,13 +528,24 @@ TIMING_HEADER = ["family", "size", "i_size", "i_rep", "source", "T", "status", "
 
 
 def numeric_csv(fr_list: list[FamilyRun]) -> bytes:
-    """Deterministic numeric CSV (no timings), one block per family at its final T."""
-    parts = []
-    for fr in fr_list:
+    """One parseable CSV with a single header, even if families use different T rungs.
+
+    Columns for dyadic times beyond a family's T are blank (not zero); T is recorded
+    explicitly for every row. The per-family original rows_csv format remains the
+    input to the separately replayed P0d tree-0 check.
+    """
+    active = [fr for fr in fr_list if fr.records]
+    times = s1.dyadic_half_times(max((fr.T for fr in active), default=0))
+    lines = [",".join(s1.CSV_HEADER + ["T"] + [f"q_t{t}" for t in times])]
+    for fr in active:
         rows = [(r.family, r.size, r.i_size, r.i_rep, r.res) for r in fr.records]
-        if rows:
-            parts.append(s1.rows_csv(rows, fr.T))
-    return b"".join(parts)
+        family_lines = s1.rows_csv(rows, fr.T).decode().splitlines()[1:]
+        padding = [""] * (len(times) - len(s1.dyadic_half_times(fr.T)))
+        for line in family_lines:
+            fields = line.split(",")
+            full = fields[:len(s1.CSV_HEADER)] + [str(fr.T)] + fields[len(s1.CSV_HEADER):] + padding
+            lines.append(",".join(full))
+    return ("\n".join(lines) + "\n").encode()
 
 
 def timing_csv(fr_list: list[FamilyRun]) -> bytes:
@@ -581,6 +607,8 @@ def p0d_pilot_tree(design: dict, fr: FamilyRun, root: Path = Path(".")) -> dict:
 def run_pilot(design: dict, outdir: Path, root: Path = Path("."), families=None,
               controls: bool = True) -> dict:
     """Run families in the frozen order with the global budget; write CSVs and report JSON."""
+    if design["mode"] == "pilot" and not controls:
+        raise ValueError("preregistered pilot requires the P0 STOP controls")
     outdir.mkdir(parents=True, exist_ok=True)
     budget = Budget(design["total_cpu_s"])
     families = list(families or s1.FAMILY_ORDER)
@@ -613,16 +641,29 @@ def run_pilot(design: dict, outdir: Path, root: Path = Path("."), families=None,
         report["controls"] = {"P0a": s1.p0a(), "P0c": s1.p0c(),
                               "P0d_pilot_tree0": (p0d_pilot_tree(design, cay, root) if cay
                                                   else {"pass": False, "reason": "no CAY tree"})}
-    # Controls count toward the whole-pilot budget (prereg §6); the replay subprocess CPU
-    # is reported via RUSAGE_CHILDREN.
-    children = resource.getrusage(resource.RUSAGE_CHILDREN)
+    # Child CPU is counted since *this* run started, not as lifetime RUSAGE_CHILDREN.
     report["budget"] = {"cpu_s_used": budget.used(),
-                        "child_cpu_s": children.ru_utime + children.ru_stime,
+                        "child_cpu_s": budget.child_used(),
                         "cpu_s_total": design["total_cpu_s"],
-                        "within_total": budget.used() + children.ru_utime + children.ru_stime
-                        <= design["total_cpu_s"],
+                        "within_total": budget.used() <= design["total_cpu_s"],
                         "peak_rss_bytes": peak_rss_bytes(),
                         "memory_ok": peak_rss_bytes() <= design["max_memory_bytes"]}
+    stop_reasons = []
+    if not report["budget"]["within_total"]:
+        stop_reasons.append("total_cpu_budget_exceeded")
+    if not report["budget"]["memory_ok"]:
+        stop_reasons.append("peak_memory_budget_exceeded")
+    if stop_reasons:
+        # An otherwise qualifying W* cannot authorize S2 after a resource violation.
+        report["decision"]["verdict"] = "NO-GO (scoped)"
+    if controls:
+        failed_controls = [name for name, evidence in report["controls"].items()
+                           if not evidence.get("pass", False)]
+        if failed_controls:
+            # P0 controls are STOP gates (§5), not descriptive diagnostics.
+            stop_reasons.extend("P0_STOP:" + name for name in failed_controls)
+            report["decision"]["verdict"] = "FAIL (P0 STOP)"
+    report["decision"]["stop_reasons"] = stop_reasons
     num, tim = numeric_csv(runs), timing_csv(runs)
     (outdir / "s1_pilot_numeric.csv").write_bytes(num)
     (outdir / "s1_pilot_timing.csv").write_bytes(tim)
