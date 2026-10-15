@@ -190,6 +190,11 @@ def run_family(design: dict, fam: str, budget: Budget) -> FamilyRun:
     ladder = list(design["T_ladder"])
     T = ladder[0]
     recs0, _gen, cpu0, _w = _run_tree(design, fam, 0, sizes[0], 0, T)
+    # Keep the source-level *projected* costs separate from the actual costs in each
+    # SourceRecord: after two ladder reductions the original CPU time must be
+    # multiplied by 1/4, not twice by 1/2 of the unchanged original measurement.
+    estimated_source_cpu = {r.res.source: r.cpu_s for r in recs0}
+    generation_cpu = max(0.0, cpu0 - sum(estimated_source_cpu.values()))
     tree0_cpu = cpu0
     while True:
         over = [r for r in recs0 if r.res.status != "OK"]
@@ -212,6 +217,7 @@ def run_family(design: dict, fam: str, budget: Budget) -> FamilyRun:
             fr.notes.append("ladder exhausted on tree 0; family stopped (prereg §6)")
             return fr
         step["decision"] = f"reduce T to {ladder[k + 1]}"
+        old_T = T
         T = ladder[k + 1]
         # Tree 0 still counts: OK sources are truncated, OVER_CAP sources recomputed at T.
         ok = [truncate(r, T) for r in recs0 if r.res.status == "OK"]
@@ -219,10 +225,15 @@ def run_family(design: dict, fam: str, budget: Budget) -> FamilyRun:
         redo, _g, cpu_redo, _w = (_run_tree(design, fam, 0, sizes[0], 0, T, redo_src)
                                   if redo_src else ([], 0.0, 0.0, 0.0))
         recs0 = sorted(ok + redo, key=lambda r: r.res.source)
-        # Projection for the reduced T is not measured directly for truncated sources;
-        # scale the measured tree-0 cost by the step ratio (edge-steps are linear in T).
-        tree0_cpu = (sum(r.cpu_s for r in ok) * T / ladder[k] + cpu_redo)
-        step["note"] = "next step projects tree-0 cost by linear T scaling of OK sources"
+        # The estimate is updated incrementally across *every* rung. Recomputed
+        # sources replace their prior estimates; graph generation is counted once,
+        # not once per OVER_CAP retry.
+        estimated_source_cpu = {
+            **{r.res.source: estimated_source_cpu[r.res.source] * T / old_T for r in ok},
+            **{r.res.source: r.cpu_s for r in redo},
+        }
+        tree0_cpu = generation_cpu + sum(estimated_source_cpu.values())
+        step["note"] = "next rung scales prior OK-source CPU estimates and replaces recomputed costs"
     fr.T = T
     fr.projected_cpu_s = projected
     fr.records.extend(recs0)
