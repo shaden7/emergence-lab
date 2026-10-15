@@ -292,3 +292,23 @@ def test_excess_total_budget_vetoes_positive_decision(cfg, tmp_path, monkeypatch
 def test_pilot_mode_does_not_allow_skipping_stop_controls(cfg, tmp_path):
     with pytest.raises(ValueError, match="P0 STOP"):
         sp.run_pilot(sp.pilot_design(cfg), tmp_path, controls=False)
+
+
+def test_ladder_cost_compounds_across_two_reductions(cfg, monkeypatch):
+    d = tiny(cfg, ladder_trigger_cpu_s=0.0)
+    # Fixed source costs independent of T intentionally expose bookkeeping errors.
+    # Projections after two 1/2 horizon reductions must be 1+4*(2/4) = 3, not 5.
+    def fake_tree(design, fam, i_size, size, i_rep, T, recompute_only=None):
+        records = []
+        for v in range(4):
+            res = s1.KilledBallResult(v, 1, 4, T, 4, 6,
+                                      np.full(T, 0.25), np.zeros(T))
+            records.append(sp.SourceRecord(fam, size, i_size, i_rep, T, size,
+                                           res, 2.0, 2.0, 0))
+        return records, 1.0, 9.0, 9.0
+
+    monkeypatch.setattr(sp, "_run_tree", fake_tree)
+    fr = sp.run_family(d, CAY, sp.Budget(1000.0))
+    assert fr.status == "BLOCKED"
+    assert [x["T"] for x in fr.ladder] == [32, 16, 8]
+    assert [x["tree0_cpu_s"] for x in fr.ladder] == pytest.approx([9.0, 5.0, 3.0])
