@@ -145,6 +145,9 @@ def test_run_pilot_end_to_end_is_deterministic(cfg, tmp_path):
         (tmp_path / "b" / "s1_pilot_numeric.csv").read_bytes()
     rep = json.loads((tmp_path / "a" / "s1_pilot_report.json").read_text())
     assert rep["mode"] == "engineering" and rep["design"]["seed_base"] == s1.TEST_SEED_BASE
+    # The manifest enumerates executed SeedSequence tuples rather than placeholders.
+    assert rep["manifest"]["seeds"][0] == [s1.TEST_SEED_BASE, 0, 0, 0]
+    assert len(rep["manifest"]["seeds"]) == 34  # 16 CAY + 16 UST + 2 RRT
     assert rep["decision"]["verdict"] in ("GO (full S2)", "GO (reduced)", "NO-GO (scoped)")
     for fam in (CAY, UST):
         fa = rep["families"][fam]
