@@ -120,6 +120,18 @@ jobs:
         run: |
           python -m emergence_lab.spectral_s1 --output results/spectral_s1_p0.json
           python -c "import json; r=json.load(open('results/spectral_s1_p0.json')); print('::notice title=S1 P0::' + json.dumps({k: r[k]['pass'] for k in ('P0a','P0b','P0c','P0d')}) + ' p0a_max_err=' + json.dumps({n: c['max_abs_error'] for n, c in r['P0a']['cases'].items()}) + ' p0d_sha=' + r['P0d']['csv_sha256'][0] + ' python=' + r['manifest']['python'] + ' numpy=' + r['manifest']['numpy'])"
+      # S1 pilot orchestration smoke: engineering mode (engineering seeds, scaled design); not pilot data.
+      - name: S1 pilot orchestration engineering smoke
+        timeout-minutes: 5
+        env:
+          GIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -m emergence_lab.spectral_s1_pilot --mode engineering --no-controls --output results/spectral_s1_eng_a
+          python -m emergence_lab.spectral_s1_pilot --mode engineering --no-controls --output results/spectral_s1_eng_b
+          cmp results/spectral_s1_eng_a/s1_pilot_numeric.csv results/spectral_s1_eng_b/s1_pilot_numeric.csv
+          python -c "import json; r=json.load(open('results/spectral_s1_eng_a/s1_pilot_report.json')); print('::notice title=S1 orchestration (engineering)::mode=' + r['mode'] + ' verdict=' + r['decision']['verdict'] + ' numeric_sha=' + r['numeric_csv_sha256'] + ' cpu_s=%.1f' % r['budget']['cpu_s_used'])"
       - name: Preregistered many-batch coverage gate (report gate 4)
         if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/research/coverage-gate-20261010' || github.ref == 'refs/heads/main')
         timeout-minutes: 45
