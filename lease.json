@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261016T0718Z-a56c5b176293",
+  "leaseId": "e643f76c-6865-422b-a73e-077a80092065",
+  "acquiredAt": "2026-10-16T07:18:02Z",
+  "heartbeatAt": "2026-10-16T07:18:02Z",
+  "expiresAt": "2026-10-16T09:18:02Z",
+  "task": "hourly Director: recovery audit, PR review/integration",
   "previousOwner": "rd-gpt6-20261015T0748Z-d7f6d936"
 }
