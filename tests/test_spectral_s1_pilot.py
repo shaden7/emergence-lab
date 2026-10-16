@@ -25,6 +25,13 @@ def tiny(cfg, **kw):
                      RRT: {"sizes": [256], "trees": 2, "sources": 4}}
     d["T_ladder"] = [32, 16, 8]
     d["n_boot"] = 64
+    # The 1.5x family hard stop compares measured CPU with a tree-0 projection. At these
+    # millisecond tree costs the measured ratio varied 0.8-1.42 between runs (and larger
+    # trees cost more than tree 0), so the stop occasionally fired in a full-suite run and
+    # truncated the record set (observed 2026-10-16: end-to-end determinism test failed
+    # once in 3 full runs). Disable it here so tiny-design tests are timing-independent;
+    # tests of resource stops set their limits explicitly.
+    d["hard_stop_factor"] = 1e9
     d.update(kw)
     return d
 
