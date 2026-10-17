@@ -1,73 +1,67 @@
-# S1b — Replication of the S1 size difference with fresh seeds (Issue #37), preregistration v0.1
+# S1b — Cost-bounded material-effect replication of the S1 size contrast (Issue #37), preregistration v0.2
 
-**Status: PROPOSED design, no seed drawn.** Requires a later-pass review by a different session before any implementation is merged, and before the S1b seed base is unlocked. Engineering/instrument question only: no statement about dimensional reduction, emergent geometry or spacetime.
-**Date:** 2026-10-17. **Author:** Director `rd-claude-20261017T0846Z-21c3330dce46`. **Config:** [`configs/spectral_s1b.json`](../configs/spectral_s1b.json).
-**Builds on:** [S1 prereg v0.2](SPECTRAL_S1_PREREGISTRATION.md) (frozen; its §7 NO-GO stands and is not revisited), [S1 pilot result](experiments/2026-10-17-s1-pilot.md), [post-hoc diagnostic](experiments/2026-10-17-s1-pilot-diagnostic.md).
+**Status: PROPOSED, reviewer-corrected design; no S1b seed drawn, no implementation/run authorized.** This revision responds to the [later-pass REVISE review of v0.1](https://github.com/shaden7/emergence-lab/pull/48#issuecomment-6235832071). A separate later-pass review and tests on the final exact PR head are required before design integration; implementation requires its own review and explicit seed unlock. This is **instrument diagnosis**, not evidence of dimensional reduction, physical spacetime, or a new theorem.
 
-## 0. Why this step (decision for Issue #37)
+**Date:** 2026-10-17. **Config:** [`configs/spectral_s1b.json`](../configs/spectral_s1b.json). **Issue:** [#37](https://github.com/shaden7/emergence-lab/issues/37).
+**Basis:** frozen [S1 prereg v0.2](SPECTRAL_S1_PREREGISTRATION.md), [S1 pilot NO-GO](experiments/2026-10-17-s1-pilot.md), [exploratory post-hoc diagnostic](experiments/2026-10-17-s1-pilot-diagnostic.md). This new preregistration does **not** change the S1 outcome or reuse S1 data as S1b test samples.
 
-The S1 NO-GO had two different causes: (i) UST size equivalence was **undetermined** (eight trees per size give CIs ≈ ±0.07, far wider than ±0.03), and (ii) CAY showed a **resolved** larger-minus-smaller slope difference (+0.071, 90 % CI [+0.020, +0.122] at 128–1024). The post-hoc diagnostic found the local (t = 1) statistics correct at both sizes, a CAY difference of similar size already in the 8–64 window, and no change under source-degree post-stratification. Whether (ii) is a systematic N-dependence of the annealed estimator at t ≤ 4096 or a sampling fluctuation decides between two very different continuations:
+## 0. Scientific decision and asymmetric scope
 
-- systematic → the annealed killed-ball estimator is not a size-stable instrument on CAY at these sizes; change method (quenched/per-source estimator, heat-kernel trace) or close the spectral track at this budget;
-- fluctuation → a two-family S2 calibration design remains possible.
+The pilot's large-minus-small slope contrast on CAY at W=128–1024 was +0.0706 (tree-level SE 0.02886, 8 independent trees per size). A difference could be finite-size/estimator sensitivity, a generator or sampling defect not captured by existing controls, or chance. The pilot also left UST equivalence unresolved.
 
-A direct replication at the pilot's sizes with fresh seeds and three times more trees is the smallest experiment that discriminates these, and the same run resolves (i) for UST at modest extra cost. Alternatives considered and **not** chosen now: a new estimator (larger change, does not explain the pilot), closing S1 (premature while (ii) is unexplained and cheap to test), more sources per tree instead of more trees (same CPU per unit variance reduction at S = 32, since source sampling dominates; trees are the independent units).
+**Primary purpose of S1b:** test on fresh seeds whether the CAY contrast is **materially greater than** the engineering margin +0.03 at the preregistered sizes and window, rather than merely positive. This is a **one-direction material-effect replication**, not a balanced proof of equivalence or a newly optimized estimator. The original S1 choice of W=128–1024 was data-informed; possible winner's curse is explicitly acknowledged. The smaller N=2¹⁴ cohort checks shape descriptively, not as a second unadjusted confirmatory test.
 
-## 1. Questions
+**Secondary UST purpose:** estimate its contrast with improved precision and report equivalence if unusually precise; failure to establish UST equivalence will not be interpreted as evidence of a nonzero difference. The two-family equivalence criterion of S1 remains *not achieved*. Neither a CAY null result nor a UST inconclusive result unlocks S2.
 
-- **Q1 (primary, CAY):** does the larger-minus-smaller annealed window slope difference D_CAY = d̂_W(N = 2¹⁸) − d̂_W(N = 2¹⁶) at W = 128–1024 replicate on fresh trees?
-- **Q2 (UST):** is D_UST = d̂_W(L = 256) − d̂_W(L = 128) at W = 128–1024 inside ±0.03 (90 % CI), as needed for any later S2?
-- **Q3 (descriptive, CAY):** does the difference depend on N? Compare D(2¹⁶ − 2¹⁴) with D(2¹⁸ − 2¹⁶).
+Alternatives deferred: substantially more independent trees for a symmetric equivalence design (exceeds this budget), source-allocation/pilot reweighting, a different estimator (quenched source / heat-kernel trace), or stopping the spectral workstream. A 200-CPU-min budget is justified solely for the narrower CAY replication question; an unrevealing outcome triggers a new method/scope decision, not repeated seeds at will.
 
-The window 128–1024 is fixed now. It was the pilot's headline window and one of its largest differences, so the pilot effect size is likely inflated (selection); this makes a positive replication *harder*, not easier.
+## 1. Observable and fixed comparison
 
-## 2. Observable and method (unchanged from S1 v0.2 §3)
+Unchanged from S1 v0.2 §3: simple random-walk even-time return q_v(t) = [P^(2t)]_vv, uniformly sampled sources without replacement, **annealed** mean across trees and sources before taking logs, window slope d̂_W = −2[ln q̄(hi) − ln q̄(lo)]/ln(hi/lo). Fixed W=(128, 1024), T=4096; killed-ball certified bracket η=10⁻⁴, R initially 64 with doubling, 2×10⁹ edge-step cap per source, unchanged generators (Prüfer CAY; Wilson UST torus).
 
-Same observable (annealed q̄(t) from q_v(t) = [P^(2t)]_vv, simple random walk, uniform sources without replacement, mean before logs), same killed-ball kernel with η = 10⁻⁴ certified bracket and radius rule, same per-source cap 2·10⁹ edge-steps (OVER_CAP recorded, never dropped), same window-slope formula, same tree-level delta-method influences ψᵢ and standard error as S1 P3/P5 (Welch–Satterthwaite t for the 90 % CI). **T = 4096 fixed** (the pilot measured cost at T = 4096 for every family; no ladder). Generators unchanged (CAY Prüfer, UST Wilson on the L×L torus, as D2/S1).
+Primary D_CAY = d̂_W(N=2¹⁸) − d̂_W(N=2¹⁶). Secondary D_UST = d̂_W(L=256) − d̂_W(L=128). Independently seeded **trees** are the sampling units. Tree-level delta-method influence variance and Welch–Satterthwaite two-sided **90% CI** [L,U] follow S1 P3/P5; the 90% CI inside ±0.03 is the ordinary two-one-sided-tests (TOST) equivalence criterion at nominal α=0.05. A one-sided material-positive rule L>+0.03 tests D>+0.03 at nominal one-sided α=0.05 under adequate coverage assumptions. These are **model-based, uncalibrated nominal levels** for heavy-tailed finite-n annealed data, not guarantees.
 
-## 3. Design
+## 2. Cohorts, controls, fixed seeds
 
-| Family | Sizes | Trees × sources per size |
-| --- | --- | --- |
-| CAY | N ∈ {2¹⁴, 2¹⁶, 2¹⁸} | 24 × 32 |
-| UST (torus) | L ∈ {128, 256} | 48 × 32 |
+| Family | Sizes | Independently seeded trees per size | Sources per tree | Role |
+| --- | --- | ---: | ---: | --- |
+| CAY | N={2¹⁴,2¹⁶,2¹⁸} | 24 | 32 | CAY 2¹⁸−2¹⁶ confirmatory; other differences descriptive |
+| UST torus | L={128,256} | 48 | 32 | secondary equivalence/contrast descriptive |
 
-No RRT null (characterized in the S1 pilot). Engineering controls P0a–P0d of S1 v0.2 §5 are re-run unchanged as STOP gates before any S1b tree.
+Before the first S1b seed, run S1 P0a–P0d engineering controls unchanged; any STOP gate blocks inference. No RRT resampling (already a pilot null). Report q(t=1), P(deg=1) and all S1-compatible windows descriptively; do not make multiplicity-free claims from those comparisons.
 
-**Seeds:** `seed_base = 2036101701`, disjoint from every seed constant in `configs/`, `docs/`, `src/`, `tests/` (grep at `187349c`), in particular from S1 pilot 2036101301, S1 engineering 2036101397 and D2 2036101101. Rule: `np.random.SeedSequence([seed_base, i_family, i_size, i_rep])`, PCG64, family index CAY = 0, UST = 1, i_size indexes the S1b size list above; sources from a child of the same sequence (as S1). The S1b seed base is locked in code until this design and its implementation have passed review.
+Frozen seed base **2036101701**, bootstrap seed **2036101799**, both unused for S1b as of this revision. SeedSequence([seed_base, i_family, i_size, i_rep]) with PCG64; CAY=0, UST=1, indices in size-list order; sources from the same tree-seed child protocol as S1. Draw **only after** separately reviewed implementation and run authorization. Never recycle a partly executed seed tuple. Execute round-robin over replicate index across sizes/families to limit imbalance, but **do not** treat this as a valid optional-stopping adjustment.
 
-**Execution order:** round-robin over i_rep (rep 0 of every size, then rep 1, …) so that a stop leaves balanced partial data.
+## 3. Computation and outcome eligibility
 
-## 4. Budget and stops
+**Fixed full-sample analysis only.** CAY needs exactly 24 complete, valid trees **at each of all three sizes**, UST exactly 48 complete, valid trees at each size. No data-dependent subsampling or replacing unfavorable trees. The implementation should record attempted seeds, COMPLETED/OVER_CAP/PARTIAL status, timings, tree/source counts, and certified errors in a manifest. Missing, censored or OVER_CAP sources are **never** silently dropped. Incomplete per-family sample or any failed numeric control is **BLOCKED / INCONCLUSIVE**, even when its interim CI looks decisive. Primary CAY gate cannot pass on a partial CAY sample, including a completed pair with an incomplete N=2¹⁴ cohort. A complete eligible family can be described even if the other family is blocked, but this never authorizes S2.
 
-- 1 core, ≤ 2 GiB (external `taskset` / `ulimit -v`), no Lightsail, no network during the run, no paid service. Any later S2 must use yet another seed base.
-- **Projection from measured S1 pilot cost** (CPU-s per tree with 32 sources): CAY 2¹⁶ 82, 2¹⁸ 98, 2¹⁴ ≤ 82 (not measured; the R = 256 ball covers the whole tree); UST L = 128 12.6, L = 256 16.5. CAY ≈ 24 × 262 s ≈ 105 CPU-min; UST ≈ 48 × 29 s ≈ 23 CPU-min; controls ≈ 2 CPU-min; **total ≈ 130 CPU-min** (≈ 2.2 h wall on one core).
-- **Hard stops:** 200 CPU-min total; per family 1.5× its projection. A stop yields PARTIAL; the §5 outcomes are computed only if every size has ≥ 16 CAY or ≥ 32 UST complete trees, otherwise BLOCKED (budget).
-- Expected precision (from pilot influences, scaled by √(8/n)): SE(D_CAY) ≈ 0.017, SE(D_UST) ≈ 0.017, 90 % CI half-width ≈ 0.028 each. Consequence stated in advance: an equivalence outcome (CI inside ±0.03) is reachable only if the point difference is within about ±0.002; the design is therefore mainly able to **confirm** a difference of the pilot's magnitude (P(lower bound > 0) ≈ 0.99 if D = 0.07, ≈ 0.66 if D = 0.035) and will otherwise often return "undetermined".
+Budget: one core, ≤2 GiB externally enforced, no Lightsail, no paid service/network during the experiment. S1 pilot cost per CAY tree: 2¹⁶ ≈82 CPU-s, 2¹⁸ ≈98 CPU-s; 2¹⁴ ≤82 CPU-s is an **unverified projection**. UST: L=128 ≈12.6, L=256 ≈16.5 CPU-s. With fixed n: CAY ≈105 CPU-min, UST ≈23, controls ≈2; ~130 CPU-min projected, **200 total CPU-min absolute stop**, 1.5× each family's projected budget as a secondary STOP. Resource checks and OS limits are required; no automatic extension if an early stop prevents formal classification. Log all completed descriptive data and failures without selective omission.
 
-## 5. Outcomes (fixed now)
+**Plug-in operating characteristics (assumptions, not observations):** S1 pilot SE(D) CAY 0.028861 and UST 0.042157 at 8 trees/size, extrapolated SE ∝√(8/n), fixed independent normal estimates and symmetric 90%-t half-widths. CAY n=24: SE≈0.01666, half-width≈0.02797; UST n=48: SE≈0.01721, half-width≈0.02859. P(CAY L>0.03 | true D=+0.07)≈**76.5%**, at true D=+0.035 only **8.4%**; P(CAY L>0.03 | D=0)≈0.03%. Thus a negative/undetermined result cannot reliably exclude effects just above 0.03. If *both* true differences were zero, the chance of proving **both** ±0.03 equivalences is only ≈0.63%, so the two-family GO is **not powered**. Analytic audit: [`docs/experiments/s1b_power_audit.py`](experiments/s1b_power_audit.py). Coverage may be worse with unequal Welch df, skew or variance uncertainty. Increasing S within each tree is not assumed cost-equivalent to more independent trees.
 
-For CAY at W = 128–1024:
-- **C-REPLICATED:** 90 % CI of D_CAY entirely above 0 (same sign as the pilot).
-- **C-EQUIVALENT:** 90 % CI entirely inside [−0.03, +0.03].
-- **C-UNDETERMINED:** otherwise (including a CI entirely below 0, reported as such).
+## 4. Exact and mutually exclusive outcome classification
 
-For UST at W = 128–1024: **U-EQUIVALENT** (90 % CI inside ±0.03) or **U-NOT-SHOWN**.
+For any **eligible complete** family and finite 90% CI [L,U] with L≤U and margin m=0.03, in the following order:
+1. **MATERIAL-POSITIVE** iff L>m.
+2. **MATERIAL-NEGATIVE** iff U<−m (reported as an unexpected reversed-size effect).
+3. **EQUIVALENT** iff L>−m **and** U<m (strict entire containment).
+4. **INCONCLUSIVE** otherwise, including intervals entirely above/below 0 but intersecting the margin.
 
-**Consequence for Issue #37 (fixed now):**
-- C-REPLICATED → record "annealed killed-ball slope on CAY is size-dependent at N ≤ 2¹⁸, t ≤ 4096 (numerical observation)"; no S2 with this estimator; decide between a method change and closing the spectral track at this budget.
-- C-EQUIVALENT and U-EQUIVALENT → an S2 two-family calibration preregistration may be drafted (fresh seed base, its own review); pooled-size analysis allowed only if both equivalences hold.
-- Anything else → close S1 as **undetermined at this budget**; no further replication without a method change.
+The cases are disjoint mathematically; touching a threshold is INCONCLUSIVE unless another strict condition applies. A positive-sign CI like [+0.010,+0.020] is **EQUIVALENT**, never MATERIAL-POSITIVE. A CI [+0.015,+0.045] is **INCONCLUSIVE**, not proof of a >0.03 effect. Prefix results with C-/U-; a failed family eligibility gate yields **C-BLOCKED** or **U-BLOCKED**, not a calculated confirmatory class. If the finite-n reliability screen fails, return **UNRELIABLE** before applying the CI classification; keep its estimate and interval as descriptive.
 
-Q3 and all other windows (every admissible window as in S1 §3, with headroom per source) are reported descriptively, with no multiplicity-free claims. The pilot data are **not pooled** with S1b for any outcome.
+**Reliability screen:** any invalid/non-positive q̄, missing certified tolerance/headroom/validity check, nonfinite SE or 90% CI, or degenerate influence variance yields UNRELIABLE. Also report S1 P3 influence skewness and maximal squared share; |g₁|>1.5 or max influence share>0.5 triggers UNRELIABLE. Delete-one-tree jackknife SE >1.25× delta-method SE triggers UNRELIABLE; this 25% cutoff is a **heuristic** and does not validate coverage when it passes. A whole-tree 4096-resample deterministic percentile bootstrap (seed 2036101799) and jackknife/nominal intervals are reported side by side, but not used to change outcome cutoffs after observing results. If headroom at W's hi fails S1's ≥10× per-source floor rule, classify UNRELIABLE; this prevents promoting a known biased window. A mandatory control STOP marks the affected run BLOCKED even if descriptive data exist.
 
-## 6. Threats
+**Consequences for Issue #37:**
+- C-MATERIAL-POSITIVE or C-MATERIAL-NEGATIVE: record **replicated material finite-size/estimator dependence at these sizes and this fixed window**, conditional on validity screens, and prioritize a method change or closure of S1 at this budget. No S2 with the current estimator.
+- C-EQUIVALENT **and** U-EQUIVALENT: dual size equivalence is *observed on fresh seeds*; an independently reviewed **new S2 preregistration may be drafted** (no S2 seeds unlocked by S1b itself). This is possible but very unlikely under the design's assumed null power.
+- All other combinations, including C-INCONCLUSIVE, C-UNRELIABLE, any BLOCKED, and U-INCONCLUSIVE: **no S2**. Record exactly which claim was not established; decide whether redesigning the estimator or dropping this two-family objective is warranted. No automatic repeated replication or assertion of non-equivalence from failure to pass TOST.
 
-- **Same estimator, same generators:** a defect common to pilot and S1b would replicate; P0a–P0d and the post-hoc t = 1 local-limit check (2(e−1)/e² ≈ 0.4651) do not test large-t behaviour beyond N = 4096. S1b will additionally report the t = 1 check and P(deg = 1) per size.
-- **Normal-theory CI with heavy-tailed annealed means:** report the delete-one-tree jackknife SE and a whole-tree bootstrap percentile interval (4096 resamples, bootstrap seed 2036101799) beside the primary CI; if the jackknife SE exceeds the delta-method SE by > 25 % for a family, the outcome for that family is reported as UNRELIABLE instead of REPLICATED/EQUIVALENT.
-- **Cost:** 2¹⁴ cost is projected, not measured; the per-family stop limits overrun.
-- **Reviewer independence:** later-pass review by a different session before implementation merges; a different-model-family review before any interpretation beyond instrument calibration (Issue #37).
+The reference deterministic case table and edge-condition tests must pass on the exact implementation head; the run report must include all classification inputs and codes. The pilot and S1b samples are never pooled in the outcome calculation.
 
-## 7. Provenance and implementation (later PR)
+## 5. Limitations and staged execution
 
-An `s1b` mode in `src/emergence_lab/spectral_s1_pilot.py` (or a thin wrapper) reading this config, reusing the S1 kernel and statistics unchanged, with tests that the seed lock, the round-robin order and the outcome rule work on engineering seeds. Result note `docs/experiments/YYYY-MM-DD-s1b-replication.md` with numeric/timing CSVs, manifest and an independent CSV-only check script.
+- New seeds reduce pilot reuse but cannot expose a defect shared by both runs (generator/kernel, stratification, large-t truncation). t=1 and degree controls check only local structure; S1 P0b tests kernels on N≤4096.
+- The CAY difference observed post hoc as early as W=8–64 is consistent with source fluctuation but no cause is proven. The claim that N^(3/2) mixing makes this too early for finite-size effects is a **scaling heuristic**, not a finite-N theorem.
+- The small equivalence margin is an engineering convention, not an experimentally calibrated tolerance for emergent physics. Nominal Welch coverage and power are not validated for heavy-tailed walks. Statistical classification is **numerical inference**, not mathematical proof.
+- After this prereg passes distinct later-pass review, a **separate implementation PR** adds the codepath, seed locks, round-robin scheduler, cost stops, full manifest and synthetic-CI classification tests; exact-head CI/smoke and a new review are required. Then and only then may a **single** controlled S1b run occur with an archived CSV, manifest and independently rechecked arithmetic.
