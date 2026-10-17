@@ -1,0 +1,106 @@
+{
+  "name": "spectral_s1b_material_effect_replication",
+  "protocol": "docs/SPECTRAL_S1B_PREREGISTRATION.md",
+  "version": "0.2",
+  "status": "proposed revised design; no S1b seeds drawn; later-pass review and implementation approval required",
+  "issue": 37,
+  "builds_on": "configs/spectral_s1_pilot.json v0.2; S1 pilot NO-GO remains binding",
+  "T": 4096,
+  "ladder": null,
+  "kernel": {
+    "type": "killed ball, certified bracket",
+    "R_start": 64,
+    "eta": 0.0001,
+    "per_source_edge_step_cap": 2000000000
+  },
+  "families": {
+    "cayley_uniform_tree": {
+      "N": [
+        16384,
+        65536,
+        262144
+      ],
+      "trees": 24,
+      "sources": 32
+    },
+    "ust_2d_torus": {
+      "L": [
+        128,
+        256
+      ],
+      "trees": 48,
+      "sources": 32
+    }
+  },
+  "family_index_order": [
+    "cayley_uniform_tree",
+    "ust_2d_torus"
+  ],
+  "execution_order": "round-robin over i_rep across all sizes and families",
+  "seed_base": 2036101701,
+  "bootstrap_seed": 2036101799,
+  "seed_rule": "np.random.SeedSequence([seed_base, i_family, i_size, i_rep]) with PCG64; sources from a child of the same sequence (as S1)",
+  "controls": "S1 v0.2 P0a-P0d unchanged, STOP gates",
+  "primary_window": [
+    128,
+    1024
+  ],
+  "outcomes": {
+    "confidence_level": 0.9,
+    "margin": 0.03,
+    "ci_type": "Welch-Satterthwaite, tree-level delta method; fixed-n normal-theory nominal coverage only",
+    "family_status_priority": [
+      "BLOCKED",
+      "UNRELIABLE",
+      "MATERIAL-POSITIVE",
+      "MATERIAL-NEGATIVE",
+      "EQUIVALENT",
+      "INCONCLUSIVE"
+    ],
+    "classify": [
+      "MATERIAL-POSITIVE if lower>+margin",
+      "MATERIAL-NEGATIVE if upper<-margin",
+      "EQUIVALENT if lower>-margin and upper<+margin",
+      "INCONCLUSIVE otherwise"
+    ],
+    "primary_comparison": {
+      "family": "cayley_uniform_tree",
+      "larger": 262144,
+      "smaller": 65536
+    },
+    "secondary_comparison": {
+      "family": "ust_2d_torus",
+      "larger": 256,
+      "smaller": 128
+    },
+    "full_samples_required": true,
+    "partial_verdict": "BLOCKED per incomplete family; never classify confirmatory outcomes from partial data",
+    "exact_trees_per_size": {
+      "cayley_uniform_tree": 24,
+      "ust_2d_torus": 48
+    },
+    "reliability": {
+      "max_abs_influence_skew": 1.5,
+      "max_squared_influence_share": 0.5,
+      "max_jackknife_to_delta_se_ratio": 1.25,
+      "require_positive_annealed_q": true,
+      "require_finite_se_and_ci": true,
+      "require_certified_error": true,
+      "min_headroom_per_source": 10,
+      "bootstrap_resamples": 4096
+    },
+    "dual_equivalence_s2": "may draft reviewed S2 only if C-EQUIVALENT and U-EQUIVALENT; not powered for this outcome",
+    "stop_failure": "no S2; do not interpret failure of equivalence test as non-equivalence"
+  },
+  "budget": {
+    "cores": 1,
+    "memory_GiB": 2,
+    "projected_cpu_min": 130,
+    "hard_stop_total_cpu_min": 200,
+    "family_hard_stop_factor": 1.5,
+    "host": "not Lightsail",
+    "notes": "CPU estimates are based on pilot timings; 2^14 per-tree estimate unmeasured; no partial inferential verdict"
+  },
+  "primary_question": "CAY 2^18 minus 2^16 slope difference materially > +0.03 on fresh seeds at W=128..1024",
+  "secondary_question": "UST size-contrast descriptive; equivalence is underpowered and not a balanced S2 gate"
+}
