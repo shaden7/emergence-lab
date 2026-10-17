@@ -26,6 +26,7 @@ def classify_family(
     *,
     counts: tuple[int, ...],
     expected_trees: int,
+    expected_sizes: int,
     controls_passed: bool,
     budget_ok: bool,
     certified: bool,
@@ -43,7 +44,8 @@ def classify_family(
     Counts include *all* sizes of the family, including descriptive CAY 2^14.
     A family with no full sample is BLOCKED, not conditionally 'equivalent'.
     """
-    if (not controls_passed or not budget_ok or not counts or expected_trees <= 0
+    if (not controls_passed or not budget_ok or expected_trees <= 0
+            or expected_sizes <= 0 or len(counts) != expected_sizes
             or any(n != expected_trees for n in counts)):
         return "BLOCKED"
     if not certified or not headroom_ok or not annealed_q_positive:
