@@ -1,0 +1,34 @@
+{
+  "name": "spectral_s1b_replication",
+  "protocol": "docs/SPECTRAL_S1B_PREREGISTRATION.md",
+  "version": "0.1",
+  "status": "proposed design; no seed drawn; seed base locked until review",
+  "issue": 37,
+  "builds_on": "configs/spectral_s1_pilot.json v0.2 (observable, kernel, statistics unchanged)",
+  "T": 4096,
+  "ladder": null,
+  "kernel": {
+    "type": "killed ball, certified bracket",
+    "R_start": 64,
+    "eta": 0.0001,
+    "per_source_edge_step_cap": 2000000000
+  },
+  "families": {
+    "cayley_uniform_tree": {"N": [16384, 65536, 262144], "trees": 24, "sources": 32},
+    "ust_2d_torus": {"L": [128, 256], "trees": 48, "sources": 32}
+  },
+  "family_index_order": ["cayley_uniform_tree", "ust_2d_torus"],
+  "execution_order": "round-robin over i_rep across all sizes and families",
+  "seed_base": 2036101701,
+  "bootstrap_seed": 2036101799,
+  "seed_rule": "np.random.SeedSequence([seed_base, i_family, i_size, i_rep]) with PCG64; sources from a child of the same sequence (as S1)",
+  "controls": "S1 v0.2 P0a-P0d unchanged, STOP gates",
+  "primary_window": [128, 1024],
+  "outcomes": {
+    "cayley_uniform_tree": "D = slope(2^18) - slope(2^16); REPLICATED if 90% Welch CI > 0; EQUIVALENT if CI inside [-0.03, 0.03]; else UNDETERMINED",
+    "ust_2d_torus": "D = slope(256) - slope(128); EQUIVALENT if 90% CI inside [-0.03, 0.03]; else NOT-SHOWN",
+    "reliability": "UNRELIABLE for a family if jackknife SE > 1.25 x delta-method SE",
+    "minimum_complete_trees": {"cayley_uniform_tree": 16, "ust_2d_torus": 32}
+  },
+  "budget": {"cores": 1, "memory_GiB": 2, "projected_cpu_min": 130, "hard_stop_total_cpu_min": 200, "family_hard_stop_factor": 1.5, "host": "not Lightsail"}
+}
