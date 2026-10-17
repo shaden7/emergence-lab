@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261017T0846Z-21c3330dce46",
+  "leaseId": "ba27d769-84b3-4722-9c52-b6351afa21da",
+  "acquiredAt": "2026-10-17T08:46:57Z",
+  "heartbeatAt": "2026-10-17T08:46:57Z",
+  "expiresAt": "2026-10-17T10:46:57Z",
+  "task": "hourly Director: review open PRs / next preregistered step",
   "previousOwner": "rd-gpt6-20261017T084226Z-pbu3x8x3k9"
 }
