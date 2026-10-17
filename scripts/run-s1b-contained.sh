@@ -18,8 +18,10 @@ revision=$(git rev-parse HEAD)
 mkdir "$2"
 if test "$mode" = engineering; then
   set -- "$1" "$2" --mode engineering --contained-engineering --no-controls
+  wall_limit=118s
 else
   set -- "$1" "$2" --mode s1b
+  wall_limit=11998s
 fi
 image=$1
 output=$2
@@ -32,4 +34,5 @@ docker run --rm --network none --cpus 1 --memory 2g --memory-swap 2g \
   -e OPENBLAS_NUM_THREADS=1 -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e NUMEXPR_NUM_THREADS=1 \
   --mount "type=bind,src=$output,dst=/results" \
   --mount "type=bind,src=$(pwd),dst=/app,readonly" \
-  --entrypoint python "$image" -m emergence_lab.spectral_s1b --output /results/run "$@"
+  --entrypoint timeout "$image" --signal=KILL "$wall_limit" \
+  python -m emergence_lab.spectral_s1b --output /results/run "$@"

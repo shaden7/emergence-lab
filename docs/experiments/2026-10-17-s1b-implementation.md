@@ -55,7 +55,11 @@ stopping at a two-CPU-second reserve before the 200-CPU-min total. The kernel
 enforces CPU *rate* and memory; the cumulative CPU stop is a watchdog, **not a
 mathematically exact kernel CPU-total limit**. Scheduling/GIL delays and forced
 termination are risks to challenge in later review. The reserve is conservative,
-not a proven worst-case latency bound. There is no automatic budget extension.
+not a proven worst-case latency bound. A separate native `timeout` process also
+kills the worker after 11,998 wall seconds (118 for engineering), independent of
+the Python GIL; the <=one-core quota makes this a conservative additional stop.
+This can terminate an I/O-delayed run before its CPU budget, yielding partial
+evidence only. There is no automatic budget extension.
 
 A full result is invalid without `resource_evidence.json` with a clean exit,
 within-budget accounting and no `resource_stop.json`; a killed run can leave an
