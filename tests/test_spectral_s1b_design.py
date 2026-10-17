@@ -38,7 +38,7 @@ def test_ci_invalid(lower, upper):
 
 def family(**overrides):
     settings = dict(
-        counts=(24, 24, 24), expected_trees=24, controls_passed=True,
+        counts=(24, 24, 24), expected_trees=24, expected_sizes=3, controls_passed=True,
         budget_ok=True, certified=True, headroom_ok=True,
         annealed_q_positive=True, ci=(0.035, 0.055),
         delta_se=0.015, jackknife_se=0.015,
@@ -73,8 +73,8 @@ def test_unreliable_screens_block_material_verdict(changes):
 
 
 def test_ust_complete_48_and_underpowered_is_classified_normally():
-    assert family(counts=(48, 48), expected_trees=48, ci=(-0.02, 0.02)) == "EQUIVALENT"
-    assert family(counts=(47, 48), expected_trees=48) == "BLOCKED"
+    assert family(counts=(48, 48), expected_trees=48, expected_sizes=2, ci=(-0.02, 0.02)) == "EQUIVALENT"
+    assert family(counts=(47, 48), expected_trees=48, expected_sizes=2) == "BLOCKED"
 
 
 def test_reference_thresholds_match_config():
