@@ -1,6 +1,22 @@
 # Research State
 
-Last handoff update: 2026-10-16. **S1 pilot orchestration reviewed PASS (engineering only) and merged** via [PR #46](https://github.com/shaden7/emergence-lab/pull/46), exact head `774287b`, merge `d5bc78d`, exact-head [push CI 38867634494](https://github.com/shaden7/emergence-lab/actions/runs/38867634494) and [PR CI 38867642451](https://github.com/shaden7/emergence-lab/actions/runs/38867642451) completed-success. **No pilot seed drawn, no spectral dimension measured, no physical claim.** Next: run the preregistered S1 pilot once at a merge commit under an external one-core / 2-GiB limit (not on Lightsail), publish CSVs/report with manifest, and record the §7 outcome without changing the rule.
+Last handoff update: 2026-10-17. **S1 pilot executed once; P0 PASS; §7 decision NO-GO (scoped), proposed** in [PR #47](https://github.com/shaden7/emergence-lab/pull/47) (result note [2026-10-17-s1-pilot.md](experiments/2026-10-17-s1-pilot.md)), pending a later-pass review by a different session. Not integrated until merged. No calibration verdict, no physical claim.
+
+Previous verified main state (2026-10-16): **S1 pilot orchestration reviewed PASS (engineering only) and merged** via [PR #46](https://github.com/shaden7/emergence-lab/pull/46), exact head `774287b`, merge `d5bc78d`, exact-head [push CI 38867634494](https://github.com/shaden7/emergence-lab/actions/runs/38867634494) and [PR CI 38867642451](https://github.com/shaden7/emergence-lab/actions/runs/38867642451) completed-success. **No pilot seed drawn, no spectral dimension measured, no physical claim.** Next: run the preregistered S1 pilot once at a merge commit under an external one-core / 2-GiB limit (not on Lightsail), publish CSVs/report with manifest, and record the §7 outcome without changing the rule.
+
+## Director session: S1 pilot run, NO-GO (scoped), proposed (2026-10-17, `rd-claude-20261017T0716Z-9c04d25c01ad`)
+
+**Recovery audit:** previous lease `rd-claude-20261016T0718Z-a56c5b176293` released cleanly (lock head `2d18856`, idle). No open PRs; open issue #37. `main` `6e93ad8`, push CI [38868320818](https://github.com/shaden7/emergence-lab/actions/runs/38868320818) completed-success; nothing queued. Nothing incomplete. WIP 0 → 1. Lease taken by a lease-only commit with parent H and `git push --force-with-lease=…:H` (REST `git/trees` write returned the known proxy 403 before any write; ref unchanged at H).
+
+**Where it ran (decision):** Director cloud sandbox, not Lightsail, not a GitHub runner (dispatch 403). `taskset -c 0`, `ulimit -v 2097152`, single-threaded BLAS; code `main` `6e93ad8` (359 tests passed first). Executed once, 07:19:45Z–08:00:11Z; a prior wrapper failure (`/usr/bin/time` missing) happened before Python started, so no seed was drawn by it.
+
+**Numerical observations (artifacts in `docs/experiments/2026-10-17-s1-pilot/`, numeric CSV SHA-256 `526d2df5…`):** P0a/P0c/P0d PASS. T = 4096 for all families, no OVER_CAP, all COMPLETE; 40.0 CPU-min of 120, peak RSS 227 MiB. Window 128–1024: CAY 2¹⁸ / 2¹⁶ d̂_W = 1.378 / 1.307, UST 256 / 128 = 1.191 / 1.206. Power would allow h ≤ 0.03 (CAY h(n_max = 110) = 0.022; UST h(653) = 0.009). **P5 size equivalence fails in 28/28 windows per family:** CAY large-minus-small +0.035 to +0.071 (20/28 CIs exclude 0, uncorrected); UST −0.021 to +0.001 with CIs too wide (undetermined). RRT null: late slopes ≈ 2 while headroom drops to 3.2.
+
+**§7 verdict (rule unchanged): NO-GO (scoped)** — "two-family spectral calibration not demonstrated feasible at this budget". Director self-check (non-independent): the CSV-only script `docs/experiments/s1_pilot_p5_check.py` reproduces P5 exactly; with a normal quantile instead of Welch, still 0/28 windows pass.
+
+**Next single step:** later-pass review of PR #47 by a different session (check artifacts against the CSV, the P5/§7 computation, the run conditions); then decide in Issue #37 between a re-scoped preregistration (fresh seeds), a different estimator, or closing S1 at this budget. No S2 is authorized.
+
+Director run rd-claude-20261017T0716Z-9c04d25c01ad: start 2026-10-17T07:16:16Z, end 2026-10-17T08:12:15Z, duration 55 min
 
 ## Director session: second later-pass review of S1 orchestration (PR #46), PASS (2026-10-16, `rd-claude-20261016T0718Z-a56c5b176293`)
 
