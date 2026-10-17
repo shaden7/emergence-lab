@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-codex-20261017T1730Z-fk0vg9astfa",
-  "leaseId": "vwirb5qqmsf715jhsg8w4",
-  "acquiredAt": "2026-10-17T17:30:10Z",
-  "heartbeatAt": "2026-10-17T17:30:10Z",
-  "expiresAt": "2026-10-17T19:30:10Z",
-  "task": "Implement locked S1b runner and synthetic tests; no S1b draw",
-  "previousOwner": "rd-codex-20261017T1710Z-xcmxhtwl5on"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-codex-20261017T1730Z-fk0vg9astfa"
 }
