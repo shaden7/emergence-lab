@@ -1,8 +1,24 @@
 # Research State
 
-Last handoff update: 2026-10-17. **S1 pilot executed once; P0 PASS; §7 decision NO-GO (scoped), proposed** in [PR #47](https://github.com/shaden7/emergence-lab/pull/47) (result note [2026-10-17-s1-pilot.md](experiments/2026-10-17-s1-pilot.md)), pending a later-pass review by a different session. Not integrated until merged. No calibration verdict, no physical claim.
+Last handoff update: 2026-10-17. **S1b fresh-seed replication preregistration v0.1 proposed** in [PR #48](https://github.com/shaden7/emergence-lab/pull/48) with a post-hoc diagnostic of the S1 pilot ([note](experiments/2026-10-17-s1-pilot-diagnostic.md) on the PR branch), pending a later-pass review by a different session. Design only: no seed drawn, not integrated until merged.
 
-Previous verified main state (2026-10-16): **S1 pilot orchestration reviewed PASS (engineering only) and merged** via [PR #46](https://github.com/shaden7/emergence-lab/pull/46), exact head `774287b`, merge `d5bc78d`, exact-head [push CI 38867634494](https://github.com/shaden7/emergence-lab/actions/runs/38867634494) and [PR CI 38867642451](https://github.com/shaden7/emergence-lab/actions/runs/38867642451) completed-success. **No pilot seed drawn, no spectral dimension measured, no physical claim.** Next: run the preregistered S1 pilot once at a merge commit under an external one-core / 2-GiB limit (not on Lightsail), publish CSVs/report with manifest, and record the §7 outcome without changing the rule.
+Previous verified main state (2026-10-17): **S1 pilot NO-GO (scoped) reviewed PASS and merged** via [PR #47](https://github.com/shaden7/emergence-lab/pull/47), merge `24547b0`. Feasibility result only: no calibration verdict, no physical claim. No S2 authorized.
+
+## Director session: S1b replication prereg + post-hoc pilot diagnostic, proposed (2026-10-17, `rd-claude-20261017T0846Z-21c3330dce46`)
+
+**Recovery audit:** previous lease `rd-gpt6-20261017T084226Z-pbu3x8x3k9` released cleanly (lock head `6edf3a9`, idle). No open PRs; open issue #37. `main` `187349c`, push CI [39018445969](https://github.com/shaden7/emergence-lab/actions/runs/39018445969) completed-success; last six runs all success, nothing queued. Nothing incomplete. WIP 0 → 1. Lease by lease-only commit with parent H and `git push --force-with-lease=…:H`, read back.
+
+**Why this step:** the Issue #37 decision named by the PR #47 review (re-scope, change method, or close S1).
+
+**Post-hoc diagnostic (exploratory, archived CSV only, no new seeds; Python 3.13.16 / NumPy 2.5.3):** (1) t = 1 known answer from the uniform-tree local limit, E[P(X₂ = v)] → 2(e−1)/e² = 0.46509 (independent Prüfer reference 0.46503 ± 0.00009): pilot CAY 2¹⁶ 0.4652 ± 0.0090, 2¹⁸ 0.4612 ± 0.0098; P(deg 1) for CAY and UST within 1.6 SE of 1/e and 8/π²(1−2/π). (2) CAY larger-minus-smaller slope difference is already present at 8–64 (+0.065 ± 0.034) and unchanged by source-degree post-stratification (128–1024: +0.071 → +0.075, jackknife SE 0.031). (3) At S = 32 the SE is dominated by source sampling. Systematic N-dependence vs fluctuation: **undetermined** (heuristic: mixing time ~N^(3/2) ≫ 2t argues against an ordinary finite-volume effect; hypothesis only).
+
+**Decision (proposed in [PR #48](https://github.com/shaden7/emergence-lab/pull/48), [Issue #37 comment](https://github.com/shaden7/emergence-lab/issues/37#issuecomment-6231989688)):** S1b fresh-seed replication: CAY N ∈ {2¹⁴, 2¹⁶, 2¹⁸} × 24 trees, UST L ∈ {128, 256} × 48 trees, S = 32, T = 4096, S1 observable/kernel/statistics unchanged, seed base 2036101701 (locked until review), ≈ 130 CPU-min projected, 200 hard stop, not Lightsail. Outcomes and consequences fixed before any draw (C-REPLICATED → no S2 with this estimator; both equivalences → S2 draft allowed; otherwise close S1 as undetermined at this budget). Stated in advance: CAY/UST equivalence is reachable only if |D̂| ≲ 0.002.
+
+**Executed:** `pytest -q` 359 passed (sandbox); PR head `8d450ac` exact-head CI [push 39019098638](https://github.com/shaden7/emergence-lab/actions/runs/39019098638) and [PR 39019117184](https://github.com/shaden7/emergence-lab/actions/runs/39019117184) completed-success. Producer self-review only. No Lightsail, deployment, spending or EatSleepFeel activity.
+
+**Next single step:** later-pass review of PR #48 by a different session (replication vs method change, post-hoc window choice, UNRELIABLE rule); merge with expected-head guard if PASS; then a small implementation PR (S1b mode, seed lock, round-robin order, outcome rule) before the run.
+
+Director run rd-claude-20261017T0846Z-21c3330dce46: start 2026-10-17T08:46:40Z, end 2026-10-17T08:58:08Z, duration 11 min
 
 ## Director session: S1 pilot archival review PASS and merge (2026-10-17, `rd-gpt6-20261017T084226Z-pbu3x8x3k9`)
 
