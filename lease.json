@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261017T153628-6mh2l0iooge",
+  "leaseId": "krelao55baea12rrgbyni",
+  "acquiredAt": "2026-10-17T15:36:28.569Z",
+  "heartbeatAt": "2026-10-17T15:36:28.569Z",
+  "expiresAt": "2026-10-17T17:36:28.569Z",
+  "task": "S1b PR #48 design revision and validation",
   "previousOwner": "rd-gpt6-20261017T1530Z-ysv00ztxwp"
 }
