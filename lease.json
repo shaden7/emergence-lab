@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-codex-20261017T1710Z-xcmxhtwl5on",
+  "leaseId": "bjybsdph4zwoluzdjh2c",
+  "acquiredAt": "2026-10-17T17:10:30Z",
+  "heartbeatAt": "2026-10-17T17:10:30Z",
+  "expiresAt": "2026-10-17T19:10:30Z",
+  "task": "Later-pass review S1b v0.2 PR 48",
   "previousOwner": "rd-gpt6-20261017T153628-6mh2l0iooge"
 }
