@@ -38,6 +38,10 @@ from emergence_lab.spectral_dimension import graph_even_returns, torus_even_retu
 PREREG_PATH = Path("docs/SPECTRAL_S1_PREREGISTRATION.md")
 CONFIG_PATH = Path("configs/spectral_s1_pilot.json")
 PILOT_SEED_BASE = 2036101301
+# S1b sampling requires a separately reviewed activation commit. Environment flags
+# alone cannot unlock it in the implementation PR, including through this API.
+S1B_SEED_BASE = 2036101701
+S1B_RUN_AUTHORIZED = False
 BOOTSTRAP_SEED = 2036101499
 # Engineering-only seed base for P0b/P0d and unit tests. Disjoint from the pilot base,
 # the bootstrap seed and the D2 base 2036101101 (grep at the implementation commit).
@@ -247,6 +251,9 @@ def pipeline_annealed_cayley(n: int, half_times) -> dict[int, float]:
 def build_instance(fam: str, size: int, i_size: int, i_rep: int, n_sources: int,
                    seed_base: int):
     """(graph, sorted sources) with the D2 seed rule; caller supplies the seed base."""
+    if seed_base == S1B_SEED_BASE:
+        if not S1B_RUN_AUTHORIZED or os.environ.get("S1B_ALLOW_SEEDS") != "1":
+            raise PermissionError("S1b seeds locked: reviewed implementation and activation required")
     if seed_base == PILOT_SEED_BASE and os.environ.get("S1_ALLOW_PILOT_SEEDS") != "1":
         raise PermissionError("pilot seeds are locked until the implementation is reviewed")
     graph_rng, src_rng = _seed_seq(seed_base, FAMILY_ORDER.index(fam), i_size, i_rep)
