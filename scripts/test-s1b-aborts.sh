@@ -62,9 +62,15 @@ print(f'S1b {mode}: fsynced STARTED, no terminal run/evidence/source outputs; pa
 PY
   # The real CLI must fail closed on the consumed output directory. No seed
   # may be redrawn on automatic retries.
-  if python -m emergence_lab.spectral_s1b --mode engineering --no-controls --output "$base/run" > /dev/null 2>&1; then
-    echo "S1b $mode: unsafe output reuse was allowed" >&2
+  set +e
+  refusal=$(python -m emergence_lab.spectral_s1b --mode engineering --no-controls --output "$base/run" 2>&1)
+  refusal_rc=$?
+  set -e
+  test "$refusal_rc" -ne 0 || { echo "S1b $mode: unsafe output reuse was allowed" >&2; exit 1; }
+  echo "$refusal" | grep -q FileExistsError || {
+    echo "S1b $mode: restart failed for an unrelated reason, not consumed-output refusal" >&2
+    echo "$refusal" >&2
     exit 1
-  fi
+  }
 done
 echo "S1b SIGKILL and kernel-OOM containment PASS (engineering-only)"
