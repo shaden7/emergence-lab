@@ -80,9 +80,7 @@ host along the exact script path; it does not test a full run.
 - The marker release is created before seeds are touched; any later dispatch
   fails closed. A STARTED-without-terminal attempt ledger, a missing result or a
   `resource_stop.json` means **incomplete, seeds consumed, no rerun**.
-- Packaging, artifact upload (90 days) and non-overwriting release-asset upload
-  with download re-verification run `if: always()`, so watchdog, OOM or timeout
-  stops still archive whatever exists. Runner loss before packaging leaves only
+- Packaging and workflow artifact upload (90 days) run `if: always()` for every invocation. **Release-asset upload** additionally requires a local proof that this exact invocation successfully created the once-only marker, and verifies the marker body binds the current run URL and commit before any asset write. A later rejected dispatch cannot backfill a prior run's missing assets. Where the first runner dies after creating the release but before writing its local ownership proof, only the marker survives: incomplete evidence, never repaired by a later run. Non-overwriting release-asset upload includes download re-verification; ordinary watchdog, OOM or timeout stops can still archive whatever exists when the owner proof was established. Runner loss before packaging leaves only
   the marker: recorded as *incomplete, no evidence*, not retried.
 - A result is admissible for analysis review only with exit code 0,
   `resource_evidence.json` `clean_exit=true`, no watchdog failure, no
