@@ -38,10 +38,12 @@ for mode in sigkill oom; do
   # 137 is SIGKILL; Docker's OOMKilled distinguishes kernel memory killing
   # from our intentional non-OOM SIGKILL. timeout(1) instead reports 124.
   test "$rc" -eq 137 || { echo "Expected SIGKILL (137), received $rc" >&2; exit 1; }
+  # Some Docker/runner combinations also report OOMKilled=true for an
+  # explicit PID-1 SIGKILL. The flag is not a trustworthy negative control.
+  # For the OOM path require it *positively* in addition to the actual
+  # memory-exhaustion fault and exit 137. The SIGKILL path checks only 137.
   if test "$mode" = oom; then
     test "$oom_state" = true || { echo 'Expected kernel OOMKilled=true' >&2; exit 1; }
-  else
-    test "$oom_state" = false || { echo 'Unexpected OOM in SIGKILL scenario' >&2; exit 1; }
   fi
   python - "$base/run" "$mode" <<'PY'
 import json
