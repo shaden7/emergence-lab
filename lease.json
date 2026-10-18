@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261018T01193-h86zcwnfew",
+  "leaseId": "osvv5s9yj7bf4mtzxrq3",
+  "acquiredAt": "2026-10-18T01:19:32.202Z",
+  "heartbeatAt": "2026-10-18T01:19:32.202Z",
+  "expiresAt": "2026-10-18T03:19:32.202Z",
+  "task": "PR49 abnormal-exit containment evidence and reviewer repair",
   "previousOwner": "rd-gpt6-20261018-0gwqell57nyb"
 }
