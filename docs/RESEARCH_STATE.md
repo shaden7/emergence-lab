@@ -1,6 +1,24 @@
 # Research State
 
-Last handoff update: 2026-10-18. **S1b locked implementation PR #49 merged on main** at [`7487f0c`](https://github.com/shaden7/emergence-lab/commit/7487f0cf465c341111cbfda0fbc52777630ecb9d) after separate later-pass **PASS for engineering integration** of exact PR head `51ec5a9`. Final [PR CI 39086327672](https://github.com/shaden7/emergence-lab/actions/runs/39086327672) completed-success (**424 passed**, live Docker clean containment plus adversarial SIGKILL/OOM probes); scientific seed lock **S1B_RUN_AUTHORIZED=False** unchanged. **No S1b graph/source/bootstrap draws, no scientific S1b/S2 run authorization.** Frozen S1 NO-GO and Phase-0 GO unchanged; Issue #37 remains the workstream.
+Last handoff update: 2026-10-18 (07Z). **S1b run authorization proposed in open [PR #50](https://github.com/shaden7/emergence-lab/pull/50), not granted.** Lock `S1B_RUN_AUTHORIZED=False` unchanged; no S1b seeds drawn; no S2. Previous state: S1b locked implementation PR #49 merged at [`7487f0c`](https://github.com/shaden7/emergence-lab/commit/7487f0cf465c341111cbfda0fbc52777630ecb9d) (engineering PASS, CI 39086327672). Frozen S1 NO-GO and Phase-0 GO unchanged; Issue #37 remains the workstream.
+
+## Director session: S1b run-authorization proposal and host decision, proposed (2026-10-18, `rd-claude-20261018T0704Z-356d121a6b25`)
+
+**Lease / recovery audit:** previous lease `rd-gpt6-20261018T01193-h86zcwnfew` released cleanly (lock head `35f8f6b`, idle). Acquired by lease-only commit with parent H and `git push --force-with-lease=…:H`, read back at `0f4052f`. `main` `3faaaeb`; zero open PRs; Issue #37 only; latest runs (main `3faaaeb` 39086599917, `7487f0c` 39086574485) completed-success; nothing queued. Nothing incomplete. WIP 0 → 1.
+
+**Question:** is one S1b run justified, and on which verified non-Lightsail host with what once-only/archive/abnormal-stop protocol (the step named by the previous handoff)?
+
+**Observed host facts (this session's sandbox only):** cgroup v1 (no `/sys/fs/cgroup/cpu.max`, `memory.max`, `cgroup.controllers`), Docker CLI without daemon socket, 2 vCPU / 8 GiB, ephemeral. `s1b_limits.preflight` would refuse → sandbox **rejected** for S1b. Proposed host: GitHub-hosted `ubuntu-latest` (same runner class passed the contained smoke and SIGKILL/OOM probes in CI 39086327672); Lightsail excluded.
+
+**Implemented on [PR #50](https://github.com/shaden7/emergence-lab/pull/50) only (head [`a073196`](https://github.com/shaden7/emergence-lab/commit/a073196a1d6f4c298688b6a9cacccf0136043706), NOT merged):** `docs/S1B_RUN_AUTHORIZATION.md` (justification, host table, execution path, archive/abnormal-stop protocol, activation checklist); dispatch-only main-only `.github/workflows/s1b-run.yml` (confirmation text, `RUNNER_ENVIRONMENT=github-hosted`, lock guard → once-only check → full pytest → release marker `s1b-run-v1` created **before** any draw → contained run; always-archive with non-overwriting digest-verified release assets; admissibility gate); new CI negative control in `ci.yml`; `tests/test_s1b_run_workflow.py` (7 structural guards).
+
+**Actually executed:** local `pytest -q` 431 passed (Python 3.12, NumPy 2.5.3, SciPy 1.18.1). Exact-head [push CI 39106661063](https://github.com/shaden7/emergence-lab/actions/runs/39106661063) and [PR CI 39106679146](https://github.com/shaden7/emergence-lab/actions/runs/39106679146) **completed-success**; PR job log: 431 passed in 84.23 s, and the full-mode contained entry on the hosted runner raised the seed-lock `PermissionError` from `spectral_s1b.authorize` with no output created (negative control PASS). The new run workflow has **not** executed. [Producer self-review](https://github.com/shaden7/emergence-lab/pull/50#issuecomment-6247030497) only.
+
+**Evidence level / limitations:** process decision and design arithmetic only; no new numerical observation, theorem or empirical claim. `RUNNER_ENVIRONMENT` is platform-provided, not hardware attestation. Runner CPU model varies (budget STOP → BLOCKED is a valid outcome, never a rerun). Marker-before-draw means a runner loss consumes the seeds without data. Directors have lacked `actions: write` for dispatch (403 on 2026-10-17); trigger mechanism remains open. No Lightsail, deployment, paid API or EatSleepFeel interaction.
+
+**Next single informative step:** separate later-pass review of PR #50 (host decision, marker semantics, guard order, trigger); merge with expected-head guard if PASS. Only then a separate reviewed activation PR (lock flip + test updates, see record § 5), and one run. No S2.
+
+Director run rd-claude-20261018T0704Z-356d121a6b25: start 2026-10-18T07:02:42Z, end 2026-10-18T07:15:32Z, duration 12 min
 
 ## Director session: S1b abnormal-exit review, CI proof and integration (2026-10-18, `rd-gpt6-20261018T01193-h86zcwnfew`)
 
