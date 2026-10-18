@@ -68,6 +68,9 @@ jobs:
             "$RUN_URL" "$GIT_SHA" "$(cat "$RUNNER_TEMP/image_id")" > "$RUNNER_TEMP/started.txt"
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GIT_SHA" \
             --title "S1b replication run (once only)" --notes-file "$RUNNER_TEMP/started.txt" --latest=false
+          # This local proof is created ONLY by the invocation that successfully created the marker.
+          # A later rejected dispatch must not attach replacement evidence to an earlier run.
+          printf '%s\\n' "$RUN_URL" > "$RUNNER_TEMP/s1b_marker_created_by_this_run"
       - name: Contained S1b run (1 core, 2 GiB, no network, 200 CPU-min watchdog)
         timeout-minutes: 205
         run: |
@@ -103,7 +106,16 @@ jobs:
       - name: Archive non-overwriting release assets and re-verify download
         if: always()
         run: |
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || { echo 'no marker: seeds were not consumed'; exit 0; }
+          if [ ! -s "$RUNNER_TEMP/s1b_marker_created_by_this_run" ]; then
+            echo "This invocation did not create the marker; release archival forbidden"
+            exit 0
+          fi
+          test "$(cat "$RUNNER_TEMP/s1b_marker_created_by_this_run")" = "$RUN_URL" || exit 1
+          # Verify remote marker identity, not mere tag existence, before uploading any asset.
+          marker_body="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq .body)"
+          printf '%s\\n' "$marker_body" | grep -Fq "STARTED by $RUN_URL at commit $GIT_SHA," || {
+            echo "Release marker belongs to another invocation or revision"; exit 1;
+          }
           test -s s1b_run_evidence.tar.gz || exit 1
           for file in s1b_run_evidence.tar.gz s1b_run_evidence.sha256; do
             local_hash="$(sha256sum "$file" | cut -d ' ' -f 1)"
