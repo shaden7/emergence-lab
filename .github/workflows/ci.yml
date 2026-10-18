@@ -19,6 +19,27 @@ jobs:
           python-version: '3.12'
       - run: pip install -e '.[test]'
       - run: pytest -q
+      # Isolated engineering seeds only; S1b graph and bootstrap seeds stay locked.
+      - name: S1b engineering containment and checkpoint smoke
+        timeout-minutes: 5
+        env:
+          S1B_HOST_CLASS: non-lightsail
+        run: |
+          docker build -t emergence-s1b-ci .
+          image=$(docker image inspect emergence-s1b-ci --format '{{.Id}}')
+          sh scripts/run-s1b-contained.sh "$image" "$RUNNER_TEMP/s1b-contained" engineering
+          mkdir -p results/s1b_contained
+          cp -r "$RUNNER_TEMP/s1b-contained/run/." results/s1b_contained/
+          python -c "import json,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP'])/'s1b-contained'/'run'; r=json.load(open(p/'resource_evidence.json')); m=json.load(open(p/'manifest.json')); a=json.load(open(p/'report.json')); assert r['clean_exit'] and r['watchdog_failure'] is None; assert m['mode']=='engineering' and all(s[0]==2036101797 for s in m['seed_tuples_attempted']); assert not a['s2_run_authorized']; print('S1b containment engineering PASS', r)"
+      # These execute only disjoint engineering seeds on disposable GitHub runners.
+      # A real Docker SIGKILL and kernel OOM must leave no admissible run evidence.
+      - name: S1b engineering forced-abort and OOM containment
+        timeout-minutes: 4
+        env:
+          S1B_HOST_CLASS: non-lightsail
+        run: |
+          image=$(docker image inspect emergence-s1b-ci --format '{{.Id}}')
+          sh scripts/test-s1b-aborts.sh "$image" "$RUNNER_TEMP/s1b-abort"
       - run: emergence-lab --config configs/smoke.json --output results
       - name: Exact 4x4 reference holdout
         env:
