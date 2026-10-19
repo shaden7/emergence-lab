@@ -95,7 +95,15 @@ def test_release_archive_is_owned_by_this_invocation(tmp_path):
     assert denied.returncode == 0, denied.stderr
     assert not calls.exists()
 
-    (tmp_path / "s1b_marker_created_by_this_run").write_text(env["RUN_URL"] + "\n")
+    # Create the ownership proof with the workflow's OWN command (not from Python),
+    # so a quoting/escaping defect in the writer cannot hide behind the test.
+    consume = TEXT[step_index("Consume seeds"):step_index("Contained S1b run")]
+    writer = [line.strip() for line in consume.splitlines()
+              if "s1b_marker_created_by_this_run" in line and ">" in line]
+    assert len(writer) == 1, writer
+    made = subprocess.run(["bash", "-e", "-c", writer[0]], env=env, capture_output=True, text=True)
+    assert made.returncode == 0, made.stderr
+    assert (tmp_path / "s1b_marker_created_by_this_run").read_text() == env["RUN_URL"] + "\n"
     env["RELEASE_BODY"] = "STARTED by https://github.com/example/repo/actions/runs/OLD at commit abc123, image old."
     mismatched = subprocess.run(["bash", "-c", guard], env=env, capture_output=True, text=True)
     assert mismatched.returncode != 0
