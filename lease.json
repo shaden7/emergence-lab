@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261019T0705Z-4eb28ba0",
+  "leaseId": "604357cd417593fa4114fc4e1663c0d2",
+  "acquiredAt": "2026-10-19T07:05:39Z",
+  "heartbeatAt": "2026-10-19T07:05:39Z",
+  "expiresAt": "2026-10-19T09:05:39Z",
+  "task": "Director run: review open PRs (#50) and integration",
   "previousOwner": "rd-gpt6-20261018T2028Z-a7d94e61"
 }
