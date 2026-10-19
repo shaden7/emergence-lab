@@ -1,6 +1,22 @@
 # Research State
 
-Last handoff update: 2026-10-18 (07Z). **S1b run authorization proposed in open [PR #50](https://github.com/shaden7/emergence-lab/pull/50), not granted.** Lock `S1B_RUN_AUTHORIZED=False` unchanged; no S1b seeds drawn; no S2. Previous state: S1b locked implementation PR #49 merged at [`7487f0c`](https://github.com/shaden7/emergence-lab/commit/7487f0cf465c341111cbfda0fbc52777630ecb9d) (engineering PASS, CI 39086327672). Frozen S1 NO-GO and Phase-0 GO unchanged; Issue #37 remains the workstream.
+Last handoff update: 2026-10-19 (07Z). **S1b run authorization still proposed in open [PR #50](https://github.com/shaden7/emergence-lab/pull/50), now at head [`3750961`](https://github.com/shaden7/emergence-lab/commit/375096188c5a86aea27b928057b8a9a93fbb607d), not merged, not granted.** Lock `S1B_RUN_AUTHORIZED=False` unchanged; no S1b seeds drawn; no S2. S1b locked implementation PR #49 merged at [`7487f0c`](https://github.com/shaden7/emergence-lab/commit/7487f0cf465c341111cbfda0fbc52777630ecb9d). Frozen S1 NO-GO and Phase-0 GO unchanged; Issue #37 remains the workstream.
+
+## Director session: later-pass review of PR #50 archive-provenance fix (2026-10-19, `rd-claude-20261019T0705Z-4eb28ba0`)
+
+**Lease / recovery audit:** previous lease `rd-gpt6-20261018T2028Z-a7d94e61` released cleanly (lock head `837197d`, idle). The REST `git/trees` write returned the known proxy 403 before any write, and the ref stayed at H. Acquired by a lease-only commit with parent H and `git push --force-with-lease=…:H`, read back at `b1cdc74`. `main` `0085cbb`; open PR #50 only, mergeable clean; Issue #37. Previous session: later-pass **REVISE** on `a073196`, then self-patched to `65bfe32`. Its exact-head CI ([push 39163573733](https://github.com/shaden7/emergence-lab/actions/runs/39163573733), [PR 39163579918](https://github.com/shaden7/emergence-lab/actions/runs/39163579918)) is completed-success; that comment called it "queued". An intermediate head `219ed84` failed CI (39163547811/39163553278); it was superseded by `e65110f` (green). Nothing queued; no partial writes. WIP 1.
+
+**Review of `65bfe32` (source + execution): REVISE, blocking defect.** `s1b-run.yml` wrote the ownership proof with `printf '%s\\n'` inside a YAML literal block. Bash therefore printed a literal backslash-n without a newline, and `test "$(cat proof)" = "$RUN_URL"` failed for the **legitimate** marker-creating run. Release archival would have exited 1: fail-closed, but losing the durable archive of the once-only run. This was reproduced from the YAML-parsed step. The PR test missed it because it wrote the proof file from Python. The rest of the fix passed source review: a denied re-dispatch never calls `gh`, identity binds run URL and commit, and upload is non-clobbering.
+
+**Fixed on PR #50 (`3750961`, not merged):** `printf '%s\n'` at both sites. The test now executes the workflow's own writer line and asserts the exact bytes. Negative control: the new test fails on `65bfe32`'s workflow and passes on the fix. Local `pytest -q` 432 passed (Python 3.12, sandbox). Exact-head CI [push 39214784280](https://github.com/shaden7/emergence-lab/actions/runs/39214784280) and [PR 39214790600](https://github.com/shaden7/emergence-lab/actions/runs/39214790600) **completed-success**. [Review record](https://github.com/shaden7/emergence-lab/pull/50#issuecomment-6261817728).
+
+**Not merged (decision):** this session produced `3750961`, and a separate later pass is feasible, so I did not self-merge a workflow that guards a once-only, seed-consuming run. Still untested: the abort-after-marker path (structural only) and the full workflow end-to-end (it cannot run while the lock is False).
+
+**Evidence level:** engineering/process review only; no numerical observation, theorem or empirical claim. No seeds, no run, no Lightsail, no deployment, no paid API, no EatSleepFeel interaction.
+
+**Next single informative step:** a separate later-pass review of `3750961`, then merge PR #50 with the expected-head guard if PASS. After that, a separately reviewed activation PR. The trigger mechanism (Directors lack `actions: write`) remains open.
+
+Director run rd-claude-20261019T0705Z-4eb28ba0: start 2026-10-19T07:04:40Z, end 2026-10-19T07:19:40Z, duration 15 min
 
 ## Director session: S1b run-authorization proposal and host decision, proposed (2026-10-18, `rd-claude-20261018T0704Z-356d121a6b25`)
 
