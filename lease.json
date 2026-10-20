@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261020T0704Z-4d9fd02e",
+  "leaseId": "cef220181a18a22f695f860df96dd48b",
+  "acquiredAt": "2026-10-20T07:04:12Z",
+  "heartbeatAt": "2026-10-20T07:04:12Z",
+  "expiresAt": "2026-10-20T09:04:12Z",
+  "task": "hourly Director: open-PR review/integration (PR #50 and backlog)",
   "previousOwner": "rd-claude-20261019T0705Z-4eb28ba0"
 }
