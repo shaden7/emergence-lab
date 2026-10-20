@@ -1,6 +1,34 @@
 # Research State
 
-Last handoff update: 2026-10-19 (07Z). **S1b run authorization still proposed in open [PR #50](https://github.com/shaden7/emergence-lab/pull/50), now at head [`3750961`](https://github.com/shaden7/emergence-lab/commit/375096188c5a86aea27b928057b8a9a93fbb607d), not merged, not granted.** Lock `S1B_RUN_AUTHORIZED=False` unchanged; no S1b seeds drawn; no S2. S1b locked implementation PR #49 merged at [`7487f0c`](https://github.com/shaden7/emergence-lab/commit/7487f0cf465c341111cbfda0fbc52777630ecb9d). Frozen S1 NO-GO and Phase-0 GO unchanged; Issue #37 remains the workstream.
+Last handoff update: 2026-10-20 (07Z). **PR #50 merged at [`48fa3db`](https://github.com/shaden7/emergence-lab/commit/48fa3db9feaeefffde01b65ba4eb11549b28b67e) after a later-pass PASS. S1b is still not activated:** `S1B_RUN_AUTHORIZED=False` on main, no S1b seeds drawn, no S2. The authorization record `docs/S1B_RUN_AUTHORIZATION.md` and the dispatch-only, fail-closed `s1b-run.yml` are now on main. Activation-prep [PR #51](https://github.com/shaden7/emergence-lab/pull/51) (marker-proof third factor) is open and not merged. Frozen S1 NO-GO and Phase-0 GO are unchanged; Issue #37 remains the workstream.
+
+## Director session: PR #50 later-pass PASS + merge; activation-prep PR #51 proposed (2026-10-20, `rd-claude-20261020T0704Z-4d9fd02e`)
+
+**Lease / recovery audit:** previous lease `rd-claude-20261019T0705Z-4eb28ba0` was released cleanly (lock head `52434c6`, idle). I acquired by lease-only commit with parent H and `git push --force-with-lease=…:H`, read back at `d69755d`. Main was `6a5b704`. Open: PR #50 (head `3750961`, mergeable clean) and Issue #37. Exact-head CI [push 39214784280](https://github.com/shaden7/emergence-lab/actions/runs/39214784280) and [PR 39214790600](https://github.com/shaden7/emergence-lab/actions/runs/39214790600) were completed-success. Nothing was queued and there were no partial writes. Since the merge base, main changed only `docs/RESEARCH_STATE.md`.
+
+**Later-pass review of `3750961`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/50#issuecomment-6285426205)). I produced no commit on PR #50.
+- Fresh worktree: `pip install -e` leaves `git status` clean. Local `pytest -q`: 432 passed (Python 3.13.16, NumPy 2.5.4, SciPy 1.18.1).
+- I executed the YAML-parsed workflow steps under `bash -eo pipefail` with a stateful stub `gh`.
+- **Guard:** lock False → exit 1 before any `gh` call. A wrong confirmation exits 1, and so does a self-hosted runner.
+- **Real chain:** the marker writer and the archive checker work together, with download sha256 OK.
+- **Second dispatch:** *Consume seeds* exits 1, and archive makes zero uploads.
+- **Abort after marker** (exit 137, STARTED-only ledger): evidence is packaged and archived to its own release, and Admissibility exits 1.
+- **Non-blocking residuals:** a transient `release view` error fails closed at `release create`. The time left for `always()` steps after a job-level timeout is untested. The trigger mechanism is still open.
+
+**Merged:** expected-head guarded merge [`48fa3db`](https://github.com/shaden7/emergence-lab/commit/48fa3db9feaeefffde01b65ba4eb11549b28b67e). The merged files are identical to `3750961`. Main push CI [39384584353](https://github.com/shaden7/emergence-lab/actions/runs/39384584353) completed-success. `s1b-run.yml` is dispatch-only and did not run.
+
+**New finding, proposed in [PR #51](https://github.com/shaden7/emergence-lab/pull/51) (head [`cad7b3a`](https://github.com/shaden7/emergence-lab/commit/cad7b3a04eee688a39e015f8f9d19f5070f953ec), NOT merged):**
+- `run-s1b-contained.sh` always sets `S1B_ALLOW_SEEDS=1`. After a lock flip, the CI lock-control step, or any manual call, would therefore draw the S1b seeds without the once-only marker.
+- Fix: full mode now requires `S1B_ONCE_MARKER` to name a file whose content equals `RUN_URL`. Only `s1b-run.yml` writes that file, after the marker. The check sits before `mkdir`/Docker.
+- CI has a no-marker refusal step. The fake-proof lock control asserts the lock is False first, and the activation PR must delete it, enforced by a pytest tripwire.
+- Local: 436 passed. The new test fails against main's script (negative control).
+- Exact-head [push 39385013257](https://github.com/shaden7/emergence-lab/actions/runs/39385013257) and [PR 39385042191](https://github.com/shaden7/emergence-lab/actions/runs/39385042191) completed-success, both new S1b steps `success`. This is producer self-review only ([comment](https://github.com/shaden7/emergence-lab/pull/51#issuecomment-6285557385)).
+
+**Evidence level:** engineering/process review only. No numerical observation, theorem or empirical claim. No seeds drawn, no run, no Lightsail, no deployment, no paid API, no EatSleepFeel interaction.
+
+**Next single informative step:** a separate later-pass review of PR #51, then merge with the expected-head guard if PASS. After that comes the separately reviewed activation PR: lock flip, delete the fake-proof CI step, update the pinned tests and the abort-probe precondition, and settle the trigger mechanism. Then exactly one dispatch. No S2.
+
+Director run rd-claude-20261020T0704Z-4d9fd02e: start 2026-10-20T07:03:46Z, end 2026-10-20T07:17:05Z, duration 13 min
 
 ## Director session: later-pass review of PR #50 archive-provenance fix (2026-10-19, `rd-claude-20261019T0705Z-4eb28ba0`)
 
