@@ -1,0 +1,144 @@
+name: S1b locked replication run (once only, dispatch from main)
+
+# Issue #37, S1b v0.2 (docs/SPECTRAL_S1B_PREREGISTRATION.md, PR #48) and the
+# run-authorization record docs/S1B_RUN_AUTHORIZATION.md. This workflow is the
+# proposed execution path on a disposable GitHub-hosted runner (NOT Lightsail).
+# While spectral_s1.S1B_RUN_AUTHORIZED is False it fails closed at the first
+# guard, before any marker, container or random generator. Activation requires a
+# separately reviewed commit on main that flips the lock.
+# Once only: a release tag is created BEFORE the seeds are touched; any later
+# dispatch sees the tag and fails closed. A killed/aborted run therefore consumes
+# the seeds and is archived as incomplete evidence; it is never rerun.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type S1B-ONCE-2036101701 to confirm a single, seed-consuming run'
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: s1b-run-v1
+  cancel-in-progress: false
+
+jobs:
+  s1b:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # 11,998 s native wall stop (~200 min) + build/tests/archive margin; < 6 h hosted cap.
+    timeout-minutes: 240
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GIT_SHA: ${{ github.sha }}
+      TAG: s1b-run-v1
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      S1B_HOST_CLASS: non-lightsail
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install (no seeds touched)
+        run: pip install -e '.[test]'
+      - name: Guard - confirmation, hosted runner, reviewed activation, once only
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          test "$CONFIRM" = S1B-ONCE-2036101701 || { echo 'confirmation text mismatch'; exit 1; }
+          test "$RUNNER_ENVIRONMENT" = github-hosted || { echo 'GitHub-hosted runner required'; exit 1; }
+          test -z "$(git status --porcelain)"
+          python -c "from emergence_lab import spectral_s1 as s; assert s.S1B_RUN_AUTHORIZED is True, 'S1b lock is False: no reviewed activation on main'"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG exists: S1b seeds already consumed; refusing any rerun"; exit 1
+          fi
+      - name: Full test suite on the exact commit
+        run: pytest -q
+      - name: Build immutable image
+        run: |
+          docker build -t emergence-s1b-run .
+          docker image inspect emergence-s1b-run --format '{{.Id}}' > "$RUNNER_TEMP/image_id"
+      - name: Consume seeds - create the once-only marker before any draw
+        run: |
+          printf 'S1b once-only marker. STARTED by %s at commit %s, image %s.\nSeeds are consumed from this point; an absent result asset means an incomplete run.\n' \
+            "$RUN_URL" "$GIT_SHA" "$(cat "$RUNNER_TEMP/image_id")" > "$RUNNER_TEMP/started.txt"
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GIT_SHA" \
+            --title "S1b replication run (once only)" --notes-file "$RUNNER_TEMP/started.txt" --latest=false
+          # This local proof is created ONLY by the invocation that successfully created the marker.
+          # A later rejected dispatch must not attach replacement evidence to an earlier run.
+          printf '%s\n' "$RUN_URL" > "$RUNNER_TEMP/s1b_marker_created_by_this_run"
+      - name: Contained S1b run (1 core, 2 GiB, no network, 200 CPU-min watchdog)
+        timeout-minutes: 205
+        run: |
+          set +e
+          sh scripts/run-s1b-contained.sh "$(cat "$RUNNER_TEMP/image_id")" "$RUNNER_TEMP/s1b" \
+            > "$RUNNER_TEMP/run_stdout.txt" 2> "$RUNNER_TEMP/run_stderr.txt"
+          echo $? > "$RUNNER_TEMP/run_exit_code"
+          exit 0
+      - name: Package evidence (always, including aborted runs)
+        if: always()
+        run: |
+          mkdir -p results/s1b_run
+          cp -r "$RUNNER_TEMP/s1b/." results/s1b_run/ 2>/dev/null || true
+          for f in image_id run_exit_code run_stdout.txt run_stderr.txt started.txt; do
+            cp "$RUNNER_TEMP/$f" results/s1b_run/ 2>/dev/null || true
+          done
+          {
+            echo "run_url=$RUN_URL"; echo "git_sha=$GIT_SHA"; echo "runner_environment=$RUNNER_ENVIRONMENT"
+            echo "image_os=${ImageOS:-unknown}"; echo "image_version=${ImageVersion:-unknown}"
+            echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo || true; uname -a
+          } > results/s1b_run/host_provenance.txt
+          tar -C results -czf s1b_run_evidence.tar.gz s1b_run
+          sha256sum s1b_run_evidence.tar.gz > s1b_run_evidence.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1b-run-evidence
+          path: |
+            s1b_run_evidence.tar.gz
+            s1b_run_evidence.sha256
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Archive non-overwriting release assets and re-verify download
+        if: always()
+        run: |
+          if [ ! -s "$RUNNER_TEMP/s1b_marker_created_by_this_run" ]; then
+            echo "This invocation did not create the marker; release archival forbidden"
+            exit 0
+          fi
+          test "$(cat "$RUNNER_TEMP/s1b_marker_created_by_this_run")" = "$RUN_URL" || exit 1
+          # Verify remote marker identity, not mere tag existence, before uploading any asset.
+          marker_body="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq .body)"
+          printf '%s\n' "$marker_body" | grep -Fq "STARTED by $RUN_URL at commit $GIT_SHA," || {
+            echo "Release marker belongs to another invocation or revision"; exit 1;
+          }
+          test -s s1b_run_evidence.tar.gz || exit 1
+          for file in s1b_run_evidence.tar.gz s1b_run_evidence.sha256; do
+            local_hash="$(sha256sum "$file" | cut -d ' ' -f 1)"
+            remote_hash="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq ".assets[] | select(.name == \"$file\") | .digest")"
+            if [ -n "$remote_hash" ]; then
+              test "$remote_hash" = "sha256:$local_hash" || { echo "Digest conflict: $file"; exit 1; }
+            else
+              gh release upload "$TAG" "$file" --repo "$GITHUB_REPOSITORY"
+            fi
+          done
+          mkdir -p downloaded
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir downloaded --pattern 's1b_run_evidence.*'
+          (cd downloaded && sha256sum --check s1b_run_evidence.sha256)
+      - name: Admissibility check (result invalid without clean resource evidence)
+        run: |
+          test "$(cat "$RUNNER_TEMP/run_exit_code")" = 0
+          python - <<'PY'
+          import json, os, pathlib
+          p = pathlib.Path(os.environ['RUNNER_TEMP']) / 's1b' / 'run'
+          r = json.loads((p / 'resource_evidence.json').read_text())
+          assert r['clean_exit'] and r['watchdog_failure'] is None, r
+          assert not (p / 'resource_stop.json').exists()
+          m = json.loads((p / 'manifest.json').read_text())
+          assert m['mode'] == 's1b', m['mode']
+          print('S1b run evidence admissible for analysis review', r)
+          PY
