@@ -63,6 +63,16 @@ hosted-runner loss mid-run is possible (handled in § 4).
    read-only checkout, single-threaded BLAS, cgroup CPU watchdog, native
    11,998 s wall stop).
 
+**Third seed factor (activation prep, 2026-10-20):** in full mode,
+`run-s1b-contained.sh` refuses (exit 2, before `mkdir` or Docker) unless
+`S1B_ONCE_MARKER` names a non-empty file whose content equals `RUN_URL`. Only the
+*Consume seeds* step of `s1b-run.yml` writes that file, after it has created the
+release marker. So even with `S1B_RUN_AUTHORIZED=True` on `main`, a CI job, a
+manual invocation or a rejected re-dispatch cannot start a full run through this
+script. This is a cooperative guard against accidents, not a security boundary:
+an operator could forge the file. The in-code check
+(`S1B_RUN_AUTHORIZED` and `S1B_ALLOW_SEEDS=1`) is unchanged.
+
 Trigger: Directors have so far lacked `actions: write` (dispatch returned 403,
 2026-10-17). Until a Director verifies it can dispatch, the owner may press
 *Run workflow* once after activation; this is a mechanical trigger, not a review
@@ -92,8 +102,14 @@ host along the exact script path; it does not test a full run.
 
 - flip `S1B_RUN_AUTHORIZED = True` and update the tests that pin `False`
   (`tests/test_spectral_s1b.py`, `tests/test_s1b_run_workflow.py`, the abort
-  probe precondition, the CI lock negative control) so that engineering seeds
-  remain disjoint and the abort probes still never touch scientific seeds;
+  probe precondition) so that engineering seeds remain disjoint and the abort
+  probes still never touch scientific seeds;
+- **delete** the CI step "S1b full-mode seed-lock refusal on hosted runner
+  (lock-false only)". It supplies a fake marker proof, so after the flip it would
+  draw the seeds in CI. Two tripwires guard this: the step first asserts the lock
+  is `False`, and `test_ci_fake_marker_control_exists_only_while_lock_is_false`
+  fails `pytest`, which runs before any Docker step. Keep the no-marker refusal
+  step;
 - keep `S1B_ALLOW_SEEDS=1` set only inside `run-s1b-contained.sh`;
 - update `configs/spectral_s1b.json` `status` text;
 - record the reviewer's PASS and this record's accepted host decision.

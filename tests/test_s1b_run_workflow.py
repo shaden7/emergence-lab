@@ -112,3 +112,83 @@ def test_release_archive_is_owned_by_this_invocation(tmp_path):
     env["RELEASE_BODY"] = "STARTED by " + env["RUN_URL"] + " at commit abc123, image sha256:1."
     matching = subprocess.run(["bash", "-c", guard], env=env, capture_output=True, text=True)
     assert matching.returncode == 0, matching.stderr
+
+
+CI = Path(".github/workflows/ci.yml").read_text()
+SCRIPT = Path("scripts/run-s1b-contained.sh").resolve()
+
+
+def test_contained_full_run_receives_this_invocations_marker_proof():
+    run_step = TEXT[step_index("Contained S1b run"):step_index("Package evidence")]
+    assert 'S1B_ONCE_MARKER="$RUNNER_TEMP/s1b_marker_created_by_this_run"' in run_step
+    consume = TEXT[step_index("Consume seeds"):step_index("Contained S1b run")]
+    assert '> "$RUNNER_TEMP/s1b_marker_created_by_this_run"' in consume
+
+
+def test_ci_fake_marker_control_exists_only_while_lock_is_false():
+    """Tripwire: after activation a fake marker in CI would draw the S1b seeds."""
+    if s1.S1B_RUN_AUTHORIZED:
+        assert "S1B_ONCE_MARKER" not in CI and "fake_marker_proof" not in CI
+    else:
+        step = CI[CI.index("lock-false only)"):CI.index("- run: emergence-lab --config configs/smoke.json")]
+        assert "assert s.S1B_RUN_AUTHORIZED is False" in step
+        assert step.index("assert s.S1B_RUN_AUTHORIZED is False") < step.index("run-s1b-contained.sh")
+
+
+def _script_env(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
+                    "commit", "-q", "--allow-empty", "-m", "t"], check=True)
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    docker = bindir / "docker"
+    docker.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> "$DOCKER_CALLS"\n')
+    docker.chmod(0o755)
+    env = {k: v for k, v in os.environ.items() if k not in ("RUN_URL", "S1B_ONCE_MARKER")}
+    env.update(PATH=f"{bindir}{os.pathsep}{env.get('PATH', '')}", S1B_HOST_CLASS="non-lightsail",
+               DOCKER_CALLS=str(tmp_path / "docker_calls"))
+    return repo, env
+
+
+def _contained(repo, env, out, *extra):
+    return subprocess.run(["sh", str(SCRIPT), "sha256:0", str(out), *extra], cwd=repo, env=env,
+                          capture_output=True, text=True)
+
+
+def test_contained_full_mode_requires_marker_proof_before_docker(tmp_path):
+    repo, env = _script_env(tmp_path)
+    calls = tmp_path / "docker_calls"
+    url = "https://github.com/o/r/actions/runs/7"
+    proof = tmp_path / "proof"
+    cases = [
+        ({}, "no proof, no RUN_URL"),
+        ({"RUN_URL": url}, "no proof"),
+        ({"S1B_ONCE_MARKER": str(proof)}, "proof but no RUN_URL"),
+        ({"RUN_URL": url, "S1B_ONCE_MARKER": str(tmp_path / "missing")}, "missing proof file"),
+        ({"RUN_URL": url + "8", "S1B_ONCE_MARKER": str(proof)}, "proof of another invocation"),
+    ]
+    proof.write_text(url + "\n")
+    for i, (extra, label) in enumerate(cases):
+        out = tmp_path / f"out{i}"
+        r = _contained(repo, dict(env, **extra), out)
+        assert r.returncode == 2, label
+        assert "once-only marker proof" in r.stderr, label
+        assert not out.exists() and not calls.exists(), label
+    empty = tmp_path / "empty"
+    empty.write_text("")
+    r = _contained(repo, dict(env, RUN_URL="", S1B_ONCE_MARKER=str(empty)), tmp_path / "out_empty")
+    assert r.returncode == 2 and not calls.exists()
+
+    ok = _contained(repo, dict(env, RUN_URL=url, S1B_ONCE_MARKER=str(proof)), tmp_path / "out_ok")
+    assert ok.returncode == 0, ok.stderr
+    args = calls.read_text()
+    assert "--mode s1b" in args and "S1B_ALLOW_SEEDS=1" in args and "--network none" in args
+
+
+def test_contained_engineering_mode_needs_no_marker(tmp_path):
+    repo, env = _script_env(tmp_path)
+    r = _contained(repo, env, tmp_path / "eng", "engineering")
+    assert r.returncode == 0, r.stderr
+    assert "--mode engineering" in (tmp_path / "docker_calls").read_text()

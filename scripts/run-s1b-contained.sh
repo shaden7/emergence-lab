@@ -1,5 +1,6 @@
 #!/bin/sh
-# Future reviewed/activated run only. It currently exits at the seed lock.
+# Future reviewed/activated run only. Full mode exits without the once-only marker proof
+# (s1b-run.yml) and, while S1B_RUN_AUTHORIZED is False, at the in-code seed lock.
 # Build the existing Dockerfile first; pass an immutable local image ID (sha256:...).
 set -eu
 test "$#" -ge 2 && test "$#" -le 3 || { echo 'usage: run-s1b-contained.sh sha256:IMAGE_ID ABSOLUTE_NEW_OUTPUT_DIR [engineering]' >&2; exit 2; }
@@ -13,6 +14,13 @@ case "$2" in /*) ;; *) echo 'Output path must be absolute' >&2; exit 2;; esac
 test ! -e "$2" || { echo 'Refusing existing output directory' >&2; exit 2; }
 # Docker creates no new infrastructure. The operator must verify this is NOT Lightsail.
 test "${S1B_HOST_CLASS:-}" = non-lightsail || { echo 'Verify the non-Lightsail host first' >&2; exit 2; }
+# Third factor (besides S1B_RUN_AUTHORIZED and S1B_ALLOW_SEEDS): a full run starts only inside the
+# s1b-run.yml invocation that created the once-only release marker, whose proof file holds RUN_URL.
+if test "$mode" = s1b; then
+  test -n "${RUN_URL:-}" && test -s "${S1B_ONCE_MARKER:-/nonexistent}" \
+    && test "$(cat "$S1B_ONCE_MARKER")" = "$RUN_URL" \
+    || { echo 'Full S1b requires the once-only marker proof written by s1b-run.yml' >&2; exit 2; }
+fi
 test -z "$(git status --porcelain)" || { echo 'Use a clean reviewed checkout' >&2; exit 2; }
 revision=$(git rev-parse HEAD)
 mkdir "$2"
