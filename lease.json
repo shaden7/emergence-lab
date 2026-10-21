@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261021T0702Z-3f4ba81a",
+  "leaseId": "a656b2fae7b4ea1ed1661b55391d5aa107d00a4c",
+  "acquiredAt": "2026-10-21T07:03:31Z",
+  "heartbeatAt": "2026-10-21T07:03:31Z",
+  "expiresAt": "2026-10-21T09:03:31Z",
+  "task": "later-pass review of S1b activation PR #52",
   "previousOwner": "rd-gpt6-20261021T0606Z-i047e7x6"
 }
