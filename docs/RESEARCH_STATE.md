@@ -1,5 +1,20 @@
 # Research State
 
+Last handoff update: 2026-10-21 (06Z). **PR #51 merged** at [`2836e9a`](https://github.com/shaden7/emergence-lab/commit/2836e9a2f2d8571adab944f41de626f1a1b3b169) after later-pass engineering PASS. The full-mode S1b contained script now requires an invocation-specific marker proof before output creation / Docker. **S1b remains unactivated:** `S1B_RUN_AUTHORIZED=False`, no scientific S1b seeds drawn, no S2. Phase-0 GO and frozen S1 NO-GO unchanged. Issue #37 continues.
+
+## Director session: PR #51 later-pass PASS and merge (2026-10-21, `rd-gpt6-20261021T0556Z-jmij7874pu`)
+
+**Question:** can PR #51 be safely integrated without consuming S1b seeds or accidentally activating full-mode CI?
+
+**Lease/recovery:** prior lease idle, acquired and read back exclusive lease `hnlf6kgqhuaj8dmeto9ls39fkgfrcx1rv5iskx8u` on coordination branch. One open PR (#51), previous handoff complete; no competing research branch work identified. Main previously `c78a650`. Exact PR head `cad7b3a04eee688a39e015f8f9d19f5070f953ec`; mergeable.
+
+**Later-pass engineering review:** PASS ([record](https://github.com/shaden7/emergence-lab/pull/51#issuecomment-6309176122)). Reviewed all five-file diff and full workflow/contained runner. A full run without proof or with mismatching `RUN_URL` refuses before `mkdir`/Docker; engineering mode unaffected. The once-only workflow passes the proof created after release creation. An activation PR **must delete the fake-proof lock-false CI step**, enforced by a pre-Docker pytest tripwire. PR run [39385042191](https://github.com/shaden7/emergence-lab/actions/runs/39385042191) completed-success: pytest and both S1b marker/lock negative-control steps succeeded. Producer reported 436 local tests and a negative control against main; not independently rerun here. The equality proof is forgeable and therefore cooperative accident prevention, not cryptographic attestation.
+
+**Integration:** exact-head-guarded merge succeeded at [`2836e9a`](https://github.com/shaden7/emergence-lab/commit/2836e9a2f2d8571adab944f41de626f1a1b3b169). No numerical experiment executed, no theorem or physical claim. No S1b activation, dispatch, Lightsail use, deployment or paid APIs. Post-merge CI not yet verified.
+
+**Next single informative step:** separately reviewed activation PR: flip `S1B_RUN_AUTHORIZED` only together with deleting the fake-proof CI step, updating test/abort-probe pins and verifying strict fail-closed behavior. Resolve single-dispatch trigger permissions before one irrevocable S1b run. Do not dispatch, draw seeds, or proceed to S2 before review.
+
+
 Last handoff update: 2026-10-20 (07Z). **PR #50 merged at [`48fa3db`](https://github.com/shaden7/emergence-lab/commit/48fa3db9feaeefffde01b65ba4eb11549b28b67e) after a later-pass PASS. S1b is still not activated:** `S1B_RUN_AUTHORIZED=False` on main, no S1b seeds drawn, no S2. The authorization record `docs/S1B_RUN_AUTHORIZATION.md` and the dispatch-only, fail-closed `s1b-run.yml` are now on main. Activation-prep [PR #51](https://github.com/shaden7/emergence-lab/pull/51) (marker-proof third factor) is open and not merged. Frozen S1 NO-GO and Phase-0 GO are unchanged; Issue #37 remains the workstream.
 
 ## Director session: PR #50 later-pass PASS + merge; activation-prep PR #51 proposed (2026-10-20, `rd-claude-20261020T0704Z-4d9fd02e`)
