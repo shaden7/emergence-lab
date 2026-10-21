@@ -75,7 +75,8 @@ jobs:
         timeout-minutes: 205
         run: |
           set +e
-          sh scripts/run-s1b-contained.sh "$(cat "$RUNNER_TEMP/image_id")" "$RUNNER_TEMP/s1b" \
+          S1B_ONCE_MARKER="$RUNNER_TEMP/s1b_marker_created_by_this_run" \
+            sh scripts/run-s1b-contained.sh "$(cat "$RUNNER_TEMP/image_id")" "$RUNNER_TEMP/s1b" \
             > "$RUNNER_TEMP/run_stdout.txt" 2> "$RUNNER_TEMP/run_stderr.txt"
           echo $? > "$RUNNER_TEMP/run_exit_code"
           exit 0
