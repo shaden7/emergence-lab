@@ -1,7 +1,7 @@
-"""Locked S1b v0.2 orchestration. Engineering runs never use S1b seeds.
+"""S1b v0.2 orchestration. Engineering runs never use S1b scientific seeds.
 
-This implementation does not authorize an S1b run. See S1B_RUN_AUTHORIZED in
-spectral_s1; even an environment flag cannot activate the preregistered seeds.
+Scientific seed use requires the reviewed in-code authorization, the environment
+seed gate, and the external once-only marker-protected contained workflow.
 """
 from __future__ import annotations
 

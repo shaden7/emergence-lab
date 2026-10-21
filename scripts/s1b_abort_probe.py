@@ -20,8 +20,10 @@ def main() -> None:
     mode, output = sys.argv[1], Path(sys.argv[2])
     if mode not in {"sigkill", "oom"}:
         raise ValueError("test-only fault must be sigkill or oom")
-    if s1.S1B_RUN_AUTHORIZED:
-        raise AssertionError("S1b scientific seeds must remain locked")
+    # Even after activation, fault probes run only in isolated engineering mode.
+    # No CI probe may carry the environment gate for scientific seeds.
+    if os.environ.get("S1B_ALLOW_SEEDS") == "1":
+        raise AssertionError("Abort probe must never enable S1b scientific seeds")
 
     def interrupt_before_rng(*_args, **_kwargs):
         # The real production runner already wrote these checkpoints and

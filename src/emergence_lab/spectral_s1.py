@@ -38,10 +38,11 @@ from emergence_lab.spectral_dimension import graph_even_returns, torus_even_retu
 PREREG_PATH = Path("docs/SPECTRAL_S1_PREREGISTRATION.md")
 CONFIG_PATH = Path("configs/spectral_s1_pilot.json")
 PILOT_SEED_BASE = 2036101301
-# S1b sampling requires a separately reviewed activation commit. Environment flags
-# alone cannot unlock it in the implementation PR, including through this API.
+# S1b authorization is enabled only by the separately reviewed activation commit.
+# Real seed use still requires S1B_ALLOW_SEEDS=1, supplied by the once-only workflow
+# after its release marker; the contained entry also requires an invocation proof.
 S1B_SEED_BASE = 2036101701
-S1B_RUN_AUTHORIZED = False
+S1B_RUN_AUTHORIZED = True
 BOOTSTRAP_SEED = 2036101499
 # Engineering-only seed base for P0b/P0d and unit tests. Disjoint from the pilot base,
 # the bootstrap seed and the D2 base 2036101101 (grep at the implementation commit).

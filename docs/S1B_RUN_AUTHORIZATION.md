@@ -1,10 +1,11 @@
-# S1b run authorization record (PROPOSED, not granted)
+# S1b once-only run authorization record (plan integrated; activation separately gated)
 
-**Status:** proposed by Director `rd-claude-20261018T0704Z-356d121a6b25` on 2026-10-18.
-**This record does not authorize a run.** `spectral_s1.S1B_RUN_AUTHORIZED` stays
-`False`; no S1b graph, source or bootstrap seed has been drawn. The decision
-becomes effective only after (1) a separate later-pass review merges this record
-and its workflow, and (2) a further reviewed activation commit flips the lock.
+**Status:** proposed by Director `rd-claude-20261018T0704Z-356d121a6b25` on 2026-10-18;
+plan and workflow reviewed and integrated in PR #50; marker proof integrated in PR #51.
+**This record alone does not authorize a run.** Scientific S1b sampling additionally
+requires a separately reviewed activation commit on `main`, then an explicit
+single dispatch passing the once-only marker guards. No S1b scientific run is
+claimed by this document; verify the release tag and archived run evidence.
 
 Inputs: S1b v0.2 design ([`docs/SPECTRAL_S1B_PREREGISTRATION.md`](SPECTRAL_S1B_PREREGISTRATION.md),
 PR #48, merge `4614500`), locked implementation (PR #49, merge `7487f0c`),
@@ -80,10 +81,12 @@ step. If neither is available, the activation PR may instead add a one-time
 `push: main` path trigger on its own activation file (the pattern used by
 `archive-phase0-evidence.yml`); that choice must be reviewed in the activation PR.
 
-**CI negative control (this PR):** `ci.yml` runs the full-mode contained entry on
-the hosted runner and requires refusal with the seed-lock message, with no
-`run/` directory or other output created. This tests the lock on the proposed
-host along the exact script path; it does not test a full run.
+**CI negative controls:** before activation, the hosted runner checked both
+in-code seed-lock refusal with a fake marker and refusal without a marker.
+**After activation, general CI must retain only the no-marker test.** A fake
+marker alongside the enabled in-code authorization could consume scientific
+seeds; the activation commit deletes that CI step and retains its structural
+test tripwire. Neither test executes the actual S1b run.
 
 ## 4. Archive and abnormal-stop protocol
 

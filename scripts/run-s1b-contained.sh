@@ -1,6 +1,6 @@
 #!/bin/sh
-# Future reviewed/activated run only. Full mode exits without the once-only marker proof
-# (s1b-run.yml) and, while S1B_RUN_AUTHORIZED is False, at the in-code seed lock.
+# Reviewed/activated full runs require the once-only marker proof from s1b-run.yml.
+# Without the proof, full mode exits before Docker; normal CI must never forge it.
 # Build the existing Dockerfile first; pass an immutable local image ID (sha256:...).
 set -eu
 test "$#" -ge 2 && test "$#" -le 3 || { echo 'usage: run-s1b-contained.sh sha256:IMAGE_ID ABSOLUTE_NEW_OUTPUT_DIR [engineering]' >&2; exit 2; }

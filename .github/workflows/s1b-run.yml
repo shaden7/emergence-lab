@@ -3,9 +3,9 @@ name: S1b locked replication run (once only, dispatch from main)
 # Issue #37, S1b v0.2 (docs/SPECTRAL_S1B_PREREGISTRATION.md, PR #48) and the
 # run-authorization record docs/S1B_RUN_AUTHORIZATION.md. This workflow is the
 # proposed execution path on a disposable GitHub-hosted runner (NOT Lightsail).
-# While spectral_s1.S1B_RUN_AUTHORIZED is False it fails closed at the first
-# guard, before any marker, container or random generator. Activation requires a
-# separately reviewed commit on main that flips the lock.
+# Activation requires a separately reviewed commit on main that flips the
+# in-code authorization. This dispatch-only workflow never runs on a normal CI
+# push; its guard and once-only release marker still precede any seed draw.
 # Once only: a release tag is created BEFORE the seeds are touched; any later
 # dispatch sees the tag and fails closed. A killed/aborted run therefore consumes
 # the seeds and is archived as incomplete evidence; it is never rerun.
