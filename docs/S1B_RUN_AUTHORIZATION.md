@@ -56,7 +56,7 @@ hosted-runner loss mid-run is possible (handled in § 4).
 `tests/test_s1b_run_workflow.py`):
 
 1. confirmation text, hosted runner, clean checkout;
-2. `S1B_RUN_AUTHORIZED is True` on the dispatched commit (fails today);
+2. `S1B_RUN_AUTHORIZED is True` on the dispatched commit (true on `main` since PR #52, merge `d07e703`);
 3. release tag `s1b-run-v1` absent (once-only);
 4. full `pytest -q` on the exact commit and image build;
 5. **create `s1b-run-v1` as the seed-consumption marker** before any draw;
