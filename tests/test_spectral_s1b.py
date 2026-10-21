@@ -73,10 +73,12 @@ def test_config_drift_rejected(change):
         sb.design(cfg)
 
 
-def test_locked_seeds_fail_before_rng_or_files_even_with_env(monkeypatch, tmp_path):
-    monkeypatch.setenv('S1B_ALLOW_SEEDS', '1')
-    monkeypatch.setattr(s1, '_seed_seq', lambda *a: pytest.fail('locked RNG reached'))
-    assert s1.S1B_RUN_AUTHORIZED is False
+def test_activated_code_still_requires_env_before_any_rng_or_files(monkeypatch, tmp_path):
+    # A reviewed authorization flag does not let pytest draw scientific seeds.
+    # Only the once-only workflow may supply the separate environment gate.
+    monkeypatch.delenv('S1B_ALLOW_SEEDS', raising=False)
+    monkeypatch.setattr(s1, '_seed_seq', lambda *a: pytest.fail('scientific RNG reached'))
+    assert s1.S1B_RUN_AUTHORIZED is True
     with pytest.raises(PermissionError, match='locked'):
         s1.build_instance(CAY, 8, 0, 0, 1, s1.S1B_SEED_BASE)
     out = tmp_path/'locked'

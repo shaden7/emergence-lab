@@ -2,7 +2,7 @@
   "name": "spectral_s1b_material_effect_replication",
   "protocol": "docs/SPECTRAL_S1B_PREREGISTRATION.md",
   "version": "0.2",
-  "status": "proposed revised design; no S1b seeds drawn; later-pass review and implementation approval required",
+  "status": "reviewed frozen design; activation candidate for a once-only dispatch; no S1b results yet",
   "issue": 37,
   "builds_on": "configs/spectral_s1_pilot.json v0.2; S1 pilot NO-GO remains binding",
   "T": 4096,

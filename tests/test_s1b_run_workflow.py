@@ -20,8 +20,8 @@ def step_index(name: str) -> int:
     return i
 
 
-def test_lock_still_false_in_this_revision():
-    assert s1.S1B_RUN_AUTHORIZED is False
+def test_reviewed_activation_flag_is_true_but_dispatch_remains_once_only():
+    assert s1.S1B_RUN_AUTHORIZED is True
 
 
 def test_dispatch_only_from_main_with_confirmation():
@@ -127,12 +127,12 @@ def test_contained_full_run_receives_this_invocations_marker_proof():
 
 def test_ci_fake_marker_control_exists_only_while_lock_is_false():
     """Tripwire: after activation a fake marker in CI would draw the S1b seeds."""
-    if s1.S1B_RUN_AUTHORIZED:
-        assert "S1B_ONCE_MARKER" not in CI and "fake_marker_proof" not in CI
-    else:
-        step = CI[CI.index("lock-false only)"):CI.index("- run: emergence-lab --config configs/smoke.json")]
-        assert "assert s.S1B_RUN_AUTHORIZED is False" in step
-        assert step.index("assert s.S1B_RUN_AUTHORIZED is False") < step.index("run-s1b-contained.sh")
+    assert s1.S1B_RUN_AUTHORIZED is True
+    assert "S1b full mode refuses without once-only marker proof" in CI
+    assert "S1B_ONCE_MARKER" not in CI and "fake_marker_proof" not in CI
+    assert "S1B_ALLOW_SEEDS" not in CI
+    assert "lock-false only" not in CI
+    assert "S1b full-mode seed-lock refusal" not in CI
 
 
 def _script_env(tmp_path):
