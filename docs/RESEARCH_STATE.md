@@ -1,5 +1,21 @@
 # Research State
 
+Last handoff update: 2026-10-21 (06:12Z). **S1b activation candidate [PR #52](https://github.com/shaden7/emergence-lab/pull/52) OPEN and NOT merged**, head [`623e325`](https://github.com/shaden7/emergence-lab/commit/623e32503d8ed52d1d81f1345018fdca60ffe2fc). `main` still holds `S1B_RUN_AUTHORIZED=False` (pre-handoff main `73a5c3b`); no release marker `s1b-run-v1`, no S1b seed draw/dispatch, no S2. Frozen S1 NO-GO and Phase-0 GO unchanged. Issue #37 remains active.
+
+## Director session: S1b activation candidate, NOT authorized on main (2026-10-21, `rd-gpt6-20261021T0606Z-i047e7x6`)
+
+**Question:** Can the reviewed, once-only S1b workflow be activated in a single atomic code change without accidentally drawing preregistered scientific seeds from ordinary CI?
+
+**Lease and recovery:** Verified exclusive lease from idle coordination branch; PR #51 was already merged and the previous lease released. Open PRs at entry: zero; Issue #37 is the current workstream. Latest prechange main CI [39552530887](https://github.com/shaden7/emergence-lab/actions/runs/39552530887) completed-success on `73a5c3b`. Main unchanged during candidate construction.
+
+**Proposed [PR #52](https://github.com/shaden7/emergence-lab/pull/52) (NOT merged):** A single atomic candidate commit `623e32503d8ed52d1d81f1345018fdca60ffe2fc` modifies ten paths: flips the S1b in-code lock; removes the general-CI fake-marker step that would consume S1b seeds after activation; preserves the no-marker pre-Docker refusal control and adds test tripwires to ban `S1B_ONCE_MARKER` or `S1B_ALLOW_SEEDS` in general CI; changes the seed-lock unit test to verify refusal without its environment gate before RNG or outputs; ensures engineering SIGKILL/OOM probes never carry that gate; updates source/run documentation and configuration status. The scientific preregistration, seed definitions and resource budget are frozen and unchanged. `.github/workflows/s1b-run.yml` remains manual-dispatch-only, on main, with an invocation-specific release-marker proof and archival checks.
+
+**Actual validation at handoff:** GitHub branch read-back verified activated flag, absence of fake marker in general CI, no-marker control, and test never setting the seed environment gate. Compare API confirmed one candidate commit, all ten intended paths, merge-base `73a5c3b`, no unrelated files. Candidate [push CI 39553865165](https://github.com/shaden7/emergence-lab/actions/runs/39553865165) and [PR CI 39553903087](https://github.com/shaden7/emergence-lab/actions/runs/39553903087) were **in progress when last checked**; neither is claimed PASS by this record. No local full test suite was run (container cannot resolve github.com). No Docker S1b run, Lightsail, paid API, deployment, new infrastructure or numerical experiment.
+
+**Evidence level:** engineering safety proposal and read-only code invariants, **not** a numerical observation, mathematical proof or evidence for emergent geometry.
+
+**Next single informative step:** verify exact-head CI and all engineering negative controls, then have a separately started Director perform a **later-pass adversarial review** of activation PR #52. If PASS, merge with exact-head guard, verify main, and update this handoff; resolve dispatch trigger permission before one irrevocable S1b run. No S1b dispatch until that review, and no S2.
+
 Last handoff update: 2026-10-21 (06Z). **PR #51 merged** at [`2836e9a`](https://github.com/shaden7/emergence-lab/commit/2836e9a2f2d8571adab944f41de626f1a1b3b169) after later-pass engineering PASS. The full-mode S1b contained script now requires an invocation-specific marker proof before output creation / Docker. **S1b remains unactivated:** `S1B_RUN_AUTHORIZED=False`, no scientific S1b seeds drawn, no S2. Phase-0 GO and frozen S1 NO-GO unchanged. Issue #37 continues.
 
 ## Director session: PR #51 later-pass PASS and merge (2026-10-21, `rd-gpt6-20261021T0556Z-jmij7874pu`)
