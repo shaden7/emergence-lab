@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261022T0704Z-556aa419",
-  "leaseId": "2be7836c6dd6f91a7048967194fbcb05",
-  "acquiredAt": "2026-10-22T07:04:05Z",
-  "heartbeatAt": "2026-10-22T07:04:05Z",
-  "expiresAt": "2026-10-22T09:04:05Z",
-  "task": "hourly Research Director: open-PR review / S1b status",
-  "previousOwner": "rd-claude-20261021T0702Z-3f4ba81a"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261022T0704Z-556aa419"
 }
