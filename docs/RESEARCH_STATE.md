@@ -1,3 +1,19 @@
+Last handoff update: 2026-10-22 (07:0xZ). **No change in scientific state.** `S1B_RUN_AUTHORIZED=True` on `main` since PR #52 (`d07e703`); **no S1b run has happened**: release marker `s1b-run-v1` absent (404), no `s1b-run.yml` run exists, no seeds drawn, no S2. Zero open PRs. Frozen S1 NO-GO and Phase-0 GO unchanged. Issue #37 continues. **Waiting on one owner action** (see below).
+
+## Director session: no-change iteration; S1b dispatch still blocked (2026-10-22, `rd-claude-20261022T0704Z-556aa419`)
+
+**Lease / recovery audit:** previous lease `rd-claude-20261021T0702Z-3f4ba81a` released cleanly (lock head `f105669`, idle). REST `git/trees` write returned the known proxy 403 before any write (ref unchanged at H); acquired by lease-only commit with parent H and `git push --force-with-lease=…:H`, read back at `e1cb3f9`. `main` `29913a1`, unchanged since the last handoff; its push CI [39560585586](https://github.com/shaden7/emergence-lab/actions/runs/39560585586) completed-success; nothing queued or in progress. Open PRs: none; open issues: #37. No partial writes, nothing incomplete. WIP 0.
+
+**Action attempted:** with all preconditions verified on `main` (lock True, marker absent, exact-head CI green, workflow dispatch-only on a hosted runner), this Director attempted the single mechanical dispatch that `docs/S1B_RUN_AUTHORIZATION.md` § 3 permits a Director to make. The call was **refused before reaching GitHub** by this session's own tool-permission guard (classified as a production deploy). Per `RESEARCH_LOCK.md` no workaround was tried (no connector or alternate endpoint). No run exists; no seeds drawn.
+
+**Evidence level:** process/status only; no numerical observation, theorem or empirical claim. No Lightsail, deployment, paid API or EatSleepFeel interaction.
+
+**Open blocker (owner action, mechanical, not a review):** *Actions → "S1b locked replication run (once only, dispatch from main)" → Run workflow* on `main`, confirmation `S1B-ONCE-2036101701`, pressed **once**. Alternatively grant scheduled Directors permission to dispatch. Until then, scheduled Directors have no integrable work on Issue #37 and will record no-change iterations without repeating this report.
+
+**Next single informative step:** after the one dispatch completes, a later-pass Director audits the archived release assets and the admissibility gate (§ 4), then reviews the archived CSV against the frozen S1b rules. Never rerun if the marker exists. No S2.
+
+Director run rd-claude-20261022T0704Z-556aa419: start 2026-10-22T07:03:11Z, end 2026-10-22T07:06:06Z, duration 3 min
+
 Last handoff update: 2026-10-21 (07:14Z). **S1b activation [PR #52](https://github.com/shaden7/emergence-lab/pull/52) MERGED** at [`d07e703`](https://github.com/shaden7/emergence-lab/commit/d07e703ac8f2390c2035948c5e10fae6eace396c) after a later-pass PASS: `S1B_RUN_AUTHORIZED=True` on `main`. **No S1b run has happened**: release marker `s1b-run-v1` absent (404 at handoff), no scientific seeds drawn, `s1b-run.yml` not dispatched, no S2. Frozen S1 NO-GO and Phase-0 GO unchanged. Issue #37 continues.
 
 ## Director session: later-pass review PASS and merge of S1b activation PR #52 (2026-10-21, `rd-claude-20261021T0702Z-3f4ba81a`)
