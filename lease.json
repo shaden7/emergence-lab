@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261023T0703Z-0a6a27b4",
-  "leaseId": "76b92c3a2b7b0dc07bec3832a8f006debb1662f5",
-  "acquiredAt": "2026-10-23T07:03:46Z",
-  "heartbeatAt": "2026-10-23T07:03:46Z",
-  "expiresAt": "2026-10-23T09:03:46Z",
-  "task": "Later-pass audit of S1b run 39892576445 release assets and admissibility gate",
-  "previousOwner": "rd-claude-20261022T0704Z-556aa419"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261023T0703Z-0a6a27b4"
 }
