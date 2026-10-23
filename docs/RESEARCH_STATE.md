@@ -1,3 +1,31 @@
+Last handoff update: 2026-10-23 (07:08Z). **The once-only S1b run has executed** ([run 39892576445](https://github.com/shaden7/emergence-lab/actions/runs/39892576445), owner dispatch on `main` `5c77016`, release marker [`s1b-run-v1`](https://github.com/shaden7/emergence-lab/releases/tag/s1b-run-v1) with archived evidence). It passed the admissibility gate. Under the frozen prereg the outcome is **C-INCONCLUSIVE, U-EQUIVALENT → no S2**. The audit record is in [PR #53](https://github.com/shaden7/emergence-lab/pull/53), which is **open and not merged**. Frozen S1 NO-GO and Phase-0 GO are unchanged. Issue #37 continues.
+
+## Director session: later-pass audit of the S1b run (2026-10-23, `rd-claude-20261023T0703Z-0a6a27b4`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261022T0704Z-556aa419` was released cleanly (lock head `cc5eaed`, idle). I acquired by a lease-only commit with parent H and `git push --force-with-lease=…:H`, read back at `fa196a3`.
+- `main` `5c77016`, zero open PRs, Issue #37.
+- New since the last handoff: the owner dispatched `s1b-run.yml` once (attempt 1, 02:59–03:52Z), and every step succeeded. No other S1b run exists. Nothing is queued.
+
+**Admissibility (direct observation from the release, re-hashed after REST download):**
+- The tarball sha256 `0211d32d…` matches the asset digest. The manifest is `mode=s1b`, FINISHED, 168/168 seed tuples, and its prereg and config hashes equal those on `main`.
+- Exit 0, `clean_exit=true`, no watchdog failure or `resource_stop.json`. Controls P0a–P0d pass. The run used 49.7 of 200 CPU-min. Result: **admissible**.
+
+**Later-pass review of the result (separate session, AI-mediated):** an independent script reading only `numeric.csv` reproduces the report.
+- **CAY 2¹⁸−2¹⁶: D = −0.0433, 90 % CI [−0.0893, +0.0027] → C-INCONCLUSIVE.**
+- **UST 256−128: D = +0.0047, CI [−0.0184, +0.0279] → U-EQUIVALENT.**
+- The reliability screen passes for all five cohorts.
+
+So the pilot's CAY contrast (+0.071) was **not replicated as a material effect**. Neither a reversed effect nor CAY equivalence is established. Post hoc and descriptive only: the two runs differ by about 2.9 combined SE.
+
+**Evidence level:** numerical observation at nominal, uncalibrated levels; instrument diagnosis only, no physical claim. No Lightsail, deployment, paid API, rerun or S2. Local `pytest -q`: 436 passed.
+
+**Open:** PR #53 (record plus recheck script) needs a later-pass review of its interpretive text by a separately started session, then an expected-head-guarded merge.
+
+**Next single informative step:** review and merge PR #53. Then the prereg-mandated **method/scope decision** for Issue #37: a different estimator (quenched or heat-kernel trace), a symmetric equivalence design with more trees, or closing the two-family S1 objective at this budget. This calls for a short written decision proposal, not more seeds.
+
+Director run rd-claude-20261023T0703Z-0a6a27b4: start 2026-10-23T07:03:00Z, end 2026-10-23T07:08:37Z, duration 6 min
+
 Last handoff update: 2026-10-22 (07:0xZ). **No change in scientific state.** `S1B_RUN_AUTHORIZED=True` on `main` since PR #52 (`d07e703`); **no S1b run has happened**: release marker `s1b-run-v1` absent (404), no `s1b-run.yml` run exists, no seeds drawn, no S2. Zero open PRs. Frozen S1 NO-GO and Phase-0 GO unchanged. Issue #37 continues. **Waiting on one owner action** (see below).
 
 ## Director session: no-change iteration; S1b dispatch still blocked (2026-10-22, `rd-claude-20261022T0704Z-556aa419`)
