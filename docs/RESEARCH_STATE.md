@@ -1,3 +1,38 @@
+Last handoff update: 2026-10-24 (07:10Z). **S1b audit [PR #53](https://github.com/shaden7/emergence-lab/pull/53) MERGED** at [`614902c`](https://github.com/shaden7/emergence-lab/commit/614902c0e7bdd6a25dcce5e19d2bb565a6f6a7bb) after a later-pass PASS. The S1b outcome stays **C-INCONCLUSIVE, U-EQUIVALENT → no S2**, now integrated on `main`. The prereg-mandated method/scope decision for Issue #37 is **proposed, not adopted**, in [PR #54](https://github.com/shaden7/emergence-lab/pull/54). Frozen S1 NO-GO and Phase-0 GO are unchanged.
+
+## Director session: PR #53 later-pass PASS and merge; method/scope decision proposed (2026-10-24, `rd-claude-20261024T0703Z-ce170500`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261023T0703Z-0a6a27b4` was released cleanly (lock head `6b01666`, idle). I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `d2f3ce2`.
+- `main` was `04f8942`. One open PR (#53, head `751a904`, mergeable clean) and Issue #37.
+- All recent runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #53 `751a904`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/53#issuecomment-6381240253)). This session was separate from the producer; the review is AI-mediated.
+- **Provenance:** I re-downloaded release `s1b-run-v1`; the tarball sha256 `0211d32d…` matches. The manifest's prereg and config hashes equal `main`.
+- **Reproduction:** the PR's recheck script reproduces every value.
+- **Independent script (descriptive only):**
+  - Leave-one-tree-out keeps D_CAY in [−0.052, −0.033].
+  - A bootstrap with a non-prereg seed gives [−0.088, +0.002].
+  - Median per-tree CAY slopes (1.321, 1.321, 1.307) differ from the annealed values by about 0.02.
+- **Addition:** the observed SE(D_CAY) 0.0274 is **1.64×** the prereg plug-in 0.0167, so the confirmatory contrast had less power than preregistered. UST is 0.81×.
+
+**Integration:**
+- Expected-head-guarded merge `614902c`. The merged tree differs from `751a904` only by `docs/RESEARCH_STATE.md` from `04f8942`.
+- Exact-head CI ([push 39915855209](https://github.com/shaden7/emergence-lab/actions/runs/39915855209), [PR 39915882338](https://github.com/shaden7/emergence-lab/actions/runs/39915882338)) and post-merge main [CI 40072744542](https://github.com/shaden7/emergence-lab/actions/runs/40072744542) all completed-success.
+
+**Proposed in [PR #54](https://github.com/shaden7/emergence-lab/pull/54) (`docs/S1_METHOD_SCOPE_DECISION.md`, head `8cd6d43`):**
+- (1) Close the frozen S1/S1b two-family ±0.03 size-equivalence line at this budget as *not established*.
+- (2) Next: a small, separately preregistered **SE error-model audit**.
+  - A same-size CAY null, so true D = 0. N = 2¹⁴, 16 × 12 fresh trees, about 53 CPU-min.
+  - R = between-batch sd ÷ RMS delta SE. R > ≈ 1.29 → new estimator. Otherwise a symmetric CAY equivalence study (about 220 CPU-min) becomes defensible.
+- PR CI was in progress at handoff. Local `pytest -q`: 436 passed (Python 3.13.17, NumPy 2.5.3, SciPy 1.18.1).
+
+**Evidence level:** review and integration, plus a decision proposal built on nominal numerical observations. No physical claim. No Lightsail, deployment, paid API, seeds, rerun or S2.
+
+**Next single informative step:** a separately started session does a later-pass review of PR #54 (check the power figures, the batch normality assumption, and consistency with the S1/S1b obligations), then merges or revises it. Only after that merge is the audit preregistration drafted.
+
+Director run rd-claude-20261024T0703Z-ce170500: start 2026-10-24T07:03:03Z, end 2026-10-24T07:10:02Z, duration 7 min
+
 Last handoff update: 2026-10-23 (07:08Z). **The once-only S1b run has executed** ([run 39892576445](https://github.com/shaden7/emergence-lab/actions/runs/39892576445), owner dispatch on `main` `5c77016`, release marker [`s1b-run-v1`](https://github.com/shaden7/emergence-lab/releases/tag/s1b-run-v1) with archived evidence). It passed the admissibility gate. Under the frozen prereg the outcome is **C-INCONCLUSIVE, U-EQUIVALENT → no S2**. The audit record is in [PR #53](https://github.com/shaden7/emergence-lab/pull/53), which is **open and not merged**. Frozen S1 NO-GO and Phase-0 GO are unchanged. Issue #37 continues.
 
 ## Director session: later-pass audit of the S1b run (2026-10-23, `rd-claude-20261023T0703Z-0a6a27b4`)
