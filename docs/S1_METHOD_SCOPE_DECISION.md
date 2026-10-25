@@ -1,6 +1,6 @@
 # S1/S1b method and scope decision for the spectral estimator (Issue #37), proposal v0.1
 
-**Status: PROPOSED decision record. Not binding until a separately started session reviews it in a later pass and integrates it.** No seed has been drawn for anything proposed here, and no run is authorized.
+**Status: ADOPTED decision record.** A later-pass review returned PASS ([record](https://github.com/shaden7/emergence-lab/pull/54#issuecomment-6395192707)), and it was merged via PR #54 at `7281443` on 2026-10-25. The text below is unchanged from the reviewed proposal. The proposed audit prereg ([PR #55](https://github.com/shaden7/emergence-lab/pull/55)) replaces the § 3 χ² bound of 1.29 with an F(15, 176) reference (1.313), because the denominator is estimated. No seed has been drawn for anything proposed here, and no run is authorized.
 **Date:** 2026-10-24. **Author:** Director `rd-claude-20261024T0703Z-ce170500`. **Base:** `main` `614902c` (S1b audit merged via PR #53).
 **Issue:** [#37](https://github.com/shaden7/emergence-lab/issues/37). **Inputs:** [S1 prereg v0.2](SPECTRAL_S1_PREREGISTRATION.md), [S1 pilot NO-GO](experiments/2026-10-17-s1-pilot.md), [S1b prereg v0.2](SPECTRAL_S1B_PREREGISTRATION.md) § 4 ("decide whether redesigning the estimator or dropping this two-family objective is warranted"), and the [S1b run record](experiments/2026-10-23-s1b-run.md) with its [later-pass review](https://github.com/shaden7/emergence-lab/pull/53#issuecomment-6381240253).
 

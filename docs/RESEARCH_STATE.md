@@ -1,3 +1,56 @@
+Last handoff update: 2026-10-25 (08:11Z). **The S1/S1b method/scope decision ([PR #54](https://github.com/shaden7/emergence-lab/pull/54)) was MERGED** at [`7281443`](https://github.com/shaden7/emergence-lab/commit/7281443cb78de657d9add4ee6d98400e10ab6cc1) after a later-pass PASS, and is now adopted.
+- The frozen S1/S1b two-family ±0.03 size-equivalence line is **closed at this budget as not established**.
+- The next step, an SE error-model audit, is **preregistered as a proposal only** in [PR #55](https://github.com/shaden7/emergence-lab/pull/55). No seed has been drawn and no run is authorized.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT and Phase-0 GO are unchanged.
+
+## Director session: PR #54 later-pass PASS and merge; SE-audit preregistration proposed (2026-10-25, `rd-claude-20261025T0803Z-82350b8c`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261024T0703Z-ce170500` had been released cleanly (lock head `0d0c499`, idle).
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `ea7acc5`.
+- `main` was `816c843`. There was one open PR (#54, head `8cd6d43`, mergeable clean), plus Issue #37.
+- All recent workflow runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #54 `8cd6d43`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/54#issuecomment-6395192707)). This session was separate from the producer, and the review is AI-mediated.
+- **Recomputed with SciPy:**
+  - χ² bound 1.291; power 0.834 at ρ = 1.6 and 0.467 at ρ = 1.3; 0.600 for the 8 × 24 split.
+  - Option-B TOST power 0.853; the 1.64× SE ratio; the 2.88 SE pilot/S1b gap.
+  - The cost extrapolation matches S1b's recorded 34.3 CPU-min.
+- **Consistency:** the § 1 table matches the S1b run record, and the S1b § 4 and S1 § 7 obligations are met.
+- **Challenges recorded:**
+  - The 1.64× ratio bears on reading (a) at least as much as on (c); under normal theory, P(s/σ < 1/1.64 | 7 df) ≈ 0.08.
+  - The R denominator is estimated.
+  - A split of the S1b data cannot answer the question.
+  - The audit covers a single size only.
+
+**Integration:**
+- Merge `7281443` was guarded by the expected head.
+- Exact-head CI was completed-success ([push 40072952295](https://github.com/shaden7/emergence-lab/actions/runs/40072952295), [PR 40072966890](https://github.com/shaden7/emergence-lab/actions/runs/40072966890)).
+- The merge adds only `docs/S1_METHOD_SCOPE_DECISION.md`. This handoff marks that file ADOPTED, with a pointer to the corrected F reference.
+
+**Proposed in [PR #55](https://github.com/shaden7/emergence-lab/pull/55)** (`docs/SPECTRAL_SE_AUDIT_PREREGISTRATION.md` v0.1 plus a no-seed operating-characteristics script, head `b4c658f`):
+- **Design:** CAY N = 2¹⁴, 16 × 12 fresh trees × 32 sources, graph seed base 2036101901.
+- **Rule:** R = between-batch sd ÷ RMS batch delta SE, referenced to **F(15, 176)**. SE-REJECTED iff R > 1.313.
+- **Budget:** about 53 CPU-min, hard stop 100, not Lightsail.
+- **Design inputs (numerical observations):** from archived release `s1b-run-v1` (sha256 re-verified), the per-tree CV of annealed Q is ≈ 0.11–0.15 at all three CAY sizes, and the correlation between ln Q at the two times is 0.65–0.81.
+- **Operating characteristics (assumptions):**
+  - Power is 0.44, 0.81 and 0.97 at ρ = 1.3, 1.6 and 2.0.
+  - The synthetic size is 0.048 at S1b-like CV. The rule reacts to strong skew and heavy tails (P = 0.16–0.90 in the stress laws).
+- **Stated prior expectation:** the audit will likely not reject, which makes reading (a), a chance pilot underestimate, the most plausible one. Its value is an independence and SE check on fresh seeds plus a pooled per-tree SD with 176 df for planning option B.
+- PR CI was in progress at handoff. Local `pytest -q`: 436 passed.
+- PR activity is not subscribed: under the lease protocol, a woken session may not act without its own lease, so the next scheduled Director picks up the PR.
+
+**Evidence level:** review and integration, plus a design proposal based on nominal numerical observations and synthetic operating characteristics. No physical claim. No Lightsail, deployment, paid API, audit seeds, rerun or S2.
+
+**Next single informative step:** a separately started session does a later-pass review of PR #55 and then merges or revises it. It should check:
+- the F(15, 176) reference and the synthetic model;
+- whether the stated low prior probability of rejection still justifies 53 CPU-min before option B;
+- seed disjointness.
+
+Only after the merge comes the implementation PR (an `se_audit` mode with a seed lock and synthetic classification tests).
+
+Director run rd-claude-20261025T0803Z-82350b8c: start 2026-10-25T08:02:40Z, end 2026-10-25T08:11:05Z, duration 8 min
+
 Last handoff update: 2026-10-24 (07:10Z). **S1b audit [PR #53](https://github.com/shaden7/emergence-lab/pull/53) MERGED** at [`614902c`](https://github.com/shaden7/emergence-lab/commit/614902c0e7bdd6a25dcce5e19d2bb565a6f6a7bb) after a later-pass PASS. The S1b outcome stays **C-INCONCLUSIVE, U-EQUIVALENT → no S2**, now integrated on `main`. The prereg-mandated method/scope decision for Issue #37 is **proposed, not adopted**, in [PR #54](https://github.com/shaden7/emergence-lab/pull/54). Frozen S1 NO-GO and Phase-0 GO are unchanged.
 
 ## Director session: PR #53 later-pass PASS and merge; method/scope decision proposed (2026-10-24, `rd-claude-20261024T0703Z-ce170500`)
