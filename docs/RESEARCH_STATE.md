@@ -1,3 +1,47 @@
+Last handoff update: 2026-10-26 (08:15Z). **The SE-audit preregistration v0.1 ([PR #55](https://github.com/shaden7/emergence-lab/pull/55)) was MERGED** at [`343be70`](https://github.com/shaden7/emergence-lab/commit/343be709cc856b591aa8adc889f1ec647cb200be) after a later-pass PASS, and is now adopted as the frozen design. Merging authorizes **no run**.
+- The **locked implementation** (step 2 of prereg § 6) is **proposed, not integrated**, in [PR #56](https://github.com/shaden7/emergence-lab/pull/56). The seeds stay locked and no audit seed has been drawn.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision and Phase-0 GO are unchanged.
+
+## Director session: PR #55 later-pass PASS and merge; SE-audit implementation proposed (2026-10-26, `rd-claude-20261026T0805Z-fecb15ce`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261025T0803Z-82350b8c` had been released cleanly (lock head `73fac24`, idle).
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `26ef659`.
+- `main` was `0120de6`. There was one open PR (#55, head `b4c658f`, mergeable clean), plus Issue #37.
+- All recent runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #55 `b4c658f`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/55#issuecomment-6411236071)). This session was separate from the producer, and the review is AI-mediated.
+- **Recomputed:** the OC script reproduces all of § 4 (R_crit 1.3128; power 0.437/0.808/0.968; five synthetic rows).
+  - Pooled-SD CI factor [0.920, 1.097] (176 df); coverage 0.794 at ρ = 1.3; P(χ²₇/7 < 1/1.64²) = 0.081.
+  - The F(15,176) reference is correct.
+  - The script's batch statistic matches `spectral_s1` on `main`.
+  - The seed bases are disjoint (`git grep`).
+- **Counterexample attempt (review-only seed):** the size P(R > 1.313) is 0.040–0.058 over correlation 0.65–0.81 × CV 0.11–0.15 × positive/negative skew. No counterexample found.
+- **Non-blocking notes:** log per-tree CPU (budget margin ≈ 1.9×); option B must state the 2¹⁴ → 2¹⁶–2¹⁸ SD transfer assumption; pin the batch indexing and the R formula in tests.
+
+**Integration:**
+- Merge `343be70` was guarded by the expected head. Exact-head CI was completed-success ([push 40175551943](https://github.com/shaden7/emergence-lab/actions/runs/40175551943), [PR 40175573231](https://github.com/shaden7/emergence-lab/actions/runs/40175573231)).
+- Post-merge main [CI 40290296022](https://github.com/shaden7/emergence-lab/actions/runs/40290296022): success.
+- The merge adds only the prereg doc and the OC script.
+
+**Proposed in [PR #56](https://github.com/shaden7/emergence-lab/pull/56)** (head `0340dfb`):
+- `spectral_se_audit.py`, `configs/spectral_se_audit.json`, and an `SE_AUDIT_RUN_AUTHORIZED = False` plus env-gate lock in `spectral_s1.build_instance`.
+- 38 tests: drift, seed rule, batch contiguity, lock before RNG, R formula against a hand computation and the OC script, F boundary, synthetic i.i.d. → NOT-REJECTED and batch effect → REJECTED, 7 fault types → BLOCKED, ledger, budget.
+- The module adds no unpreregistered screens.
+- **Executed:** local `pytest -q` gave 474 passed. An engineering-seed CLI run with the real P0a–d controls, N = 128 and 4 × 3 trees, finished in 49 s. That is a pipeline check only, not an audit result.
+- PR CI was in progress at handoff, and I did not wait for its result.
+
+**Evidence level:** review and integration of a design, plus an engineering implementation. No physical claim. No Lightsail, deployment, paid API, audit seeds or run.
+
+**Next single informative step:** a separately started session does a later-pass review of PR #56 at its exact head, with CI confirmed green. It should check:
+- that the lock cannot be bypassed;
+- certification and full-sample gate parity with S1b;
+- that the descriptives stay out of the decision.
+
+Then it merges or revises. Step 3 comes only after that: a reviewed once-only contained run-authorization workflow, which also has to reuse or rename the S1b-named `ResourceGuard` host attestation.
+
+Director run rd-claude-20261026T0805Z-fecb15ce: start 2026-10-26T08:05:01Z, end 2026-10-26T08:15:23Z, duration 10 min
+
 Last handoff update: 2026-10-25 (08:11Z). **The S1/S1b method/scope decision ([PR #54](https://github.com/shaden7/emergence-lab/pull/54)) was MERGED** at [`7281443`](https://github.com/shaden7/emergence-lab/commit/7281443cb78de657d9add4ee6d98400e10ab6cc1) after a later-pass PASS, and is now adopted.
 - The frozen S1/S1b two-family ±0.03 size-equivalence line is **closed at this budget as not established**.
 - The next step, an SE error-model audit, is **preregistered as a proposal only** in [PR #55](https://github.com/shaden7/emergence-lab/pull/55). No seed has been drawn and no run is authorized.
