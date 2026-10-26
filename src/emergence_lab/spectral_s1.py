@@ -44,6 +44,11 @@ PILOT_SEED_BASE = 2036101301
 S1B_SEED_BASE = 2036101701
 S1B_RUN_AUTHORIZED = True
 BOOTSTRAP_SEED = 2036101499
+# SE audit (docs/SPECTRAL_SE_AUDIT_PREREGISTRATION.md). LOCKED: flipping this flag
+# requires a separately reviewed run-authorization change; real seed use additionally
+# requires SE_AUDIT_ALLOW_SEEDS=1 in the environment.
+SE_AUDIT_SEED_BASE = 2036101901
+SE_AUDIT_RUN_AUTHORIZED = False
 # Engineering-only seed base for P0b/P0d and unit tests. Disjoint from the pilot base,
 # the bootstrap seed and the D2 base 2036101101 (grep at the implementation commit).
 TEST_SEED_BASE = 2036101397
@@ -255,6 +260,9 @@ def build_instance(fam: str, size: int, i_size: int, i_rep: int, n_sources: int,
     if seed_base == S1B_SEED_BASE:
         if not S1B_RUN_AUTHORIZED or os.environ.get("S1B_ALLOW_SEEDS") != "1":
             raise PermissionError("S1b seeds locked: reviewed implementation and activation required")
+    if seed_base == SE_AUDIT_SEED_BASE:
+        if not SE_AUDIT_RUN_AUTHORIZED or os.environ.get("SE_AUDIT_ALLOW_SEEDS") != "1":
+            raise PermissionError("SE-audit seeds locked: reviewed run authorization required")
     if seed_base == PILOT_SEED_BASE and os.environ.get("S1_ALLOW_PILOT_SEEDS") != "1":
         raise PermissionError("pilot seeds are locked until the implementation is reviewed")
     graph_rng, src_rng = _seed_seq(seed_base, FAMILY_ORDER.index(fam), i_size, i_rep)

@@ -1,0 +1,48 @@
+{
+  "name": "spectral_se_audit",
+  "protocol": "docs/SPECTRAL_SE_AUDIT_PREREGISTRATION.md",
+  "version": "0.1",
+  "status": "implementation candidate; seeds LOCKED; no run authorized",
+  "issue": 37,
+  "builds_on": "S1 v0.2 observable/kernel; S1 method/scope decision (PR #54) option 2",
+  "family": "cayley_uniform_tree",
+  "N": 16384,
+  "batches": 16,
+  "trees_per_batch": 12,
+  "sources": 32,
+  "T": 4096,
+  "ladder": null,
+  "kernel": {
+    "type": "killed ball, certified bracket",
+    "R_start": 64,
+    "eta": 0.0001,
+    "per_source_edge_step_cap": 2000000000
+  },
+  "primary_window": [
+    128,
+    1024
+  ],
+  "seed_base": 2036101901,
+  "seed_rule": "np.random.SeedSequence([seed_base, 0, 0, i_tree]) with PCG64, i_tree = 0..191; sources from a child of the same sequence (as S1); batch b = trees 12b..12b+11",
+  "engineering_seed_base": 2036101997,
+  "controls": "S1 v0.2 P0a-P0d unchanged, STOP gates",
+  "statistic": {
+    "R": "sample sd (ddof=1) of the 16 batch annealed slopes divided by sqrt(mean over batches of SE_b^2), SE_b = tree-level delta SE within batch",
+    "reference": "R^2 ~ F(15, 176) in the linear approximation",
+    "alpha": 0.05,
+    "R_crit": 1.313
+  },
+  "outcomes": {
+    "SE-REJECTED": "R > R_crit",
+    "SE-NOT-REJECTED": "R <= R_crit (wording: not rejected at 2^14, never SE validated)",
+    "BLOCKED": "any control STOP, incomplete/uncertified/over-cap tree, non-finite or non-positive batch mean, budget stop; no classification and no automatic rerun",
+    "full_samples_required": true
+  },
+  "budget": {
+    "cores": 1,
+    "memory_GiB": 2,
+    "projected_cpu_min": 53,
+    "hard_stop_total_cpu_min": 100,
+    "host": "not Lightsail"
+  }
+}
