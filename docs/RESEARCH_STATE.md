@@ -1,3 +1,54 @@
+Last handoff update: 2026-10-27 (08:17Z). **The SE-audit locked implementation ([PR #56](https://github.com/shaden7/emergence-lab/pull/56)) was MERGED** at [`bb23e81`](https://github.com/shaden7/emergence-lab/commit/bb23e819a4775f579227b1cdc257705deff565f7) after a later-pass PASS. Seeds stay locked on `main` (`SE_AUDIT_RUN_AUTHORIZED = False`).
+- The **run authorization** (step 3 of prereg § 6) is **proposed, not integrated**, in [PR #57](https://github.com/shaden7/emergence-lab/pull/57). No audit seed has been drawn and no run has happened.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision and Phase-0 GO are unchanged.
+
+## Director session: PR #56 later-pass PASS and merge; SE-audit run authorization proposed (2026-10-27, `rd-claude-20261027T0803Z-5ae580f5`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261026T0805Z-fecb15ce` had been released cleanly (lock head `4951533`, idle).
+- The REST `git/trees` write returned the known proxy 403 before any write, and the ref was unchanged.
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `b457aac`. A heartbeat followed at `c8502d4`.
+- `main` was `e0750da`. There was one open PR (#56, head `0340dfb`, mergeable clean), plus Issue #37.
+- All recent runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #56 `0340dfb`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/56#issuecomment-6436824997)). This session was separate from the producer, and the review is AI-mediated.
+- **Executed at the exact head:** `pytest -q` gave 474 passed.
+  - An engineering CLI run with the real P0 controls reproduced R = 1.17430. That is a pipeline check, not an audit result.
+  - `numeric.csv` was byte-identical across repeats.
+- **Lock-bypass attempts:** 5 of 5 were refused before any directory or RNG, with the env gate set.
+- **Independent R implementation:** agrees to 1e-15.
+- **Null size through the module statistic:** 0.052 (1500 reps; review-only RNG). Power is 0.93 with a shared batch component of sd 0.02.
+- **Parity:** the gates match prereg § 3. S1b's headroom and jackknife screens are correctly absent.
+- **Non-blocking notes**, all addressed in #57:
+  - a manifest stuck at STARTED must count as BLOCKED;
+  - the literal 1.313 vs the exact 1.31284;
+  - `ResourceGuard` naming.
+
+**Integration:**
+- Merge `bb23e81` was guarded by the expected head. The API returned 502, but reconciliation confirmed the merge.
+- Exact-head CI was completed-success ([push 40290897180](https://github.com/shaden7/emergence-lab/actions/runs/40290897180), [PR 40290938532](https://github.com/shaden7/emergence-lab/actions/runs/40290938532)).
+- Post-merge main [CI 40471414340](https://github.com/shaden7/emergence-lab/actions/runs/40471414340): success.
+- `src`, `tests` and `configs` on `main` are identical to the reviewed head.
+
+**Proposed in [PR #57](https://github.com/shaden7/emergence-lab/pull/57)** (head `5885ef1`):
+- `SE_AUDIT_RUN_AUTHORIZED = True`.
+- `.github/workflows/se-audit-run.yml`: dispatch only, `main` only, hosted runner, confirmation `SE-AUDIT-ONCE-2036101901`, release marker `se-audit-run-v1` created before any draw.
+- `scripts/run-se-audit-contained.sh`, `--contained-engineering`, and two CI steps (an engineering containment smoke and a no-marker refusal).
+- 15 new tests.
+- `docs/SE_AUDIT_RUN_AUTHORIZATION.md`.
+- **Executed:** local `pytest -q` gave 489 passed. Exact-head CI was completed-success ([push 40472122412](https://github.com/shaden7/emergence-lab/actions/runs/40472122412), [PR 40472168564](https://github.com/shaden7/emergence-lab/actions/runs/40472168564)). This includes the **first real execution** of the SE-audit Docker containment smoke and the no-marker refusal, both of which succeeded.
+
+**Evidence level:** review and integration of an engineering implementation, plus a process proposal. No physical claim. No Lightsail, deployment, paid API, audit seeds or run.
+
+**Next single informative step:** a separately started session does a later-pass review of PR #57 at its exact head. It should check:
+- that no path other than the marker-creating dispatch can draw seeds (CI, tests, engineering);
+- the guard order and timeouts;
+- that the admissibility gate is sufficient.
+
+Then it merges or revises. After the merge, the step-4 trigger is one owner dispatch of *SE audit v0.1 locked run* with `SE-AUDIT-ONCE-2036101901`, unless a Director can verifiably dispatch. Then comes a later-pass result note that recomputes R from the archived `numeric.csv`.
+
+Director run rd-claude-20261027T0803Z-5ae580f5: start 2026-10-27T08:02:57Z, end 2026-10-27T08:17:57Z, duration 15 min
+
 Last handoff update: 2026-10-26 (08:15Z). **The SE-audit preregistration v0.1 ([PR #55](https://github.com/shaden7/emergence-lab/pull/55)) was MERGED** at [`343be70`](https://github.com/shaden7/emergence-lab/commit/343be709cc856b591aa8adc889f1ec647cb200be) after a later-pass PASS, and is now adopted as the frozen design. Merging authorizes **no run**.
 - The **locked implementation** (step 2 of prereg § 6) is **proposed, not integrated**, in [PR #56](https://github.com/shaden7/emergence-lab/pull/56). The seeds stay locked and no audit seed has been drawn.
 - Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision and Phase-0 GO are unchanged.
