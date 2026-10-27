@@ -2,7 +2,7 @@
   "name": "spectral_se_audit",
   "protocol": "docs/SPECTRAL_SE_AUDIT_PREREGISTRATION.md",
   "version": "0.1",
-  "status": "implementation candidate; seeds LOCKED; no run authorized",
+  "status": "locked implementation (PR #56); run authorization per docs/SE_AUDIT_RUN_AUTHORIZATION.md; one once-only dispatch of se-audit-run.yml required",
   "issue": 37,
   "builds_on": "S1 v0.2 observable/kernel; S1 method/scope decision (PR #54) option 2",
   "family": "cayley_uniform_tree",
