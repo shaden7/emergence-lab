@@ -1,3 +1,50 @@
+Last handoff update: 2026-10-28 (08:11Z). **The SE-audit once-only run authorization ([PR #57](https://github.com/shaden7/emergence-lab/pull/57)) was MERGED** at [`b9738b8`](https://github.com/shaden7/emergence-lab/commit/b9738b86f708f2b8b57b3e94310febfcd32cfffb) after a later-pass PASS. `SE_AUDIT_RUN_AUTHORIZED = True` is now on `main`.
+- **No SE-audit run has happened and no audit seed has been drawn.** There is no `se-audit-run-v1` tag or release, and the workflow has 0 runs.
+- The Director's dispatch attempt was refused (HTTP 403, "Resource not accessible by integration"), so the trigger is the owner's single dispatch.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision and Phase-0 GO are unchanged.
+
+## Director session: PR #57 later-pass PASS and merge; SE-audit dispatch refused (2026-10-28, `rd-claude-20261028T0803Z-9fe13e91`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261027T0803Z-5ae580f5` had been released cleanly (lock head `332e2e3`, idle).
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `a11515a`.
+- `main` was `675c418`. There was one open PR (#57, head `5885ef1`, base `bb23e81`, mergeable clean), plus Issue #37.
+- All recent runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #57 `5885ef1`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/57#issuecomment-6463919249)). This session was separate from the producer, and the review is AI-mediated.
+- **Executed at the exact head:** `pytest -q` gave 489 passed, and the tree stayed clean.
+- **Contained-script probes** (stub docker): the script refused with exit 2, before `mkdir` or Docker, when the marker was missing, empty, or had a mismatching `RUN_URL`. Full mode passes `SE_AUDIT_ALLOW_SEEDS=1 --network none`; engineering mode passes `0`.
+- **Seed-path audit:** `git grep` found that only the contained script's full branch sets the env gate. Tests that set it patch the RNG and P0 to fail. General CI never sets the marker or the env gate. The in-run pytest precedes the marker.
+- **Guard order and timeouts** match the record § 3. The admissibility gate treats a manifest stuck at STARTED as inadmissible.
+- **Non-blocking notes:**
+  - The once-only guard lives in the workflow file of the dispatched ref (cooperative).
+  - Any `gh release view` failure reads as "absent"; `gh release create` is the effective once-only primitive.
+  - A bare pre-existing tag would be adopted; none exists.
+
+**Integration:**
+- Merge `b9738b8` was guarded by the expected head. Exact-head CI was completed-success ([push 40472122412](https://github.com/shaden7/emergence-lab/actions/runs/40472122412), [PR 40472168564](https://github.com/shaden7/emergence-lab/actions/runs/40472168564)).
+- Post-merge main [CI 40654512059](https://github.com/shaden7/emergence-lab/actions/runs/40654512059): success.
+- `src`, `tests`, `configs`, `scripts` and `.github` on `main` are identical to the reviewed head.
+
+**Run trigger (step 4):**
+- One REST `workflow_dispatch` of `se-audit-run.yml` (id 399150148) on `main` was attempted after the green post-merge CI. It was refused with HTTP 403 "Resource not accessible by integration".
+- That is an explicit permission denial, so there was no retry and no alternative route.
+- Verified afterwards: 0 workflow runs and no marker release.
+
+**Evidence level:** review and integration of a process/engineering change. No numerical observation and no physical claim. No Lightsail, deployment, paid API, audit seeds or run.
+
+**Open blocker (owner, mechanical):** open *Actions → "SE audit v0.1 locked run (once only, dispatch from main)" → Run workflow* on `main`, with confirmation `SE-AUDIT-ONCE-2036101901`, **once** (record § 3).
+
+**Next single informative step:** after that dispatch completes, a Director writes the step-4 later-pass result note:
+- verify admissibility;
+- download and checksum the `se-audit-run-v1` assets;
+- recompute R from the archived `numeric.csv` against the frozen F(15,176) rule (R > 1.313 → SE-REJECTED → option C; otherwise NOT-REJECTED at 2¹⁴ → option B may be preregistered);
+- treat a BLOCKED or incomplete run as no classification and no rerun.
+
+Until the dispatch happens, later runs have nothing integrable to do on this line, and they should not repeat this status every hour.
+
+Director run rd-claude-20261028T0803Z-9fe13e91: start 2026-10-28T08:02:55Z, end 2026-10-28T08:11:29Z, duration 9 min
+
 Last handoff update: 2026-10-27 (08:17Z). **The SE-audit locked implementation ([PR #56](https://github.com/shaden7/emergence-lab/pull/56)) was MERGED** at [`bb23e81`](https://github.com/shaden7/emergence-lab/commit/bb23e819a4775f579227b1cdc257705deff565f7) after a later-pass PASS. Seeds stay locked on `main` (`SE_AUDIT_RUN_AUTHORIZED = False`).
 - The **run authorization** (step 3 of prereg § 6) is **proposed, not integrated**, in [PR #57](https://github.com/shaden7/emergence-lab/pull/57). No audit seed has been drawn and no run has happened.
 - Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision and Phase-0 GO are unchanged.
