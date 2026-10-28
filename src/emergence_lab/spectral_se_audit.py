@@ -2,9 +2,10 @@
 tree-level delta SE of the annealed CAY window slope at N = 2^14.
 
 Instrument diagnosis only. Engineering runs never use the audit seed base. Audit seed
-use requires spectral_s1.SE_AUDIT_RUN_AUTHORIZED (False in this implementation; a
-separately reviewed run-authorization change must flip it), SE_AUDIT_ALLOW_SEEDS=1,
-and the Linux containment guard. Nothing here unlocks S2.
+use requires spectral_s1.SE_AUDIT_RUN_AUTHORIZED (set by the reviewed run-authorization
+change, docs/SE_AUDIT_RUN_AUTHORIZATION.md), SE_AUDIT_ALLOW_SEEDS=1, the Linux
+containment guard and, via scripts/run-se-audit-contained.sh, the once-only release
+marker proof of .github/workflows/se-audit-run.yml. Nothing here unlocks S2.
 """
 from __future__ import annotations
 
@@ -301,11 +302,20 @@ def main(argv=None):
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--mode", choices=["engineering", "se_audit"], default="engineering")
     parser.add_argument("--no-controls", action="store_true", help="engineering only")
+    parser.add_argument("--contained-engineering", action="store_true",
+                        help="exercise Linux containment on engineering seeds only")
     args = parser.parse_args(argv)
     if args.no_controls and args.mode != "engineering":
         parser.error("--no-controls is engineering only")
+    if args.contained_engineering and args.mode != "engineering":
+        parser.error("--contained-engineering requires engineering mode")
     d = design(json.loads(CONFIG.read_text()), engineering=args.mode == "engineering")
-    result = run(d, args.output, controls=not args.no_controls)
+    if args.contained_engineering:
+        from emergence_lab.s1b_limits import ResourceGuard
+        with ResourceGuard(args.output, d["total_cpu_s"], d["max_memory_bytes"]):
+            result = run(d, args.output, controls=not args.no_controls)
+    else:
+        result = run(d, args.output, controls=not args.no_controls)
     print(json.dumps({"verdict": result["result"]["verdict"], "R": result["result"].get("R")}))
     return 0
 

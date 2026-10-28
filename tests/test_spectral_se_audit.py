@@ -85,14 +85,20 @@ def test_seed_bases_disjoint():
 
 
 def test_audit_seeds_locked_before_any_rng_or_files(monkeypatch, tmp_path):
+    """The env gate is required even with the activated flag; the flag is required even
+    with the env gate. Neither path reaches the RNG or creates the output directory."""
     monkeypatch.setattr(s1, "_seed_seq", lambda *a: pytest.fail("audit RNG reached"))
-    assert s1.SE_AUDIT_RUN_AUTHORIZED is False
-    for env in (None, "1"):  # the env gate alone never unlocks the unauthorized code
-        if env:
+    monkeypatch.delenv("SE_AUDIT_ALLOW_SEEDS", raising=False)
+    cases = [(True, None), (True, "0"), (False, None), (False, "1")]
+    for flag, env in cases:
+        monkeypatch.setattr(s1, "SE_AUDIT_RUN_AUTHORIZED", flag)
+        if env is None:
+            monkeypatch.delenv("SE_AUDIT_ALLOW_SEEDS", raising=False)
+        else:
             monkeypatch.setenv("SE_AUDIT_ALLOW_SEEDS", env)
         with pytest.raises(PermissionError, match="locked"):
             s1.build_instance(CAY, 8, 0, 0, 1, s1.SE_AUDIT_SEED_BASE)
-        out = tmp_path / f"locked{env}"
+        out = tmp_path / f"locked{flag}{env}"
         with pytest.raises(PermissionError, match="locked"):
             sa.run(sa.design(config()), out)
         with pytest.raises(PermissionError):
@@ -100,6 +106,26 @@ def test_audit_seeds_locked_before_any_rng_or_files(monkeypatch, tmp_path):
         with pytest.raises(PermissionError):
             sa.main(["--mode", "se_audit", "--output", str(out)])
         assert not out.exists()
+
+
+def test_activated_full_mode_still_refused_outside_containment(monkeypatch, tmp_path):
+    """Run authorization (flag True) + env gate: an uncontained host is refused by the
+    cgroup/network/host-attestation preflight before mkdir, P0 or any RNG."""
+    assert s1.SE_AUDIT_RUN_AUTHORIZED is True
+    monkeypatch.setattr(s1, "_seed_seq", lambda *a: pytest.fail("audit RNG reached"))
+    monkeypatch.setattr(s1, "run_p0", lambda *a: pytest.fail("controls reached"))
+    monkeypatch.setenv("SE_AUDIT_ALLOW_SEEDS", "1")
+    monkeypatch.delenv("S1B_HOST_CLASS", raising=False)
+    out = tmp_path / "uncontained"
+    with pytest.raises((PermissionError, OSError)):
+        sa.run(sa.design(config()), out)
+    assert not out.exists()
+
+
+def test_contained_engineering_flag_requires_engineering_mode(tmp_path):
+    with pytest.raises(SystemExit):
+        sa.main(["--mode", "se_audit", "--contained-engineering", "--output", str(tmp_path / "x")])
+    assert not (tmp_path / "x").exists()
 
 
 def test_engineering_cannot_borrow_audit_seed():

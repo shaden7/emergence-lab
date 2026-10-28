@@ -44,11 +44,12 @@ PILOT_SEED_BASE = 2036101301
 S1B_SEED_BASE = 2036101701
 S1B_RUN_AUTHORIZED = True
 BOOTSTRAP_SEED = 2036101499
-# SE audit (docs/SPECTRAL_SE_AUDIT_PREREGISTRATION.md). LOCKED: flipping this flag
-# requires a separately reviewed run-authorization change; real seed use additionally
-# requires SE_AUDIT_ALLOW_SEEDS=1 in the environment.
+# SE audit (docs/SPECTRAL_SE_AUDIT_PREREGISTRATION.md). Activated by the reviewed
+# run-authorization change (docs/SE_AUDIT_RUN_AUTHORIZATION.md). Real seed use
+# additionally requires SE_AUDIT_ALLOW_SEEDS=1, which only the contained runner sets
+# inside the once-only se-audit-run.yml invocation that created the release marker.
 SE_AUDIT_SEED_BASE = 2036101901
-SE_AUDIT_RUN_AUTHORIZED = False
+SE_AUDIT_RUN_AUTHORIZED = True
 # Engineering-only seed base for P0b/P0d and unit tests. Disjoint from the pilot base,
 # the bootstrap seed and the D2 base 2036101101 (grep at the implementation commit).
 TEST_SEED_BASE = 2036101397

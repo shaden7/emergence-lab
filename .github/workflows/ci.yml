@@ -58,6 +58,35 @@ jobs:
           grep -q 'Full S1b requires the once-only marker proof' "$RUNNER_TEMP/nomarker.err"
           test ! -e "$RUNNER_TEMP/s1b-nomarker"
           echo 'S1b full mode refused without marker proof: PASS'
+      # SE audit (Issue #37): engineering seed base only, inside the same containment as the run.
+      - name: SE-audit engineering containment smoke
+        timeout-minutes: 4
+        env:
+          S1B_HOST_CLASS: non-lightsail
+        run: |
+          image=$(docker image inspect emergence-s1b-ci --format '{{.Id}}')
+          sh scripts/run-se-audit-contained.sh "$image" "$RUNNER_TEMP/se-audit-contained" engineering
+          mkdir -p results/se_audit_contained
+          cp -r "$RUNNER_TEMP/se-audit-contained/run/." results/se_audit_contained/
+          python -c "import json,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP'])/'se-audit-contained'/'run'; r=json.load(open(p/'resource_evidence.json')); m=json.load(open(p/'manifest.json')); a=json.load(open(p/'report.json')); assert r['clean_exit'] and r['watchdog_failure'] is None; assert m['mode']=='engineering' and len(m['seed_tuples_attempted'])==12 and all(s[0]==2036101997 for s in m['seed_tuples_attempted']); assert not a['s2_run_authorized']; print('SE-audit containment engineering PASS', r)"
+      # Negative control: full SE-audit mode without a once-only marker proof must refuse
+      # before Docker or RNG. NEVER provide a fake marker proof in general CI.
+      - name: SE-audit full mode refuses without once-only marker proof
+        timeout-minutes: 2
+        env:
+          S1B_HOST_CLASS: non-lightsail
+        run: |
+          image=$(docker image inspect emergence-s1b-ci --format '{{.Id}}')
+          set +e
+          RUN_URL=https://example.invalid/no-marker \
+            sh scripts/run-se-audit-contained.sh "$image" "$RUNNER_TEMP/se-audit-nomarker" 2> "$RUNNER_TEMP/se-nomarker.err"
+          rc=$?
+          set -e
+          cat "$RUNNER_TEMP/se-nomarker.err"
+          test "$rc" -eq 2
+          grep -q 'Full SE audit requires the once-only marker proof' "$RUNNER_TEMP/se-nomarker.err"
+          test ! -e "$RUNNER_TEMP/se-audit-nomarker"
+          echo 'SE-audit full mode refused without marker proof: PASS'
       - run: emergence-lab --config configs/smoke.json --output results
       - name: Exact 4x4 reference holdout
         env:
