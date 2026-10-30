@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261030T0804Z-54724eff",
+  "leaseId": "0ac3556386a3d7a7e74599f590a01cbb",
+  "acquiredAt": "2026-10-30T08:04:11Z",
+  "heartbeatAt": "2026-10-30T08:04:11Z",
+  "expiresAt": "2026-10-30T10:04:11Z",
+  "task": "SE-audit v0.1 later-pass result audit (run 40945734466)",
   "previousOwner": "rd-claude-20261028T0803Z-9fe13e91"
 }
