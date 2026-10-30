@@ -1,3 +1,36 @@
+Last handoff update: 2026-10-30 (08:13Z). **The once-only SE-audit v0.1 run has executed** ([run 40945734466](https://github.com/shaden7/emergence-lab/actions/runs/40945734466), owner dispatch on `main` `1465946`, 2026-10-29 20:04–21:36Z; marker and evidence in release [`se-audit-run-v1`](https://github.com/shaden7/emergence-lab/releases/tag/se-audit-run-v1)). It is **admissible**, and under the frozen rule the outcome is **SE-NOT-REJECTED at N = 2¹⁴ (R = 0.7017 ≤ 1.313)**.
+- The audit record is in [PR #58](https://github.com/shaden7/emergence-lab/pull/58), which is **open and not merged**.
+- Option C is not triggered. Option B may be *separately* preregistered; nothing is authorized yet.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision and Phase-0 GO are unchanged.
+
+## Director session: later-pass audit of the SE-audit run (2026-10-30, `rd-claude-20261030T0804Z-54724eff`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261028T0803Z-9fe13e91` had been released cleanly (lock head `7c720b2`, idle). No lease commit exists for 2026-10-29.
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `35d3395`.
+- `main` was `1465946`. Zero open PRs, Issue #37.
+- New since the last handoff: the owner dispatched `se-audit-run.yml` once; every step succeeded. It is the only run of that workflow. Nothing is queued, and there were no partial writes.
+
+**Admissibility (direct observation from the release, re-hashed after REST download):**
+- Tarball sha256 `63d8b42a…53de` matches the archived digest. The manifest's prereg, config and six source hashes equal `main`; all five output hashes match.
+- Exit 0, `clean_exit`, no watchdog failure or `resource_stop.json`, `mode=se_audit`, FINISHED, 192/192 seeds at base 2036101901, P0a–P0d pass, `s2_run_authorized=false`. **Admissible.**
+- **Budget flag:** 89.7 of 100 CPU-min used, against a projection of ≈ 53 (27.8 CPU-s per tree vs ≈ 16; AMD EPYC 7763 runner).
+
+**Later-pass review of the result (separate session, AI-mediated):** `docs/experiments/se_audit_run_recheck.py` in PR #58 reads only `numeric.csv` and reproduces the report to ≤ 1.4e-15.
+- sd_b(d̂_b) 0.01606, RMS SE_b 0.02289, **R = 0.7017** → **SE-NOT-REJECTED** (P(F ≥ R²) = 0.94).
+- Descriptive: pooled ψ SD 0.07929 (176 df), 90 % CI [0.07295, 0.08696]; CV(SE_b) 0.151; jackknife/delta 1.0002; near-normal per-tree Q (skew ≤ 0.52).
+- Post hoc, descriptive only: R is low (lower-tail P = 0.058). Not a finding, but the result should not be read as "SE exact".
+
+**Interpretation (hypothesis):** reading (c) "SE misstatement" is less likely at 2¹⁴. Reading (a), a chance pilot SE underestimate, is the leading but unproved explanation of the S1b 1.64× SE ratio. 2¹⁶–2¹⁸ stay uncertified.
+
+**Evidence level:** numerical observation at a nominal F level, one size; instrument diagnosis only. No physical claim. No Lightsail, deployment, paid API, new seeds, rerun or S2. Local `pytest -q` on PR #58 head `3fb6574`: 489 passed.
+
+**Open:** PR #58 needs a later-pass review of its interpretive text by a separately started session, then an expected-head-guarded merge. Exact-head CI completed-success ([push 41024565566](https://github.com/shaden7/emergence-lab/actions/runs/41024565566), [PR 41024599015](https://github.com/shaden7/emergence-lab/actions/runs/41024599015)).
+
+**Next single informative step:** review and merge PR #58. Then, only if still judged worthwhile, a **separate option-B preregistration** (symmetric CAY equivalence). It must use the SD upper factor 0.08696, state the 2¹⁴ → 2¹⁶–2¹⁸ transfer assumption, and re-derive its CPU budget from the observed 27.8 CPU-s per 2¹⁴ tree. The ≈ 220 CPU-min estimate is likely low, so the prereg should check whether option B still fits a single hosted-runner job.
+
+Director run rd-claude-20261030T0804Z-54724eff: start 2026-10-30T08:03:26Z, end 2026-10-30T08:13:58Z, duration 10 min
+
 Last handoff update: 2026-10-28 (08:11Z). **The SE-audit once-only run authorization ([PR #57](https://github.com/shaden7/emergence-lab/pull/57)) was MERGED** at [`b9738b8`](https://github.com/shaden7/emergence-lab/commit/b9738b86f708f2b8b57b3e94310febfcd32cfffb) after a later-pass PASS. `SE_AUDIT_RUN_AUTHORIZED = True` is now on `main`.
 - **No SE-audit run has happened and no audit seed has been drawn.** There is no `se-audit-run-v1` tag or release, and the workflow has 0 runs.
 - The Director's dispatch attempt was refused (HTTP 403, "Resource not accessible by integration"), so the trigger is the owner's single dispatch.
