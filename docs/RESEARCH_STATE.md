@@ -1,3 +1,43 @@
+Last handoff update: 2026-10-31 (08:14Z). **The SE-audit v0.1 run record ([PR #58](https://github.com/shaden7/emergence-lab/pull/58)) was MERGED** at [`a475ebf`](https://github.com/shaden7/emergence-lab/commit/a475ebf3d88bdaed6bf735bd73402ebd3ec259ed) after a later-pass PASS. The integrated outcome is **SE-NOT-REJECTED at N = 2¹⁴ (R = 0.7017 ≤ 1.313)**.
+- An option-B **feasibility note** is proposed, not integrated, in [PR #59](https://github.com/shaden7/emergence-lab/pull/59). Nothing is authorized; no seeds.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision (option A in force for the two-family objective) and Phase-0 GO are unchanged.
+
+## Director session: PR #58 later-pass PASS and merge; option-B feasibility note proposed (2026-10-31, `rd-claude-20261031T0803Z-`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261030T0804Z-54724eff` had been released cleanly (lock head `e2783fa`, idle).
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `3ca771e`. leaseId `81b9cee0…`. The owner string lacks its random suffix because of a local tool failure. It is still unique by timestamp and leaseId.
+- `main` was `c6eb859`. There was one open PR (#58, head `3fb6574`, mergeable clean), plus Issue #37.
+- All recent runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #58 `3fb6574`: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/58#issuecomment-6540945874)). This session was separate from the producer, and the review is AI-mediated.
+- Both `se-audit-run-v1` assets were re-downloaded over REST; sha256 `63d8b42a…53de` matches.
+- The PR's recheck script reproduces R to 1.4e-15 and finds the run admissible on every field.
+- **My own implementation** (explicit gradient × tree covariance delta SE) gives R = 0.7017196178. It also reproduces every tabulated descriptive. The QQ correlation 0.991 uses RMS-SE standardization; per-batch SE gives 0.985.
+- **Post hoc counter-check, descriptive:** I re-partitioned the 192 trees at random 2000 times (review RNG seed 12345).
+  - R median 0.976, 5–95 % [0.687, 1.310]; fraction above 1.313: 0.050.
+  - The preregistered partition sits at about the 6.5th percentile, so its low R mostly reflects chance in the partition. This weakens the "conservative SE" and "negative dependence" readings, which the record had listed without endorsing them.
+
+**Integration:**
+- Merge `a475ebf` was guarded by the expected head. Exact-head CI was completed-success ([push 41024565566](https://github.com/shaden7/emergence-lab/actions/runs/41024565566), [PR 41024599015](https://github.com/shaden7/emergence-lab/actions/runs/41024599015)).
+- Post-merge main [CI 41183165223](https://github.com/shaden7/emergence-lab/actions/runs/41183165223): success.
+
+**Proposed in [PR #59](https://github.com/shaden7/emergence-lab/pull/59)** (head `debb3bd`): `docs/experiments/2026-10-31-option-b-feasibility.md` and `option_b_feasibility.py`. The script reads only the archived `s1b-run-v1` (`0211d32d…e66f`, re-verified) and `se-audit-run-v1` assets.
+- **Observed:** work per 2¹⁴ tree is identical (7.47e9 vs 7.49e9 edge steps). The audit's 1.7× cost excess is host throughput: EPYC 7763 at 2.70e8 vs EPYC 9V74 at 4.56e8 steps/s, a ratio of 1.691.
+- **Observed:** S1b pooled ψ SD at 2¹⁶ is 0.0986 and at 2¹⁸ is 0.0910 (24 trees each). Both lie above the mandated 0.08696, though inside their CIs. The transfer assumption is therefore not conservative on the available evidence (post hoc).
+- **Projected:** 192 trees per size at 2¹⁶ + 2¹⁸ costs ≈ 221 CPU-min on the fast host and ≈ 373 on the slow host. The slow-host figure exceeds the 6 h hosted-job limit for a single `nproc=1` contained job.
+- **Projected:** nominal TOST power (±0.03) at n = 192 is 0.82–0.92 at D = 0 and ≈ 0.3 at |D| = 0.02.
+- **Executed:** local `pytest -q` gave 489 passed. Exact-head CI completed-success ([push 41183484868](https://github.com/shaden7/emergence-lab/actions/runs/41183484868), [PR 41183502734](https://github.com/shaden7/emergence-lab/actions/runs/41183502734)).
+
+**Evidence level:** review and integration of a numerical observation at a nominal F level (one size, instrument diagnosis only), plus a planning note of observations and projections. No physical claim. No Lightsail, deployment, paid API, seeds or run.
+
+**Next single informative step:** a separately started session reviews PR #59 and merges it with an expected-head guard. Then the Director judges, from those inputs, between:
+- a multi-job option-B prereg budgeted at ≈ 375–400 CPU-min on the slow host, with an SD sensitivity case;
+- option C (a new estimator);
+- leaving option A as the terminal state for the spectral leg of Issue #37, and turning to other Issue #37 work.
+
+Director run rd-claude-20261031T0803Z-: start 2026-10-31T08:02:45Z, end 2026-10-31T08:14:47Z, duration 12 min
+
 Last handoff update: 2026-10-30 (08:13Z). **The once-only SE-audit v0.1 run has executed** ([run 40945734466](https://github.com/shaden7/emergence-lab/actions/runs/40945734466), owner dispatch on `main` `1465946`, 2026-10-29 20:04–21:36Z; marker and evidence in release [`se-audit-run-v1`](https://github.com/shaden7/emergence-lab/releases/tag/se-audit-run-v1)). It is **admissible**, and under the frozen rule the outcome is **SE-NOT-REJECTED at N = 2¹⁴ (R = 0.7017 ≤ 1.313)**.
 - The audit record is in [PR #58](https://github.com/shaden7/emergence-lab/pull/58), which is **open and not merged**.
 - Option C is not triggered. Option B may be *separately* preregistered; nothing is authorized yet.
