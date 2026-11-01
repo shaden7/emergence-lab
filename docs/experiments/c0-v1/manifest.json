@@ -1,0 +1,49 @@
+{
+  "commit": "11c801aca3183ff28edb83e1ca6c059c5e8e7f08",
+  "config": {
+    "address_space_bytes": 536870912,
+    "cpu_seconds": 300,
+    "output_bytes": 5242880,
+    "repetitions": 2,
+    "wall_seconds": 600
+  },
+  "config_sha256": "3868572165313ef93bdee52a7e52b1efac694c6fcc78bec4f3feebf87f32b596",
+  "numerical_byte_identical": true,
+  "outcome": "PASS",
+  "output_bytes": 23982,
+  "platform": "linux",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "runs": [
+    {
+      "cpu_seconds": 0.48542599999999997,
+      "exit_code": 0,
+      "peak_rss_kib": 60872,
+      "sha256": "47895f28612e25b7c1c899f94736117cea9dcd8dcb897b004598bc7b06f498c3",
+      "timeout": false,
+      "wall_seconds": 0.5051110099998368
+    },
+    {
+      "cpu_seconds": 0.55383,
+      "exit_code": 0,
+      "peak_rss_kib": 60872,
+      "sha256": "47895f28612e25b7c1c899f94736117cea9dcd8dcb897b004598bc7b06f498c3",
+      "timeout": false,
+      "wall_seconds": 0.5681103130000338
+    }
+  ],
+  "source_sha256": {
+    "docs/DIMENSION_C0_PREREGISTRATION.md": "c57c9610a436b6c3999f381ad1f13ed44ec5ceaf8b4f351fd86c8a04e0a4b9e1",
+    "src/emergence_lab/c0_supervisor.py": "8bccad8bf880f45d4fdc261e32e36e29870375caa56ee556514eadc6358f6b90",
+    "src/emergence_lab/dimension_c0.py": "97cd2e7d3bb224e4e9dd2702f15b544aa7472a1e9fbb29fd9999936700b957d7",
+    "src/emergence_lab/dimension_d1.py": "a569ed2d4ddc2e2922efc998e7827918d59d8ab887dcc791689d90141fdea104",
+    "src/emergence_lab/spectral_dimension.py": "affeda4ae57c68ebb207b3e5f207f0e417a2b9f0ffd2d98629a68a6a1547d06c"
+  },
+  "supervisor_cpu_seconds": 0.085674578,
+  "threads": 1,
+  "total_child_cpu_seconds": 1.039256,
+  "versions": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "wall_seconds": 1.0746900230001302
+}
