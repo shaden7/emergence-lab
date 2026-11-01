@@ -1,3 +1,11 @@
+Last handoff update: 2026-11-01 (21:08Z).
+- PR #62 preregistration merged at 9a12092260d733dd10f06b9167d0ca9eaccf3552 after nonindependent continuation review and bounded import check.
+- PR #63 DRAFT implements C0 worker/supervisor/tests and preserves both actual local outputs plus manifest. Execution revision 11c801aca3183ff28edb83e1ca6c059c5e8e7f08. G0–G3 numerical checks pass; two outputs byte-identical (SHA-256 47895f28612e25b7c1c899f94736117cea9dcd8dcb897b004598bc7b06f498c3). 1.039 child CPU seconds, peak 60,872 KiB.
+- Overall outcome INCOMPLETE (provenance), overriding raw supervisor PASS: three materialized baseline/prereg files each had an extra trailing newline. Actual hashes preserved; semantic contents match but exact executing-tree requirement failed. No silent rerun.
+- Repaired source preflight in PR #63: require exact HEAD and byte-identical committed sources. Current candidate 0caad266e2c328f5d3ea857784dab65b7b24b739. Local unittest: 3 tests pass, including dirty newline/wrong revision and resource failures. pytest unavailable locally; full suite not run locally. CI for current candidate not yet verified.
+- Numerical observation only: fixed-dimensional controls have volume slopes rising toward 1/2 from below; nulls correctly saturated/insufficient. No emergent-physics finding; frozen random-tree conclusions unchanged.
+- Next: review PR #63 supervisor/report semantics and provenance repair, explicitly version a rerun authorization preserving the first outcome, then re-execute from a clean exact checkout. Implementation/results remain unmerged. No Lightsail/deployment/paid API.
+
 Last handoff update: 2026-11-01 (20:59Z).
 - PR #61 MERGED at e16e6e85563bea9add68502b9871e530817628aa after later-session design review; final document blob verified on main.
 - Found and fixed an execution-budget defect: slope t=256 requires q(512), hence 134,217,728 directed-edge steps on the 256-square torus, exceeding the existing 100,000,000 cap. Corrected suggested endpoint t=128 requires q(256), 67,108,864 steps. This is static code-based arithmetic, not a numerical C0 result or measured runtime.
