@@ -75,3 +75,7 @@ Outcome precedence: FAIL if an observed scientific/engineering gate fails; other
 Before execution record exact implementation commit, this preregistration SHA-256, machine-readable config SHA-256, source blob hashes, Python/NumPy/SciPy versions, platform and thread configuration. Record actual CPU/wall/peak-memory/output-byte observations and SHA-256 for all outputs, including failed runs.
 Store result and manifest using repository archive conventions; a result note must link retrievable bytes. Do not claim execution from configuration or CI alone.
 Static design and known-oracle sizing are not blinded hypothesis tests. C0 PASS calibrates only these deterministic controls and report semantics. Historical D2 is design context, not new evidence. Random-tree spectral size stability and Issue #37 remain unresolved.
+
+## Review record (2026-11-01)
+
+PASS for preregistration, conditional on integration before implementation. Continuing agent review is nonindependent, not an external later-pass scientific review. Checked endpoint closure, vertex-transitive source equivalence, no-wrap domain, separate estimands, full-prefix null verdict inputs and outcome precedence against the existing kernels. A setup-only import check succeeded with 512 MiB RLIMIT_AS and one BLAS thread (NumPy 2.3.5, SciPy 1.17.0); this does not establish whole-run feasibility. Original candidate CI 41349498129 completed-success. No gated C0 output has been computed. Implementation must test supervisor failure paths and record its exact commit before execution.
