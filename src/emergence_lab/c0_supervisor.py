@@ -11,6 +11,16 @@ import subprocess
 import sys
 import time
 
+def verify_sources(root, commit, files):
+    resolved=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+    if resolved != commit:
+        raise ValueError('executing HEAD differs from requested commit')
+    for path in files:
+        relative=path.relative_to(root).as_posix()
+        original=subprocess.check_output(['git','show',f'{commit}:{relative}'],cwd=root)
+        if path.read_bytes()!=original:
+            raise ValueError('uncommitted source bytes: '+relative)
+
 def execute(command, output, cpu, wall, memory, size):
     start=time.monotonic()
     def limits():
@@ -49,6 +59,7 @@ def main():
     files=[root/'docs/DIMENSION_C0_PREREGISTRATION.md',Path(__file__),
            Path(__file__).with_name('dimension_c0.py'),Path(__file__).with_name('dimension_d1.py'),
            Path(__file__).with_name('spectral_dimension.py')]
+    verify_sources(root,a.commit,files)
     manifest['source_sha256']={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     manifest['config_sha256']=hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest()
     manifest['python']=sys.version
