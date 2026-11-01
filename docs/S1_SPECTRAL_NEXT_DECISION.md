@@ -1,6 +1,6 @@
-# Issue #37 spectral-leg scope decision — 2026-11-01 (proposal v0.1)
+# Issue #37 spectral-leg scope decision — 2026-11-01 (adopted v0.1)
 
-**Status: PROPOSED, pending later-pass review and merge.** This note does not authorize seeds, runs or deployments.
+**Status: ADOPTED via [PR #60](https://github.com/shaden7/emergence-lab/pull/60), merge `a904a49a13732ff89e5e9011c20a5a313bcae0d9`, after [later-pass PASS](https://github.com/shaden7/emergence-lab/pull/60#issuecomment-6563063341) and exact-head CI success.** This note does not authorize seeds, runs or deployments.
 
 ## Decision
 
