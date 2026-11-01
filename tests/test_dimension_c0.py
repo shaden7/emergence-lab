@@ -34,3 +34,18 @@ class C0Tests(unittest.TestCase):
                 self.assertGreater(result['peak_rss_kib'],0)
                 if i==0: self.assertIn('partial',out.read_text())
                 if i==4: self.assertEqual(out.read_text(),'42\n')
+
+    def test_exact_source_preflight(self):
+        import subprocess
+        from emergence_lab.c0_supervisor import verify_sources
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            subprocess.run(['git','init','-q',directory],check=True)
+            path=root/'source.py'; path.write_text('x=1\n')
+            subprocess.run(['git','add','source.py'],cwd=root,check=True)
+            subprocess.run(['git','-c','user.name=C0 Test','-c','user.email=test@example.invalid','commit','-qm','test'],cwd=root,check=True)
+            sha=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+            verify_sources(root,sha,[path])
+            path.write_text('x=1\n\n')
+            with self.assertRaises(ValueError): verify_sources(root,sha,[path])
+            with self.assertRaises(ValueError): verify_sources(root,'0'*40,[path])
