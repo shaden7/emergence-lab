@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-c0-2026-11-01T21:03:13.805Z",
+  "leaseId": "9iwdtbc6nqfssup7h82xzdgwh99tk08dnfgqegmelwtan7dya6fs03pt47l3cegdpk17doh11ozdcp03jjkh07qb",
+  "acquiredAt": "2026-11-01T21:03:13.805Z",
+  "heartbeatAt": "2026-11-01T21:03:13.805Z",
+  "expiresAt": "2026-11-01T23:03:13.805Z",
+  "task": "Review C0 preregistration and implement calibration",
   "previousOwner": "rd-codex-2026-11-01T20:55:22.856Z"
 }
