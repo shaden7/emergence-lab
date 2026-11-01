@@ -41,7 +41,7 @@ S1b per-tree source CPU on the fast host was 29.0 s at 2¹⁶ and 40.0 s at 2¹�
 | fast (EPYC 9V74, observed per size) | 29.0 | 40.0 | **221 CPU-min** |
 | slow (EPYC 7763, scaled by the 2¹⁴ throughput ratio 1.691) | 49.1 | 67.6 | **373 CPU-min** |
 
-**Assumption:** the host ratio measured at 2¹⁴ transfers to 2¹⁶ and 2¹⁸. On the fast host, throughput at 2¹⁸ was already 14 % below 2¹⁴, so cache effects could make the slow-host figure worse, not better.
+**Assumption:** the host ratio measured at 2¹⁴ transfers to 2¹⁶ and 2¹⁸. On the fast host, throughput at 2¹⁸ was already 12.3 % below 2¹⁴ (3.995 vs 4.558 × 10⁸ steps/s; erratum 2026-11-01, previously misstated as 14 %), so cache effects could make the slow-host figure worse, not better.
 
 Overhead adds about 40–50 CPU-s per run.
 
@@ -86,5 +86,6 @@ At n = 192 the nominal power at D = 0 is 0.82–0.92, depending on which SD tran
 
 - Cost figures are observations for 2¹⁴. The figures for 2¹⁶–2¹⁸ on the slow host are projections under the stated transfer assumption, and only two host models have been observed.
 - The power figures are nominal normal-theory projections. They inherit the SE model, which was not rejected at 2¹⁴ only, and they ignore SD estimation uncertainty.
+- SD estimator comparability (later-pass review, 2026-11-01): the S1b per-size SDs in § 3 centre ψ on one pooled mean per size (n − 1 df), while the audit's 0.07929 is the batch-pooled estimate (176 df). Applying the § 3 estimator to the audit's 192 trees gives 0.0782 instead of 0.0793, a 1.4 % difference that does not change the observation that the S1b 2¹⁶/2¹⁸ point SDs exceed 0.08696.
 - The 6 h job limit is a GitHub platform limit, not a project measurement.
 - No Lightsail, deployment, paid API, seeds or run.
