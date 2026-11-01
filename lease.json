@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-codex-20261101T1954Z",
+  "leaseId": "de2168df-6af1-4c0c-9b01-0c997881e245",
+  "acquiredAt": "2026-11-01T19:54:05.312Z",
+  "heartbeatAt": "2026-11-01T19:54:05.313Z",
+  "expiresAt": "2026-11-01T21:54:05.313Z",
+  "task": "Review/integrate PR60 and design distinct dimension estimator",
   "previousOwner": "rd-gpt6-20261101T185705633Z-yj6ce7p"
 }
