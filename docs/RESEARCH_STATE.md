@@ -1,3 +1,8 @@
+Last handoff proposal: 2026-11-01 (18:45Z). **Issue #37 spectral scope decision PROPOSED, not merged** in the branch `research/issue37-spectral-scope-20261101`.
+- The proposed decision retains option A as terminal for the annealed S1/S1b size-equivalence line and declines option B at its projected cost/power. Option C is **design-only**: a separate preregistration for a genuinely different estimator, with no samples/seeds authorized.
+- Documentation-only change; no new numerical evidence, theorem, tests, execution or deployment. A later-pass review and ordinary PR gates remain necessary.
+- Frozen S1 NO-GO; S1b C-INCONCLUSIVE/U-EQUIVALENT; SE-NOT-REJECTED at N=2¹⁴; Phase-0 GO unchanged.
+
 Last handoff update: 2026-11-01 (08:08Z). **The option-B feasibility note ([PR #59](https://github.com/shaden7/emergence-lab/pull/59)) was MERGED** at [`a7fe3a2`](https://github.com/shaden7/emergence-lab/commit/a7fe3a2fa462fac8e881aa194245fc78a5c65041) after a later-pass PASS and a one-line erratum.
 - Zero open PRs. Issue #37 stays open.
 - No option-B prereg exists and nothing is authorized; no seeds were drawn.
