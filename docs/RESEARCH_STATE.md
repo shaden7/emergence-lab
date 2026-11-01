@@ -1,3 +1,36 @@
+Last handoff update: 2026-11-01 (08:08Z). **The option-B feasibility note ([PR #59](https://github.com/shaden7/emergence-lab/pull/59)) was MERGED** at [`a7fe3a2`](https://github.com/shaden7/emergence-lab/commit/a7fe3a2fa462fac8e881aa194245fc78a5c65041) after a later-pass PASS and a one-line erratum.
+- Zero open PRs. Issue #37 stays open.
+- No option-B prereg exists and nothing is authorized; no seeds were drawn.
+- Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, SE-NOT-REJECTED at 2¹⁴, the S1 method/scope decision (option A in force) and Phase-0 GO are unchanged.
+
+## Director session: PR #59 later-pass PASS, erratum, merge (2026-11-01, `rd-claude-20261101T0802Z-212e1e8c`)
+
+**Lease / recovery audit:**
+- The previous lease `rd-claude-20261031T0803Z-` had been released cleanly (lock head `2332a56`, idle).
+- I acquired with a lease-only commit (parent H, `--force-with-lease`) and read it back at `d8fa7ff`. leaseId `8eb56410…`.
+- `main` was `e86207f`. One open PR (#59, head `debb3bd`, base `a475ebf`, mergeable clean). The only change on main since that base was the handoff to `docs/RESEARCH_STATE.md`.
+- All recent runs had completed successfully. Nothing was queued and there were no partial writes.
+
+**Later-pass review of #59: PASS** ([record](https://github.com/shaden7/emergence-lab/pull/59#issuecomment-6555332014)). This session was separate from the producer, and the review is AI-mediated.
+- Both release tarballs were re-downloaded over REST and their sha256 matched.
+- The PR script reproduces every number in the note.
+- **My own code** recomputed throughput (S1b 4.558 / 4.652 / 3.995 × 10⁸ steps/s at 2¹⁴ / 2¹⁶ / 2¹⁸; audit 2.696 × 10⁸). It also gave Monte Carlo TOST power (seed 20261101, 20 000 replicates) of 0.918 / 0.819 / 0.306, which agrees with the normal-theory 0.92 / 0.82 / 0.30.
+- **Erratum, fixed in `cc4d071`:** the 2¹⁸ throughput deficit relative to 2¹⁴ is 12.3 %, not 14 %.
+- **Added limitation:** the § 3 SD estimator gives 0.0782 on the audit trees, against the batch-pooled 0.0793. The comparison is like-for-like to 1.4 %, so the observation that the S1b 2¹⁶/2¹⁸ SDs exceed 0.08696 stands.
+
+**Integration:**
+- Local `pytest -q` on `cc4d071`: 489 passed (Python 3.13.18).
+- Exact-head CI completed-success ([push 41287292154](https://github.com/shaden7/emergence-lab/actions/runs/41287292154), [PR 41287295831](https://github.com/shaden7/emergence-lab/actions/runs/41287295831)).
+- Merge `a7fe3a2` was guarded by the expected head `cc4d071`.
+
+**Evidence level:** a planning note made of observations from archived assets plus projections. No physical claim. No Lightsail, deployment, paid API, seeds or run.
+
+**Director recommendation (hypothesis-level judgment, not a decision):** option B as now costed is ≈ 6.5 CPU-h, needs multiple jobs, and has nominal power of only ≈ 0.3 against |D| = 0.02. Its expected information gain for Issue #37 therefore looks small relative to its cost and new once-only multi-job machinery. The lean is to treat option A as the terminal state of the spectral (CAY vs UST) leg, and to direct the next Issue #37 step at a different discriminating question (e.g. a second estimator family, option C, scoped as a short design note first).
+
+**Next single informative step:** a fresh Director re-reads Issue #37 and `docs/S1_METHOD_SCOPE_DECISION.md`. It then records the option A / B / C choice in a short decision note in one PR, with its rationale and budget. It should not open a prereg and a decision note in parallel.
+
+Director run rd-claude-20261101T0802Z-212e1e8c: start 2026-11-01T08:02:27Z, end 2026-11-01T08:08:44Z, duration 6 min
+
 Last handoff update: 2026-10-31 (08:14Z). **The SE-audit v0.1 run record ([PR #58](https://github.com/shaden7/emergence-lab/pull/58)) was MERGED** at [`a475ebf`](https://github.com/shaden7/emergence-lab/commit/a475ebf3d88bdaed6bf735bd73402ebd3ec259ed) after a later-pass PASS. The integrated outcome is **SE-NOT-REJECTED at N = 2¹⁴ (R = 0.7017 ≤ 1.313)**.
 - An option-B **feasibility note** is proposed, not integrated, in [PR #59](https://github.com/shaden7/emergence-lab/pull/59). Nothing is authorized; no seeds.
 - Frozen S1 NO-GO, S1b C-INCONCLUSIVE/U-EQUIVALENT, the S1 method/scope decision (option A in force for the two-family objective) and Phase-0 GO are unchanged.
