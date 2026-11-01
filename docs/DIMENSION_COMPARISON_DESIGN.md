@@ -34,7 +34,7 @@ Do not set r = sqrt(t) on random trees. A relation such as ds = 2*dV/dw requires
 **Target:** demonstrate that a joint reporting/interpretation procedure distinguishes exact finite-scale corrections and saturation from failures of an instrument. No random graphs or new model comparison in C0.
 
 Suggested preregistration grid (design inputs, not frozen authorization):
-- Positive controls: cycle C1024 and a 256-by-256 square torus; graph-distance radii r = 4, 8, 16 and spectral half-times t = 8, 16, 32, 64, 128, 256.
+- Positive controls: cycle C1024 and a 256-by-256 square torus; graph-distance radii r = 4, 8, 16 and spectral half-times t = 8, 16, 32, 64, 128 (evaluate q also at 256 for the final dyadic slope).
 - Volume oracle before wrapping: |B(r)| = 2r+1 on the cycle and 1+2r(r+1) on the square torus when the full ball does not wrap. For every dV(r), verify that this includes **2r**, not only r.
 - Spectral oracle: S0's finite-torus Fourier formula and infinite-lattice combinatorial reference. Compare to the finite reference for implementation accuracy; any asymptotic comparison must separately quantify finite-time error.
 - Saturation controls: C8 and K32, using S0's correct stationary floors. For volume, require the existing guard/range classification; never convert a saturated zero slope into a positive zero-dimensional verdict.
@@ -66,3 +66,7 @@ If a calibrated spectral leg remains unaffordable, retain **unresolved** for it 
 - Barlow, Croydon & Kumagai, *Subsequential scaling limits of simple random walk on the two-dimensional uniform spanning tree*: https://arxiv.org/abs/1407.5162 .
 
 External theorems, previously reviewed numerical observations, proposed tolerances/budgets and methodological judgment remain separate. This document supplies a design choice and failure cases; it reports no new numerical result or theorem.
+
+## Later-pass engineering review (2026-11-01)
+
+The original suggested endpoint t=256 would require q(512). On the 256-by-256 torus, the existing graph kernel checks max(half_times) * adjacency.nnz: 512 * (4 * 256^2) = 134,217,728, exceeding its unchanged 100,000,000-operation cap before propagation. The suggested slope endpoint is therefore reduced to t=128, requiring q(256) and 67,108,864 edge-steps. This is a static feasibility correction, not an executed C0 result or measured runtime. Keep the kernel cap unchanged. A preregistration must distinguish slope times from required return times and verify this budget before execution.
