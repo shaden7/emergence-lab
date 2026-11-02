@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-c0-review-2026-11-02T07:11:32.303Z",
-  "leaseId": "tbh8e7yuagx76l9bfbii85kasy1y4nzrm04a4qx3q8m87u3a6ow2jns5ihjyfz3d8ydwshvl3qwyiwv1vo4ukm",
-  "acquiredAt": "2026-11-02T07:11:32.303Z",
-  "heartbeatAt": "2026-11-02T07:11:32.303Z",
-  "expiresAt": "2026-11-02T09:11:32.303Z",
-  "task": "Review PR63 provenance and C0 supervisor",
-  "previousOwner": "rd-c0-2026-11-01T21:03:13.805Z"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-c0-review-2026-11-02T07:11:32.303Z"
 }
