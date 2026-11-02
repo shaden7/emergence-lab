@@ -11,6 +11,21 @@ import subprocess
 import sys
 import time
 
+def report_outcome(payload):
+    """Require explicit gate evidence; failure takes precedence over omissions."""
+    if not isinstance(payload, dict):
+        return 'INCOMPLETE'
+    gates = payload.get('gates')
+    if payload.get('outcome') == 'FAIL':
+        return 'FAIL'
+    if isinstance(gates, dict) and any(value is False for value in gates.values()):
+        return 'FAIL'
+    if (payload.get('outcome') != 'PASS' or not isinstance(gates, dict)
+            or set(gates) != {f'C0-G{i}' for i in range(4)}
+            or any(value is not True for value in gates.values())):
+        return 'INCOMPLETE'
+    return 'PASS'
+
 def verify_sources(root, commit, files):
     resolved=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
     if resolved != commit:
@@ -88,7 +103,11 @@ def main():
         if run['exit_code']!=0: break
         try: payload=json.loads(output.read_text())
         except (ValueError,UnicodeError): break
-        observed_failure |= payload.get('outcome')=='FAIL'
+        outcome = report_outcome(payload)
+        run['report_outcome'] = outcome
+        observed_failure |= outcome == 'FAIL'
+        save()
+        if outcome != 'PASS': break
         hashes.append(run['sha256'])
         if observed_failure: break
     complete=len(hashes)==2
@@ -105,3 +124,4 @@ def main():
     print(manifest['outcome'])
 
 if __name__=='__main__': main()
+
