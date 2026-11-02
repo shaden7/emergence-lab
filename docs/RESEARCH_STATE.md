@@ -1,3 +1,16 @@
+Last handoff update: 2026-11-02 (08:14Z).
+- PR #63 blockers 1–4 from the C0 review were addressed on the existing branch at 726e0295b4f5d1ce89c429dbc3d4993f02e1f473. Exact-head CI 41411006540 / 41410999846 completed-success.
+  - Full report-contract validation (`c0_report.py`) is used by the worker and the supervisor. PASS now requires a complete, consistent report.
+  - Module-resolution provenance: `__init__`/`c0_report` were added to the verified sources, the child path is pinned and a `find_spec` probe runs before execution.
+  - A durable INCOMPLETE manifest is now written on any setup failure.
+  - Independent CSR topology checks (loops, duplicates, symmetry, connectivity) were added to C0-G0.
+- Local results: C0 tests 8 passed (44 subtests, including 16 rejected report mutations); full pytest 493 passed, 4 skipped. Environment: Python 3.13 / NumPy 2.5.3 / SciPy 1.18.1.
+- [Review record](https://github.com/shaden7/emergence-lab/blob/726e0295b4f5d1ce89c429dbc3d4993f02e1f473/docs/experiments/2026-11-02-c0-review.md) and [PR comment](https://github.com/shaden7/emergence-lab/pull/63#issuecomment-6572310510). Status: REVISE. The PR is still a draft and unmerged; the implementation on main is unchanged.
+- No gated C0 execution or rerun took place, and none was authorized. c0-v1 remains INCOMPLETE (provenance). The report schema changed (topology field), so a rerun's outputs will not be byte-comparable with c0-v1. No new numerical or physical finding. No Lightsail, deployment or paid API.
+- Recovery audit: the preceding lease was released cleanly, #63 was the only open PR and #37 the only open issue. The latest runs all completed-success; nothing was queued.
+- Next: a later session challenges 726e029, then a versioned c0-v2 rerun authorization (preserving c0-v1 and stating the schema change), then a gated run from a clean exact checkout.
+- Director run rd-claude-20261102T0803Z-86ae7c9f: start 2026-11-02T08:03:05Z, end 2026-11-02T08:14:16Z, duration 11 min
+
 Last handoff update: 2026-11-02.
 - PR #63 later-session AI-mediated review: REVISE. Candidate 0caad266e2c328f5d3ea857784dab65b7b24b739 had completed-success exact-head CI 41350311183 / 41350306616.
 - Fixed false PASS path on the existing PR branch: 27c0a4a7d95fdf7dbc3faa58ca9c88cad8d4867b. Supervisor now requires an explicit PASS with exactly G0–G3 boolean true gates, preserves explicit/gate failures, and treats missing/invalid status evidence as INCOMPLETE. Five local unittest tests passed, including three synthetic end-to-end supervisor cases. Full local pytest unavailable; new-head CI pending verification.
