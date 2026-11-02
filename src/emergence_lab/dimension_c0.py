@@ -8,21 +8,30 @@ from emergence_lab.spectral_dimension import (graph_even_returns,
     torus_even_return_fourier, complete_graph_even_return,
     infinite_lattice_even_return, local_spectral_slope, has_powerlaw_headroom)
 
-TIMES = [8, 16, 32, 64, 128, 256]
-RADII = [4, 8, 16, 32]
+from emergence_lab.c0_report import TIMES, RADII, validate_row, validate_report  # noqa: F401  (re-exported)
 
-def validate_row(row):
-    """Fail closed on missing kernel evidence or inconsistent interpretation."""
-    if row.get('kernel') != 'graph_even_returns':
-        raise ValueError('missing graph kernel evidence')
-    expected_floor = (2 if row['bipartite'] else 1) / row['n']
-    if row['floor'] != expected_floor:
-        raise ValueError('wrong stationary floor')
-    for t in TIMES[:-1]:
-        if str(t) not in row['returns'] or str(2*t) not in row['returns']:
-            raise ValueError('missing doubled endpoint')
-    if row['null'] and row['classification'] != 'SATURATED':
-        raise ValueError('invalid positive null classification')
+
+def check_topology(graph):
+    """Independent CSR checks of the frozen C0-G0 topology properties.
+
+    Performed here on the constructed graph; this does not rely on the builders' own
+    loop/duplicate removal. Connectivity uses SciPy connected components, not BFS shells."""
+    from scipy import sparse
+    from scipy.sparse.csgraph import connected_components
+    n = graph.n
+    rows = np.repeat(np.arange(n, dtype=np.int64), graph.degrees)
+    cols = graph.indices.astype(np.int64)
+    key = rows * n + cols
+    reverse = np.sort(cols * n + rows)
+    forward = np.sort(key)
+    no_loops = bool(np.all(rows != cols))
+    no_dup = bool(forward.size == 0 or np.all(np.diff(forward) > 0))
+    undirected = bool(np.array_equal(forward, reverse))
+    matrix = sparse.csr_matrix((np.ones(cols.size, dtype=np.int8), cols, graph.indptr), shape=(n, n))
+    connected = bool(connected_components(matrix, directed=False)[0] == 1)
+    return {'connected': connected, 'simple': no_loops and no_dup, 'undirected': undirected,
+            'no_self_loops': no_loops, 'no_duplicate_edges': no_dup,
+            'checked_by': 'dimension_c0.check_topology (independent of graph builder)'}
 
 def run():
     rows = []
@@ -37,6 +46,8 @@ def run():
         n = graph.n
         floor = (2 if d else 1)/n
         degree = 2*d if d else 31
+        topology = check_topology(graph)
+        gates['C0-G0'] &= all(topology[k] for k in ['connected','simple','undirected'])
         gates['C0-G0'] &= bool(np.all(graph.degrees == degree) and
             graph.n_edges == n*degree//2 and max(TIMES)*graph.indices.size <= 100000000)
         q = graph_even_returns(graph,0,TIMES)
@@ -88,13 +99,15 @@ def run():
         row={'graph':name,'n':n,'dimension_parameter':d,'side':L,'source':0,
              'null':null,'bipartite':bool(d),'floor':floor,'kernel':'graph_even_returns',
              'volume_kernel':'shell_counts','returns':returns,'spectral_slopes':slopes,
-             'volume':volume,'volume_verdict':vv,
+             'volume':volume,'volume_verdict':vv,'topology':topology,
              'classification':'SATURATED' if null else 'POINTWISE_CONTROL'}
         validate_row(row)
         rows.append(row)
-    return {'schema':1,'rng':'not used','time_units':'half_steps_2t','radii':RADII,
-            'return_half_times':TIMES,'graphs':rows,'gates':gates,
-            'outcome':'PASS' if all(gates.values()) else 'FAIL'}
+    report = {'schema':1,'rng':'not used','time_units':'half_steps_2t','radii':RADII,
+              'return_half_times':TIMES,'graphs':rows,'gates':gates,
+              'outcome':'PASS' if all(gates.values()) else 'FAIL'}
+    validate_report(report)
+    return report
 
 if __name__ == '__main__':
     print(json.dumps(run(),sort_keys=True,separators=(',',':'),allow_nan=False))

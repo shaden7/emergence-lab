@@ -11,9 +11,12 @@ class C0Tests(unittest.TestCase):
         import os
         import subprocess
         from emergence_lab import c0_supervisor
+        from emergence_lab import c0_report
+        from emergence_lab.dimension_c0 import run
         for payload, expected in [({}, 'INCOMPLETE'),
                                   ({'outcome': 'PASS', 'gates': {'C0-G0': False}}, 'FAIL'),
-                                  ({'outcome': 'PASS', 'gates': {f'C0-G{i}': True for i in range(4)}}, 'PASS')]:
+                                  ({'outcome': 'PASS', 'gates': {f'C0-G{i}': True for i in range(4)}}, 'INCOMPLETE'),
+                                  (run(), 'PASS')]:
             with self.subTest(expected=expected), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 package = root/'src/emergence_lab'
@@ -21,6 +24,7 @@ class C0Tests(unittest.TestCase):
                 (root/'docs').mkdir()
                 (root/'docs/DIMENSION_C0_PREREGISTRATION.md').write_text('synthetic test fixture\n')
                 (package/'__init__.py').write_text('')
+                (package/'c0_report.py').write_bytes(Path(c0_report.__file__).read_bytes())
                 for name in ['dimension_d1.py', 'spectral_dimension.py']:
                     (package/name).write_text('')
                 (package/'dimension_c0.py').write_text('print('+repr(json.dumps(payload))+')\n')
@@ -40,8 +44,10 @@ class C0Tests(unittest.TestCase):
     def test_report_outcome(self):
         from emergence_lab.c0_supervisor import report_outcome
         good = {f'C0-G{i}': True for i in range(4)}
+        from emergence_lab.dimension_c0 import run
         cases = [
-            ({'outcome': 'PASS', 'gates': good}, 'PASS'),
+            (run(), 'PASS'),
+            ({'outcome': 'PASS', 'gates': good}, 'INCOMPLETE'),  # gates alone are not a report
             ({}, 'INCOMPLETE'),
             ([], 'INCOMPLETE'),
             ({'outcome': 'INCOMPLETE', 'gates': good}, 'INCOMPLETE'),
@@ -57,17 +63,97 @@ class C0Tests(unittest.TestCase):
                 self.assertEqual(report_outcome(payload), expected)
 
     def test_payloads(self):
-        for mutation in ['none','endpoint','floor','oracle','label']:
-            with self.subTest(mutation=mutation):
-                r={'kernel':'graph_even_returns','bipartite':True,'n':8,'floor':.25,
-                   'returns':{str(t):{} for t in TIMES},'null':True,'classification':'SATURATED'}
-                if mutation=='endpoint': del r['returns']['256']
-                if mutation=='floor': r['floor']=.125
-                if mutation=='oracle': del r['kernel']
-                if mutation=='label': r['classification']='POSITIVE_DIMENSION'
-                if mutation=='none': validate_row(r)
-                else:
-                    with self.assertRaises(ValueError): validate_row(r)
+        import copy
+        from emergence_lab.dimension_c0 import run
+        from emergence_lab.c0_report import validate_report
+        from emergence_lab.c0_supervisor import report_outcome
+        report = run()
+        self.assertEqual(report['outcome'], 'PASS')
+        validate_report(report)
+        def null_row(r): return r['graphs'][2]
+        def pos_row(r): return r['graphs'][1]
+        mutations = {
+            'endpoint': lambda r: null_row(r)['returns'].pop('256'),
+            'floor': lambda r: null_row(r).update(floor=.125),
+            'oracle_only': lambda r: null_row(r).pop('kernel'),
+            'label': lambda r: null_row(r).update(classification='POSITIVE_DIMENSION'),
+            'empty_return': lambda r: pos_row(r)['returns'].update({'8': {}}),
+            'nan_observed': lambda r: pos_row(r)['returns']['16'].update(observed=float('nan')),
+            'missing_slope': lambda r: pos_row(r)['spectral_slopes'].pop(),
+            'missing_headroom': lambda r: pos_row(r)['spectral_slopes'][0]['headroom'].pop('20'),
+            'missing_volume': lambda r: pos_row(r)['volume'].pop(0),
+            'volume_label': lambda r: pos_row(r)['volume'][0].update(classification='DIMENSIONAL_REDUCTION'),
+            'missing_topology': lambda r: pos_row(r).pop('topology'),
+            'wrong_source': lambda r: pos_row(r).update(source=1),
+            'missing_graph': lambda r: r['graphs'].pop(),
+            'null_verdict': lambda r: null_row(r)['volume_verdict'].update(verdict='PLATEAU'),
+            'outcome_mismatch': lambda r: r['gates'].update({'C0-G3': False}),
+            'grid': lambda r: r.update(radii=[4, 8, 16]),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(mutation=name):
+                bad = copy.deepcopy(report)
+                mutate(bad)
+                with self.assertRaises(ValueError):
+                    validate_report(bad)
+                self.assertNotEqual(report_outcome(bad), 'PASS')
+        # Prereg-required row-level rejections.
+        for name in ['endpoint', 'floor', 'oracle_only', 'label']:
+            with self.subTest(row=name):
+                bad = copy.deepcopy(report)
+                mutations[name](bad)
+                with self.assertRaises(ValueError):
+                    validate_row(null_row(bad))
+
+    def test_topology_checks(self):
+        import numpy as np
+        from emergence_lab.dimension_d1 import Graph, torus_lattice
+        from emergence_lab.dimension_c0 import check_topology
+        good = check_topology(torus_lattice(2, 8))
+        self.assertTrue(all(good[k] for k in ['connected', 'simple', 'undirected']))
+        def csr(rows):
+            indptr = np.cumsum([0] + [len(r) for r in rows])
+            return Graph(indptr, np.array([x for r in rows for x in r], dtype=np.int32))
+        cases = {'self_loop': ([[0, 1], [0]], 'no_self_loops'),
+                 'duplicate': ([[1, 1], [0, 0]], 'no_duplicate_edges'),
+                 'directed': ([[1], [0, 2], []], 'undirected'),
+                 'disconnected': ([[1], [0], [3], [2]], 'connected')}
+        for name, (rows, key) in cases.items():
+            with self.subTest(case=name):
+                self.assertFalse(check_topology(csr(rows))[key])
+
+    def test_setup_failure_is_persisted(self):
+        import json
+        import os
+        import subprocess
+        from emergence_lab import c0_supervisor
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(['git','init','-q',directory],check=True)
+            package = root/'src/emergence_lab'
+            package.mkdir(parents=True)
+            supervisor = package/'c0_supervisor.py'
+            supervisor.write_bytes(Path(c0_supervisor.__file__).read_bytes())
+            # Missing sources and no commit: preflight must fail with a durable manifest.
+            result = subprocess.run([sys.executable,str(supervisor),'--commit','0'*40,
+                                     '--output',str(root/'output')],cwd=root,
+                                    env={**os.environ,'PYTHONPATH':str(Path(c0_supervisor.__file__).parents[1])},
+                                    capture_output=True,timeout=30)
+            self.assertEqual(result.returncode, 2)
+            manifest = json.loads((root/'output/manifest.json').read_text())
+            self.assertEqual(manifest['outcome'], 'INCOMPLETE')
+            self.assertEqual(manifest['setup'], 'failed')
+            self.assertIn('setup_error', manifest)
+            self.assertEqual(manifest['runs'], [])
+
+    def test_module_resolution_rejects_foreign_source(self):
+        from emergence_lab.c0_supervisor import verify_resolution
+        root = Path(__file__).resolve().parents[1]
+        package = root/'src/emergence_lab'
+        names = ['__init__.py','c0_report.py','dimension_c0.py','dimension_d1.py','spectral_dimension.py']
+        verify_resolution(root, [package/n for n in names])
+        with self.assertRaises(ValueError):
+            verify_resolution(root, [package/n for n in names[:-1]])
 
     def test_supervisor(self):
         cases=[('import time; print("partial",flush=True); time.sleep(10)',.15,4096),
