@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261102T0803Z-86ae7c9f",
+  "leaseId": "03570764-977b-4ef1-a20a-a9b59f73bce9",
+  "acquiredAt": "2026-11-02T08:03:49Z",
+  "heartbeatAt": "2026-11-02T08:03:49Z",
+  "expiresAt": "2026-11-02T10:03:49Z",
+  "task": "PR #63 later-pass review of C0 supervisor/provenance repair",
   "previousOwner": "rd-c0-review-2026-11-02T07:11:32.303Z"
 }
