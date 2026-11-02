@@ -1,3 +1,10 @@
+Last handoff update: 2026-11-02.
+- PR #63 later-session AI-mediated review: REVISE. Candidate 0caad266e2c328f5d3ea857784dab65b7b24b739 had completed-success exact-head CI 41350311183 / 41350306616.
+- Fixed false PASS path on the existing PR branch: 27c0a4a7d95fdf7dbc3faa58ca9c88cad8d4867b. Supervisor now requires an explicit PASS with exactly G0–G3 boolean true gates, preserves explicit/gate failures, and treats missing/invalid status evidence as INCOMPLETE. Five local unittest tests passed, including three synthetic end-to-end supervisor cases. Full local pytest unavailable; new-head CI pending verification.
+- Review record: [C0 review](https://github.com/shaden7/emergence-lab/blob/27c0a4a7d95fdf7dbc3faa58ca9c88cad8d4867b/docs/experiments/2026-11-02-c0-review.md). Remaining blockers: complete report validation, imported-source/child-path provenance, durable preflight-failure manifest, explicit topology checks. This patch is unmerged; main implementation unchanged.
+- First C0 outcome remains INCOMPLETE (provenance). No rerun authorized or performed; no Lightsail/deployment/paid API. Frozen scientific decisions unchanged.
+- Next: close those review blockers in PR #63, verify final-head tests, then version an explicit rerun authorization preserving c0-v1.
+
 Last handoff update: 2026-11-01 (21:08Z).
 - PR #62 preregistration merged at 9a12092260d733dd10f06b9167d0ca9eaccf3552 after nonindependent continuation review and bounded import check.
 - PR #63 DRAFT implements C0 worker/supervisor/tests and preserves both actual local outputs plus manifest. Execution revision 11c801aca3183ff28edb83e1ca6c059c5e8e7f08. G0–G3 numerical checks pass; two outputs byte-identical (SHA-256 47895f28612e25b7c1c899f94736117cea9dcd8dcb897b004598bc7b06f498c3). 1.039 child CPU seconds, peak 60,872 KiB.
