@@ -89,6 +89,38 @@ class C0Tests(unittest.TestCase):
             'null_verdict': lambda r: null_row(r)['volume_verdict'].update(verdict='PLATEAU'),
             'outcome_mismatch': lambda r: r['gates'].update({'C0-G3': False}),
             'grid': lambda r: r.update(radii=[4, 8, 16]),
+            # Later-pass counterexamples (2026-11-02 review of 726e029): topology/G0 coherence.
+            'topology_disconnected_under_g0': lambda r: r['graphs'][0]['topology'].update(connected=False),
+            'topology_simple_with_loop': lambda r: r['graphs'][0]['topology'].update(no_self_loops=False),
+            'topology_simple_with_duplicate': lambda r: r['graphs'][3]['topology'].update(no_duplicate_edges=False),
+            'topology_not_simple_clean': lambda r: r['graphs'][3]['topology'].update(simple=False),
+            'topology_directed_under_g0': lambda r: r['graphs'][2]['topology'].update(undirected=False),
+            # Derived-field identities.
+            'abs_error_identity': lambda r: pos_row(r)['returns']['8'].update(absolute_error=0.0),
+            'rel_error_identity': lambda r: pos_row(r)['returns']['8'].update(relative_error=0.0),
+            'finite_vs_infinite_identity': lambda r: pos_row(r)['returns']['8'].update(finite_relative_to_infinite=0.5),
+            'slope_residual_identity': lambda r: pos_row(r)['spectral_slopes'][0].update(residual=0.0, observed=0.9),
+            'volume_observed_identity': lambda r: pos_row(r)['volume'][0].update(observed=1.0),
+            'volume_offset_identity': lambda r: pos_row(r)['volume'][0].update(finite_radius_offset=0.0),
+            'volume_limiting_d': lambda r: pos_row(r)['volume'][0].update(limiting_d=3),
+            # True gates contradicted by self-consistent row evidence.
+            'g1_ball_mismatch': lambda r: pos_row(r)['volume'][0].update(
+                ball=pos_row(r)['volume'][0]['ball'] + 1,
+                observed=__import__('math').log2(pos_row(r)['volume'][0]['double_ball'] /
+                                                 (pos_row(r)['volume'][0]['ball'] + 1)),
+                residual=__import__('math').log2(pos_row(r)['volume'][0]['double_ball'] /
+                                                 (pos_row(r)['volume'][0]['ball'] + 1))
+                - pos_row(r)['volume'][0]['oracle']),
+            'g2_error_over_tolerance': lambda r: pos_row(r)['returns']['8'].update(
+                observed=pos_row(r)['returns']['8']['oracle'] + 1e-6,
+                absolute_error=abs(pos_row(r)['returns']['8']['oracle'] + 1e-6
+                                   - pos_row(r)['returns']['8']['oracle']),
+                relative_error=abs(pos_row(r)['returns']['8']['oracle'] + 1e-6
+                                   - pos_row(r)['returns']['8']['oracle'])
+                / pos_row(r)['returns']['8']['oracle']),
+            'g3_headroom_false': lambda r: pos_row(r)['spectral_slopes'][-1]['headroom'].update({'10': False}),
+            'g3_null_unsaturated': lambda r: null_row(r)['spectral_slopes'][-1].update(
+                observed=0.5, oracle=0.5, residual=0.0),
         }
         for name, mutate in mutations.items():
             with self.subTest(mutation=name):

@@ -2,8 +2,12 @@
 
 The validator checks the *shape and internal consistency* of a C0 report: required
 metadata, every required observed/oracle/residual value, finite numbers, complete
-time/radius coverage, gate keys and labels. It does not recompute kernels or oracles;
-numerical agreement is established by the worker's gates C0-G0..G3.
+time/radius coverage, gate keys and labels; the arithmetic identities linking reported
+derived fields (errors, residuals, offsets, log-ratios) to the reported observed/oracle
+values; topology-field coherence; and agreement between each true gate and the reported
+per-row evidence for that gate. It does not recompute kernels or oracles from graphs;
+numerical agreement is established by the worker's gates C0-G0..G3, and this validator
+only ensures a report cannot claim a true gate that its own rows contradict.
 """
 import math
 
@@ -36,6 +40,11 @@ def _numbers(entry, keys, where):
         _need(_finite(entry.get(key)), f'{where}: missing or non-finite {key}')
 
 
+def _same(reported, recomputed, where):
+    """Exact identity check: derived fields are computed by the same float expression."""
+    _need(reported == recomputed, where + ': derived field inconsistent with reported values')
+
+
 def validate_row(row):
     """Fail closed on missing kernel evidence, coverage gaps or inconsistent labels."""
     _need(isinstance(row, dict), 'row is not an object')
@@ -63,19 +72,30 @@ def validate_row(row):
         keys = ['observed', 'oracle', 'absolute_error', 'relative_error']
         if positive_lattice:
             keys += ['infinite', 'finite_relative_to_infinite']
-        _numbers(returns[str(t)], keys, f'return {t}')
+        entry = returns[str(t)]
+        _numbers(entry, keys, f'return {t}')
+        _need(entry['oracle'] > 0, f'return {t}: non-positive oracle')
+        _same(entry['absolute_error'], abs(entry['observed'] - entry['oracle']), f'return {t}')
+        _same(entry['relative_error'], entry['absolute_error'] / entry['oracle'], f'return {t}')
+        if positive_lattice:
+            _need(entry['infinite'] > 0, f'return {t}: non-positive infinite-lattice value')
+            _same(entry['finite_relative_to_infinite'],
+                  (entry['oracle'] - entry['infinite']) / entry['infinite'], f'return {t}')
     slopes = row.get('spectral_slopes')
     _need(isinstance(slopes, list) and [s.get('half_time') if isinstance(s, dict) else None
                                         for s in slopes] == TIMES[:-1], 'spectral slope coverage')
     for s in slopes:
         _numbers(s, ['observed', 'oracle', 'residual'] +
                  (['infinite_slope_offset'] if positive_lattice else []), 'slope')
+        _same(s['residual'], s['observed'] - s['oracle'], 'slope')
         head = s.get('headroom')
         _need(isinstance(head, dict) and set(head) == {'5', '10', '20'}
               and all(isinstance(v, bool) for v in head.values()), 'headroom outcomes')
     topology = row.get('topology')
     _need(isinstance(topology, dict) and set(TOPOLOGY_KEYS) <= set(topology)
           and all(isinstance(topology[k], bool) for k in TOPOLOGY_KEYS), 'topology evidence')
+    _need(topology['simple'] == (topology['no_self_loops'] and topology['no_duplicate_edges']),
+          'topology: simple inconsistent with no_self_loops/no_duplicate_edges')
     volume = row.get('volume')
     verdict = row.get('volume_verdict')
     _need(isinstance(volume, list) and isinstance(verdict, dict), 'missing volume evidence')
@@ -89,6 +109,49 @@ def validate_row(row):
             _numbers(v, ['ball', 'double_ball', 'oracle_ball', 'oracle_double_ball', 'observed',
                          'oracle', 'residual', 'limiting_d', 'finite_radius_offset'], 'volume')
             _need(v.get('classification') == 'FINITE_RADIUS_CORRECTION', 'volume label')
+            _need(v['ball'] > 0 and v['oracle_ball'] > 0, 'volume: non-positive ball')
+            _same(v['observed'], math.log2(v['double_ball'] / v['ball']), 'volume observed')
+            _same(v['oracle'], math.log2(v['oracle_double_ball'] / v['oracle_ball']), 'volume oracle')
+            _same(v['residual'], v['observed'] - v['oracle'], 'volume residual')
+            _same(v['limiting_d'], row.get('dimension_parameter'), 'volume limiting_d')
+            _same(v['finite_radius_offset'], v['oracle'] - v['limiting_d'], 'volume offset')
+
+
+def check_gate_evidence(rows, gates):
+    """A true gate must not be contradicted by the report's own per-row evidence.
+
+    Thresholds are the worker's frozen C0 gate thresholds. This is a necessary-condition
+    check on reported values only; it cannot detect a fabricated but self-consistent report.
+    """
+    if gates['C0-G0']:
+        for row in rows:
+            _need(all(row['topology'][k] for k in TOPOLOGY_KEYS),
+                  'C0-G0 true but topology evidence false for ' + row['graph'])
+    if gates['C0-G1']:
+        for row in rows:
+            for v in row['volume']:
+                _need(v['ball'] == v['oracle_ball'] and v['double_ball'] == v['oracle_double_ball']
+                      and abs(v['residual']) <= 1e-12,
+                      'C0-G1 true but volume evidence disagrees for ' + row['graph'])
+    if gates['C0-G2']:
+        for row in rows:
+            for e in row['returns'].values():
+                _need(e['absolute_error'] <= 1e-12 and e['relative_error'] <= 1e-9,
+                      'C0-G2 true but return error exceeds tolerance for ' + row['graph'])
+            for s in row['spectral_slopes']:
+                _need(abs(s['residual']) <= 1e-9,
+                      'C0-G2 true but slope residual exceeds tolerance for ' + row['graph'])
+    if gates['C0-G3']:
+        for row in rows:
+            if not row['null']:
+                _need(all(s['headroom']['10'] for s in row['spectral_slopes']),
+                      'C0-G3 true but positive-control headroom false for ' + row['graph'])
+            else:
+                _need(abs(row['spectral_slopes'][-1]['observed']) <= 0.02
+                      and all(abs(row['returns'][str(t)]['observed'] / row['floor'] - 1) <= 0.01
+                              for t in (128, 256))
+                      and row['volume_verdict'].get('verdict') == 'INSUFFICIENT_RANGE',
+                      'C0-G3 true but null control not saturated for ' + row['graph'])
 
 
 def validate_report(payload):
@@ -111,5 +174,6 @@ def validate_report(payload):
     gates = payload.get('gates')
     _need(isinstance(gates, dict) and set(gates) == set(GATES)
           and all(isinstance(v, bool) for v in gates.values()), 'gate set')
+    check_gate_evidence(rows, gates)
     expected = 'PASS' if all(gates.values()) else 'FAIL'
     _need(payload.get('outcome') == expected, 'outcome inconsistent with gates')
