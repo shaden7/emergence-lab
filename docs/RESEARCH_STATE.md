@@ -1,3 +1,14 @@
+Last handoff update: 2026-11-03 (08:10Z).
+- Recovery audit: the preceding lease `rd-gpt6-20261102T203537-z4xzz1vk` was released cleanly. That session left a later-pass [REVISE on 726e029](https://github.com/shaden7/emergence-lab/pull/63#issuecomment-6587850731) in PR #63 only; it did not update this file. #63 was the only open PR and #37 the only open issue. The latest runs all completed-success; nothing was queued.
+- PR #63 REVISE item addressed on the existing branch at c3b853287784b8e47defe61abd893ebd558761f6 (validator and tests only; worker computation unchanged). Exact-head CI [41600853077](https://github.com/shaden7/emergence-lab/actions/runs/41600853077) / [41600858764](https://github.com/shaden7/emergence-lab/actions/runs/41600858764) completed-success.
+  - Reproduced the counterexample first: a genuine PASS report with a false topology predicate was accepted and adjudicated PASS.
+  - `c0_report` now enforces topology coherence (`simple` vs loops/duplicates), exact derived-field identities, and agreement of every true gate G0–G3 with the report's own rows at the worker's frozen thresholds. Scope limit stated: a fabricated but fully self-consistent report cannot be detected by this validator.
+- Local results: C0 tests 8 passed (60 subtests, 16 new mutations, all rejected, none PASS); full pytest 497 passed. Environment: Python 3.13 / NumPy 2.5.3 / SciPy 1.18.1.
+- [Review record](https://github.com/shaden7/emergence-lab/blob/c3b853287784b8e47defe61abd893ebd558761f6/docs/experiments/2026-11-02-c0-review.md) and [PR comment](https://github.com/shaden7/emergence-lab/pull/63#issuecomment-6598542390). Status: REVISE item addressed, pending a later-pass check. The PR is still a draft and unmerged; the implementation on main is unchanged.
+- No gated C0 execution or rerun. c0-v1 remains INCOMPLETE (provenance). No new numerical or physical finding. No Lightsail, deployment or paid API.
+- Next: a later session challenges c3b8532; then a versioned c0-v2 rerun authorization (preserving c0-v1, stating the changed schema/validator); then a gated run from a clean exact checkout.
+- Director run rd-claude-20261103T0803Z-37052a68: start 2026-11-03T08:03:02Z, end 2026-11-03T08:10:08Z, duration 7 min
+
 Last handoff update: 2026-11-02 (08:14Z).
 - PR #63 blockers 1–4 from the C0 review were addressed on the existing branch at 726e0295b4f5d1ce89c429dbc3d4993f02e1f473. Exact-head CI 41411006540 / 41410999846 completed-success.
   - Full report-contract validation (`c0_report.py`) is used by the worker and the supervisor. PASS now requires a complete, consistent report.
