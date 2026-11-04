@@ -1,0 +1,8 @@
+{
+  "actual_raw_output_bytes": 26373,
+  "independent_integer_walk_and_ball_checks": 36,
+  "maximum_return_absolute_error": 5.551115123125783e-17,
+  "note": "manifest byte count precedes its final save; actual bytes checked separately",
+  "outcome": "PASS",
+  "raw_manifest_output_bytes": 26348
+}

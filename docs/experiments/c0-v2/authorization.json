@@ -1,0 +1,34 @@
+{
+  "actual_raw_output_bytes": 26373,
+  "authorization_blob": "4c462bc0c81625ae6ff27be387845a72252d3a7b",
+  "authorization_pr": 64,
+  "authorization_sha256": "17e44f273bfc70fee88c9feac027df71736ddcd117bda28281c2b51354fcd2fc",
+  "execution_commit": "7352c56e5c89df90f301bb6bb78fe05026d95f1e",
+  "execution_tree": "9e009c538c61511b591b5c8c7042be7bf306863c",
+  "gated_supervisor_invocations": 1,
+  "prior_outcome": "c0-v1 INCOMPLETE (provenance); unchanged",
+  "raw_files": {
+    "manifest.json": {
+      "bytes": 2671,
+      "sha256": "cc8bdf0ed07a0ffc67c2eaf8f03bb43890b8b6c82bbbae1c05c350a88e5bd942"
+    },
+    "run1.json": {
+      "bytes": 11851,
+      "sha256": "c28c52a1ce4fa5a1913933bb732c11f617091cf6846c56d8524f2c44c626c0b0"
+    },
+    "run1.json.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run2.json": {
+      "bytes": 11851,
+      "sha256": "c28c52a1ce4fa5a1913933bb732c11f617091cf6846c56d8524f2c44c626c0b0"
+    },
+    "run2.json.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "reviewed_tool_commit": "45d5ed4821888b82365ef6b9986ca7adff4b21c5",
+  "tracked_tree_verified_clean_before_execution": true
+}
