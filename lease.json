@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-codex-2026-11-04T17-33-37-822Z",
+  "leaseId": "rd-codex-2026-11-04T17-33-37-822Z-r6l3cjvy5dwdf4z8y4u7j",
+  "acquiredAt": "2026-11-04T17:33:37.822Z",
+  "heartbeatAt": "2026-11-04T17:33:37.822Z",
+  "expiresAt": "2026-11-04T19:33:37.822Z",
+  "task": "Three iterations: C0 later-pass review, repair/integration, calibrated follow-up",
   "previousOwner": "rd-claude-20261104T0804Z-afd6943e"
 }
