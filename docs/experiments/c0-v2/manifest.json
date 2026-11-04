@@ -1,0 +1,61 @@
+{
+  "commit": "7352c56e5c89df90f301bb6bb78fe05026d95f1e",
+  "config": {
+    "address_space_bytes": 536870912,
+    "cpu_seconds": 300,
+    "output_bytes": 5242880,
+    "repetitions": 2,
+    "wall_seconds": 600
+  },
+  "config_sha256": "3868572165313ef93bdee52a7e52b1efac694c6fcc78bec4f3feebf87f32b596",
+  "module_resolution": {
+    "emergence_lab": "/workspace/scratch/5ca25a1e0b39/emergence-lab/src/emergence_lab/__init__.py",
+    "emergence_lab.c0_report": "/workspace/scratch/5ca25a1e0b39/emergence-lab/src/emergence_lab/c0_report.py",
+    "emergence_lab.dimension_c0": "/workspace/scratch/5ca25a1e0b39/emergence-lab/src/emergence_lab/dimension_c0.py",
+    "emergence_lab.dimension_d1": "/workspace/scratch/5ca25a1e0b39/emergence-lab/src/emergence_lab/dimension_d1.py",
+    "emergence_lab.spectral_dimension": "/workspace/scratch/5ca25a1e0b39/emergence-lab/src/emergence_lab/spectral_dimension.py"
+  },
+  "numerical_byte_identical": true,
+  "outcome": "PASS",
+  "output_bytes": 26348,
+  "platform": "linux",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "runs": [
+    {
+      "cpu_seconds": 0.43332499999999996,
+      "exit_code": 0,
+      "peak_rss_kib": 67808,
+      "report_outcome": "PASS",
+      "sha256": "c28c52a1ce4fa5a1913933bb732c11f617091cf6846c56d8524f2c44c626c0b0",
+      "timeout": false,
+      "wall_seconds": 0.44748707400003696
+    },
+    {
+      "cpu_seconds": 0.429867,
+      "exit_code": 0,
+      "peak_rss_kib": 67796,
+      "report_outcome": "PASS",
+      "sha256": "c28c52a1ce4fa5a1913933bb732c11f617091cf6846c56d8524f2c44c626c0b0",
+      "timeout": false,
+      "wall_seconds": 0.44559310099998584
+    }
+  ],
+  "setup": "passed",
+  "source_sha256": {
+    "docs/DIMENSION_C0_PREREGISTRATION.md": "40cac028d071dfe0337cbbd0ed604e82a2d7723b665c1b8433030a4e0379f884",
+    "src/emergence_lab/__init__.py": "f6de33c6a7d0dac51f128ef3b778a86fd9b1c87f6e552f19fe3acd2e537d4597",
+    "src/emergence_lab/c0_report.py": "502f71d5647451207b33ef355191378eb177f2f43367015994ebef4b16dcdc7e",
+    "src/emergence_lab/c0_supervisor.py": "e7258831a790d2bf0efd5217abafba294631bce977f7bf3e8eb1e32f04118147",
+    "src/emergence_lab/dimension_c0.py": "44b546e09bf85a964a7204b5b789381bf4a11ed956e1a7271b5327a654db7aaf",
+    "src/emergence_lab/dimension_d1.py": "25025775d98932fffd31616ecc6c1409c8efaa0e83622a39d7b9217ec639c87c",
+    "src/emergence_lab/spectral_dimension.py": "58b5cbcad08940d20820c994d5021df7fe70a496210ed0a4f8e1aa7f5829685d"
+  },
+  "supervisor_cpu_seconds": 0.255316545,
+  "threads": 1,
+  "total_child_cpu_seconds": 0.863192,
+  "versions": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "wall_seconds": 0.8965459000000919
+}
