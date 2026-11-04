@@ -1,3 +1,14 @@
+Last handoff update: 2026-11-04 (08:14Z).
+- Recovery audit: the preceding lease `rd-claude-20261103T0803Z-37052a68` was released cleanly. #63 was the only open PR and #37 the only open issue. All runs completed-success; nothing was queued.
+- Later-pass review of PR #63 at c3b8532: **REVISE**. Three counterexamples were reproduced first, each accepted by the validator and adjudicated PASS: T256 slopes rewritten to exactly 2.0 (returns imply 1.955–1.997), C8 null headroom set true, C1024 q(256) = 5 × floor with G3 true. Cause: slopes, infinite offsets and headroom booleans were not tied to the reported returns/floor.
+- Repaired on the existing branch at [45d5ed4](https://github.com/shaden7/emergence-lab/commit/45d5ed4821888b82365ef6b9986ca7adff4b21c5). These are now exact identities using the worker's own functions; the supervisor's own-process check covers all loaded `emergence_lab` modules. Validator, supervisor and tests only; worker computation unchanged.
+- Exact-head CI [41797421954](https://github.com/shaden7/emergence-lab/actions/runs/41797421954) / [41797431229](https://github.com/shaden7/emergence-lab/actions/runs/41797431229) completed-success. Local: C0 tests 8 passed (65 subtests, 5 new mutations); full pytest 497 passed. Environment: Python 3.13 / NumPy 2.5.3 / SciPy 1.18.1.
+- [Review record](https://github.com/shaden7/emergence-lab/blob/45d5ed4821888b82365ef6b9986ca7adff4b21c5/docs/experiments/2026-11-02-c0-review.md) and [PR comment](https://github.com/shaden7/emergence-lab/pull/63#issuecomment-6625938533). The review is AI-mediated. The PR is still a draft and unmerged; the implementation on main is unchanged.
+- Remaining limit: a fully self-consistent fabricated report is undetectable. Volume oracle balls are not checked against the closed forms.
+- No gated C0 execution or rerun. c0-v1 remains INCOMPLETE (provenance). No new numerical or physical finding. No Lightsail, deployment or paid API.
+- Next: a later session challenges 45d5ed4; then a versioned c0-v2 rerun authorization; then a gated run from a clean exact checkout.
+- Director run rd-claude-20261104T0804Z-afd6943e: start 2026-11-04T08:03:28Z, end 2026-11-04T08:14:10Z, duration 10 min
+
 Last handoff update: 2026-11-03 (08:10Z).
 - Recovery audit: the preceding lease `rd-gpt6-20261102T203537-z4xzz1vk` was released cleanly. That session left a later-pass [REVISE on 726e029](https://github.com/shaden7/emergence-lab/pull/63#issuecomment-6587850731) in PR #63 only; it did not update this file. #63 was the only open PR and #37 the only open issue. The latest runs all completed-success; nothing was queued.
 - PR #63 REVISE item addressed on the existing branch at c3b853287784b8e47defe61abd893ebd558761f6 (validator and tests only; worker computation unchanged). Exact-head CI [41600853077](https://github.com/shaden7/emergence-lab/actions/runs/41600853077) / [41600858764](https://github.com/shaden7/emergence-lab/actions/runs/41600858764) completed-success.
