@@ -1,3 +1,9 @@
+Last handoff update: 2026-11-04 (iteration 1 of 3, interactive).
+- PR #63 integrated as experimental tooling at [bec9284](https://github.com/shaden7/emergence-lab/commit/bec92847ba53fd5b1af13eba1a5cf7f8140e6007); c0-v1 remains INCOMPLETE (provenance), with original bytes and raw PASS preserved.
+- Later-pass [PASS review](https://github.com/shaden7/emergence-lab/pull/63#issuecomment-6637652537) at 45d5ed4: 250 blob hashes/full tree and exact commit verified; full local pytest 493 passed, 4 optional skips, 65 subtests (60.46 s). Python 3.12.14 / NumPy 2.3.5 / SciPy 1.17.0. Exact-head CI 41797421954 / 41797431229 completed-success.
+- Independent arithmetic development check: 36 integer walk-count/ball checks; maximum return absolute discrepancy 5.551115123125783e-17. No gated rerun or new physical finding. Main-side changes since the PR base were research-state handoffs only.
+- Next: integrate a versioned c0-v2 authorization, then run once from its clean exact revision. No Lightsail, deployment or paid API. Frozen S1/S1b, SE and Phase-0 decisions unchanged.
+
 Last handoff update: 2026-11-04 (08:14Z).
 - Recovery audit: the preceding lease `rd-claude-20261103T0803Z-37052a68` was released cleanly. #63 was the only open PR and #37 the only open issue. All runs completed-success; nothing was queued.
 - Later-pass review of PR #63 at c3b8532: **REVISE**. Three counterexamples were reproduced first, each accepted by the validator and adjudicated PASS: T256 slopes rewritten to exactly 2.0 (returns imply 1.955–1.997), C8 null headroom set true, C1024 q(256) = 5 × floor with G3 true. Cause: slopes, infinite offsets and headroom booleans were not tied to the reported returns/floor.
