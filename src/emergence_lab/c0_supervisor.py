@@ -119,6 +119,11 @@ def main():
         import emergence_lab.c0_report as own_report
         if Path(own_report.__file__).resolve()!=package/'c0_report.py':
             raise ValueError('supervisor validator not loaded from verified checkout')
+        verified={str(Path(p).resolve()) for p in files}
+        own={m:str(Path(mod.__file__).resolve()) for m,mod in list(sys.modules.items())
+             if (m=='emergence_lab' or m.startswith('emergence_lab.')) and getattr(mod,'__file__',None)}
+        if any(f not in verified for f in own.values()):
+            raise ValueError('supervisor loaded project module outside verified sources: '+json.dumps(own))
         manifest['config_sha256']=hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest()
         manifest['python']=sys.version
         import importlib.metadata

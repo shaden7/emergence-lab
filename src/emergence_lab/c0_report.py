@@ -3,13 +3,15 @@
 The validator checks the *shape and internal consistency* of a C0 report: required
 metadata, every required observed/oracle/residual value, finite numbers, complete
 time/radius coverage, gate keys and labels; the arithmetic identities linking reported
-derived fields (errors, residuals, offsets, log-ratios) to the reported observed/oracle
-values; topology-field coherence; and agreement between each true gate and the reported
+derived fields (errors, residuals, offsets, log-ratios, local spectral slopes and
+headroom outcomes) to the reported observed/oracle/infinite returns and floor; topology-field coherence; and agreement between each true gate and the reported
 per-row evidence for that gate. It does not recompute kernels or oracles from graphs;
 numerical agreement is established by the worker's gates C0-G0..G3, and this validator
 only ensures a report cannot claim a true gate that its own rows contradict.
 """
 import math
+
+from emergence_lab.spectral_dimension import has_powerlaw_headroom, local_spectral_slope
 
 TIMES = [8, 16, 32, 64, 128, 256]
 RADII = [4, 8, 16, 32]
@@ -87,10 +89,25 @@ def validate_row(row):
     for s in slopes:
         _numbers(s, ['observed', 'oracle', 'residual'] +
                  (['infinite_slope_offset'] if positive_lattice else []), 'slope')
+        t = s['half_time']
+        early, late = returns[str(t)], returns[str(2 * t)]
+        # Slopes and headroom are derived from the reported returns with the worker's own
+        # functions, so these identities are exact (and survive a JSON round trip).
+        _same(s['observed'], local_spectral_slope(early['observed'], late['observed']),
+              f'slope {t} observed vs returns')
+        _same(s['oracle'], local_spectral_slope(early['oracle'], late['oracle']),
+              f'slope {t} oracle vs returns')
         _same(s['residual'], s['observed'] - s['oracle'], 'slope')
+        if positive_lattice:
+            _same(s['infinite_slope_offset'],
+                  local_spectral_slope(early['infinite'], late['infinite'])
+                  - row['dimension_parameter'], f'slope {t} infinite offset')
         head = s.get('headroom')
         _need(isinstance(head, dict) and set(head) == {'5', '10', '20'}
               and all(isinstance(v, bool) for v in head.values()), 'headroom outcomes')
+        for k in (5, 10, 20):
+            _same(head[str(k)], all(has_powerlaw_headroom(e['observed'], row['floor'], ratio=k)
+                                    for e in (early, late)), f'slope {t} headroom {k}')
     topology = row.get('topology')
     _need(isinstance(topology, dict) and set(TOPOLOGY_KEYS) <= set(topology)
           and all(isinstance(topology[k], bool) for k in TOPOLOGY_KEYS), 'topology evidence')

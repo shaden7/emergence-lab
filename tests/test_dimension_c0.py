@@ -25,8 +25,9 @@ class C0Tests(unittest.TestCase):
                 (root/'docs/DIMENSION_C0_PREREGISTRATION.md').write_text('synthetic test fixture\n')
                 (package/'__init__.py').write_text('')
                 (package/'c0_report.py').write_bytes(Path(c0_report.__file__).read_bytes())
+                # Real dependency sources: the validator imports spectral_dimension helpers.
                 for name in ['dimension_d1.py', 'spectral_dimension.py']:
-                    (package/name).write_text('')
+                    (package/name).write_bytes((Path(c0_report.__file__).parent/name).read_bytes())
                 (package/'dimension_c0.py').write_text('print('+repr(json.dumps(payload))+')\n')
                 supervisor = package/'c0_supervisor.py'
                 supervisor.write_bytes(Path(c0_supervisor.__file__).read_bytes())
@@ -63,6 +64,13 @@ class C0Tests(unittest.TestCase):
                 self.assertEqual(report_outcome(payload), expected)
 
     def test_payloads(self):
+        def _low_return(row):
+            # Self-consistent return row at 5x floor while headroom(10) and G3 stay true.
+            e = row['returns']['256']
+            e.update(observed=5 * row['floor'], oracle=5 * row['floor'])
+            e.update(absolute_error=abs(e['observed'] - e['oracle']))
+            e.update(relative_error=e['absolute_error'] / e['oracle'])
+            e.update(finite_relative_to_infinite=(e['oracle'] - e['infinite']) / e['infinite'])
         import copy
         from emergence_lab.dimension_c0 import run
         from emergence_lab.c0_report import validate_report
@@ -121,6 +129,17 @@ class C0Tests(unittest.TestCase):
             'g3_headroom_false': lambda r: pos_row(r)['spectral_slopes'][-1]['headroom'].update({'10': False}),
             'g3_null_unsaturated': lambda r: null_row(r)['spectral_slopes'][-1].update(
                 observed=0.5, oracle=0.5, residual=0.0),
+            # Later-pass counterexamples (2026-11-04 review of c3b8532): slopes/headroom
+            # not tied to the reported returns were accepted and adjudicated PASS.
+            'slope_vs_returns_exact': lambda r: [s.update(observed=2.0, oracle=2.0, residual=0.0)
+                                                 for s in pos_row(r)['spectral_slopes']],
+            'slope_oracle_vs_returns': lambda r: pos_row(r)['spectral_slopes'][0].update(
+                oracle=pos_row(r)['spectral_slopes'][0]['observed'], residual=0.0),
+            'null_headroom_true': lambda r: [s['headroom'].update({'5': True, '10': True, '20': True})
+                                             for s in null_row(r)['spectral_slopes']],
+            'infinite_slope_offset_identity': lambda r: pos_row(r)['spectral_slopes'][0].update(
+                infinite_slope_offset=0.0),
+            'g3_positive_return_below_headroom': lambda r: _low_return(r['graphs'][0]),
         }
         for name, mutate in mutations.items():
             with self.subTest(mutation=name):
