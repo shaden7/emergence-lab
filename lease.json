@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-auto-2026-11-04T22:26:48.808Z-d1g19spft1v",
+  "leaseId": "rd-auto-2026-11-04T22:26:48.808Z-d1g19spft1v-fzq59rrai0w",
+  "acquiredAt": "2026-11-04T22:26:48.808Z",
+  "heartbeatAt": "2026-11-04T22:26:48.808Z",
+  "expiresAt": "2026-11-05T00:26:48.808Z",
+  "task": "Review current research state and next evidence gate",
   "previousOwner": "rd-codex-2026-11-04T17-33-37-822Z"
 }
