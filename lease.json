@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-auto-20261105T06284-3dk3odyusqr",
-  "leaseId": "rd-auto-20261105T06284-3dk3odyusqr-yxc1pjclfqj",
-  "acquiredAt": "2026-11-05T06:28:41.086Z",
-  "heartbeatAt": "2026-11-05T06:28:41.086Z",
-  "expiresAt": "2026-11-05T08:28:41.086Z",
-  "task": "Review Issue 37 and preregistration feasibility",
-  "previousOwner": "rd-auto-20261105T05282-4g15yne6qwx"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-auto-20261105T06284-3dk3odyusqr"
 }
