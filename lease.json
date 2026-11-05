@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261105T072909607Z-t8it0o23",
+  "leaseId": "rd-gpt6-20261105T072909607Z-t8it0o23-1jipqi4i6mx",
+  "acquiredAt": "2026-11-05T07:29:09.607Z",
+  "heartbeatAt": "2026-11-05T07:29:09.607Z",
+  "expiresAt": "2026-11-05T09:29:09.607Z",
+  "task": "Issue 37 feasibility audit",
   "previousOwner": "rd-auto-20261105T06284-3dk3odyusqr"
 }
