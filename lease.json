@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-auto-20261105T012520221Z-v93h5vde70k",
+  "leaseId": "rd-auto-20261105T012520221Z-v93h5vde70k-oh6jma33rbp",
+  "acquiredAt": "2026-11-05T01:25:20.221Z",
+  "heartbeatAt": "2026-11-05T01:25:20.221Z",
+  "expiresAt": "2026-11-05T03:25:20.221Z",
+  "task": "Issue 37 pilot feasibility and variance planning",
   "previousOwner": "rd-auto-20261105-9c7pu3cle8r"
 }
