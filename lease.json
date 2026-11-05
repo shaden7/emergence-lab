@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-auto-20261105-9c7pu3cle8r",
-  "leaseId": "rd-auto-20261105-9c7pu3cle8r-du6yvyrvr6",
-  "acquiredAt": "2026-11-05T00:29:20.291Z",
-  "heartbeatAt": "2026-11-05T00:29:20.291Z",
-  "expiresAt": "2026-11-05T02:29:20.291Z",
-  "task": "Issue 37 pilot design and evidence review",
-  "previousOwner": "rd-auto-2026-11-04T23:26:08.268Z-9kpdqxmrwfo"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-auto-20261105-9c7pu3cle8r"
 }
