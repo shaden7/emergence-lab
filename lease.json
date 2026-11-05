@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261105T092939072Z-hb8z5qk7j8",
-  "leaseId": "rd-gpt6-20261105T092939072Z-hb8z5qk7j8",
-  "acquiredAt": "2026-11-05T09:29:39.072Z",
-  "heartbeatAt": "2026-11-05T09:29:39.072Z",
-  "expiresAt": "2026-11-05T11:29:39.072Z",
-  "task": "Research Director review and feasibility audit",
-  "previousOwner": "rd-gpt6-20261105T082400753Z-jxn7ewoy99"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261105T092939072Z-hb8z5qk7j8"
 }
