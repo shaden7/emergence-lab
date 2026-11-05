@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-auto-202611050322-o3v8tuuv1q9",
+  "leaseId": "rd-auto-202611050322-o3v8tuuv1q9-w7voegbvl6c",
+  "acquiredAt": "2026-11-05T03:22:32.213Z",
+  "heartbeatAt": "2026-11-05T03:22:32.213Z",
+  "expiresAt": "2026-11-05T05:22:32.213Z",
+  "task": "Review and freeze bounded paired pilot feasibility design",
   "previousOwner": "rd-auto-20261105-hyeo0iyuju5"
 }
