@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261105T122321373Z-e9kytf4jhia",
-  "leaseId": "rd-gpt6-20261105T122321373Z-e9kytf4jhia",
-  "acquiredAt": "2026-11-05T12:23:21.373Z",
-  "heartbeatAt": "2026-11-05T12:23:21.373Z",
-  "expiresAt": "2026-11-05T14:23:21.373Z",
-  "task": "Review research state, CI and issue 37; select discriminating next step",
-  "previousOwner": "rd-gpt6-20261105T112311276Z-07vurn9w8hw"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261105T122321373Z-e9kytf4jhia"
 }
