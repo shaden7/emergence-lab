@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261106T052236Z-6h14pu72rp",
+  "leaseId": "tu0lktbpux87byol3zct79",
+  "acquiredAt": "2026-11-06T05:22:57.631Z",
+  "heartbeatAt": "2026-11-06T05:22:57.631Z",
+  "expiresAt": "2026-11-06T07:22:57.631Z",
+  "task": "Review Issue #37, CI and bounded pilot readiness",
   "previousOwner": "rd-gpt6-20261106T042151601Z-fyz7yu64ue"
 }
