@@ -1,9 +1,12 @@
 # D2-M0 — deterministic finite-occupancy MM reference (proposed)
 
-Status: **proposed, not evaluated**. This is a separate follow-up to the exact
-D2 combinatorial reference, not CS0 study execution or run authorization.
-Merge and review this protocol before evaluating the target curve. A later
-implementation/run record must pin its exact code, config and runtime versions.
+Status: **reviewed/frozen; evaluation recorded separately**. Accepted in the
+[PR #71 review](https://github.com/shaden7/emergence-lab/pull/71#issuecomment-6686226940)
+at df77fc87711aaa93b640d95b33df62c34fdc1d63, merged as
+7dd34c3f4d1dc282a0e220ee6f764f2ee30c93dd. No curve had been evaluated at freeze.
+This is a separate follow-up to the exact D2 combinatorial reference, not CS0
+study execution or run authorization. Review the numerical implementation and
+runner before evaluation; pin the exact code, config and runtime in its record.
 No RNG, seed entropy, Monte Carlo samples or physical data enter this diagnostic.
 
 ## Question, model and discriminator
