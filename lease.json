@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-codex-2026-11-06T124532474Z",
-  "leaseId": "0b5b8416-0cbf-447d-a337-1f7476b46c37",
-  "acquiredAt": "2026-11-06T12:45:32.474Z",
-  "heartbeatAt": "2026-11-06T14:07:06.347Z",
-  "expiresAt": "2026-11-06T16:07:06.347Z",
-  "task": "Pinned D2-M0 deterministic reference execution and evidence review; no full CS0 seeds",
-  "previousOwner": "rd-codex-20261106T121743182Z"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-codex-2026-11-06T124532474Z"
 }
