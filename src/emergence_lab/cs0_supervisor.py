@@ -3,11 +3,13 @@
 Linux only. The trusted worker must not fork or write files: its sole artifact
 channel is stdout. RLIMIT_AS conservatively bounds virtual memory (and hence
 RSS), RLIMIT_CPU bounds worker CPU, and the parent bounds captured output.
+A Linux parent-death signal kills the direct worker if the supervisor dies.
 A future study runner must account for its own CPU and artifact metadata too.
 """
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import ctypes
 import hashlib
 import json
 import math
@@ -18,6 +20,18 @@ import selectors
 import signal
 import subprocess
 import time
+
+
+def _parent_death_guard(expected_parent: int, prctl):
+    """Kill this trusted Linux worker if its launching supervisor disappears.
+
+    The second check closes the race where the parent dies before prctl arms
+    the signal. The worker must not fork, change credentials or clear the guard.
+    """
+    if prctl(1, signal.SIGKILL, 0, 0, 0) != 0:  # PR_SET_PDEATHSIG
+        raise OSError(ctypes.get_errno(), 'PR_SET_PDEATHSIG failed')
+    if os.getppid() != expected_parent:
+        os.kill(os.getpid(), signal.SIGKILL)
 
 
 @dataclass(frozen=True)
@@ -70,6 +84,8 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
 
     Output must be outside the checkout. This is deliberately not a PASS/FAIL
     scientific gate, nor a full CS0 runner. The caller must inspect the payload.
+    The caller must be single-threaded (preexec_fn); the trusted worker must
+    preserve its parent-death signal and must not fork or change credentials.
     """
     output = output.resolve()
     root = root.resolve()
@@ -91,7 +107,11 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
             'NUMEXPR_NUM_THREADS')}}
         env['PYTHONPATH'] = str(root / 'src')
         env.pop('PYTHONHOME', None)
+        # Resolve libc before fork. preexec_fn requires a single-threaded caller.
+        prctl = ctypes.CDLL(None, use_errno=True).prctl
+        parent_pid = os.getpid()
         def restrict():
+            _parent_death_guard(parent_pid, prctl)
             resource.setrlimit(resource.RLIMIT_CPU, (limits.cpu_seconds, limits.cpu_seconds))
             resource.setrlimit(resource.RLIMIT_AS, (limits.memory_bytes, limits.memory_bytes))
             # Worker file output is prohibited; stdout/stderr pipes remain usable.
@@ -120,6 +140,7 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
                 if events:
                     data = os.read(process.stdout.fileno(), 65536)
                     if not data:
+                        selector.unregister(process.stdout)
                         if usage is not None:
                             break
                     else:
@@ -132,6 +153,8 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
                             reason = 'output limit'
                             break
                 elif usage is not None:
+                    if not selector.get_map():
+                        break
                     # Pipe can remain open only through a prohibited descendant.
                     reason = 'worker exited without closing output'
                     break
