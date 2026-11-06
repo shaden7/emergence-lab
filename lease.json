@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261106T032230851Z-rmykdwplvbe",
+  "leaseId": "h0f98o09n8rkwsnklugl7i",
+  "acquiredAt": "2026-11-06T03:22:30.851Z",
+  "heartbeatAt": "2026-11-06T03:22:30.851Z",
+  "expiresAt": "2026-11-06T05:22:30.851Z",
+  "task": "Read-only evidence audit Issue 37",
   "previousOwner": "rd-gpt6-20261106T023046754Z-glt9oujvvvl"
 }
