@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-codex-2026-11-06T124532474Z",
+  "leaseId": "0b5b8416-0cbf-447d-a337-1f7476b46c37",
+  "acquiredAt": "2026-11-06T12:45:32.474Z",
+  "heartbeatAt": "2026-11-06T12:45:32.474Z",
+  "expiresAt": "2026-11-06T14:45:32.474Z",
+  "task": "Orchestrate three bounded CS0 engineering and review rounds",
   "previousOwner": "rd-codex-20261106T121743182Z"
 }
