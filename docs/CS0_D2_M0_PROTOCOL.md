@@ -41,6 +41,9 @@ For all admitted positive fractions, r>=1/496>r_10=1/2002; invert in [1,10].
 Strict d(E[r|R>0])<2 is an analytic consequence, not a binary64 sign gate:
 the deviation at large N can round away. Preserve high-precision decimal strings
 for that observable rather than mistaking a rounded value for zero selection.
+Construct every high-precision fraction directly from its exact integer
+numerator and denominator, never through a binary64 value. Retain at least
+70 significant digits for high-precision conditioned dimensions.
 
 ## Independent numerical checks and outcomes
 
