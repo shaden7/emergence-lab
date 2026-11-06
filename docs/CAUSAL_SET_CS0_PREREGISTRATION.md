@@ -46,6 +46,7 @@ This is instrument calibration. The dimension D is put in by construction, so a 
 - **Multiplicity scope (v0.2, corrected after the [later-pass REVISE](https://github.com/shaden7/emergence-lab/pull/66#issuecomment-6681691664)).** The stochastic mean-tests form one family of **24 cells**: 12 positive-control cells (G1) and 12 null cells (G3: two-layer, 3-order and 4-order at each of 4 values of N). Each cell uses t = (mean r − E[r]) / (sd(r)/√30) with 29 degrees of freedom. Reject a cell if |t| > c, where c = t₂₉ upper quantile at 0.05/(2·24) = **3.3806** (Bonferroni, nominal family-wise 5%).
   - *Correction of v0.1:* v0.1 claimed a 3·SE rule had 0.27% per cell and about 3% family-wise over 12 cells. That treated the statistic as N(0,1). Under t(29), P(|t| > 3) ≈ 0.0055 per cell, giving ≈ 6.4% over 12 independent cells and ≈ 12.4% over 24. The v0.1 figures were wrong and are withdrawn.
   - *Caveat:* the t-reference assumes approximately normal realization-level r. In fact r is bounded and may be skewed at small N or high D, so the 5% is a nominal operational error rate, **not a guarantee**. A null-calibrated Monte Carlo check of the false-alarm rate is deferred; it is not part of CS0.
+  - *Undefined-statistic clarification during runner review:* a stochastic cell with zero estimated standard error has an undefined t statistic, including 0/0 when the mean equals its reference. It does not pass its mean-test gate; record the undefined statistic explicitly. This conservative rule does not establish an implementation defect and does not relax any gate.
 - **G1, unbiasedness on positive controls.** All 12 positive-control cells satisfy |t| ≤ 3.3806.
 - **G2, discrimination.** At N = 1024, the mean r of each pair of positive-control dimensions must differ by more than 6× the combined SE.
 - **G3, null exactness.** All 12 null cells satisfy |t| ≤ 3.3806 against their exact E[r].
@@ -60,7 +61,7 @@ This is instrument calibration. The dimension D is put in by construction, so a 
 ## 6. Budget and stop conditions
 
 - **Development timing** (non-gated observation, this cloud host, Python 3.13.18, NumPy 2.5.3, SciPy 1.18.1): one N = 1024, D = 4 sprinkle plus relation matrix took 0.041 s CPU, and the exact order check took 0.036 s CPU.
-- **Projection, not a bound:** the whole grid (about 840 orders) is projected at under 2 CPU-minutes.
+- **Projection, not a bound:** the whole grid (**728 orders**: 360 positive, 360 stochastic nulls, 8 exact controls) is projected at under 2 CPU-minutes. The earlier rough count of about 840 was an arithmetic error, corrected during runner development; no cell sizes or replicates changed.
 - **Hard caps for the authorized run:**
   - 10 CPU-minutes total.
   - 1 GiB peak RSS.

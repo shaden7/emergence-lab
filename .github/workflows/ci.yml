@@ -19,6 +19,21 @@ jobs:
           python-version: '3.12'
       - run: pip install -e '.[test]'
       - run: pytest -q
+      - name: CS0 miniature engineering pipeline and persisted-count recheck
+        timeout-minutes: 2
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
+        run: |
+          python -I -B -X pycache_prefix="$RUNNER_TEMP/cs0-launcher-cache" -c 'import pathlib,sys; sys.path.insert(0,str(pathlib.Path.cwd()/"src")); from emergence_lab.cs0_engineering import main; sys.exit(main())' --root "$GITHUB_WORKSPACE" --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/cs0-engineering"
+          python -m emergence_lab.cs0_recheck --input "$RUNNER_TEMP/cs0-engineering/measurements.csv" --mode engineering --entropy 2036110697
+      - name: Retain CS0 engineering checkpoint including failures
+        if: always()
+        run: |
+          if [ -d "$RUNNER_TEMP/cs0-engineering" ]; then
+            mkdir -p results/cs0_engineering
+            cp -r "$RUNNER_TEMP/cs0-engineering/." results/cs0_engineering/
+          fi
       # Isolated engineering seeds only; S1b graph and bootstrap seeds stay locked.
       - name: S1b engineering containment and checkpoint smoke
         timeout-minutes: 5
