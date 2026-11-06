@@ -103,3 +103,32 @@ def test_development_sanity_means():
         assert abs(np.mean(rs) - mm.expected_ordering_fraction(d)) < 0.05
     rs3 = [mm.ordering_fraction(mm.random_k_order(128, 3, rng)) for _ in range(20)]
     assert abs(np.mean(rs3) - 0.25) < 0.05
+
+
+@pytest.mark.parametrize("d", [3, 4])
+def test_sprinkling_time_and_radial_marginals_match_analytic_cdfs(d):
+    """Independent analytic check of rejection sampling (development check).
+
+    Uniform on |t| + rho <= 1/2 in d dims: the time marginal has density
+    proportional to (1/2 - |t|)^(d-1), so P(|t| <= s) = 1 - (1 - 2s)^d. The
+    spatial radius rho has density proportional to rho^(d-2) (1 - 2 rho) on
+    [0, 1/2]. Fixed seed; loose KS threshold to avoid flaky failure."""
+    from scipy import stats
+
+    pts = mm.sprinkle_diamond(4000, d, np.random.default_rng(1000 + d))
+    abs_t = np.abs(pts[:, 0])
+    rho = np.sqrt(np.sum(pts[:, 1:] ** 2, axis=1))
+
+    def cdf_t(s):
+        return 1.0 - (1.0 - 2.0 * np.clip(s, 0.0, 0.5)) ** d
+
+    def prim(a):
+        return a ** (d - 1) / (d - 1) - 2.0 * a ** d / d
+
+    def cdf_rho(a):
+        return prim(np.clip(a, 0.0, 0.5)) / prim(0.5)
+
+    assert stats.kstest(abs_t, cdf_t).pvalue > 1e-3
+    assert stats.kstest(rho, cdf_rho).pvalue > 1e-3
+    # Negative control: the wrong dimension's time marginal must be rejected.
+    assert stats.kstest(abs_t, lambda s: 1.0 - (1.0 - 2.0 * np.clip(s, 0, 0.5)) ** (d + 1)).pvalue < 1e-6

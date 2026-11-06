@@ -1,4 +1,4 @@
-# CS0 — Myrheim–Meyer ordering-fraction calibration on causal sets (PROPOSED, v0.1)
+# CS0 — Myrheim–Meyer ordering-fraction calibration on causal sets (PROPOSED, v0.2)
 
 **Status: PROPOSED preregistration + scope decision, not a run authorization.** Proposed 2026-11-06 by Director `rd-claude-20261106T0803Z-c7f85c29`. No gated seeds have been drawn and no gated data exist. Execution requires (1) a later-pass review of this document and of `src/emergence_lab/causal_set_mm.py` at an exact commit, then (2) a separate versioned run authorization that freezes the seed entropy. This document is AI-authored; its review is AI-mediated.
 
@@ -42,14 +42,19 @@ This is instrument calibration. The dimension D is put in by construction, so a 
 
 ## 5. Gates and falsification
 
-- **G0, exactness.** All unit tests pass at the exact commit. Every order passes `check_partial_order`. Every sprinkled point lies inside the diamond. Chain gives TOTAL_ORDER with d = 1. Antichain gives OUT_OF_RANGE.
-- **G1, unbiasedness on positive controls.** In each of the 12 cells, |mean r − r_D| ≤ 3·SE. Any failure means the instrument fails (REVISE/REJECT), and there is no downstream causal-set use. Nominal two-sided 0.27% per cell gives about 3% family-wise for 12 cells. This false-alarm rate is accepted and disclosed.
+- **G0, exactness.** All unit tests pass at the exact commit, including the analytic time and radial marginal checks of D = 3, 4 sprinkling. Every order passes `check_partial_order`. Every sprinkled point lies inside the diamond. Chain gives TOTAL_ORDER with d = 1. Antichain gives OUT_OF_RANGE.
+- **Multiplicity scope (v0.2, corrected after the [later-pass REVISE](https://github.com/shaden7/emergence-lab/pull/66#issuecomment-6681691664)).** The stochastic mean-tests form one family of **24 cells**: 12 positive-control cells (G1) and 12 null cells (G3: two-layer, 3-order and 4-order at each of 4 values of N). Each cell uses t = (mean r − E[r]) / (sd(r)/√30) with 29 degrees of freedom. Reject a cell if |t| > c, where c = t₂₉ upper quantile at 0.05/(2·24) = **3.3806** (Bonferroni, nominal family-wise 5%).
+  - *Correction of v0.1:* v0.1 claimed a 3·SE rule had 0.27% per cell and about 3% family-wise over 12 cells. That treated the statistic as N(0,1). Under t(29), P(|t| > 3) ≈ 0.0055 per cell, giving ≈ 6.4% over 12 independent cells and ≈ 12.4% over 24. The v0.1 figures were wrong and are withdrawn.
+  - *Caveat:* the t-reference assumes approximately normal realization-level r. In fact r is bounded and may be skewed at small N or high D, so the 5% is a nominal operational error rate, **not a guarantee**. A null-calibrated Monte Carlo check of the false-alarm rate is deferred; it is not part of CS0.
+- **G1, unbiasedness on positive controls.** All 12 positive-control cells satisfy |t| ≤ 3.3806.
 - **G2, discrimination.** At N = 1024, the mean r of each pair of positive-control dimensions must differ by more than 6× the combined SE.
-- **G3, null exactness.** Two-layer, 3-order and 4-order means each lie within 3·SE of their exact E[r].
+- **G3, null exactness.** All 12 null cells satisfy |t| ≤ 3.3806 against their exact E[r].
 - **Predeclared expected limitation (not a gate).** The 3- and 4-orders are expected to yield finite, non-integer d_MM in the IN_RANGE class. CS0 therefore cannot certify manifold-likeness. Every CS0 report must state that MM alone does not distinguish a flat-diamond sprinkling from a random k-order. Any later causal-set dimension claim requires a second, independently calibrated discriminator, such as interval-abundance or midpoint-scaling consistency.
 - **Outcomes:**
   - **PASS:** G0–G3 all hold.
-  - **FAIL:** any of G0–G3 is violated. Record it and do not rerun to hide it.
+  - **FAIL:** any of G0–G3 is violated. Record it and do not rerun to hide it. Classify the failure as follows:
+    - **G0 (exact-check) failure** demonstrates an implementation defect.
+    - **G1/G2/G3 (stochastic) failure** is a *stochastic gate failure*. It is expected with roughly nominal 5% probability even for a correct implementation, so it is not by itself proof of a defect. The instrument is still not accepted. Diagnosis needs a new reviewed authorization with fresh entropy, while the failed run stays in the record.
   - **INCOMPLETE:** a resource or provenance stop. No automatic retry.
 
 ## 6. Budget and stop conditions
@@ -62,6 +67,11 @@ This is instrument calibration. The dimension D is put in by construction, so a 
   - 50 MB of output.
   - Exceeding any cap means INCOMPLETE.
 - **Execution location:** CI or a local runner only. **Not on the shared Lightsail host.**
+- **Missing component (blocks authorization).** This PR contains only the reference library and tests, not a gated runner. Before any run authorization, a separately reviewed runner must:
+  - enforce the aggregate CPU, RSS and output caps above in a supervised child process;
+  - write a durable INCOMPLETE manifest on any cap breach or setup or provenance failure;
+  - refuse to run unless the checkout is clean at the pinned exact commit.
+  The run authorization must pin that commit and the seed entropy E.
 
 ## 7. Artifacts and provenance
 
