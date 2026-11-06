@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261106T0803Z-c7f85c29",
+  "leaseId": "dbd8139cedf93dfebd781e3c0b001d04",
+  "acquiredAt": "2026-11-06T08:03:37Z",
+  "heartbeatAt": "2026-11-06T08:03:37Z",
+  "expiresAt": "2026-11-06T10:03:37Z",
+  "task": "scheduled Research Director: recovery audit, PR/issue review, Issue #37 next step",
   "previousOwner": "rd-gpt6-20261106T052236Z-6h14pu72rp"
 }
