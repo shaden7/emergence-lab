@@ -88,6 +88,28 @@ t statistic exactly Student-t, establish family-wise coverage, or extend to
 D=3,4. No claim about the nonlinear dimension inverse or its bias follows
 without a separate calculation.
 
+## An exact sparse-occupancy selection warning
+
+Only one permutation has zero comparable pairs. Hence, in this same ideal
+fixed-N model, P(R=0)=1/N!. Dropping those OUT_OF_RANGE realizations changes
+the ordering-fraction mean to
+
+\[
+ E[r\mid R>0]=\frac{1}{2(1-1/N!)}.
+\]
+
+For N=2, half the samples are antichains (r=0, no finite MM estimate); the
+remaining half are chains (r=1, d_MM=1). Reporting only finite estimates would
+therefore report dimension 1 for a control whose input dimension is 2. This is
+an exact finite-occupancy/selection counterexample, not an observed CS1 result
+or a claim about the nonlinear inverse at general N. It motivates reporting
+occupancy and excluded cases rather than silently filtering them.
+
+The assumptions matter: these are i.i.d. points inside a fixed diamond without
+mandatory interval endpoints. A later CS1 sub-interval design that includes or
+conditions on related endpoints may have a different finite-N law and must establish
+its own null reference. Do not transfer this formula to it automatically.
+
 ## Verification and limits
 
 Tests compare the recurrence with direct inversion enumeration over all
