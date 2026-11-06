@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261106T023046754Z-glt9oujvvvl",
+  "leaseId": "g4zw2cx2d1q-8jht8tx6j4g-91rhwfnulk-5gn7053q1ok",
+  "acquiredAt": "2026-11-06T02:30:46.754Z",
+  "heartbeatAt": "2026-11-06T02:30:46.754Z",
+  "expiresAt": "2026-11-06T04:30:46.754Z",
+  "task": "Review Issue 37 feasibility and CI",
   "previousOwner": "rd-gpt6-20261106T012724058Z-pa9es7yt80p"
 }
