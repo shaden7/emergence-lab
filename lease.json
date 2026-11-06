@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-codex-20261106T121743182Z",
-  "leaseId": "cs0-a6sahghusprvx5gm4b0tr",
-  "acquiredAt": "2026-11-06T12:17:43.182Z",
-  "heartbeatAt": "2026-11-06T12:17:43.182Z",
-  "expiresAt": "2026-11-06T14:17:43.182Z",
-  "task": "Implement and test bounded CS0 supervisor; no gated data",
-  "previousOwner": "rd-gpt6-20261106T1027Z-k8p4v2"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-codex-20261106T121743182Z"
 }
