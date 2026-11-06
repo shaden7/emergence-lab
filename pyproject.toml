@@ -10,8 +10,9 @@ requires-python = ">=3.11"
 dependencies = ["numpy>=1.26,<3", "scipy>=1.11,<2"]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10", "py_ecc>=7,<9"]
+test = ["pytest>=8,<10", "py_ecc>=7,<9", "mpmath==1.3.0"]
 beacon = ["py_ecc>=7,<9"]
+reference = ["mpmath==1.3.0"]
 
 [project.scripts]
 emergence-lab = "emergence_lab.cli:main"
