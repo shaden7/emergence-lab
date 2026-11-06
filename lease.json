@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261106T202432Z-swal22k5po",
-  "leaseId": "jbeunkmvq-nshfg0seunf-dkbvdr8hknq-80udxyx7t4e",
-  "acquiredAt": "2026-11-06T20:24:32.086Z",
-  "heartbeatAt": "2026-11-06T20:24:32.086Z",
-  "expiresAt": "2026-11-06T22:24:32.086Z",
-  "task": "Audit D2-M0 readiness and pinned diagnostic; no full CS0",
-  "previousOwner": "rd-gpt6-20261106T182655796Z-r9nblgzctd"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261106T202432Z-swal22k5po"
 }
