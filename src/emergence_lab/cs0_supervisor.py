@@ -11,7 +11,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import ctypes
 import hashlib
-import json
 import math
 import os
 from pathlib import Path
@@ -20,6 +19,10 @@ import selectors
 import signal
 import subprocess
 import time
+
+from emergence_lab.cs0_artifacts import (
+    bounded_error, checkpoint, json_bytes, manifest_checkpoint, safe_commit,
+)
 
 
 def _parent_death_guard(expected_parent: int, prctl):
@@ -46,29 +49,14 @@ class Limits:
             value = getattr(self, name)
             if type(value) is not int or value <= 0:
                 raise ValueError(f'{name} must be a positive integer')
-        if not math.isfinite(self.wall_seconds) or self.wall_seconds <= 0:
+        if (type(self.wall_seconds) not in (int, float)
+                or not math.isfinite(self.wall_seconds) or self.wall_seconds <= 0):
             raise ValueError('wall_seconds must be finite and positive')
-
-
-def checkpoint(path: Path, record: dict):
-    """Atomic replacement with file and directory fsync; initial record survives kills."""
-    temporary = path.with_suffix('.tmp')
-    with temporary.open('w') as stream:
-        json.dump(record, stream, indent=2, sort_keys=True, allow_nan=False)
-        stream.write('\n')
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temporary, path)
-    directory = os.open(path.parent, os.O_DIRECTORY)
-    try:
-        os.fsync(directory)
-    finally:
-        os.close(directory)
 
 
 def verify_checkout(root: Path, commit: str):
     """Reject dirty/untracked sources, wrong revisions and abbreviated pins."""
-    if len(commit) != 40 or any(c not in '0123456789abcdef' for c in commit):
+    if safe_commit(commit) is None:
         raise ValueError('an exact lowercase 40-character commit is required')
     def git(*args):
         return subprocess.check_output(['git', *args], cwd=root, text=True, timeout=10).strip()
@@ -93,15 +81,20 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
         raise ValueError('output must be outside the checkout')
     output.mkdir(parents=True, exist_ok=False)
     manifest = output / 'manifest.json'
-    record = dict(outcome='INCOMPLETE', stage='setup', commit=commit,
-                  limits=asdict(limits), study_authorized=False)
+    # Do not serialize unvalidated caller values before the failure checkpoint.
+    record = dict(outcome='INCOMPLETE', stage='setup', study_authorized=False)
     checkpoint(manifest, record)
     process = None
     usage = None
     start = time.monotonic()
     try:
+        if type(limits) is not Limits:
+            raise ValueError('limits must be a Limits instance')
         limits.validate()
         verify_checkout(root, commit)
+        validated_limits = asdict(limits)
+        json_bytes(validated_limits)  # refuse unserializable limits before spawn
+        record.update(commit=commit, limits=validated_limits)
         env = {**os.environ, **{key: '1' for key in (
             'OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS',
             'NUMEXPR_NUM_THREADS')}}
@@ -168,7 +161,7 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
         verify_checkout(root, commit)
         record.update(outcome='COMPLETE', stage='finished')
     except Exception as error:
-        record.update(outcome='INCOMPLETE', error=f'{type(error).__name__}: {error}')
+        record.update(outcome='INCOMPLETE', error=bounded_error(error))
     finally:
         if process is not None:
             # Also kill any unexpected surviving member of the worker session.
@@ -184,5 +177,5 @@ def supervise(command: list[str], output: Path, root: Path, commit: str,
             record['worker_cpu_seconds'] = usage.ru_utime + usage.ru_stime
             record['worker_peak_rss_kib'] = usage.ru_maxrss
         record['wall_seconds'] = time.monotonic() - start
-        checkpoint(manifest, record)
+        record = manifest_checkpoint(manifest, record)
     return record

@@ -34,9 +34,10 @@ not cause a CPU busy loop or remove the wall limit.
   for arbitrary commands. CPU and memory limits are per-process; they do not
   bound a malicious or forking process tree. File-size limits do not prevent
   zero-length files or directory changes.
-- The byte limit applies to captured worker output only. The future runner must
-  reserve and account for manifest, configuration, CSV and report overhead under
-  the preregistered 50 MB aggregate cap.
+- The generic supervisor's chosen byte limit applies to captured worker output.
+  The separate engineering caller now reserves bounded metadata/CSV/report and
+  atomic-copy slots (docs/CS0_ARTIFACT_BUDGET.md). This does not authorize the
+  full runner or extend that fixed bound to arbitrary supervisor commands.
 - The future runner must budget supervisor/preflight CPU under the aggregate
   600-second cap, leaving an explicit margin before launching the worker.
 - A worker can be killed while the parent still writes a final checkpoint.

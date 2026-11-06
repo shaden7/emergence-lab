@@ -196,3 +196,51 @@ def test_wall_stop_still_works_after_output_close(checkout, tmp_path):
     assert result['outcome'] == 'INCOMPLETE'
     assert 'wall limit' in result['error']
     assert result['wall_seconds'] < 5
+
+
+@pytest.mark.parametrize('wall', [float('nan'), float('inf'), -float('inf'),
+                               object(), 'invalid', True, None])
+def test_invalid_wall_limit_keeps_initial_durable_incomplete(checkout, tmp_path, wall):
+    result = run(checkout, tmp_path, "raise AssertionError('MUST NOT RUN')",
+                 Limits(wall_seconds=wall))
+    assert result['outcome'] == 'INCOMPLETE'
+    assert 'pid' not in result and 'limits' not in result
+    assert not (tmp_path / 'out/worker.bin').exists()
+    assert (tmp_path / 'out/manifest.json').stat().st_size < 4096
+
+
+@pytest.mark.parametrize('commit', [None, 4, b'0' * 40, object(), 'x' * 2_000_000])
+def test_invalid_commit_type_or_size_refuses_durably(checkout, tmp_path, commit):
+    result = run((checkout[0], commit), tmp_path, "raise AssertionError('MUST NOT RUN')")
+    assert result['outcome'] == 'INCOMPLETE'
+    assert 'pid' not in result and 'commit' not in result
+    assert 'exact lowercase' in result['error']
+    assert (tmp_path / 'out/manifest.json').stat().st_size < 4096
+
+
+def test_large_or_unformattable_failure_is_bounded(checkout, tmp_path, monkeypatch):
+    from emergence_lab import cs0_supervisor as supervisor
+    def fail(*args):
+        raise ValueError('x' * 2_000_000)
+    monkeypatch.setattr(supervisor, 'verify_checkout', fail)
+    result = run(checkout, tmp_path, 'pass')
+    assert result['outcome'] == 'INCOMPLETE'
+    assert len(result['error']) <= 1024
+    assert 'pid' not in result
+
+
+def test_generic_worker_output_limit_remains_separate(checkout, tmp_path):
+    # The generic API admits a caller-selected worker cap; only engineering
+    # uses its fixed one-million-byte slot. Metadata remains capped separately.
+    result = run(checkout, tmp_path, "import os; os.write(1,b'x'*1100000)",
+                 Limits(output_bytes=1_200_000))
+    assert result['outcome'] == 'COMPLETE'
+    assert result['output_bytes'] == 1_100_000
+
+
+@pytest.mark.parametrize('limits', [None, {'wall_seconds': float('nan')},
+                                  Limits(cpu_seconds=object()), Limits(output_bytes=object())])
+def test_invalid_limit_container_or_field_keeps_checkpoint(checkout, tmp_path, limits):
+    result = run(checkout, tmp_path, "raise AssertionError('MUST NOT RUN')", limits)
+    assert result['outcome'] == 'INCOMPLETE'
+    assert 'pid' not in result and 'limits' not in result

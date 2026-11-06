@@ -27,15 +27,31 @@ import json,os,pathlib,sys
 output=pathlib.Path(os.environ['TEST_OUTPUT'])
 assert json.loads((output/'envelope.json').read_text())['outcome']=='INCOMPLETE'
 pathlib.Path(os.environ['TEST_CAPTURE']).write_text(json.dumps(sys.argv[1:]))
+if os.environ.get('TEST_LOG_FLOOD')=='1':
+    for _ in range(48): os.write(1,b'x'*65536)
 if os.environ.get('TEST_SUCCESS')=='1':
     (output/'payload/run').mkdir()
     (output/'payload/run/manifest.json').write_text(json.dumps(dict(outcome='COMPLETE',
         mode='engineering',study_authorized=False,rows=40,
-        report_verdict='ENGINEERING_ONLY',commit=os.environ['TEST_REVISION'])))
+        report_verdict='ENGINEERING_ONLY',commit=os.environ['TEST_REVISION'],
+        inner_artifact_slots_verified=True,inner_artifact_bound_bytes=9000000,
+        inner_artifact_slots={p:1000000 for p in ('manifest.json','manifest.tmp',
+            'worker/manifest.json','worker/manifest.tmp','worker/worker.bin',
+            'measurements.csv','measurements.tmp','report.json','report.tmp')})))
+if os.environ.get('TEST_MISSING_BUDGET')=='1':
+    path=output/'payload/run/manifest.json'
+    record=json.loads(path.read_text()); record.pop('inner_artifact_slots_verified')
+    path.write_text(json.dumps(record))
 if os.environ.get('TEST_STALE_SUCCESS')=='1':
     path=output/'envelope.json'
     record=json.loads(path.read_text()); record['outcome']='ENGINEERING_COMPLETE'
     path.write_text(json.dumps(record))
+if os.environ.get('TEST_RICH_ANCHOR')=='1':
+    path=output/'envelope.json'
+    record=json.loads(path.read_text()); record['noise']='\u2603'*3000
+    path.write_text(json.dumps(record,ensure_ascii=False))
+if os.environ.get('TEST_OVERSIZED_ANCHOR')=='1':
+    (output/'envelope.json').write_text('x'*32768)
 sys.exit(int(os.environ.get('TEST_STATUS','0')))
 ''')
     fake.chmod(0o755)
@@ -75,6 +91,8 @@ def test_matching_engineering_completion_and_container_flags(setup):
     assert invoke(setup, TEST_SUCCESS='1').returncode == 0
     record = json.loads((setup[1] / 'envelope.json').read_text())
     assert record['outcome'] == 'ENGINEERING_COMPLETE' and not record['study_authorized']
+    assert record['fixed_pipeline_output_budget_enforced'] is True
+    assert record['fixed_pipeline_output_bound_bytes'] == 11129920
     args = json.loads(Path(setup[2]['TEST_CAPTURE']).read_text())
     for flag, value in (('--memory', '1g'), ('--memory-swap', '1g'), ('--cpus', '1'),
                         ('--network', 'none'), ('--pids-limit', '64')):
@@ -107,3 +125,32 @@ def test_dirty_checkout_and_existing_output_are_not_overwritten(setup):
     assert invoke(setup).returncode != 0
     assert marker.read_text() == 'keep'
     assert not (setup[1] / 'envelope.json').exists()
+
+
+def test_log_flood_stops_and_preserves_bounded_incomplete(setup):
+    assert invoke(setup, TEST_LOG_FLOOD='1').returncode == 2
+    record = json.loads((setup[1] / 'envelope.json').read_text())
+    assert record['outcome'] == 'INCOMPLETE'
+    assert 0 < (setup[1] / 'container.log').stat().st_size <= 2097152
+    assert (setup[1] / 'envelope.json').stat().st_size <= 16384
+    assert not record['fixed_pipeline_output_budget_enforced']
+
+
+@pytest.mark.parametrize('kind', ['TEST_RICH_ANCHOR', 'TEST_OVERSIZED_ANCHOR'])
+def test_oversized_host_record_has_minimal_bounded_failure(setup, kind):
+    assert invoke(setup, TEST_SUCCESS='1', **{kind: '1'}).returncode == 2
+    path = setup[1] / 'envelope.json'
+    record = json.loads(path.read_text())
+    assert record['outcome'] == 'INCOMPLETE' and not record['study_authorized']
+    assert not record['fixed_pipeline_output_budget_enforced']
+    assert path.stat().st_size <= 16384
+    assert len(record['error'].encode()) <= 4096
+    assert not (setup[1] / 'envelope.tmp').exists()
+
+
+def test_inner_completion_without_reviewed_slot_proof_is_incomplete(setup):
+    assert invoke(setup, TEST_SUCCESS='1', TEST_MISSING_BUDGET='1').returncode == 2
+    record = json.loads((setup[1] / 'envelope.json').read_text())
+    assert record['outcome'] == 'INCOMPLETE'
+    assert not record['fixed_pipeline_output_budget_enforced']
+    assert 'artifact-bound evidence' in record['error']

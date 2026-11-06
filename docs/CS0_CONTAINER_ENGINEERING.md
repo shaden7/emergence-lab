@@ -37,11 +37,27 @@ wrapper leaves its durable INCOMPLETE anchor. If the client or wrapper is killed
 the container may remain active until its own 30-second deadline. Host/daemon or
 filesystem failure cannot guarantee persistence or termination.
 
-There is **no aggregate output cap** on the bind mount. The host client log has a
-per-file shell limit; this is not a disk quota. No host transport CPU, aggregate
-RSS measurement, Docker daemon overhead, image build cost or total output
-accounting is claimed. The image/runtime and Docker daemon are trusted. These
-gaps still block full-run authorization.
+There is **no arbitrary-filesystem quota** on the bind mount. The reviewed fixed
+pipeline instead bounds its own regular-file contents, including simultaneous
+atomic-replacement copies:
+
+- nine inner JSON/CSV/raw-output slots at 1,000,000 bytes each: 9,000,000 bytes;
+- host `envelope.json` and `envelope.tmp` at 16,384 bytes each: 32,768 bytes;
+- host client log: conservatively at most 2,097,152 bytes (`ulimit -f 2048`, whose
+  shell units can be 512 or 1024 bytes; core dumps are disabled).
+
+The combined fixed-writer bound is **11,129,920 bytes**. Host JSON is serialized
+and size-checked before any write; error text is bounded to 4,096 UTF-8 bytes.
+Oversized or unserializable rich records become a small INCOMPLETE fallback.
+The wrapper records `fixed_pipeline_output_budget_enforced=true` only after the
+matching inner manifest confirms all nine reviewed slots and their limits. A
+missing proof cannot produce engineering completion. This is a property of the
+trusted fixed writers, not containment of arbitrary code or other filesystems.
+
+No host transport CPU, aggregate RSS measurement, Docker daemon overhead, image
+build/cache bytes or other output locations are included in that bound. The
+image/runtime and Docker daemon are trusted. The overall aggregate-budget flags
+remain false, and full-run authorization is still blocked.
 
 Local refusal/argument/checkpoint tests use a fake Docker executable and establish
 only wrapper behavior. Actual cgroup enforcement, OOM, namespace cleanup and
@@ -54,5 +70,5 @@ exercise a one-second PID1 timeout with a sleeping descendant, and request a
 `State.OOMKilled`; an exit code alone is insufficient. Probe containers are
 removed explicitly, and their report/checkpoints are collected even on failure.
 These are generic engineering fixtures, not CS0 observations. A passing result
-does not establish aggregate disk limits or total host-side compute accounting.
+does not establish an arbitrary disk quota or total host-side compute accounting.
 No deployment, paid service, Lightsail or EatSleepFeel change is included.
