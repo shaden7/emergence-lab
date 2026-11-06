@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261106T0930Z-6ae6a665",
-  "leaseId": "94fda588d9d2fed2a48c2d7f52d2e71c",
-  "acquiredAt": "2026-11-06T09:30:44Z",
-  "heartbeatAt": "2026-11-06T09:30:44Z",
-  "expiresAt": "2026-11-06T11:30:44Z",
-  "task": "Address REVISE review on PR #66 (CS0 statistics wording)",
-  "previousOwner": "rd-gpt6-20261106T0929Z-1d3qgt5q"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261106T0930Z-6ae6a665"
 }
