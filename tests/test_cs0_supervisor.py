@@ -1,9 +1,13 @@
 """Deterministic engineering failures only; no CS0 study seeds."""
+import ctypes
 import hashlib
 import json
+import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
+import time
 
 import pytest
 
@@ -96,3 +100,99 @@ def test_worker_cannot_write_artifact_file(checkout, tmp_path):
     result = run(checkout, tmp_path, "with open('forbidden.bin','wb') as f: f.write(b'x'); f.flush()")
     assert result['outcome'] == 'INCOMPLETE'
     assert (checkout[0] / 'forbidden.bin').stat().st_size == 0
+
+
+@pytest.mark.parametrize('death_signal', [signal.SIGKILL, signal.SIGTERM])
+def test_worker_stops_on_supervisor_death(checkout, tmp_path, death_signal):
+    root, commit = checkout
+    output = tmp_path / 'orphan-output'
+    source = f'''
+from pathlib import Path
+import sys
+from emergence_lab.cs0_supervisor import Limits, supervise
+supervise([sys.executable, '-c', 'import time; time.sleep(30)'],
+          Path({str(output)!r}), Path({str(root)!r}), {commit!r},
+          Limits(wall_seconds=40))
+'''
+    # Launching supervisor imports the source under test; its worker uses fixture cwd.
+    env = {**os.environ, 'PYTHONPATH': str(Path(__file__).resolve().parents[1] / 'src')}
+    # Adopt and reap the orphan ourselves; /proc may expose a different PID
+    # namespace, and container PID 1 need not reap zombies promptly.
+    prctl = ctypes.CDLL(None, use_errno=True).prctl
+    previous = ctypes.c_int()
+    assert prctl(37, ctypes.byref(previous), 0, 0, 0) == 0  # GET_CHILD_SUBREAPER
+    assert prctl(36, 1, 0, 0, 0) == 0  # SET_CHILD_SUBREAPER
+    supervisor = subprocess.Popen([sys.executable, '-c', source], env=env)
+    worker = None
+    reaped = False
+    try:
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            manifest = output / 'manifest.json'
+            if manifest.exists():
+                record = json.loads(manifest.read_text())
+                if record['stage'] == 'worker':
+                    worker = record['pid']
+                    break
+            if supervisor.poll() is not None:
+                pytest.fail('supervisor exited before publishing worker PID')
+            time.sleep(.01)
+        assert worker is not None
+        os.kill(worker, 0)
+        supervisor.send_signal(death_signal)
+        supervisor.wait(timeout=5)
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            pid, status = os.waitpid(worker, os.WNOHANG)
+            if pid:
+                reaped = True
+                assert os.waitstatus_to_exitcode(status) == -signal.SIGKILL
+                break
+            time.sleep(.01)
+        assert reaped, 'worker survived supervisor death'
+        durable = json.loads(manifest.read_text())
+        assert durable['outcome'] == 'INCOMPLETE'
+        assert durable['stage'] == 'worker'
+    finally:
+        if supervisor.poll() is None:
+            supervisor.kill()
+            supervisor.wait(timeout=5)
+        if worker is not None and not reaped:
+            try:
+                os.killpg(worker, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            try:
+                os.waitpid(worker, 0)
+            except ChildProcessError:
+                pass
+        assert prctl(36, previous.value, 0, 0, 0) == 0
+
+
+def test_parent_death_startup_race_fails_closed():
+    result = subprocess.run([sys.executable, '-c', '''
+import ctypes
+from emergence_lab.cs0_supervisor import _parent_death_guard
+_parent_death_guard(-1, ctypes.CDLL(None, use_errno=True).prctl)
+raise AssertionError('mismatched parent must never execute worker')
+'''], timeout=5)
+    assert result.returncode == -signal.SIGKILL
+
+
+def test_early_output_close_does_not_spin(checkout, tmp_path):
+    start_cpu = time.process_time()
+    result = run(checkout, tmp_path,
+                 'import os,time; os.close(1); os.close(2); time.sleep(.6)')
+    used_cpu = time.process_time() - start_cpu
+    assert result['outcome'] == 'COMPLETE'
+    assert result['output_bytes'] == 0
+    assert used_cpu < .3, f'supervisor busy-spun for {used_cpu:.3f} CPU seconds'
+
+
+def test_wall_stop_still_works_after_output_close(checkout, tmp_path):
+    result = run(checkout, tmp_path,
+                 'import os,time; os.close(1); os.close(2); time.sleep(20)',
+                 Limits(wall_seconds=.2))
+    assert result['outcome'] == 'INCOMPLETE'
+    assert 'wall limit' in result['error']
+    assert result['wall_seconds'] < 5
