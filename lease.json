@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261106T0929Z-1d3qgt5q",
-  "leaseId": "2r2kxo0f35km7crrmx7jy",
-  "acquiredAt": "2026-11-06T09:29:30.461Z",
-  "heartbeatAt": "2026-11-06T09:29:30.461Z",
-  "expiresAt": "2026-11-06T11:29:30.461Z",
-  "task": "Review and correct PR #66 CS0 calibration",
-  "previousOwner": "rd-claude-20261106T0803Z-c7f85c29"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261106T0929Z-1d3qgt5q"
 }
