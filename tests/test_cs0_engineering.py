@@ -16,7 +16,7 @@ def source_checkout(tmp_path):
     package = root / 'src/emergence_lab'
     package.mkdir(parents=True)
     for name in ('__init__', 'causal_set_mm', 'cs0_worker', 'cs0_recheck',
-                 'cs0_supervisor', 'cs0_engineering'):
+                 'cs0_supervisor', 'cs0_engineering', 'cs0_artifacts'):
         relative = f'src/emergence_lab/{name}.py'
         (root / relative).write_bytes((source / relative).read_bytes())
     (root / '.gitignore').write_text('src/**/ignored*\nsrc/**/__pycache__/\n')
@@ -46,6 +46,8 @@ def test_engineering_end_to_end(source_checkout, tmp_path):
     assert record['rows'] == 40
     assert record['study_authorized'] is False
     assert record['aggregate_caps_enforced'] is False
+    assert record['inner_artifact_slots_verified'] is True
+    assert record['inner_artifact_bound_bytes'] == 9_000_000
     assert record['report_verdict'] == 'ENGINEERING_ONLY'
     assert record == json.loads((output / 'manifest.json').read_text())
     report = json.loads((output / 'report.json').read_text())
@@ -120,3 +122,26 @@ def test_only_inert_editable_install_metadata_is_allowed(source_checkout):
     (metadata / 'shadow.py').write_text('raise Exception()')
     with pytest.raises(ValueError, match='unexpected file'):
         verify_sources(root, commit)
+
+
+def test_oversized_source_metadata_leaves_minimal_durable_incomplete(source_checkout, tmp_path,
+                                                                   monkeypatch):
+    from emergence_lab import cs0_engineering as engineering
+    monkeypatch.setattr(engineering, 'verify_sources', lambda *args: {'source': 'x' * 2_000_000})
+    monkeypatch.setattr(engineering, 'verify_runtime', lambda *args: None)
+    root, commit = source_checkout
+    record = run_engineering(root, commit, tmp_path / 'out')
+    assert record['outcome'] == 'INCOMPLETE'
+    assert record['stage'] == 'checkpoint-fallback'
+    assert record == json.loads((tmp_path / 'out/manifest.json').read_text())
+    assert not (tmp_path / 'out/worker').exists()
+    assert (tmp_path / 'out/manifest.json').stat().st_size < 1024
+
+
+@pytest.mark.parametrize('commit', [None, object(), 'x' * 2_000_000])
+def test_invalid_commit_metadata_never_prevents_initial_checkpoint(source_checkout, tmp_path,
+                                                                  commit):
+    record = run_engineering(source_checkout[0], commit, tmp_path / 'out')
+    assert record['outcome'] == 'INCOMPLETE'
+    assert 'commit' not in record
+    assert record == json.loads((tmp_path / 'out/manifest.json').read_text())

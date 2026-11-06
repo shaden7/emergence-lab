@@ -6,19 +6,21 @@ Only the worker has the existing supervisor's per-process enforcement.
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
-import io
 import json
 from pathlib import Path
 import resource
-import os
 import subprocess
 import sys
 import time
 
 from emergence_lab.cs0_recheck import check_rows, read_rows_csv
 from emergence_lab.cs0_supervisor import Limits, checkpoint, supervise, verify_checkout
+from emergence_lab.cs0_artifacts import (
+    ENGINEERING_BOUND_BYTES, ENGINEERING_SLOTS, MAX_ARTIFACT_BYTES,
+    atomic_write, bounded_error, csv_bytes, manifest_checkpoint, safe_commit,
+    verify_engineering_slots,
+)
 
 
 ENGINEERING_ENTROPY = 2036110697
@@ -34,6 +36,7 @@ def verify_runtime(root: Path):
         (__name__, 'cs0_engineering.py'),
         ('emergence_lab.cs0_supervisor', 'cs0_supervisor.py'),
         ('emergence_lab.cs0_recheck', 'cs0_recheck.py'),
+        ('emergence_lab.cs0_artifacts', 'cs0_artifacts.py'),
     ):
         module = sys.modules[name]
         if Path(module.__file__).resolve() != root / 'src/emergence_lab' / relative:
@@ -102,9 +105,13 @@ def run_engineering(root: Path, commit: str, output: Path) -> dict:
     output.mkdir(parents=True, exist_ok=False)
     manifest = output / 'manifest.json'
     record = dict(schema=1, mode='engineering', study_authorized=False,
-                  outcome='INCOMPLETE', commit=commit, stage='setup',
+                  outcome='INCOMPLETE', stage='setup',
                   entropy=ENGINEERING_ENTROPY,
-                  aggregate_caps_enforced=False)
+                  aggregate_caps_enforced=False,
+                  inner_artifact_bound_bytes=ENGINEERING_BOUND_BYTES,
+                  inner_artifact_slots=ENGINEERING_SLOTS.copy())
+    if safe_commit(commit) is not None:
+        record['commit'] = commit
     checkpoint(manifest, record)
     start, start_cpu = time.monotonic(), _cpu()
     try:
@@ -124,7 +131,8 @@ def run_engineering(root: Path, commit: str, output: Path) -> dict:
                    str(ENGINEERING_ENTROPY)]
         child = supervise(command, output / 'worker', root, commit,
                           Limits(cpu_seconds=15, wall_seconds=30,
-                                 memory_bytes=512 * 1024**2, output_bytes=1_000_000))
+                                 memory_bytes=512 * 1024**2,
+                                 output_bytes=MAX_ARTIFACT_BYTES))
         record['worker_outcome'] = child['outcome']
         if child['outcome'] != 'COMPLETE':
             raise ValueError(f'worker incomplete: {child.get("error")}')
@@ -150,17 +158,11 @@ def run_engineering(root: Path, commit: str, output: Path) -> dict:
         if any(m.get('type') != 'row' for m in messages[1:]):
             raise ValueError('unexpected worker message')
         rows = [{k: v for k, v in m.items() if k != 'type'} for m in messages[1:]]
-        table = io.StringIO(newline='')
         columns = ['family', 'D_or_k', 'N', 'rep', 'spawn_key', 'R', 'r',
                    'd_mm', 'classification']
-        writer = csv.DictWriter(table, fieldnames=columns)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({**row, 'spawn_key': json.dumps(row['spawn_key'])})
-        with (output / 'measurements.csv').open('w') as stream:
-            stream.write(table.getvalue())
-            stream.flush()
-            os.fsync(stream.fileno())
+        serialized = csv_bytes(
+            ({**row, 'spawn_key': json.dumps(row['spawn_key'])} for row in rows), columns)
+        atomic_write(output / 'measurements.csv', serialized)
         stored_rows = read_rows_csv(output / 'measurements.csv')
         report = check_rows(stored_rows, mode='engineering', entropy=ENGINEERING_ENTROPY)
         if report['verdict'] != 'ENGINEERING_ONLY':
@@ -171,18 +173,25 @@ def run_engineering(root: Path, commit: str, output: Path) -> dict:
         record.update(outcome='COMPLETE', stage='finished', rows=len(rows),
                       metadata=metadata, report_verdict=report['verdict'])
     except Exception as error:
-        record.update(outcome='INCOMPLETE', error=f'{type(error).__name__}: {error}')
+        record.update(outcome='INCOMPLETE', error=bounded_error(error))
     finally:
         record['observed_aggregate_cpu_seconds'] = _cpu() - start_cpu
         record['wall_seconds'] = time.monotonic() - start
-        record['artifacts'] = {
-            p.relative_to(output).as_posix(): dict(bytes=p.stat().st_size,
-                sha256=hashlib.sha256(p.read_bytes()).hexdigest())
-            for p in output.rglob('*') if p.is_file() and p != manifest}
+        try:
+            sizes = verify_engineering_slots(output)
+            record['inner_artifact_slots_verified'] = True
+            record['artifacts'] = {
+                name: dict(bytes=size,
+                    sha256=hashlib.sha256((output / name).read_bytes()).hexdigest())
+                for name, size in sizes.items()
+                if name not in ('manifest.json', 'manifest.tmp')}
+        except (OSError, ValueError) as error:
+            record.update(outcome='INCOMPLETE', inner_artifact_slots_verified=False,
+                          error=bounded_error(error), artifacts={})
         # Manifest includes itself only via the total after final replacement;
         # the value below is explicitly payload-only, avoiding self-hash claims.
         record['payload_bytes'] = sum(v['bytes'] for v in record['artifacts'].values())
-        checkpoint(manifest, record)
+        record = manifest_checkpoint(manifest, record)
     return record
 
 

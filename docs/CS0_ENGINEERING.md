@@ -67,11 +67,14 @@ or external scientific peer review. MM alone cannot certify manifold-likeness.
 
 ## Remaining full-run blockers
 
-Worker per-process limits are **not aggregate containment**. The engineering
-manifest explicitly records `aggregate_caps_enforced=false`; observed aggregate
-CPU includes waited child processes, while payload bytes exclude the manifest
-itself. No aggregate peak RSS or hard parent/rechecker/output limit is claimed.
-These measurements cannot satisfy preregistration section 6.
+Worker per-process limits are **not aggregate compute containment**. The
+engineering manifest still records `aggregate_caps_enforced=false`; observed
+aggregate CPU includes waited child processes, while payload bytes exclude the
+manifest itself. The reviewed fixed-writer artifact set is now bounded, including
+atomic copies: 9,000,000 bytes inside the pipeline, or 11,129,920 bytes with host
+envelope/log slots. See docs/CS0_ARTIFACT_BUDGET.md for exact scope. This is not an
+arbitrary filesystem quota. Aggregate peak RSS and hard parent/rechecker CPU
+containment remain unresolved, so this is not section 6 compliance.
 
 The launcher trusts the interpreter and system dependencies. `-I` still loads
 system site packages and their startup hooks. Source hashes/origins do not
