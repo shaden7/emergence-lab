@@ -4,8 +4,8 @@
   "owner": "rd-codex-2026-11-06T124532474Z",
   "leaseId": "0b5b8416-0cbf-447d-a337-1f7476b46c37",
   "acquiredAt": "2026-11-06T12:45:32.474Z",
-  "heartbeatAt": "2026-11-06T12:45:32.474Z",
-  "expiresAt": "2026-11-06T14:45:32.474Z",
-  "task": "Orchestrate three bounded CS0 engineering and review rounds",
+  "heartbeatAt": "2026-11-06T13:09:54.109Z",
+  "expiresAt": "2026-11-06T15:09:54.109Z",
+  "task": "Continue bounded CS0 implementation, review, containment engineering and exact calibration",
   "previousOwner": "rd-codex-20261106T121743182Z"
 }
