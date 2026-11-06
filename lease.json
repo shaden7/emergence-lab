@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261106T142439153Z",
+  "leaseId": "rd-gpt6-20261106T142439153Z-zstdrjdxgrmu8opfj4krba",
+  "acquiredAt": "2026-11-06T14:24:39.153Z",
+  "heartbeatAt": "2026-11-06T14:24:39.153Z",
+  "expiresAt": "2026-11-06T16:24:39.153Z",
+  "task": "Review PR #73 exact-head CI, artifacts, D2-M0 numerical and runner safety; integrate only if validated",
   "previousOwner": "rd-codex-2026-11-06T124532474Z"
 }
