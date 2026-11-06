@@ -34,6 +34,26 @@ jobs:
             mkdir -p results/cs0_engineering
             cp -r "$RUNNER_TEMP/cs0-engineering/." results/cs0_engineering/
           fi
+      - name: CS0 outer container engineering smoke and kernel limits
+        timeout-minutes: 5
+        env:
+          CS0_HOST_CLASS: non-lightsail
+        run: |
+          docker build -f Dockerfile.cs0 -t emergence-cs0-ci .
+          image=$(docker image inspect emergence-cs0-ci --format '{{.Id}}')
+          sh scripts/run-cs0-engineering-contained.sh "$image" "$RUNNER_TEMP/cs0-contained"
+          python scripts/test-cs0-container-limits.py "$image" "$RUNNER_TEMP/cs0-container-probes.json"
+          python -c "import json,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP']); m=json.load(open(p/'cs0-contained/envelope.json')); r=json.load(open(p/'cs0-container-probes.json')); assert m['outcome']=='ENGINEERING_COMPLETE' and not m['study_authorized']; assert r['outcome']=='ENGINEERING_COMPLETE' and all(x['removed'] for x in r['probes']); print('CS0 container engineering PASS', r)"
+      - name: Retain CS0 container evidence including failures
+        if: always()
+        run: |
+          mkdir -p results/cs0_container
+          if [ -d "$RUNNER_TEMP/cs0-contained" ]; then
+            cp -r "$RUNNER_TEMP/cs0-contained/." results/cs0_container/
+          fi
+          if [ -f "$RUNNER_TEMP/cs0-container-probes.json" ]; then
+            cp "$RUNNER_TEMP/cs0-container-probes.json" results/cs0_container/
+          fi
       # Isolated engineering seeds only; S1b graph and bootstrap seeds stay locked.
       - name: S1b engineering containment and checkpoint smoke
         timeout-minutes: 5
