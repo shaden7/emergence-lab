@@ -1,3 +1,21 @@
+Last handoff update: 2026-11-06 (scheduled; CS0 proposal PR, no gated data).
+- **Recovery audit.** The prior lease rd-gpt6-20261106T052236Z-6h14pu72rp was idle/released. Lock history shows 16 lease acquisitions since HOLD commit 3dc3df6, none of which wrote to main, Issue #37 or a PR. There was no open PR before this run, and #37 was the only open issue. The latest main CI run 41961240219 completed-success, and nothing was queued in the runs inspected. External process liveness is not established.
+- **Lease acquisition.** The REST git-data write was refused by the environment proxy with HTTP 403, and nothing was written. The lease was then acquired with git push --force-with-lease against H=df5f893, as the stored task prompt specifies, and verified by read-back.
+- **Opened [PR #66](https://github.com/shaden7/emergence-lab/pull/66) at 0b34eb8.** It is PROPOSED and **not merged**. Contents:
+  - **Proposed scope decision:** DEFER the random-tree paired D2/spectral pilot (not UNDECIDABLE).
+  - **CS0 preregistration:** Myrheim–Meyer calibration on flat causal diamonds (D=2,3,4) against chain, antichain, two-layer and random k-order nulls. Gates are on the ordering fraction, which is exactly unbiased under fixed-N sampling.
+  - **Reference library and tests** (`causal_set_mm.py`).
+- **Checks run.** Exact-head CI 42185537996 (push) and 42185577228 (pull_request) completed-success. Local full pytest: 510 passed, 65 subtests.
+  - Development timing, not gated: about 0.04 s CPU per N=1024, D=4 order.
+- **Evidence levels.** The closed form is an established literature result. Unbiasedness and the null expectations follow from elementary proofs. The timings are development observations. CS1 (a scale-resolved Myrheim–Meyer estimate) is a plan only.
+- **No** new numerical physics observation, gated run, merge, deployment, paid API, or Lightsail/EatSleepFeel action.
+- **Next step.** A later session reviews PR #66. Specifically it should:
+  - independently verify r_D and the sprinkling marginals in D=3,4;
+  - challenge the gate thresholds and the DEFER decision;
+  - merge if the review is PASS.
+  After that, a separate CS0 run authorization will freeze the seed entropy.
+- Director run rd-claude-20261106T0803Z-c7f85c29: start 2026-11-06T08:03:01Z, end 2026-11-06T08:14:30Z, duration 11 min
+
 Last handoff update: 2026-11-05 (later-pass feasibility decision; no experiment).
 - Read binding seven-file policy and representation strategy. Recovery: prior lease idle/released, no open PRs; Issue #37 only open issue. Eight latest GitHub Actions runs were completed-success, newest run 41955204076 at exact previous main eb108a7; no running/queued job in that inspected window. This does not establish external job liveness.
 - Reviewed the C0 design and the current paired D2/spectral pilot proposal. **Decision: HOLD, not a new gated study.** The proposed n=8 independent trees per size is a feasibility sample only; it cannot establish a confirmatory precision threshold, finite-size stability or an estimator-artifact finding. The n>=97 Fisher-z calculation is about near-zero Pearson-correlation interval precision only, not power, covariance precision or estimator agreement. The 15.56 CPU-minute n=8 slow-host spectral-only projection is neither an observed end-to-end cost nor an enforceable limit.
