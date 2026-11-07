@@ -64,13 +64,68 @@ binary64/high-precision discrepancies, including negative outcomes.
 The D2-M0 gamma relation, monotonicity and inverse domain must be
 rechecked against endpoint fractions before freezing a runner.
 
+## Numerical acceptance details (proposal; not yet a frozen runner)
+
+Use the exact integer Mahonian weights and `fractions.Fraction` for all
+fractions and moments. Evaluate the inverse D2 MM relation on **every distinct
+support fraction** `r=(2N-3+k)/C`, for every `N=2..32` and
+`k=0..(N-2)(N-3)/2`; cache equal rational fractions if desired but
+retain an auditable per-N coverage count. In particular `r=1` must return
+`d=1` exactly without iterative root finding. For every `r<1`, use
+mpmath at 80 decimal digits, passing numerator and denominator as integers,
+and a bracketed monotone inverse; do not construct an mpmath input from a
+binary64 float. Independently evaluate the forward MM relation at the
+resulting dimension and record the absolute residual.
+
+Proposed **predeclared** numerical gates: all high-precision forward
+residuals <= 1e-60; all returned dimensions finite and >= 1; dimensions
+nonincreasing in `r` across each support; for the production binary64
+path, maximum absolute discrepancy from the 80-digit reference <= 1e-11
+for every distinct support fraction, every `d(E[r])`, and every weighted
+`E[d(r)]` at N=2..32. If a high-precision solver cannot certify the
+1e-60 residual, classify NUMERICAL_CHECK_FAILED rather than silently
+lowering precision. Record worst-case N, fraction, residual, and signed
+discrepancy; report negative outcomes as well. These thresholds are
+**proposed** and require measured feasibility before freeze.
+
+Output serialization: write exact controls as integer numerators and
+denominators (not decimal-rounded JSON numbers), numeric outputs as
+17-significant-digit binary64 strings, and high-precision values as
+80-digit decimal strings. Preserve an ordered per-N support/check table
+and complete Mahonian weights, plus versioned manifest and SHA-256
+digests. No selective omission of failed fractions.
+
+## Containment and failure semantics (design only)
+
+A future runner must reuse or extend the existing CS0/D2-M0 supervised
+subprocess design, with a separately reviewed *actual implementation*:
+single worker process group; wall-clock deadline measured by the parent;
+process-group termination on timeout; conservative **aggregate** CPU
+accounting across worker descendants and controller/finalization; peak
+aggregate resident memory (not just one child); bounded stdout/stderr,
+temporary files, atomic checkpoint copies, manifest and final archive.
+Check controller overhead and post-termination finalization against the
+same total caps. If the available supervisor cannot guarantee aggregate
+CPU/RSS or bound its own archive writes, **do not run**: record the
+containment gap as a blocker instead of treating observation as enforcement.
+
+On failure, emit an atomic minimal INCOMPLETE manifest if safely possible,
+including pinned commit, config, Python/mpmath versions, stage, reason,
+elapsed CPU/wall, observed peak memory and retained bytes; include
+partial data only with explicit incompleteness labels. If even that
+manifest cannot be safely persisted, report a missing-artifact failure
+and do not infer a completed result. Never rerun automatically after
+failure. An implementation PR must test timeout, killed worker,
+oversized output, nonfinite numeric result, interrupted finalization,
+and exact-head provenance before any once-only run authorization.
+
 ## Proposed resources and decision rule (not authorization)
 
 Deterministic, no RNG or sampling error. Proposed limits:
 30 CPU seconds, 60 wall seconds, 512 MiB total observed memory,
 1,000,000 bytes retained outputs; include controller/finalization cost
 and manifest, environment, exact code/config SHA, complete results,
-error checks, and SHA-256 digests. Require explicit child containment;
+error checks, and SHA-256 digests. Require verified aggregate process-tree and controller containment;
 if budget/provenance fails record INCOMPLETE, not a selectively rerun
 curve. Outcome vocabulary: REFERENCE_COMPLETE, NUMERICAL_CHECK_FAILED,
 INCOMPLETE; never CS0 PASS.
