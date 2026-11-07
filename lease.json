@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261107132331-81ffdd54064a",
+  "leaseId": "81ffdd54064ade9a9e17a7e699a05267",
+  "acquiredAt": "2026-11-07T13:23:31.713Z",
+  "heartbeatAt": "2026-11-07T13:23:31.713Z",
+  "expiresAt": "2026-11-07T15:23:31.713Z",
+  "task": "Later-pass review and integration of D2-E0 PR #75",
   "previousOwner": "rd-gpt6-20261107T112255-db4a39e9a1"
 }
