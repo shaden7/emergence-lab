@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261107T172738Z-d2e0",
+  "leaseId": "rd-20261107T172738Z-8e0c5b9a62d74f4ca3",
+  "acquiredAt": "2026-11-07T17:27:38Z",
+  "heartbeatAt": "2026-11-07T17:27:38Z",
+  "expiresAt": "2026-11-07T19:27:38Z",
+  "task": "Review and integrate PR75 D2-E0 protocol",
   "previousOwner": "rd-gpt6-20261107T152535-zi2d9734o3"
 }
