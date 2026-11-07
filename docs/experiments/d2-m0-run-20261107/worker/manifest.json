@@ -1,0 +1,19 @@
+{
+  "commit": "60afcf445cb51f779ca765163fbb026c38f4a7e8",
+  "exit_code": 0,
+  "limits": {
+    "cpu_seconds": 27,
+    "memory_bytes": 402653184,
+    "output_bytes": 700000,
+    "wall_seconds": 55
+  },
+  "outcome": "COMPLETE",
+  "output_bytes": 171156,
+  "output_sha256": "168915a27e7b3b3d90e0348bd2c42596ca3e8b41758f37278b62f99a7fc1b6ad",
+  "pid": 775,
+  "stage": "finished",
+  "study_authorized": false,
+  "wall_seconds": 3.255170609000004,
+  "worker_cpu_seconds": 3.203916,
+  "worker_peak_rss_kib": 95828
+}

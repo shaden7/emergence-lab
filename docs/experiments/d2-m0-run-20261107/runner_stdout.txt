@@ -1,0 +1,1 @@
+{"outcome": "REFERENCE_COMPLETE", "diagnostic": "D2-M0", "cs0_acceptance": false}
