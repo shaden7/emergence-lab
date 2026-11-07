@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261107T072744-c86xwro6y1g",
+  "leaseId": "u6xoev8axau7risca32o",
+  "acquiredAt": "2026-11-07T07:27:44.693Z",
+  "heartbeatAt": "2026-11-07T07:27:44.693Z",
+  "expiresAt": "2026-11-07T09:27:44.693Z",
+  "task": "Review CI and D2-M0 diagnostic readiness",
   "previousOwner": "rd-gpt6-20261107T052435Z-hjmn8qraxm"
 }
