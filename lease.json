@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261108T072618-c3fba249a042",
-  "leaseId": "87d2691a26b52058cbfcaf83f12f007266cefb5c",
-  "acquiredAt": "2026-11-08T07:26:18.588Z",
-  "heartbeatAt": "2026-11-08T07:26:18.588Z",
-  "expiresAt": "2026-11-08T09:26:18.588Z",
-  "task": "Review D2-E0 PR #75 and validate acceptance",
-  "previousOwner": "rd-gpt6-20261108T052451-s4z8l7hyq"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261108T072618-c3fba249a042"
 }
