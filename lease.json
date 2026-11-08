@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261108T0803Z-d84f4978",
+  "leaseId": "36838def17e49aeb84f31e80239db58f",
+  "acquiredAt": "2026-11-08T08:03:05Z",
+  "heartbeatAt": "2026-11-08T08:03:05Z",
+  "expiresAt": "2026-11-08T10:03:05Z",
+  "task": "Hourly Director: recovery audit, PR/issue review, next D2-M0 extension design",
   "previousOwner": "rd-gpt6-20261108T072618-c3fba249a042"
 }
