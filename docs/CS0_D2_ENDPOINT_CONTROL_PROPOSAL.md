@@ -1,4 +1,4 @@
-# D2-E0 — endpoint-conditioned finite-occupancy MM control (design, NOT frozen)
+# D2-E0 — endpoint-conditioned finite-occupancy MM control (design r2, NOT frozen)
 
 **Status:** proposal for later-pass review; **no experiment authorized or executed**.
 Related: [D2-M0 protocol](CS0_D2_M0_PROTOCOL.md), [D2-M0 observed reference](experiments/2026-11-07-d2-m0-run.md), [Issue #37](https://github.com/shaden7/emergence-lab/issues/37).
@@ -118,6 +118,60 @@ and do not infer a completed result. Never rerun automatically after
 failure. An implementation PR must test timeout, killed worker,
 oversized output, nonfinite numeric result, interrupted finalization,
 and exact-head provenance before any once-only run authorization.
+
+## Feasibility probe r2 (2026-11-08; engineering measurement, NOT the D2-E0 diagnostic)
+
+Prompted by the two later-pass REVISE findings on this PR (naive full-row JSON
+1.72 MB > 1 MB cap; 210-step bisection extrapolated to ~44 CPU s > 30 s cap).
+Script: [docs/experiments/d2_e0_feasibility_probe.py](experiments/d2_e0_feasibility_probe.py),
+run twice with `python3 -I` in the cloud sandbox (not Lightsail; Python 3.13.18,
+mpmath 1.3.0, SciPy 1.18.1, 2 vCPU), Director `rd-claude-20261108T0803Z-d84f4978`.
+It computes real 80-digit inverses (no placeholders) but is **not** a frozen
+runner, has no containment, and its values are **not** a reported D2-E0 result.
+
+Measured (numerical engineering observations, single host, two runs; all
+non-timing outputs byte-identical between runs):
+
+- 4,526 per-N support rows reduce to **3,921 distinct reduced fractions**.
+- Solver: binary64 `brentq` seed on [1,10], then 80-digit Newton with
+  analytic derivative `f·(ψ(d+1)+ψ(d/2)/2−(3/2)ψ(3d/2))`, stop at step
+  <1e-75; **certify** each root by the sign change `f(d−1e−62)>r>f(d+1e−62)`
+  (f is decreasing) from the exact rational `r` (the target is never
+  constructed from binary64; only the starting point is). Max Newton
+  iterations 4; max forward residual 5.3e−81 (gate 1e−60); all
+  certifications passed; dimensions nonincreasing in r within every N.
+- Binary64 discrepancy vs 80-digit: support max 2.98e−15, `d(E[r])` and
+  `E[d(r)]` summaries max 1.33e−15 (proposed gate 1e−11). Exact
+  `E[r]=(N²+3N−6)/(2N(N−1))` re-asserted from the weights for every N.
+  N=32 minimum r=61/496 gives d≈3.75324363653865860, matching the earlier
+  independent bisection value.
+- Cost of the whole probe process: **10.3–11.6 CPU s**, 11.7 s wall,
+  max RSS 85,064 KiB (inverse stage 10.9 CPU s).
+- Bytes (compact UTF-8 JSON): distinct-fraction table (80-digit + binary64
+  strings) + per-N coverage counts + 31 summaries + **complete** integer
+  Mahonian weights = **536,491 bytes** (219,159 gzip-9); weights alone 82,002.
+
+Consequences for the design (proposed, still not frozen):
+
+1. Replace bisection by the seeded-Newton + sign-certification inverse; keep
+   the independent bisection only as a spot cross-check (e.g. N=2,3,4,8,32
+   extreme and mean fractions) so the 80-digit path is not solely seeded-
+   derived.
+2. Serialize one table keyed by **distinct** reduced fraction plus an
+   auditable per-N coverage list (N → k-range → fraction index) and the
+   complete weights; do not repeat 80-digit strings per (N,k) row.
+3. Budget margin is ~2.6× on CPU and ~1.9× on bytes for **one** copy.
+   Atomic old+temporary slots would double transient bytes (~1.07 MB);
+   the frozen protocol must either count retained bytes after atomic
+   replacement only, compress the table, or raise the cap with rationale —
+   decide before freeze, and measure manifest/digest/checkpoint overhead
+   in the actual runner.
+4. CPU margin is host-dependent; the runner must measure on the target
+   host before authorization rather than relying on this sandbox timing.
+
+**Still blocking freeze:** aggregate process-tree/controller/finalization
+containment is designed but **not implemented or tested**; the atomic-copy
+byte accounting choice (item 3) is open. No D2-E0 run is authorized.
 
 ## Proposed resources and decision rule (not authorization)
 
