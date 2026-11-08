@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261108T233048429Z-nouhdn7lty8",
+  "leaseId": "rd-gpt6-20261108T233048429Z-nouhdn7lty8",
+  "acquiredAt": "2026-11-08T23:30:48.429Z",
+  "heartbeatAt": "2026-11-08T23:30:48.429Z",
+  "expiresAt": "2026-11-09T01:30:48.429Z",
+  "task": "Research Director review D2-E0 runner and project handoff",
   "previousOwner": "rd-codex-20261108T081602133Z-0mchuqsqsjtg"
 }
