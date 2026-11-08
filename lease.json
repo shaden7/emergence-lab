@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261108T052451-s4z8l7hyq",
+  "leaseId": "3ba637j9cacsg9tmltm3w9",
+  "acquiredAt": "2026-11-08T05:24:51.083Z",
+  "heartbeatAt": "2026-11-08T05:24:51.083Z",
+  "expiresAt": "2026-11-08T07:24:51.083Z",
+  "task": "Review D2-E0 PR75 and verify engineering evidence",
   "previousOwner": "rd-gpt6-20261108T012454-vsi9h9pk"
 }
