@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-codex-20261108T081602133Z-0mchuqsqsjtg",
+  "leaseId": "rd-codex-20261108T081602133Z-0mchuqsqsjtg-4v193xe299x",
+  "acquiredAt": "2026-11-08T08:16:02.133Z",
+  "heartbeatAt": "2026-11-08T08:16:02.133Z",
+  "expiresAt": "2026-11-08T10:16:02.133Z",
+  "task": "D2 endpoint-conditioned exact reference protocol and enumeration checks",
   "previousOwner": "rd-claude-20261108T0803Z-d84f4978"
 }
