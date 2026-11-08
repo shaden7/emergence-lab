@@ -1,6 +1,6 @@
-# D2-E0 — endpoint-conditioned finite-occupancy MM control (design r2, NOT frozen)
+# D2-E0 — endpoint-conditioned finite-occupancy MM control (reviewed design r3, NOT frozen)
 
-**Status:** proposal for later-pass review; **no experiment authorized or executed**.
+**Status:** design integration only; protocol freeze and execution remain blocked on a separately tested runner. **No D2-E0 diagnostic authorized or executed.**
 Related: [D2-M0 protocol](CS0_D2_M0_PROTOCOL.md), [D2-M0 observed reference](experiments/2026-11-07-d2-m0-run.md), [Issue #37](https://github.com/shaden7/emergence-lab/issues/37).
 This is an exact estimator-control at fixed **input D=2**, not a model comparison, physical discovery, or full-CS0 authorization.
 
@@ -73,7 +73,7 @@ support fraction** `r=(2N-3+k)/C`, for every `N=2..32` and
 retain an auditable per-N coverage count. In particular `r=1` must return
 `d=1` exactly without iterative root finding. For every `r<1`, use
 mpmath at 80 decimal digits, passing numerator and denominator as integers,
-and a bracketed monotone inverse; do not construct an mpmath input from a
+and the seeded-Newton inverse with numerical sign checks specified below; do not construct an mpmath input from a
 binary64 float. Independently evaluate the forward MM relation at the
 resulting dimension and record the absolute residual.
 
@@ -94,6 +94,45 @@ denominators (not decimal-rounded JSON numbers), numeric outputs as
 80-digit decimal strings. Preserve an ordered per-N support/check table
 and complete Mahonian weights, plus versioned manifest and SHA-256
 digests. No selective omission of failed fractions.
+
+## Fixed-writer byte decision r3 (2026-11-08; implementation requirement)
+
+The total cap is **2,000,000 content bytes simultaneously present**, including
+old and temporary copies, rather than the earlier 1 MB retained-only proposal.
+This modest increase avoids relying on successful compression or ignoring
+atomic replacement costs. The fixed writer may create only these slots:
+
+| Slot | Count | Maximum bytes per slot |
+| --- | ---: | ---: |
+| `reference.json.gz` and its atomic temporary | 2 | 800,000 |
+| `manifest.json` and its atomic temporary | 2 | 16,384 |
+| Combined bounded diagnostic log | 1 | 131,072 |
+
+The sum is **1,763,840 bytes**, leaving 236,160 bytes unused.
+Serialize and compress in memory, check the byte limit **before opening** the
+temporary file, then fsync and replace. Keep complete exact weights, fraction
+coverage reconstruction, all numerical checks and failure flags in the
+compressed payload; never discard unfavorable rows to fit. No extra archive,
+uncompressed on-disk staging, separate error file or output spill is permitted.
+The manifest is a fixed schema with bounded strings; on refusal preserve a
+minimal INCOMPLETE record within the same slots. This is a trusted fixed-writer
+content bound, not a filesystem allocation quota or protection from arbitrary
+writers. The implementation must test all slots, compression failure and
+interrupted replacement. Previously measured 536,491 raw / 219,159 compressed
+bytes are feasibility observations, **not** a bound on the final richer payload.
+
+## Exact combinatorial later-pass check
+
+Reproduce with `python3 -I docs/experiments/d2_e0_exact_recheck.py`.
+On 2026-11-08, Python 3.12.14: all **5,914 permutations** for N=2..9
+passed direct coordinate-order pair counting, matching the full shifted
+Mahonian law. Exact Fraction mean, variance, support and normalization checks
+passed for every N=2..32 (0.082 process CPU s).
+N=4 is an explicit control: R=5 or 6 with equal weights.
+This separate implementation uses no repository simulation or inversion code.
+It is a same-session AI-mediated computational check of model-level
+mathematics, not formal verification or external scientific review.
+No MM diagnostic curve or full-CS0 data were generated in this check.
 
 ## Containment and failure semantics (design only)
 
@@ -135,7 +174,7 @@ non-timing outputs byte-identical between runs):
 - 4,526 per-N support rows reduce to **3,921 distinct reduced fractions**.
 - Solver: binary64 `brentq` seed on [1,10], then 80-digit Newton with
   analytic derivative `f·(ψ(d+1)+ψ(d/2)/2−(3/2)ψ(3d/2))`, stop at step
-  <1e-75; **certify** each root by the sign change `f(d−1e−62)>r>f(d+1e−62)`
+  <1e-75; numerically sign-check each root by the sign change `f(d−1e−62)>r>f(d+1e−62)`
   (f is decreasing) from the exact rational `r` (the target is never
   constructed from binary64; only the starting point is). Max Newton
   iterations 4; max forward residual 5.3e−81 (gate 1e−60); all
@@ -153,31 +192,31 @@ non-timing outputs byte-identical between runs):
 
 Consequences for the design (proposed, still not frozen):
 
-1. Replace bisection by the seeded-Newton + sign-certification inverse; keep
+1. Replace bisection by the seeded-Newton + numerical sign-check inverse; keep
    the independent bisection only as a spot cross-check (e.g. N=2,3,4,8,32
    extreme and mean fractions) so the 80-digit path is not solely seeded-
    derived.
 2. Serialize one table keyed by **distinct** reduced fraction plus an
    auditable per-N coverage list (N → k-range → fraction index) and the
    complete weights; do not repeat 80-digit strings per (N,k) row.
-3. Budget margin is ~2.6× on CPU and ~1.9× on bytes for **one** copy.
-   Atomic old+temporary slots would double transient bytes (~1.07 MB);
-   the frozen protocol must either count retained bytes after atomic
-   replacement only, compress the table, or raise the cap with rationale —
-   decide before freeze, and measure manifest/digest/checkpoint overhead
-   in the actual runner.
+3. The original 1 MB cap could not accommodate two uncompressed atomic
+   copies. The r3 fixed-writer decision above replaces it with a 2 MB
+   simultaneous-content cap and explicit slots; actual payload completeness,
+   compression and failure behavior still require implementation tests.
 4. CPU margin is host-dependent; the runner must measure on the target
    host before authorization rather than relying on this sandbox timing.
 
 **Still blocking freeze:** aggregate process-tree/controller/finalization
-containment is designed but **not implemented or tested**; the atomic-copy
-byte accounting choice (item 3) is open. No D2-E0 run is authorized.
+containment and the fixed-writer byte rules are **not implemented or tested**.
+The byte-accounting design choice is resolved; enforceability remains open.
+Numerical sign checks at finite precision are not rigorous interval certificates.
+No D2-E0 run is authorized.
 
 ## Proposed resources and decision rule (not authorization)
 
 Deterministic, no RNG or sampling error. Proposed limits:
 30 CPU seconds, 60 wall seconds, 512 MiB total observed memory,
-1,000,000 bytes retained outputs; include controller/finalization cost
+2,000,000 simultaneous output content bytes under the fixed-writer rules; include controller/finalization cost
 and manifest, environment, exact code/config SHA, complete results,
 error checks, and SHA-256 digests. Require verified aggregate process-tree and controller containment;
 if budget/provenance fails record INCOMPLETE, not a selectively rerun
@@ -186,6 +225,8 @@ INCOMPLETE; never CS0 PASS.
 
 **Freeze gate:** later-pass reviewer verifies the combinatorial law,
 variance, inversion range, numerical precision, endpoint ensemble,
-proposed tests and enforceable budget. Only then freeze the protocol,
-implement a bounded runner in a separate reviewed code change, and
-authorize at most one pinned diagnostic. No Lightsail deployment.
+proposed tests and enforceable budget. Design integration does not require an already implemented runner and must
+not be described as protocol freeze. Next implement the bounded runner in a
+separate reviewed code change, verify its exact-head numerical/failure/resource
+tests, and only then freeze the protocol and authorize at most one pinned
+diagnostic in a separately recorded decision. No Lightsail deployment.
