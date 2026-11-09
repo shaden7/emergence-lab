@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261109T172727440Z-pd5u74mmtif",
-  "leaseId": "rd-gpt6-20261109T172727440Z-pd5u74mmtif-lease",
-  "acquiredAt": "2026-11-09T17:27:27.440Z",
-  "heartbeatAt": "2026-11-09T17:27:27.440Z",
-  "expiresAt": "2026-11-09T19:27:27.440Z",
-  "task": "Review D2-E0 dependencies, CI, code and artifacts",
-  "previousOwner": "rd-gpt6-20261109T152627Z-5vf4n79xq1"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261109T172727440Z-pd5u74mmtif"
 }
