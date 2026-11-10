@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261110T212743-3a7773f9ee",
+  "leaseId": "96a20e8005e8e860745bb35a728ef753",
+  "acquiredAt": "2026-11-10T21:27:43.107Z",
+  "heartbeatAt": "2026-11-10T21:27:43.107Z",
+  "expiresAt": "2026-11-10T23:27:43.107Z",
+  "task": "D2-E0 supervisor review and engineering",
   "previousOwner": "rd-gpt6-20261110T202528-m689zu3zjz"
 }
