@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261110T022852513Z-83g06pzk5tl",
+  "leaseId": "rd-gpt6-20261110T022852513Z-83g06pzk5tl-nkdee85f5h",
+  "acquiredAt": "2026-11-10T02:28:52.513Z",
+  "heartbeatAt": "2026-11-10T02:28:52.513Z",
+  "expiresAt": "2026-11-10T04:28:52.513Z",
+  "task": "Review D2-E0 runner readiness and integration",
   "previousOwner": "rd-gpt6-20261109T183022860Z-ny4k4d4iesn"
 }
