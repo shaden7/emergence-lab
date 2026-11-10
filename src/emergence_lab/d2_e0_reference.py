@@ -485,7 +485,7 @@ def write_reference(directory: Path, payload: dict, base: dict, *,
     INCOMPLETE manifest if that write itself succeeds.
     """
     writer = FixedWriter(directory)
-    stage = 'setup'
+    stage, final_bytes = 'setup', None
     try:
         writer.replace(MANIFEST_NAME, _minimal_manifest(base, stage, 'started'))
         stage = 'serialize'
@@ -512,15 +512,26 @@ def write_reference(directory: Path, payload: dict, base: dict, *,
         # Log first: the finished manifest is the last write, so nothing after
         # it can fail and leave a finished manifest without its reference.
         writer.log(f'finished outcome={record["outcome"]}')
-        writer.replace(MANIFEST_NAME, _json(record))
-        record['present'] = writer.audit()
+        present = writer.audit()  # before the final write; nothing may fail after it
+        final_bytes = _json(record)
+        writer.replace(MANIFEST_NAME, final_bytes)
+        record['present'] = dict(present, **{MANIFEST_NAME: len(_json(record))})
         return record
     except Exception as error:  # preserve minimal evidence, never a result
         reason = f'{type(error).__name__}: {error}'
         try:
+            committed = (final_bytes is not None
+                         and (writer.directory / MANIFEST_NAME).read_bytes() == final_bytes)
+        except OSError:
+            committed = False
+        if committed:
+            # The finished manifest and its reference are both in place; only a
+            # post-replace step (directory fsync) failed. Do not destroy them.
+            return dict(json.loads(final_bytes), durability_unverified=reason[:256])
+        try:
             # A reference without a matching finished manifest is never left
             # looking complete: remove it (deletion only lowers content bytes).
-            for name in (REFERENCE_NAME, REFERENCE_NAME + '.tmp'):
+            for name in (REFERENCE_NAME, REFERENCE_NAME + '.tmp', MANIFEST_NAME + '.tmp'):
                 if (writer.directory / name).exists():
                     (writer.directory / name).unlink()
             writer.replace(MANIFEST_NAME, _minimal_manifest(base, stage, reason))

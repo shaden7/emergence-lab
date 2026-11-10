@@ -271,15 +271,31 @@ def test_log_failure_never_leaves_finished_manifest_without_reference(tmp_path, 
     assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()
 
 
-def test_final_manifest_dir_fsync_failure_is_incomplete(tmp_path, monkeypatch):
+def test_audit_failure_happens_before_final_manifest(tmp_path, monkeypatch):
+    real, calls = e0.FixedWriter.audit, []
+    def flaky(self):
+        calls.append(1)
+        if len(calls) == 3:  # setup replace, reference replace, then pre-final audit
+            raise e0.WriterRefusal('simulated audit failure')
+        return real(self)
+    monkeypatch.setattr(e0.FixedWriter, 'audit', flaky)
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {})
+    manifest = json.loads((tmp_path / 'out' / e0.MANIFEST_NAME).read_bytes())
+    assert record['outcome'] == manifest['outcome'] == 'INCOMPLETE'
+    assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()
+
+
+def test_post_commit_fsync_failure_keeps_consistent_pair(tmp_path, monkeypatch):
     real, calls = e0._fsync_dir, []
     def flaky(path):
         calls.append(path)
-        if len(calls) == 3:  # setup manifest, reference, then final manifest
+        if len(calls) >= 3:  # final manifest's directory fsync and anything later
             raise OSError('simulated directory fsync failure')
         return real(path)
     monkeypatch.setattr(e0, '_fsync_dir', flaky)
     record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {})
     manifest = json.loads((tmp_path / 'out' / e0.MANIFEST_NAME).read_bytes())
-    assert record['outcome'] == manifest['outcome'] == 'INCOMPLETE'
-    assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()
+    assert manifest['stage'] == 'finished' and 'durability_unverified' in record
+    data = (tmp_path / 'out' / e0.REFERENCE_NAME).read_bytes()
+    import hashlib
+    assert hashlib.sha256(data).hexdigest() == manifest['reference_sha256']

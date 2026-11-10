@@ -237,7 +237,8 @@ slot and is removed before the next replacement. Failures preserve a minimal
 INCOMPLETE manifest and delete any already written reference, so no
 complete-looking payload survives without a finished manifest, and the finished
 manifest is the last write (log first), so no finished manifest survives a
-later failure without its reference. The writer
+later failure without its reference (a failed directory fsync after the final
+replace keeps the consistent pair and flags `durability_unverified`). The writer
 refuses payloads whose outcome is not a reference outcome or is inconsistent
 with its failure list. Manifest keys from the caller are not schema-bounded;
 an oversized manifest is refused (never written beyond its slot). Tests (`tests/test_d2_e0_reference.py`, small-N fixtures
