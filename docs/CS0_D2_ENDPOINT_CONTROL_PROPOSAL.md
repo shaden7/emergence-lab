@@ -235,7 +235,9 @@ opened (`O_EXCL`); gzip is in memory with a round-trip check; the log is a singl
 truncating file; a stale temporary from an interrupted replacement is a counted
 slot and is removed before the next replacement. Failures preserve a minimal
 INCOMPLETE manifest and delete any already written reference, so no
-complete-looking payload survives without a finished manifest. The writer
+complete-looking payload survives without a finished manifest, and the finished
+manifest is the last write (log first), so no finished manifest survives a
+later failure without its reference. The writer
 refuses payloads whose outcome is not a reference outcome or is inconsistent
 with its failure list. Manifest keys from the caller are not schema-bounded;
 an oversized manifest is refused (never written beyond its slot). Tests (`tests/test_d2_e0_reference.py`, small-N fixtures

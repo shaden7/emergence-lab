@@ -258,3 +258,28 @@ def test_writer_refuses_inconsistent_outcome(tmp_path, payload):
     record = e0.write_reference(tmp_path / 'out', payload, {})
     assert record['outcome'] == 'INCOMPLETE' and record['stage'] == 'serialize'
     assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()
+
+
+def test_log_failure_never_leaves_finished_manifest_without_reference(tmp_path, monkeypatch):
+    def broken_log(self, message):
+        raise OSError('simulated fsync failure')
+    monkeypatch.setattr(e0.FixedWriter, 'log', broken_log)
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {})
+    assert record['outcome'] == 'INCOMPLETE' and record['manifest_persisted']
+    manifest = json.loads((tmp_path / 'out' / e0.MANIFEST_NAME).read_bytes())
+    assert manifest['outcome'] == 'INCOMPLETE'
+    assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()
+
+
+def test_final_manifest_dir_fsync_failure_is_incomplete(tmp_path, monkeypatch):
+    real, calls = e0._fsync_dir, []
+    def flaky(path):
+        calls.append(path)
+        if len(calls) == 3:  # setup manifest, reference, then final manifest
+            raise OSError('simulated directory fsync failure')
+        return real(path)
+    monkeypatch.setattr(e0, '_fsync_dir', flaky)
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {})
+    manifest = json.loads((tmp_path / 'out' / e0.MANIFEST_NAME).read_bytes())
+    assert record['outcome'] == manifest['outcome'] == 'INCOMPLETE'
+    assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()

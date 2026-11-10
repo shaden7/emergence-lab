@@ -509,8 +509,10 @@ def write_reference(directory: Path, payload: dict, base: dict, *,
                       reference_bytes=len(compressed),
                       reference_sha256=hashlib.sha256(compressed).hexdigest(),
                       failures=list(payload.get('failures', []))[:32])
-        writer.replace(MANIFEST_NAME, _json(record))
+        # Log first: the finished manifest is the last write, so nothing after
+        # it can fail and leave a finished manifest without its reference.
         writer.log(f'finished outcome={record["outcome"]}')
+        writer.replace(MANIFEST_NAME, _json(record))
         record['present'] = writer.audit()
         return record
     except Exception as error:  # preserve minimal evidence, never a result
@@ -521,9 +523,12 @@ def write_reference(directory: Path, payload: dict, base: dict, *,
             for name in (REFERENCE_NAME, REFERENCE_NAME + '.tmp'):
                 if (writer.directory / name).exists():
                     (writer.directory / name).unlink()
-            writer.log(f'stage={stage} {reason}')
             writer.replace(MANIFEST_NAME, _minimal_manifest(base, stage, reason))
         except Exception as nested:
             return dict(outcome='INCOMPLETE', stage=stage, reason=reason,
                         manifest_persisted=False, nested=f'{type(nested).__name__}: {nested}'[:256])
+        try:
+            writer.log(f'stage={stage} {reason}')
+        except Exception:
+            pass  # the INCOMPLETE manifest above is the authoritative record
         return dict(json.loads(_minimal_manifest(base, stage, reason)), manifest_persisted=True)
