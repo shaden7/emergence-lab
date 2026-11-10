@@ -210,6 +210,24 @@ def bisection_inverse(r: Fraction) -> str:
     return _text(ctx, (low + high) / 2)
 
 
+def _independent_forward_check(ctx, r: Fraction, d_text) -> tuple[bool, object]:
+    """Recompute residual and sign check from the stored 80-digit text and the
+    exact rational, independent of the solver's self-report."""
+    if type(d_text) is not str:
+        return False, None
+    d = ctx.mpf(d_text)
+    if not (ctx.isfinite(d) and d >= 1):
+        return False, None
+    if r == 1:
+        return bool(d == 1), ctx.mpf(0) if d == 1 else None
+    if not d < INVERSE_BRACKET[1]:
+        return False, None
+    target, delta = _as_mp(ctx, r), ctx.mpf(SIGN_DELTA)
+    residual = abs(_forward(ctx, d) - target)
+    sign = _forward(ctx, d - delta) > target > _forward(ctx, d + delta)
+    return bool(sign and residual <= ctx.mpf(RESIDUAL_GATE)), residual
+
+
 def _b64(value: float) -> str:
     return format(value, '.17g')
 
@@ -258,7 +276,7 @@ def generate_reference(sizes=SIZES, *, _inverse=newton_inverse,
 
     fractions, failures = [], []
     gate_b64 = ctx.mpf(BINARY64_GATE)
-    hp_values = {}
+    hp_values, residuals = {}, []
     for r in distinct:
         b64 = _binary64(r)
         b64_finite = type(b64) is float and math.isfinite(b64)
@@ -271,7 +289,12 @@ def generate_reference(sizes=SIZES, *, _inverse=newton_inverse,
               and inv['sign_check'] and inv['d'] is not None)
         if ok:
             d = ctx.mpf(inv['d'])
-            ok = bool(ctx.isfinite(d) and d >= 1 and inv['residual_ok'] is True)
+            independent, residual = _independent_forward_check(ctx, r, inv['d'])
+            row['independent_residual'] = None if residual is None else ctx.nstr(residual, 6)
+            row['independent_check'] = independent
+            ok = bool(independent and inv['residual_ok'] is True)
+            if residual is not None:
+                residuals.append((residual, r))
             discrepancy = ctx.mpf(b64) - d
             row['discrepancy'] = ctx.nstr(discrepancy, 6)
             ok = ok and bool(abs(discrepancy) <= gate_b64)
@@ -304,12 +327,12 @@ def generate_reference(sizes=SIZES, *, _inverse=newton_inverse,
             edr_hp = ctx.fsum(_as_mp(ctx, Fraction(c, w['denominator'])) * ctx.mpf(f['d_hp'])
                               for c, f in zip(w['counts'], rows))
             dem_ok = (dem['error'] is None and dem['converged'] and dem['sign_check']
-                      and math.isfinite(dem_b64)
-                      and dem['residual_ok'] is True)
+                      and math.isfinite(dem_b64) and dem['residual_ok'] is True
+                      and _independent_forward_check(ctx, mean, dem['d'])[0])
             disc_dem = (ctx.mpf(dem_b64) - ctx.mpf(dem['d'])) if dem_ok else None
             disc_edr = ctx.mpf(edr_b64) - edr_hp
             ok = ok and dem_ok and abs(disc_dem) <= gate_b64 and abs(disc_edr) <= gate_b64
-            ok = ok and ctx.mpf(dem['d']) < 2
+            ok = ok and 1 <= ctx.mpf(dem['d']) < 2 and ctx.isfinite(edr_hp) and edr_hp >= 1
             if n in (2, 3):
                 ok = ok and dem_b64 == 1.0 and edr_b64 == 1.0 and mean == 1
             row.update(dimension_of_mean_r=_b64(dem_b64), dimension_of_mean_r_hp=dem['d'],
@@ -350,6 +373,7 @@ def generate_reference(sizes=SIZES, *, _inverse=newton_inverse,
 
     worst = max((f for f in fractions if f['discrepancy'] is not None),
                 key=lambda f: abs(ctx.mpf(f['discrepancy'])), default=None)
+    worst_residual = max(residuals, key=lambda item: item[0], default=None)
     outcome = 'REFERENCE_COMPLETE' if not failures else 'NUMERICAL_CHECK_FAILED'
     return dict(schema=1, diagnostic='D2-E0', config=protocol_config(sizes), outcome=outcome,
                 cs0_acceptance=False, stochastic=False, failures=failures,
@@ -358,6 +382,13 @@ def generate_reference(sizes=SIZES, *, _inverse=newton_inverse,
                 counts=dict(sizes=len(sizes), support_rows=sum(len(c['fraction_index']) for c in coverage),
                             distinct_fractions=len(distinct)),
                 worst_binary64=None if worst is None else dict(r=worst['r'], discrepancy=worst['discrepancy']),
+                worst_independent_residual=None if worst_residual is None else dict(
+                    r=_rational(worst_residual[1]), residual=ctx.nstr(worst_residual[0], 6)),
+                worst_summary_discrepancy=max(
+                    (dict(N=s['N'], name=name, discrepancy=s[name]) for s in summaries
+                     for name in ('discrepancy_dimension_of_mean', 'discrepancy_mean_dimension')
+                     if s.get(name) is not None),
+                    key=lambda item: abs(ctx.mpf(item['discrepancy'])), default=None),
                 versions=dict(python=platform.python_version(), mpmath=mpmath.__version__),
                 compute_cpu_seconds=round(time.process_time() - started, 6),
                 limitation=('Fixed input D=2 with mandatory endpoints; exact estimator '
@@ -458,6 +489,11 @@ def write_reference(directory: Path, payload: dict, base: dict, *,
     try:
         writer.replace(MANIFEST_NAME, _minimal_manifest(base, stage, 'started'))
         stage = 'serialize'
+        if type(payload) is not dict or payload.get('outcome') not in (
+                'REFERENCE_COMPLETE', 'NUMERICAL_CHECK_FAILED'):
+            raise WriterRefusal('payload outcome is not a reference outcome')
+        if (payload['outcome'] == 'REFERENCE_COMPLETE') != (payload.get('failures') == []):
+            raise WriterRefusal('payload outcome inconsistent with its failure list')
         raw = _json(payload)
         stage = 'compress'
         compressed = _compress(raw)
@@ -473,16 +509,18 @@ def write_reference(directory: Path, payload: dict, base: dict, *,
                       reference_bytes=len(compressed),
                       reference_sha256=hashlib.sha256(compressed).hexdigest(),
                       failures=list(payload.get('failures', []))[:32])
-        data = _json(record)
-        if len(data) > MANIFEST_BYTES:
-            raise WriterRefusal('final manifest exceeds slot')
-        writer.replace(MANIFEST_NAME, data)
+        writer.replace(MANIFEST_NAME, _json(record))
         writer.log(f'finished outcome={record["outcome"]}')
         record['present'] = writer.audit()
         return record
     except Exception as error:  # preserve minimal evidence, never a result
         reason = f'{type(error).__name__}: {error}'
         try:
+            # A reference without a matching finished manifest is never left
+            # looking complete: remove it (deletion only lowers content bytes).
+            for name in (REFERENCE_NAME, REFERENCE_NAME + '.tmp'):
+                if (writer.directory / name).exists():
+                    (writer.directory / name).unlink()
             writer.log(f'stage={stage} {reason}')
             writer.replace(MANIFEST_NAME, _minimal_manifest(base, stage, reason))
         except Exception as nested:

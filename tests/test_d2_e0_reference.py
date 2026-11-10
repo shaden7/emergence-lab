@@ -148,7 +148,7 @@ def test_oversized_reference_refused_before_open(tmp_path, monkeypatch):
     opened = []
     real_open = os.open
     monkeypatch.setattr(e0.os, 'open', lambda p, *a, **k: (opened.append(str(p)), real_open(p, *a, **k))[1])
-    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE'), {},
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {},
                                 _compress=lambda raw: b'x' * (e0.REFERENCE_BYTES + 1))
     assert record['outcome'] == 'INCOMPLETE' and record['manifest_persisted']
     assert not any(e0.REFERENCE_NAME in p for p in opened)
@@ -160,15 +160,15 @@ def test_oversized_reference_refused_before_open(tmp_path, monkeypatch):
 def test_compression_failure_is_incomplete(tmp_path):
     def boom(raw):
         raise MemoryError('simulated')
-    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE'), {}, _compress=boom)
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {}, _compress=boom)
     assert record['outcome'] == 'INCOMPLETE' and 'MemoryError' in record['reason']
-    record = e0.write_reference(tmp_path / 'o2', dict(outcome='REFERENCE_COMPLETE'), {},
+    record = e0.write_reference(tmp_path / 'o2', dict(outcome='REFERENCE_COMPLETE', failures=[]), {},
                                 _compress=lambda raw: gzip.compress(raw[:-2]))
     assert record['outcome'] == 'INCOMPLETE' and 'round-trip' in record['reason']
 
 
 def test_nonserializable_payload_is_incomplete(tmp_path):
-    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', x=math.nan), {})
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[], x=math.nan), {})
     assert record['outcome'] == 'INCOMPLETE' and record['stage'] == 'serialize'
 
 
@@ -179,7 +179,7 @@ def test_interrupted_replacement_keeps_bound_and_incomplete(tmp_path, monkeypatc
             raise OSError('simulated power loss during replace')
         return real(src, dst)
     monkeypatch.setattr(e0.os, 'replace', fail_reference)
-    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE'), {})
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]), {})
     assert record['outcome'] == 'INCOMPLETE' and record['stage'] == 'reference'
     monkeypatch.setattr(e0.os, 'replace', real)
     out = tmp_path / 'out'
@@ -211,7 +211,7 @@ def test_log_is_bounded(tmp_path):
 
 
 def test_oversized_manifest_base_degrades_to_minimal(tmp_path):
-    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE'),
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]),
                                 dict(commit='c' * 40, blob='z' * 40_000))
     assert record['outcome'] == 'INCOMPLETE' and record['stage'] == 'manifest'
     assert (tmp_path / 'out' / e0.MANIFEST_NAME).stat().st_size <= e0.MANIFEST_BYTES
@@ -223,3 +223,38 @@ def test_import_evaluates_nothing():
             'assert "mpmath" not in sys.modules;print(time.process_time()-t)')
     out = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, timeout=60)
     assert out.returncode == 0, out.stderr
+
+
+def test_solver_self_report_is_not_trusted():
+    """Later-pass counterexample: seed returned as d with all flags True."""
+    def lying(r, seed):
+        rec = e0.newton_inverse(r, seed)
+        if r != 1:
+            rec = dict(rec, d=format(seed, '.17g'), residual='0', residual_ok=True,
+                       sign_check=True, converged=True, error=None)
+        return rec
+    p = e0.generate_reference((2, 3, 5, 6, 7, 9, 10), _inverse=lying)
+    assert p['outcome'] == 'NUMERICAL_CHECK_FAILED'
+    assert all(not f['independent_check'] for f in p['fractions'] if f['r'] != [1, 1])
+
+
+def test_worst_case_records_present():
+    p = e0.generate_reference((4, 5))
+    assert p['worst_independent_residual'] and p['worst_summary_discrepancy']
+    assert float(p['worst_independent_residual']['residual']) <= 1e-60
+
+
+def test_manifest_stage_failure_removes_reference(tmp_path):
+    record = e0.write_reference(tmp_path / 'out', dict(outcome='REFERENCE_COMPLETE', failures=[]),
+                                dict(blob='z' * 40_000))
+    assert record['outcome'] == 'INCOMPLETE' and record['stage'] == 'manifest'
+    assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()
+
+
+@pytest.mark.parametrize('payload', [dict(outcome='REFERENCE_COMPLETE', failures=['x']),
+                                     dict(outcome='NUMERICAL_CHECK_FAILED', failures=[]),
+                                     dict(outcome='COMPLETE', failures=[]), []])
+def test_writer_refuses_inconsistent_outcome(tmp_path, payload):
+    record = e0.write_reference(tmp_path / 'out', payload, {})
+    assert record['outcome'] == 'INCOMPLETE' and record['stage'] == 'serialize'
+    assert not (tmp_path / 'out' / e0.REFERENCE_NAME).exists()

@@ -221,7 +221,12 @@ distinct reduced-fraction table with per-N coverage indices; the seeded 80-digit
 Newton inverse with numerical sign check (r=1 → d=1 without iteration, target
 from the exact rational only); unseeded 80-digit bisection spot checks at
 N=2,3,4,8,32 (min, max, mean fractions); binary64 production path with the
-1e-11 gate; d(E[r])<2 and the N=2,3 exact-1 controls. Every fraction and
+1e-11 gate; d(E[r]) in [1,2) and the N=2,3 exact-1 controls. The residual and
+sign check are **recomputed by the caller** from the stored 80-digit text and
+the exact rational, so a solver's self-reported flags are not trusted (added
+after a later-pass REVISE counterexample in which returning the binary64 seed
+with all flags set was accepted). Worst-case residual and summary
+discrepancies are recorded. Every fraction and
 occupancy is retained, including failures (outcome `NUMERICAL_CHECK_FAILED`).
 
 The fixed writer enforces the r3 slot table (sum 1,763,840 bytes): only the
@@ -229,7 +234,11 @@ five named entries may exist; each size is checked before the temporary is
 opened (`O_EXCL`); gzip is in memory with a round-trip check; the log is a single
 truncating file; a stale temporary from an interrupted replacement is a counted
 slot and is removed before the next replacement. Failures preserve a minimal
-INCOMPLETE manifest. Tests (`tests/test_d2_e0_reference.py`, small-N fixtures
+INCOMPLETE manifest and delete any already written reference, so no
+complete-looking payload survives without a finished manifest. The writer
+refuses payloads whose outcome is not a reference outcome or is inconsistent
+with its failure list. Manifest keys from the caller are not schema-bounded;
+an oversized manifest is refused (never written beyond its slot). Tests (`tests/test_d2_e0_reference.py`, small-N fixtures
 only) cover brute-force weights N=2..9, exact controls N=2..32, Newton vs
 bisection, manufactured sign-check/nonfinite/discrepancy failures, oversized
 payload refused before open, compression failure and non-round-trip,
@@ -240,8 +249,8 @@ and oversized manifest.
 process-tree CPU/RSS/wall containment including controller/finalization
 (`strict_aggregate_containment` must be demonstrated, not assumed);
 (b) source/protocol/commit provenance pinning as in `d2_m0_runner`;
-(c) runner-side classification of the payload outcome (the writer copies the
-payload's claimed outcome and is not a classifier); (d) a measured bound on the
+(c) runner-side classification of the payload contents (the writer only checks
+outcome/failure-list consistency and is not a full classifier); (d) a measured bound on the
 **full** compressed payload against the 800,000-byte slot (the step-1 layout
 stores 80-digit d values but 6-digit residual/discrepancy strings; not measured
 on the target because no evaluation is authorized). This step is engineering
