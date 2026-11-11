@@ -294,17 +294,25 @@ commit, a clean tree (untracked included), and every tracked `src/` file plus
 the protocol by git blob id; the loaded runner/reference modules must come
 from the checkout. Runner-side classification recomputes exact weights,
 exact controls, support fractions and coverage indices, and checks the
-distinct-fraction table, flags, spot-check count, monotonicity, config and
-outcome/failure consistency; any mismatch is INCOMPLETE. `durability_unverified`
+distinct-fraction table, flags (a passed row must have sign_check, converged,
+independent_check true and no error), spot-check count, monotonicity, config
+and outcome/failure consistency; any mismatch is INCOMPLETE. The 80-digit and
+binary64 **values** are trusted from the pinned worker computation, not
+re-derived by the controller. Bytecode is never loaded (`-X pycache_prefix`
+to a nonexistent path) and any `.pyc`/`__pycache__` under `src` is a
+provenance failure (added after a later-pass REVISE: a planted unchecked-hash
+`.pyc` passed the blob-id check and produced a REFERENCE_COMPLETE with
+tampered values). `run()` repeats the target refusal. `durability_unverified`
 from the writer is surfaced in the result and exit code 3.
 
-Tests (`tests/test_d2_e0_runner.py`, 28, fixtures N≤10 only): fork/thread/file
+Tests (`tests/test_d2_e0_runner.py`, 36, fixtures N≤10 only): fork/thread/file
 denial and limit readback in a restricted child; worker wall kill, CPU kill,
 memory refusal and stdout overflow; git-helper budget; fixture
 REFERENCE_COMPLETE from a pinned clean clone; target/oversized refusal; wrong
 commit and untracked file → INCOMPLETE without reference; SIGKILL of the
 controller in the worker stage leaves an INCOMPLETE manifest, no reference and
-no surviving worker; 12 payload tamperings and a wrong size list → INCOMPLETE;
+no surviving worker; planted bytecode → INCOMPLETE; direct `run()` with the
+target refused; 17 payload tamperings and a wrong size list → INCOMPLETE;
 manufactured nonfinite binary64 → NUMERICAL_CHECK_FAILED.
 
 Engineering observation (cloud sandbox, Python 3.13.18, mpmath 1.3.0, root,
@@ -316,8 +324,14 @@ compressed reference 4,686 bytes. Not a D2-E0 result.
 granularity, so each process can overshoot slightly; the launching shell,
 kernel memory and page cache, filesystem faults, a concurrent adversary
 editing the checkout, and the trustworthiness of the interpreter and mpmath
-are outside it. A kill of the controller by its own limits leaves the last
-INCOMPLETE checkpoint, not a finished manifest. Containment must still be
+are outside it. Hard child limits bind the child itself only without
+CAP_SYS_RESOURCE (root in this sandbox lacks it; a normal root host has it);
+the manifest records `cap_sys_resource`, and an authorized run should require
+it false. A kill of the controller by its own limits leaves the last
+INCOMPLETE checkpoint, not a finished manifest; a kill inside the final write
+window can leave `reference.json.gz` beside a non-finished manifest, which is
+INCOMPLETE by rule (the manifest is authoritative); this window is not
+covered by a test. Containment must still be
 re-checked on whichever host a once-only run would use (e.g. seccomp
 availability) before any authorization.
 

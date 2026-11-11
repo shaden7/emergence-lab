@@ -26,6 +26,7 @@ pytestmark = pytest.mark.skipif(
     sys.platform != 'linux' or platform.machine() not in ('x86_64', 'aarch64'),
     reason='partitioned containment is Linux x86_64/aarch64 only')
 
+PYC = ['-X', f'pycache_prefix={runner.NO_PYCACHE}']
 LAUNCH = ("import sys; sys.path.insert(0, sys.argv[1] + '/src'); "
           "import emergence_lab.d2_e0_runner as r; raise SystemExit(r.main(sys.argv[2:]))")
 
@@ -52,7 +53,7 @@ def pinned(tmp_path_factory):
 
 
 def _launch(clone, commit, output, sizes, extra=()):
-    return subprocess.run([sys.executable, '-I', '-B', '-c', LAUNCH, str(clone), '--root', str(clone),
+    return subprocess.run([sys.executable, '-I', '-B', *PYC, '-c', LAUNCH, str(clone), '--root', str(clone),
                            '--commit', commit, '--output', str(output), '--sizes', sizes, *extra],
                           capture_output=True, text=True, timeout=90)
 
@@ -198,7 +199,7 @@ def test_wrong_commit_and_dirty_checkout_incomplete(pinned, tmp_path):
 def test_killed_controller_leaves_incomplete_and_no_orphan(pinned, tmp_path):
     clone, commit = pinned
     output = tmp_path / 'out'
-    process = subprocess.Popen([sys.executable, '-I', '-B', '-c', LAUNCH, str(clone), '--root', str(clone),
+    process = subprocess.Popen([sys.executable, '-I', '-B', *PYC, '-c', LAUNCH, str(clone), '--root', str(clone),
                                 '--commit', commit, '--output', str(output), '--sizes',
                                 ','.join(map(str, range(2, 11)))], stdout=subprocess.DEVNULL)
     deadline = time.monotonic() + 30
@@ -252,6 +253,11 @@ def test_classify_accepts_consistent_payload(payload):
     lambda p: p.__setitem__('monotone', False),
     lambda p: p['spot_checks'].pop(),
     lambda p: p.__setitem__('weights', None),
+    lambda p: p['fractions'][0].__setitem__('sign_check', False),
+    lambda p: p['fractions'][1].__setitem__('converged', False),
+    lambda p: p['fractions'][1].__setitem__('error', 'x'),
+    lambda p: p['fractions'][0].__setitem__('independent_check', False),
+    lambda p: p['spot_checks'][0].__setitem__('newton', None),
 ])
 def test_classify_rejects_tampering(payload, mutate):
     tampered = copy.deepcopy(payload)
@@ -269,3 +275,29 @@ def test_classify_nonfinite_is_numerical_check_failed():
     assert runner.classify(failed, (2, 3, 4)) == ('NUMERICAL_CHECK_FAILED', None)
     failed['failures'] = []
     assert runner.classify(failed, (2, 3, 4))[0] == 'INCOMPLETE'
+
+
+def test_planted_bytecode_is_provenance_failure(pinned, tmp_path):
+    clone, commit = pinned
+    cache = clone / 'src/emergence_lab/__pycache__'
+    cache.mkdir()
+    (cache / 'd2_e0_runner.cpython-0.pyc').write_bytes(b'planted')
+    try:
+        result = _launch(clone, commit, tmp_path / 'out', '2,3')
+    finally:
+        (cache / 'd2_e0_runner.cpython-0.pyc').unlink(); cache.rmdir()
+    manifest = _manifest(tmp_path / 'out')
+    assert result.returncode == 2 and 'bytecode cache' in manifest['reason']
+    assert not (tmp_path / 'out' / ref.REFERENCE_NAME).exists()
+
+
+def test_run_refuses_target_sizes_directly(tmp_path):
+    with pytest.raises(ValueError, match='not frozen'):
+        runner.run(tmp_path, '0' * 40, tmp_path / 'o', runner.TARGET_SIZES, None, time.monotonic() + 60)
+    assert not (tmp_path / 'o').exists()
+
+
+def test_manifest_records_capability(pinned, tmp_path):
+    clone, commit = pinned
+    _launch(clone, commit, tmp_path / 'out', '2')
+    assert _manifest(tmp_path / 'out')['cap_sys_resource'] in (True, False)

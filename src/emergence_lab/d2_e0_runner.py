@@ -25,8 +25,13 @@ simultaneous virtual memory (thus RSS) <= CONTROLLER_AS + CHILD_AS, up to the
 kernel's per-process tick granularity in enforcing RLIMIT_CPU. Not covered:
 the launching shell, kernel/page-cache memory, filesystem failures, a
 concurrent adversary modifying the checkout, or an untrusted interpreter or
-mpmath installation. A SIGALRM/RLIMIT kill of the controller leaves the last
-INCOMPLETE checkpoint manifest, never a complete-looking reference.
+mpmath installation. Hard child limits hold against the child itself only
+without CAP_SYS_RESOURCE (recorded as ``cap_sys_resource``); with it they bind
+trusted worker code only. The manifest is authoritative: a SIGALRM/RLIMIT
+kill of the controller during the final write can leave ``reference.json.gz``
+next to a non-finished manifest; such a directory is INCOMPLETE.
+Bytecode caches are never loaded (``-X pycache_prefix`` to an empty path) and
+any ``.pyc``/``__pycache__`` under ``src`` is a provenance failure.
 """
 from __future__ import annotations
 
@@ -58,6 +63,7 @@ FINALIZATION_WALL = 5.0
 assert CONTROLLER_CPU + GIT_CALLS * GIT_CPU + WORKER_CPU <= TOTAL_CPU
 assert CONTROLLER_AS + CHILD_AS <= TOTAL_MEMORY
 
+NO_PYCACHE = '/nonexistent-d2-e0-pycache'  # never created: no bytecode is read
 GIT_CONFIG = ('--no-optional-locks', '-c', 'core.preloadIndex=false', '-c', 'index.threads=1',
               '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false')
 
@@ -228,8 +234,10 @@ def verify_tree(controller: Controller, root: Path, commit: str) -> dict:
         if path.is_file() and relative not in expected:
             inert = (len(path.relative_to(root).parts) == 3
                      and path.parent.name == 'emergence_lab.egg-info')
-            if not inert and not (path.suffix == '.pyc' and path.parent.name == '__pycache__'):
+            if not inert:
                 raise ValueError(f'unexpected file in source tree: {relative}')
+        if path.name == '__pycache__' or path.suffix == '.pyc':
+            raise ValueError(f'bytecode cache in source tree: {relative}')
     for name, blob in expected.items():
         data = (root / name).read_bytes()
         if hashlib.sha1(b'blob %d\0' % len(data) + data).hexdigest() != blob:
@@ -296,6 +304,13 @@ def classify(payload, sizes: tuple[int, ...]) -> tuple[str, str | None]:
     for r, row in zip(distinct, fractions):
         if type(row) is not dict or row.get('r') != ref._rational(r) or type(row.get('passed')) is not bool:
             return 'INCOMPLETE', 'fraction table'
+        # A passed row must be consistent with its own check fields; numeric
+        # values themselves are trusted from the pinned worker computation.
+        if row['passed'] and not (row.get('sign_check') is True and row.get('converged') is True
+                                  and row.get('independent_check') is True and row.get('error') is None
+                                  and type(row.get('d_hp')) is str and type(row.get('binary64')) is str
+                                  and row['binary64'] != 'nonfinite'):
+            return 'INCOMPLETE', 'passed fraction row inconsistent with its checks'
     position = {r: i for i, r in enumerate(distinct)}
     for c, support in zip(coverage, supports):
         if c['fraction_index'] != [position[r] for r in support]:
@@ -306,6 +321,9 @@ def classify(payload, sizes: tuple[int, ...]) -> tuple[str, str | None]:
     if len(spot) != 3 * len([n for n in ref.SPOT_CHECK_SIZES if n in sizes]) or any(
             type(x) is not dict or type(x.get('passed')) is not bool for x in spot):
         return 'INCOMPLETE', 'spot checks'
+    if any(x['passed'] and not (type(x.get('newton')) is str and type(x.get('bisection')) is str)
+           for x in spot):
+        return 'INCOMPLETE', 'passed spot check without values'
     all_passed = (all(f['passed'] for f in fractions) and all(s['checks_passed'] for s in summaries)
                   and all(x['passed'] for x in spot) and payload.get('monotone') is True)
     claimed, failures = payload.get('outcome'), payload['failures']
@@ -331,6 +349,17 @@ def _costs() -> dict:
                 observed_wall_seconds_since_process_start=round(_process_age(), 6))
 
 
+def _has_cap_sys_resource():
+    """Children inherit these capabilities; None if unreadable."""
+    try:
+        for line in Path('/proc/self/status').read_text().splitlines():
+            if line.startswith('CapEff:'):
+                return bool(int(line.split()[1], 16) >> 24 & 1)
+    except (OSError, ValueError):
+        pass
+    return None
+
+
 def ceilings() -> dict:
     return dict(model='partitioned kernel ceilings (sequential children, seccomp no-fork)',
                 controller_cpu=CONTROLLER_CPU, git_calls=GIT_CALLS, git_cpu=GIT_CPU,
@@ -344,6 +373,10 @@ def run(root: Path, commit: str, output: Path, sizes: tuple[int, ...],
         dependency_path: Path | None, deadline: float) -> dict:
     """Assumes ``limit_controller`` already ran in this process."""
     from emergence_lab import d2_e0_reference as ref
+    sizes = tuple(sizes)
+    if (not sizes or sizes == TARGET_SIZES or max(sizes) > FIXTURE_MAX_N or min(sizes) < 2
+            or list(sizes) != sorted(set(sizes))):
+        raise ValueError('target or invalid sizes: protocol not frozen, no authorization')
     root, output = Path(root).resolve(), Path(output).resolve()
     if output == root or root in output.parents:
         raise ValueError('output must be outside checkout')
@@ -351,6 +384,7 @@ def run(root: Path, commit: str, output: Path, sizes: tuple[int, ...],
     base = dict(schema=1, diagnostic='D2-E0', commit=str(commit)[:64], sizes=list(sizes),
                 engineering_fixture=tuple(sizes) != TARGET_SIZES, frozen=False,
                 authorized=False, strict_aggregate_containment=True, ceilings=ceilings(),
+                cap_sys_resource=_has_cap_sys_resource(),
                 cs0_acceptance=False, stochastic=False,
                 versions=dict(python=platform.python_version()))
     record = dict(base, outcome='INCOMPLETE', stage='setup')
@@ -372,7 +406,8 @@ def run(root: Path, commit: str, output: Path, sizes: tuple[int, ...],
                                        if dependency_path is not None else [])
         bootstrap = (f'import sys; sys.path[:0]={paths!r}; '
                      f'import emergence_lab.d2_e0_runner as r; r.worker_main({list(sizes)!r})')
-        raw, code, reason = controller.worker([sys.executable, '-I', '-B', '-c', bootstrap])
+        raw, code, reason = controller.worker([sys.executable, '-I', '-B', '-X',
+                                               f'pycache_prefix={NO_PYCACHE}', '-c', bootstrap])
         base['worker'] = dict(exit_code=code, stdout_bytes=len(raw), reason=reason,
                               stdout_sha256=hashlib.sha256(raw).hexdigest())
         if reason or code != 0:
@@ -418,7 +453,8 @@ def main(argv=None):
     parser.add_argument('--dependency-path', type=Path)
     args = parser.parse_args(argv)
     sizes = tuple(int(x) for x in args.sizes.split(','))
-    if sizes == TARGET_SIZES or max(sizes) > FIXTURE_MAX_N or min(sizes) < 2:
+    if (sizes == TARGET_SIZES or max(sizes) > FIXTURE_MAX_N or min(sizes) < 2
+            or list(sizes) != sorted(set(sizes))):
         print(json.dumps(dict(outcome='REFUSED', reason='target or oversized sizes: '
                               'protocol not frozen and no once-only authorization')))
         return 4
