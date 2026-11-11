@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261111232435487-lug4u8vupxe",
+  "leaseId": "rd-gpt6-20261111232435487-lug4u8vupxe-h1sqc9v6lk",
+  "acquiredAt": "2026-11-11T23:24:35.487Z",
+  "heartbeatAt": "2026-11-11T23:24:35.487Z",
+  "expiresAt": "2026-11-12T01:24:35.487Z",
+  "task": "Audit post-merge CI and D2-E0 evidence",
   "previousOwner": "rd-gpt6-20261111222345138-198124009"
 }
