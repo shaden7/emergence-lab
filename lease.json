@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261111T142610-k8f3c91a",
-  "leaseId": "e7c4a19b8f2d4c6a9b12f5e03d8c7641",
-  "acquiredAt": "2026-11-11T14:26:10.656Z",
-  "heartbeatAt": "2026-11-11T14:26:10.656Z",
-  "expiresAt": "2026-11-11T16:26:10.656Z",
-  "task": "Review D2-E0 freeze readiness and research handoff",
-  "previousOwner": "rd-gpt6-20261111T1029Z-u3bitqsz5a"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261111T142610-k8f3c91a"
 }
