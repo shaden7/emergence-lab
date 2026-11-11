@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261111-1794426976718",
+  "leaseId": "0449ff85-261a-450b-a917-d07a2d37c06a",
+  "acquiredAt": "2026-11-11T19:56:16.718Z",
+  "heartbeatAt": "2026-11-11T19:56:16.718Z",
+  "expiresAt": "2026-11-11T21:56:16.718Z",
+  "task": "Sequential D2-E0 review, bounded diagnostic and evidence iterations",
   "previousOwner": "rd-gpt6-20261111T162554-m0cjj2qo"
 }
