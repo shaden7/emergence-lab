@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261111T072318-gmnky8ot62",
-  "leaseId": "7i5887bxmd4waew3gbfqht",
-  "acquiredAt": "2026-11-11T07:23:18.502Z",
-  "heartbeatAt": "2026-11-11T07:23:18.502Z",
-  "expiresAt": "2026-11-11T09:23:18.502Z",
-  "task": "Review D2-E0 supervisor dependencies and integrate eligible work",
-  "previousOwner": "rd-gpt6-20261111T063031-uq0ks1x792"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261111T072318-gmnky8ot62"
 }
