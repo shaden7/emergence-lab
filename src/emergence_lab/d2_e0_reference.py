@@ -477,14 +477,15 @@ def _minimal_manifest(base: dict, stage: str, reason: str) -> bytes:
     return _json(record)
 
 
-def write_reference(directory: Path, payload: dict, base: dict, *,
+def write_reference(directory: Path, payload: dict, base: dict, *, writer=None,
                     _compress=lambda data: gzip.compress(data, 9, mtime=0)) -> dict:
     """Persist a computed payload through the fixed writer; never re-evaluates.
 
     Returns the final manifest record. Any refusal/failure leaves a minimal
     INCOMPLETE manifest if that write itself succeeds.
     """
-    writer = FixedWriter(directory)
+    # A runner may pass the FixedWriter that already holds its checkpoints.
+    writer = FixedWriter(directory) if writer is None else writer
     stage, final_bytes = 'setup', None
     try:
         writer.replace(MANIFEST_NAME, _minimal_manifest(base, stage, 'started'))
