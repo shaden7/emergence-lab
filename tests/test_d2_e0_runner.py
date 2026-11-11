@@ -301,3 +301,116 @@ def test_manifest_records_capability(pinned, tmp_path):
     clone, commit = pinned
     _launch(clone, commit, tmp_path / 'out', '2')
     assert _manifest(tmp_path / 'out')['cap_sys_resource'] in (True, False)
+
+
+@pytest.mark.parametrize('capability', [True, None])
+def test_unverified_or_elevated_capability_refuses_before_worker(pinned, tmp_path, capability):
+    clone, commit = pinned
+    output = tmp_path / 'out'
+    code = ("import sys; sys.path.insert(0, sys.argv[1] + '/src'); "
+            "import emergence_lab.d2_e0_runner as r; "
+            f"r._has_cap_sys_resource = lambda: {capability!r}; "
+            "raise SystemExit(r.main(sys.argv[2:]))")
+    result = subprocess.run([sys.executable, '-I', '-B', *PYC, '-c', code, str(clone),
+                             '--root', str(clone), '--commit', commit, '--output', str(output),
+                             '--sizes', '2,3'], capture_output=True, text=True, timeout=30)
+    manifest = _manifest(output)
+    assert result.returncode == 2 and manifest['outcome'] == 'INCOMPLETE'
+    assert 'CAP_SYS_RESOURCE' in manifest['reason'] and 'worker' not in manifest
+    assert not (output / ref.REFERENCE_NAME).exists()
+
+
+def test_kill_after_reference_replace_leaves_authoritative_incomplete(pinned, tmp_path):
+    """Kill in the documented final-write window, after reference fsync/replace."""
+    clone, commit = pinned
+    output = tmp_path / 'out'
+    code = r"""
+import os, signal, sys
+sys.path.insert(0, sys.argv[1] + '/src')
+from emergence_lab import d2_e0_reference as ref
+from emergence_lab import d2_e0_runner as runner
+original = ref.FixedWriter.replace
+def kill_after_reference(self, name, data):
+    original(self, name, data)
+    if name == ref.REFERENCE_NAME:
+        os.kill(os.getpid(), signal.SIGKILL)
+ref.FixedWriter.replace = kill_after_reference
+raise SystemExit(runner.main(sys.argv[2:]))
+"""
+    result = subprocess.run([sys.executable, '-I', '-B', *PYC, '-c', code, str(clone),
+                             '--root', str(clone), '--commit', commit, '--output', str(output),
+                             '--sizes', '2,3,4'], capture_output=True, text=True, timeout=30)
+    assert result.returncode == -signal.SIGKILL
+    assert (output / ref.REFERENCE_NAME).exists()
+    manifest = _manifest(output)
+    assert manifest['outcome'] == 'INCOMPLETE' and manifest['stage'] != 'finished'
+    assert sum(p.stat().st_size for p in output.iterdir()) <= ref.SLOT_SUM
+
+
+@pytest.fixture
+def authorization(tmp_path):
+    from datetime import datetime, timedelta, timezone
+    from importlib.metadata import version
+    import hashlib
+    root, output = tmp_path / 'repo', tmp_path / 'out'
+    (root / 'docs').mkdir(parents=True)
+    (root / 'src/emergence_lab').mkdir(parents=True)
+    (root / runner.PROTOCOL).write_text('fixture protocol')
+    names = ('d2_e0_runner.py', 'd2_e0_reference.py', 'causal_set_mm.py')
+    for name in names:
+        (root / 'src/emergence_lab' / name).write_text('# fixture')
+    auth = dict(schema=1, diagnostic='D2-E0', id='fixture-only', sizes=list(runner.TARGET_SIZES),
+                max_invocations=1, not_after=(datetime.now(timezone.utc)+timedelta(hours=1)).isoformat(),
+                host_boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+                root=str(root), output=str(output), interpreter=sys.executable,
+                python=platform.python_version(),
+                protocol_sha256=hashlib.sha256((root / runner.PROTOCOL).read_bytes()).hexdigest(),
+                config_sha256=hashlib.sha256(ref._json(ref.protocol_config(runner.TARGET_SIZES))).hexdigest(),
+                source_sha256={name: hashlib.sha256((root/'src/emergence_lab'/name).read_bytes()).hexdigest()
+                               for name in names},
+                dependencies={name: version(name) for name in ('mpmath', 'scipy', 'numpy')})
+    return root, output, auth
+
+
+def test_target_authorization_validates_only_metadata_no_target_evaluation(authorization):
+    root, output, auth = authorization
+    (root / runner.AUTHORIZATION).write_text(json.dumps(auth))
+    checked = runner.target_authorization(root, output, 'fixture-only')
+    assert checked['id'] == 'fixture-only' and len(checked['sha256']) == 64
+    assert not output.exists()
+
+
+@pytest.mark.parametrize('field,value', [
+    ('schema', 2), ('id', 'other'), ('diagnostic', 'other'), ('sizes', [2, 3]),
+    ('max_invocations', 2), ('not_after', '2000-01-01T00:00:00Z'),
+    ('host_boot_id', 'another-host'), ('output', '/other'), ('root', '/other'),
+    ('interpreter', '/other'), ('python', '0'), ('protocol_sha256', '0'*64),
+    ('config_sha256', '0'*64), ('source_sha256', {}), ('dependencies', {}),
+])
+def test_target_authorization_rejects_changed_pins(authorization, field, value):
+    root, output, auth = authorization
+    auth[field] = value
+    (root / runner.AUTHORIZATION).write_text(json.dumps(auth))
+    with pytest.raises(ValueError):
+        runner.target_authorization(root, output, 'fixture-only')
+    assert not output.exists()
+
+
+def test_target_with_id_but_no_committed_authorization_never_starts_worker(pinned, tmp_path):
+    clone, commit = pinned
+    output = tmp_path / 'out'
+    result = _launch(clone, commit, output, ','.join(map(str, runner.TARGET_SIZES)),
+                     ['--authorization-id', 'missing'])
+    manifest = _manifest(output)
+    assert result.returncode == 2 and manifest['outcome'] == 'INCOMPLETE'
+    assert 'worker' not in manifest and not (output / ref.REFERENCE_NAME).exists()
+
+
+def test_existing_output_cannot_be_reused(pinned, tmp_path):
+    clone, commit = pinned
+    output = tmp_path / 'out'
+    first = _launch(clone, commit, output, '2,3')
+    before = {p.name: p.read_bytes() for p in output.iterdir()}
+    second = _launch(clone, commit, output, '2,3')
+    assert first.returncode == 0 and second.returncode != 0
+    assert {p.name: p.read_bytes() for p in output.iterdir()} == before

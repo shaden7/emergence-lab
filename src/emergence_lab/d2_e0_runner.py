@@ -1,9 +1,9 @@
-"""Supervised D2-E0 runner with partitioned kernel ceilings (NOT frozen, NOT authorized).
+"""Supervised D2-E0 reference with a separately pinned once-only target gate.
 
-Design: docs/CS0_D2_ENDPOINT_CONTROL_PROPOSAL.md ("Implementation step 2").
-Importing this module evaluates nothing. ``main`` refuses the target
-N=2..32 unconditionally: no freeze or once-only authorization exists. Only
-small engineering fixtures (N<=FIXTURE_MAX_N) can be evaluated.
+The numerical contract is docs/CS0_D2_E0_PROTOCOL.md. Small engineering
+fixtures need no authorization. N=2..32 additionally needs the committed
+host/output/source-pinned authorization and an explicit matching run id.
+Importing this module evaluates nothing.
 
 Containment model ("partitioned ceilings", Linux x86_64/aarch64 only). The
 controller is the root of the accountable process tree. Strict upper bounds
@@ -51,7 +51,8 @@ import subprocess
 import sys
 import time
 
-PROTOCOL = 'docs/CS0_D2_ENDPOINT_CONTROL_PROPOSAL.md'
+PROTOCOL = 'docs/CS0_D2_E0_PROTOCOL.md'
+AUTHORIZATION = 'docs/CS0_D2_E0_AUTHORIZATION.json'
 TARGET_SIZES = tuple(range(2, 33))
 FIXTURE_MAX_N = 10
 
@@ -218,7 +219,7 @@ def verify_tree(controller: Controller, root: Path, commit: str) -> dict:
         raise ValueError('checkout differs from pinned commit or root')
     if controller.git('status', '--porcelain', '--untracked-files=all'):
         raise ValueError('checkout is dirty or has untracked files')
-    listing = controller.git('ls-tree', '-r', '-z', commit, '--', 'src', PROTOCOL)
+    listing = controller.git('ls-tree', '-r', '-z', commit, '--', 'src', PROTOCOL, AUTHORIZATION)
     expected = {}
     for entry in listing.split(b'\0'):
         if entry:
@@ -227,6 +228,8 @@ def verify_tree(controller: Controller, root: Path, commit: str) -> dict:
             if mode != '100644' or kind != 'blob':
                 raise ValueError('unexpected tracked mode or type')
             expected[name.decode()] = blob
+    if (root / AUTHORIZATION).exists() and AUTHORIZATION not in expected:
+        raise ValueError('authorization is not tracked')
     if PROTOCOL not in expected or not any(n.startswith('src/') for n in expected):
         raise ValueError('pinned commit lacks protocol or sources')
     for path in (root / 'src').rglob('*'):
@@ -336,6 +339,57 @@ def classify(payload, sizes: tuple[int, ...]) -> tuple[str, str | None]:
     return 'INCOMPLETE', 'claimed outcome inconsistent with check flags'
 
 
+def _validate_sizes(sizes, authorization_id):
+    target = sizes == TARGET_SIZES
+    if (not sizes or any(type(n) is not int for n in sizes) or min(sizes) < 2
+            or list(sizes) != sorted(set(sizes))
+            or (target and not authorization_id)
+            or (not target and (max(sizes) > FIXTURE_MAX_N or authorization_id is not None))):
+        raise ValueError('target not frozen/authorized for this invocation or invalid fixture sizes')
+    return target
+
+
+def target_authorization(root: Path, output: Path, authorization_id: str) -> dict:
+    """Validate the separate committed decision; no alternate host/path or retry.
+
+    Source/protocol/authorization bytes are subsequently fenced by verify_tree.
+    Once-only is cooperative: FixedWriter refuses an existing output directory;
+    deleting it or forging a new authorization is outside the trusted workflow.
+    """
+    from datetime import datetime, timezone
+    from emergence_lab import d2_e0_reference as ref
+    raw = (root / AUTHORIZATION).read_bytes()
+    auth = json.loads(raw)
+    if auth.get('schema') != 1 or auth.get('id') != authorization_id or auth.get('diagnostic') != 'D2-E0':
+        raise ValueError('target authorization identity')
+    if auth.get('sizes') != list(TARGET_SIZES) or auth.get('max_invocations') != 1:
+        raise ValueError('target authorization scope')
+    expiry = datetime.fromisoformat(auth['not_after'].replace('Z', '+00:00'))
+    if expiry.tzinfo is None or datetime.now(timezone.utc) >= expiry:
+        raise ValueError('target authorization expired')
+    if auth.get('host_boot_id') != Path('/proc/sys/kernel/random/boot_id').read_text().strip():
+        raise ValueError('target authorization host differs')
+    if auth.get('output') != str(output) or auth.get('root') != str(root):
+        raise ValueError('target authorization paths differ')
+    if auth.get('interpreter') != sys.executable or auth.get('python') != platform.python_version():
+        raise ValueError('target authorization interpreter differs')
+    if auth.get('protocol_sha256') != hashlib.sha256((root / PROTOCOL).read_bytes()).hexdigest():
+        raise ValueError('target authorization protocol differs')
+    if auth.get('config_sha256') != hashlib.sha256(ref._json(ref.protocol_config(TARGET_SIZES))).hexdigest():
+        raise ValueError('target authorization config differs')
+    names = ('d2_e0_runner.py', 'd2_e0_reference.py', 'causal_set_mm.py')
+    expected = {name: hashlib.sha256((root / 'src/emergence_lab' / name).read_bytes()).hexdigest()
+                for name in names}
+    if auth.get('source_sha256') != expected:
+        raise ValueError('target authorization source differs')
+    from importlib.metadata import version
+    versions = {name: version(name) for name in ('mpmath', 'scipy', 'numpy')}
+    if auth.get('dependencies') != versions or versions['mpmath'] != '1.3.0':
+        raise ValueError('target authorization dependencies differ')
+    return dict(id=authorization_id, sha256=hashlib.sha256(raw).hexdigest(),
+                host_boot_id=auth['host_boot_id'], not_after=auth['not_after'])
+
+
 # ---------------------------------------------------------------- runner
 def _manifest(writer, record: dict):
     from emergence_lab import d2_e0_reference as ref
@@ -372,19 +426,17 @@ def ceilings() -> dict:
 
 
 def run(root: Path, commit: str, output: Path, sizes: tuple[int, ...],
-        dependency_path: Path | None, deadline: float) -> dict:
+        dependency_path: Path | None, deadline: float, authorization_id: str | None = None) -> dict:
     """Assumes ``limit_controller`` already ran in this process."""
     from emergence_lab import d2_e0_reference as ref
     sizes = tuple(sizes)
-    if (not sizes or sizes == TARGET_SIZES or max(sizes) > FIXTURE_MAX_N or min(sizes) < 2
-            or list(sizes) != sorted(set(sizes))):
-        raise ValueError('target or invalid sizes: protocol not frozen, no authorization')
+    target = _validate_sizes(sizes, authorization_id)
     root, output = Path(root).resolve(), Path(output).resolve()
     if output == root or root in output.parents:
         raise ValueError('output must be outside checkout')
     writer = ref.FixedWriter(output)
     base = dict(schema=1, diagnostic='D2-E0', commit=str(commit)[:64], sizes=list(sizes),
-                engineering_fixture=tuple(sizes) != TARGET_SIZES, frozen=False,
+                engineering_fixture=not target, frozen=target,
                 authorized=False, strict_aggregate_containment=True, ceilings=ceilings(),
                 cap_sys_resource=_has_cap_sys_resource(),
                 cs0_acceptance=False, stochastic=False,
@@ -393,6 +445,17 @@ def run(root: Path, commit: str, output: Path, sizes: tuple[int, ...],
     _manifest(writer, record)
     stage = 'provenance'
     try:
+        if base['cap_sys_resource'] is not False:
+            raise RuntimeError('CAP_SYS_RESOURCE must be verifiably absent')
+        if target:
+            if dependency_path is not None:
+                raise ValueError('target forbids dependency-path override')
+            if (not sys.flags.isolated or not sys.dont_write_bytecode
+                    or sys._xoptions.get('pycache_prefix') != NO_PYCACHE
+                    or Path(NO_PYCACHE).exists()):
+                raise ValueError('target requires isolated no-bytecode launch flags and absent cache')
+            base['authorization'] = target_authorization(root, output, authorization_id)
+            base['authorized'] = True
         controller = Controller(root, deadline)
         for module in (sys.modules['emergence_lab'], ref, sys.modules[__name__]):
             name = Path(module.__file__).resolve()
@@ -453,14 +516,16 @@ def main(argv=None):
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--sizes', required=True, help='comma-separated fixture sizes')
     parser.add_argument('--dependency-path', type=Path)
+    parser.add_argument('--authorization-id', help='separately committed once-only target decision id')
     args = parser.parse_args(argv)
     sizes = tuple(int(x) for x in args.sizes.split(','))
-    if (sizes == TARGET_SIZES or max(sizes) > FIXTURE_MAX_N or min(sizes) < 2
-            or list(sizes) != sorted(set(sizes))):
-        print(json.dumps(dict(outcome='REFUSED', reason='target or oversized sizes: '
-                              'protocol not frozen and no once-only authorization')))
+    try:
+        _validate_sizes(sizes, args.authorization_id)
+    except ValueError as error:
+        print(json.dumps(dict(outcome='REFUSED', reason=str(error))))
         return 4
-    result = run(args.root, args.commit, args.output, sizes, args.dependency_path, deadline)
+    result = run(args.root, args.commit, args.output, sizes, args.dependency_path, deadline,
+                 args.authorization_id)
     durability = result.get('durability_unverified')
     print(json.dumps(dict(outcome=result.get('outcome'), diagnostic='D2-E0',
                           durability_unverified=durability, cs0_acceptance=False)))

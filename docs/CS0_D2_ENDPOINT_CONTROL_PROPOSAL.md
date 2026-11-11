@@ -1,6 +1,6 @@
 # D2-E0 — endpoint-conditioned finite-occupancy MM control (reviewed design r3, NOT frozen)
 
-**Status:** design integration only; runner implemented in step 2 (pending review); protocol freeze and execution remain blocked. **No D2-E0 diagnostic authorized or executed.**
+**Current successor:** [frozen v1 contract](CS0_D2_E0_PROTOCOL.md) supersedes this historical design after integration of the freeze/target-gate PR. The dated sections below retain their original status. Execution still requires a separate committed authorization; no target has been evaluated in this change.
 Related: [D2-M0 protocol](CS0_D2_M0_PROTOCOL.md), [D2-M0 observed reference](experiments/2026-11-07-d2-m0-run.md), [Issue #37](https://github.com/shaden7/emergence-lab/issues/37).
 This is an exact estimator-control at fixed **input D=2**, not a model comparison, physical discovery, or full-CS0 authorization.
 
