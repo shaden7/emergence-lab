@@ -1,6 +1,6 @@
 # D2-E0 — endpoint-conditioned finite-occupancy MM control (reviewed design r3, NOT frozen)
 
-**Status:** design integration only; protocol freeze and execution remain blocked on a separately tested runner. **No D2-E0 diagnostic authorized or executed.**
+**Status:** design integration only; runner implemented in step 2 (pending review); protocol freeze and execution remain blocked. **No D2-E0 diagnostic authorized or executed.**
 Related: [D2-M0 protocol](CS0_D2_M0_PROTOCOL.md), [D2-M0 observed reference](experiments/2026-11-07-d2-m0-run.md), [Issue #37](https://github.com/shaden7/emergence-lab/issues/37).
 This is an exact estimator-control at fixed **input D=2**, not a model comparison, physical discovery, or full-CS0 authorization.
 
@@ -258,6 +258,72 @@ outcome/failure-list consistency and is not a full classifier); (d) a measured b
 stores 80-digit d values but 6-digit residual/discrepancy strings; not measured
 on the target because no evaluation is authorized). This step is engineering
 only; it is not protocol freeze, run authorization, or a D2-E0 result.
+
+## Implementation step 2 (2026-11-11): supervised runner, NO target run
+
+`src/emergence_lab/d2_e0_runner.py` addresses items (a)–(c) above for review;
+item (d) stays open because measuring the full payload requires the target
+evaluation, which remains unauthorized. `main` refuses the target N=2..32 and
+any N>10 unconditionally (exit 4, no output directory); only engineering
+fixtures run.
+
+**Containment model: partitioned kernel ceilings** (not cgroups; the cloud
+sandbox has no cgroup v2 and runs as root, and Issue #37's audit notes that
+`cpu.max` is a rate, not a total). The controller is the root of the
+accountable process tree. Bounds are sums of per-process kernel limits of
+processes that never overlap, not observations:
+
+| process | CPU (RLIMIT_CPU) | address space (RLIMIT_AS) | other |
+| --- | --- | --- | --- |
+| controller | 4 s (soft) | 128 MiB (soft) | ITIMER_REAL at 60 s from process start (SIGALRM default kill) |
+| ≤6 git helpers, sequential | 1 s each (hard) | 384 MiB (hard) | `--no-optional-locks`, FSIZE=0, seccomp, PDEATHSIG |
+| 1 worker, after the helpers | 20 s (hard) | 384 MiB (hard) | FSIZE=0, seccomp, PDEATHSIG, own session, killpg |
+
+Total CPU ≤ 4+6+20 = 30 s; simultaneous virtual memory (hence RSS) ≤ 128+384 =
+512 MiB; wall ≤ 60 s. Children cannot create descendants or threads: a classic
+BPF seccomp filter (with `PR_SET_NO_NEW_PRIVS`) returns EPERM for
+fork/vfork/clone/clone3 (and x32 syscalls) and kills on a foreign
+architecture; the worker runs a fork probe first and exits 3 if fork succeeds.
+Controller limits are *soft* because a non-root child cannot be given a larger
+allotment than a lowered hard limit; the kernel enforces soft limits and the
+trusted controller never raises its own. Worker stdout (≤8,000,000 bytes) is
+held only in controller memory; the only files are the fixed-writer slots.
+
+Provenance: three git helpers before and three after the worker pin HEAD =
+commit, a clean tree (untracked included), and every tracked `src/` file plus
+the protocol by git blob id; the loaded runner/reference modules must come
+from the checkout. Runner-side classification recomputes exact weights,
+exact controls, support fractions and coverage indices, and checks the
+distinct-fraction table, flags, spot-check count, monotonicity, config and
+outcome/failure consistency; any mismatch is INCOMPLETE. `durability_unverified`
+from the writer is surfaced in the result and exit code 3.
+
+Tests (`tests/test_d2_e0_runner.py`, 28, fixtures N≤10 only): fork/thread/file
+denial and limit readback in a restricted child; worker wall kill, CPU kill,
+memory refusal and stdout overflow; git-helper budget; fixture
+REFERENCE_COMPLETE from a pinned clean clone; target/oversized refusal; wrong
+commit and untracked file → INCOMPLETE without reference; SIGKILL of the
+controller in the worker stage leaves an INCOMPLETE manifest, no reference and
+no surviving worker; 12 payload tamperings and a wrong size list → INCOMPLETE;
+manufactured nonfinite binary64 → NUMERICAL_CHECK_FAILED.
+
+Engineering observation (cloud sandbox, Python 3.13.18, mpmath 1.3.0, root,
+not Lightsail): fixture N=2..8 from a pinned clone gave REFERENCE_COMPLETE in
+1.02 s wall, 0.77 s CPU for the whole process tree, max child RSS 78,688 KiB;
+compressed reference 4,686 bytes. Not a D2-E0 result.
+
+**Limits of the guarantee.** RLIMIT_CPU is enforced at scheduler-tick
+granularity, so each process can overshoot slightly; the launching shell,
+kernel memory and page cache, filesystem faults, a concurrent adversary
+editing the checkout, and the trustworthiness of the interpreter and mpmath
+are outside it. A kill of the controller by its own limits leaves the last
+INCOMPLETE checkpoint, not a finished manifest. Containment must still be
+re-checked on whichever host a once-only run would use (e.g. seccomp
+availability) before any authorization.
+
+**Still missing before freeze:** (d) above; later-pass review of this step;
+then protocol freeze and a separately recorded once-only authorization that
+adds the target path. No deployment, Lightsail action or target evaluation.
 
 ## Proposed resources and decision rule (not authorization)
 
