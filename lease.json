@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261111T092553-3yt32wr12z4",
+  "leaseId": "1s676h5ihja40ihqj1qzk2",
+  "acquiredAt": "2026-11-11T09:25:53.928Z",
+  "heartbeatAt": "2026-11-11T09:25:53.928Z",
+  "expiresAt": "2026-11-11T11:25:53.928Z",
+  "task": "D2-E0 post-merge protocol freeze audit",
   "previousOwner": "rd-claude-20261111T0803Z-d038d439"
 }
