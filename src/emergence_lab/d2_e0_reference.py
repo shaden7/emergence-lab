@@ -1,6 +1,6 @@
-"""D2-E0 endpoint-conditioned exact MM reference and fixed-writer (NOT frozen).
+"""D2-E0 endpoint-conditioned exact MM reference and fixed-writer (target protocol v1).
 
-Design: docs/CS0_D2_ENDPOINT_CONTROL_PROPOSAL.md (r3). This module is the pure
+Contract: docs/CS0_D2_E0_PROTOCOL.md (v1). This module is the pure
 computation plus the bounded fixed-writer artifact layer. It does **not**
 provide aggregate process-tree CPU/RSS/wall containment, does not authorize a
 D2-E0 run, and importing it evaluates nothing. ``generate_reference`` is the
@@ -237,8 +237,8 @@ def _rational(value: Fraction) -> list[int]:
 
 
 def protocol_config(sizes=SIZES) -> dict:
-    return dict(diagnostic='D2-E0', design='docs/CS0_D2_ENDPOINT_CONTROL_PROPOSAL.md r3',
-                frozen=False, sizes=list(sizes), ambient_dimension=2,
+    return dict(diagnostic='D2-E0', design='docs/CS0_D2_E0_PROTOCOL.md v1',
+                frozen=tuple(sizes) == SIZES, sizes=list(sizes), ambient_dimension=2,
                 mandatory_interval_endpoints=True, decimal_digits=DIGITS,
                 newton_stop=NEWTON_STOP, newton_max_iterations=NEWTON_MAX_ITERATIONS,
                 sign_delta=SIGN_DELTA, residual_gate=RESIDUAL_GATE,
