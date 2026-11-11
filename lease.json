@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261111T1029Z-u3bitqsz5a",
-  "leaseId": "uoaj8qsfb18jrhz1ny13up",
-  "acquiredAt": "2026-11-11T10:30:03.967Z",
-  "heartbeatAt": "2026-11-11T10:30:03.967Z",
-  "expiresAt": "2026-11-11T12:30:03.967Z",
-  "task": "D2-E0 protocol freeze review",
-  "previousOwner": "rd-gpt6-20261111T092553-3yt32wr12z4"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261111T1029Z-u3bitqsz5a"
 }
