@@ -1,0 +1,42 @@
+{
+  "diagnostic.log": {
+    "bytes": 36,
+    "sha256": "aee9a2c2d2effe351999fa6338ed6f768f275dc507948c2072a6e258af20278f"
+  },
+  "engineering_preflight/cache_refusal/manifest.json": {
+    "bytes": 949,
+    "sha256": "7046a671d1e9b036d722645c804c428aefb1037d956ad22847f81d660dd1e843"
+  },
+  "engineering_preflight/clean_fixture/diagnostic.log": {
+    "bytes": 36,
+    "sha256": "aee9a2c2d2effe351999fa6338ed6f768f275dc507948c2072a6e258af20278f"
+  },
+  "engineering_preflight/clean_fixture/manifest.json": {
+    "bytes": 1532,
+    "sha256": "d9aa1d9494b8f95b255ea85639bd217fc755632b3801259dd6a4d0b54ed31994"
+  },
+  "engineering_preflight/clean_fixture/reference.json.gz": {
+    "bytes": 7564,
+    "sha256": "d56520f09444f40f2d9c8af81526ff62e4abf2271775eb82d80685648beb19e3"
+  },
+  "ensemble_comparison.csv": {
+    "bytes": 2499,
+    "sha256": "48515c2f5c054d3b9b5f23f47f883dd165d56fc61c43fc50d391571e16be797c"
+  },
+  "external_timing.json": {
+    "bytes": 1547,
+    "sha256": "0fcb8320085ceb75ade5ee9f45f64a4518efec7e0b7759711afabe31d4222c2a"
+  },
+  "independent_recheck.json": {
+    "bytes": 4554,
+    "sha256": "fad1f15997c68a6bd27a73fd89088868e5c056f1a42740570dab955b8e7220b3"
+  },
+  "manifest.json": {
+    "bytes": 1830,
+    "sha256": "a7ad8d1c3237659214660e68aaaf2b9fa3ff2f0552e4be57198aee0c049a1a08"
+  },
+  "reference.json.gz": {
+    "bytes": 292321,
+    "sha256": "e1ec11250144a6f454261fa72bc444e3777b864de6ef2386e3930786c70c864e"
+  }
+}

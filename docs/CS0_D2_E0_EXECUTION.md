@@ -1,5 +1,9 @@
 # D2-E0 v1 once-only execution decision — 2026-11-11
 
+**Consumed:** the single target invocation completed on 2026-11-11. See
+[the archived outcome](experiments/2026-11-11-d2-e0-run.md). This decision
+authorizes no additional invocation. Original JSON pins remain unchanged.
+
 Authorized only after this separate operational record is committed to main.
 The reviewed code/protocol gate is integrated by PR #78, merge 864a443b4bb9db839026ae9314b724a27fc76360
 (exact reviewed head 4f2330cecb7ba432c17f322589a364838ab1a500).

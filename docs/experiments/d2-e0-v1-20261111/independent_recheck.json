@@ -1,0 +1,168 @@
+{
+  "cpu_seconds": 1.905983414,
+  "enumerated_permutations": 5914,
+  "independent_bisections": 48,
+  "limitation": "Same-session AI-mediated independent code; not external review or formal proof.",
+  "max_bisection_discrepancy": "2.5175398e-66",
+  "max_forward_residual": "3.2680814e-80",
+  "max_weighted_summary_discrepancy": "4.8494111e-80",
+  "outcome": "RECHECK_PASS",
+  "rows": [
+    {
+      "N": 2,
+      "endpoint_dimension_of_mean": 1.0,
+      "endpoint_mean_dimension": 1.0
+    },
+    {
+      "N": 3,
+      "endpoint_dimension_of_mean": 1.0,
+      "endpoint_mean_dimension": 1.0
+    },
+    {
+      "N": 4,
+      "endpoint_dimension_of_mean": 1.1384666427691015,
+      "endpoint_mean_dimension": 1.141957245770036
+    },
+    {
+      "N": 5,
+      "endpoint_dimension_of_mean": 1.2541449162629383,
+      "endpoint_mean_dimension": 1.260177663638382
+    },
+    {
+      "N": 6,
+      "endpoint_dimension_of_mean": 1.3446277326382567,
+      "endpoint_mean_dimension": 1.3522351546838567
+    },
+    {
+      "N": 7,
+      "endpoint_dimension_of_mean": 1.416138915990925,
+      "endpoint_mean_dimension": 1.424667017663409
+    },
+    {
+      "N": 8,
+      "endpoint_dimension_of_mean": 1.4737760216520417,
+      "endpoint_mean_dimension": 1.482809091339866
+    },
+    {
+      "N": 9,
+      "endpoint_dimension_of_mean": 1.5211238938963625,
+      "endpoint_mean_dimension": 1.5303983236622816
+    },
+    {
+      "N": 10,
+      "endpoint_dimension_of_mean": 1.5606774510102508,
+      "endpoint_mean_dimension": 1.570024781372488
+    },
+    {
+      "N": 11,
+      "endpoint_dimension_of_mean": 1.5942014639725883,
+      "endpoint_mean_dimension": 1.6035134155765345
+    },
+    {
+      "N": 12,
+      "endpoint_dimension_of_mean": 1.6229715089519035,
+      "endpoint_mean_dimension": 1.6321785297525466
+    },
+    {
+      "N": 13,
+      "endpoint_dimension_of_mean": 1.6479296163313186,
+      "endpoint_mean_dimension": 1.6569874993755422
+    },
+    {
+      "N": 14,
+      "endpoint_dimension_of_mean": 1.6697854595949058,
+      "endpoint_mean_dimension": 1.6786668243805658
+    },
+    {
+      "N": 15,
+      "endpoint_dimension_of_mean": 1.6890833456962384,
+      "endpoint_mean_dimension": 1.6977721076242824
+    },
+    {
+      "N": 16,
+      "endpoint_dimension_of_mean": 1.7062475101210746,
+      "endpoint_mean_dimension": 1.7147352252863663
+    },
+    {
+      "N": 17,
+      "endpoint_dimension_of_mean": 1.7216133923207473,
+      "endpoint_mean_dimension": 1.729896803725179
+    },
+    {
+      "N": 18,
+      "endpoint_dimension_of_mean": 1.7354496631683276,
+      "endpoint_mean_dimension": 1.7435290313335132
+    },
+    {
+      "N": 19,
+      "endpoint_dimension_of_mean": 1.7479740260636025,
+      "endpoint_mean_dimension": 1.755851980596154
+    },
+    {
+      "N": 20,
+      "endpoint_dimension_of_mean": 1.7593647438180788,
+      "endpoint_mean_dimension": 1.767045486272844
+    },
+    {
+      "N": 21,
+      "endpoint_dimension_of_mean": 1.7697691777675935,
+      "endpoint_mean_dimension": 1.7772579246190132
+    },
+    {
+      "N": 22,
+      "endpoint_dimension_of_mean": 1.7793102030843544,
+      "endpoint_mean_dimension": 1.7866127947620254
+    },
+    {
+      "N": 23,
+      "endpoint_dimension_of_mean": 1.7880910909334977,
+      "endpoint_mean_dimension": 1.7952137168982023
+    },
+    {
+      "N": 24,
+      "endpoint_dimension_of_mean": 1.7961992680011456,
+      "endpoint_mean_dimension": 1.803148273623136
+    },
+    {
+      "N": 25,
+      "endpoint_dimension_of_mean": 1.8037092431463224,
+      "endpoint_mean_dimension": 1.8104909946760834
+    },
+    {
+      "N": 26,
+      "endpoint_dimension_of_mean": 1.8106849086180494,
+      "endpoint_mean_dimension": 1.8173056996575125
+    },
+    {
+      "N": 27,
+      "endpoint_dimension_of_mean": 1.817181366323873,
+      "endpoint_mean_dimension": 1.8236473540778042
+    },
+    {
+      "N": 28,
+      "endpoint_dimension_of_mean": 1.823246389664561,
+      "endpoint_mean_dimension": 1.8295635526241767
+    },
+    {
+      "N": 29,
+      "endpoint_dimension_of_mean": 1.8289216030250814,
+      "endpoint_mean_dimension": 1.8350957140944884
+    },
+    {
+      "N": 30,
+      "endpoint_dimension_of_mean": 1.834243440548509,
+      "endpoint_mean_dimension": 1.8402800512896405
+    },
+    {
+      "N": 31,
+      "endpoint_dimension_of_mean": 1.8392439309173079,
+      "endpoint_mean_dimension": 1.8451483637745913
+    },
+    {
+      "N": 32,
+      "endpoint_dimension_of_mean": 1.8439513438970192,
+      "endpoint_mean_dimension": 1.8497286901137027
+    }
+  ],
+  "support_fractions": 3921
+}
