@@ -298,8 +298,11 @@ distinct-fraction table, flags (a passed row must have sign_check, converged,
 independent_check true and no error), spot-check count, monotonicity, config
 and outcome/failure consistency; any mismatch is INCOMPLETE. The 80-digit and
 binary64 **values** are trusted from the pinned worker computation, not
-re-derived by the controller. Bytecode is never loaded (`-X pycache_prefix`
-to a nonexistent path) and any `.pyc`/`__pycache__` under `src` is a
+re-derived by the controller. The worker never loads bytecode (`-X pycache_prefix`
+to a nonexistent path); the controller's own launch is a **trust precondition**
+the code cannot check before its modules load: it must be started as
+`python3 -I -B -X pycache_prefix=/nonexistent-d2-e0-pycache -c <launcher>` (as
+in the tests). A controller launched otherwise is outside the guarantee and any `.pyc`/`__pycache__` under `src` is a
 provenance failure (added after a later-pass REVISE: a planted unchecked-hash
 `.pyc` passed the blob-id check and produced a REFERENCE_COMPLETE with
 tampered values). `run()` repeats the target refusal. `durability_unverified`

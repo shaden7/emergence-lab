@@ -30,8 +30,10 @@ without CAP_SYS_RESOURCE (recorded as ``cap_sys_resource``); with it they bind
 trusted worker code only. The manifest is authoritative: a SIGALRM/RLIMIT
 kill of the controller during the final write can leave ``reference.json.gz``
 next to a non-finished manifest; such a directory is INCOMPLETE.
-Bytecode caches are never loaded (``-X pycache_prefix`` to an empty path) and
-any ``.pyc``/``__pycache__`` under ``src`` is a provenance failure.
+The worker never loads bytecode (``-X pycache_prefix`` to a nonexistent path)
+and any ``.pyc``/``__pycache__`` under ``src`` is a provenance failure. The
+controller itself must be launched with ``-I -B -X pycache_prefix=NO_PYCACHE``;
+that precondition cannot be checked before its own modules load.
 """
 from __future__ import annotations
 
