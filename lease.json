@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261112T073443162Z-wqi92osn2jo",
+  "leaseId": "rd-gpt6-20261112T073443162Z-wqi92osn2jo",
+  "acquiredAt": "2026-11-12T07:34:43.162Z",
+  "heartbeatAt": "2026-11-12T07:34:43.162Z",
+  "expiresAt": "2026-11-12T09:34:43.162Z",
+  "task": "Audit post-merge CI and D3 control readiness",
   "previousOwner": "rd-gpt6-20261111232435487-lug4u8vupxe"
 }
