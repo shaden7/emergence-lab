@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261113T080316Z-7d3fd7a3",
-  "leaseId": "9e7a6a30-8360-4f87-94d5-eccf0a114fa6",
-  "acquiredAt": "2026-11-13T08:03:16Z",
-  "heartbeatAt": "2026-11-13T08:03:16Z",
-  "expiresAt": "2026-11-13T10:03:16Z",
-  "task": "Review/integrate PR #80 (D3-E0/M0 design) and audit queued main CI",
-  "previousOwner": "rd-claude-20261112T080331Z-439095c0"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261113T080316Z-7d3fd7a3"
 }
