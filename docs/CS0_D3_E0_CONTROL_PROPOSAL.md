@@ -62,9 +62,11 @@ Pair-relation probability for two i.i.d. uniform diamond points is f(D)
   sampler and then compared with Monte Carlo; they are **not** asserted here.
 - Var(r) at D=3 is not claimed in closed form; it is estimated empirically.
 
-Numerical design observation (this session, finite-difference at r =
-0.1, 0.2286, 0.4, 0.6; not a proof): d(r) is convex on that range. If
-convexity holds on the support, Jensen gives E[d(r)] >= d(E[r]), so in arm A
+Numerical design observation (finite-difference at r = 0.1, 0.2286, 0.4,
+0.6; not a proof): d(r) is convex there. Later-pass check (2026-11-13,
+40-digit mpmath, 901-point grid on d in [1,10]): f'<0 and f''>0 at every
+grid point, so d''(r) = -f''(d)/f'(d)^3 > 0 on the whole invertible support
+(still a grid check, not a proof). Given convexity on the support, Jensen gives E[d(r)] >= d(E[r]), so in arm A
 the endpoint shift (d(E[r])<3) and the Jensen gap (>=0) compete; in arm B
 the R>0 conditioning (lower d) and the Jensen gap (higher d) compete. The
 sign of E[d(r)]-3 in either arm is therefore **not** settled by identities
@@ -144,3 +146,41 @@ Verify the identities above (and the constants test
 the Bonferroni arithmetic, whether D=2 MC-vs-exact at 4 SE is adequately
 powered as a positive control, and whether 0.01 is a sensible precision
 target given the pilot. Record PASS/REVISE before any implementation PR.
+
+## Later-pass review r0 → findings to resolve at freeze (2026-11-13)
+
+Review by Director `rd-claude-20261113T080316Z-7d3fd7a3` (separate session
+from the author; same-model AI, not external peer review). Decision: **PASS
+for integration as a design proposal only.** Verified: f(3)=8/35 (exact Gamma
+arithmetic and 40-digit check); arm-A identity R = 2N-3 + R_inner and
+C(N,2)-C(N-2,2) = 2N-3; the four quoted rationals; arm-A N=4 E[d]≈1.219020;
+arm-B N=2 law; grid invertibility (1/496 > f(10) = 1/2002); Bonferroni
+z = 3.4808; direct-sampler t-density ∝ (1/2-|t|)^2. 88 tests pass locally.
+
+The following are **mandatory freeze items** (the protocol may not be frozen
+until each is resolved in text and, where applicable, by a test):
+
+1. **D=2 positive-control power.** Fix the D=2 replicates per cell (proposed:
+   same n_c as the matching D=3 cell) and state the minimum MC-vs-exact bias
+   the 4-SE gate detects with stated power. A gate with unspecified n can
+   pass a biased pipeline.
+2. **Budget scope.** State whether the 600 CPU s / 512 MiB cap covers the
+   D=2 control, sampler-agreement and quadrature gates, or only D=3 cells.
+   Engineering-only feasibility probe in review (scratch, not a pilot, not
+   archived; no D=3 sign or mean recorded): SD(d) per cell ≈0.2–0.8, so
+   O(10^5) R>0-replicates per cell meet the 0.01 target at ≈20–75 µs per
+   replicate (vectorised direct sampler), i.e. O(10^2) CPU s in total. The
+   frozen pilot must re-measure this on the executing host.
+3. **Precision vs decision threshold.** n_c is set by a 4-SE half-width but
+   classification uses z = 3.48; keep both but say so explicitly. In arm B
+   n_c must count R>0 replicates (P(R>0) ≈ 0.47 at D=3, N=3).
+4. **Deterministic cells.** Arm A N=2,3 and arm B N=2 have d = 1 exactly
+   (SE = 0). Classify them analytically and state whether they stay in the
+   Bonferroni family (20 is conservative; 17 is exact).
+5. **Additional exact anchor.** Literature closed forms for expected k-chain
+   counts in a flat diamond (Meyer 1988, as reviewed in Surya 2019) give the
+   3-chain probability exactly; verify the reference and use it as an extra
+   check of the three-point quadrature.
+
+Not issues: the identities above; claims are correctly bounded (H_A, H_B are
+hypotheses; no D=3 data; no Issue #37 or physical inference).
