@@ -184,3 +184,86 @@ until each is resolved in text and, where applicable, by a test):
 
 Not issues: the identities above; claims are correctly bounded (H_A, H_B are
 hypotheses; no D=3 data; no Issue #37 or physical inference).
+
+## Implementation r1 and proposed freeze-item resolutions (2026-11-14, PROPOSED)
+
+Director `rd-claude-20261114T080252Z-e5ca9465`. Code:
+`src/emergence_lab/d3_e0.py`, tests `tests/test_d3_e0_impl.py`. Still **not
+frozen, not authorized, no pilot and no target run**. No D=3 target-cell
+Monte Carlo mean or SD was computed or looked at; the D=3 engineering probe
+printed CPU time only.
+
+Implemented: (i) a vectorised direct sampler (u = 1/2−|t| with density ∝
+u^(D−1), uniform ball cross-section), written independently of the existing
+rejection sampler; (ii) batched relation counting (strict light-cone
+interior) and arms A/B (arm A uses R = 2N−3 + R_inner); (iii) the inverse
+d(k/C) on [1,10] as a lookup table for every grid N (all finite, < 10);
+(iv) a deterministic mpmath (40-digit tanh-sinh) quadrature of the labeled
+three-point probabilities, using that the future/past of x inside the
+diamond is an Alexandrov interval of volume fraction τ±^D:
+q_pair = E[τ+^D], q_chain = E[τ−^D τ+^D], q_down = E[τ+^(2D)]; (v) the
+N=3 relation-count law P(3)=6q_chain, P(2)=2(3q_down−6q_chain), P(1) from
+E[R], P(0) by normalisation; (vi) a Monte Carlo cell estimator with i.i.d.
+SE and the D=2 positive-control comparison against the archived exact table.
+
+Gate checks run in tests (engineering sizes, fixed seed root 20261114, not the
+pilot or target roots):
+
+- Quadrature vs exact values (numerical agreement, not a proof): D=2
+  q_chain = 1/36, q_down = 1/9 (light-cone coordinates) to 1e−14; q_pair =
+  f(D)/2 at D=2,3 to 1e−12; q_chain equals the literature k-chain closed form
+  χ_3 at D=2 (1/36) and D=3 (2/525) to 1e−12 (freeze item 5: formula as
+  recalled from Meyer 1988 / Surya 2019; primary-source text not re-checked
+  in this run). D=3 q_down agrees with 1/30 to 1e−13.
+- **Quadrature → archived D=2 exact:** the quadrature law reproduces the
+  archived exact arm-B N=3 E[d|R>0] = 1.853650366338 and arm-A N=5 E[d] =
+  1.260177663638 to 1e−12. This checks the law construction, the inverse
+  table and the arm-A offset against an independent (Mahonian) computation.
+- Sampler agreement: pair probability within 4 SE of f(D) for both samplers
+  at D=2,3 (40,000 pairs each); D=3 R-distribution chi-square between
+  samplers at N=3,4,8 (6,000 replicates each) p > 1e−3; MC D=3 N=3 law within
+  4 SE of the quadrature law in every R class (200,000 replicates).
+- D=2 MC positive control (20,000 replicates; arm A N=4,8; arm B N=4,8,16):
+  |z| ≤ 4 against the archived exact values.
+
+Exact D=3 three-point cells implied by the quadrature (numerical evaluation
+of exact integrals; the rationals are matched to ~1e−13, not proved here):
+N=3 law P(R=0,1,2,3) = 18/35, 54/175, 27/175, 4/175; hence arm-B N=3
+E[d|R>0] ≈ 2.163007 and P(R=0) = 18/35 (P(R>0) ≈ 0.486); arm-A N=5 E[d] ≈
+1.408768. Both are below 3 (classification-free statement about two
+small-N cells; H_B concerns N ≥ N_B and is untested).
+
+Proposed resolutions (to be confirmed by a later-pass review, then frozen):
+
+1. **D=2 control power.** D=2 replicates per cell = the matching D=3 cell's
+   n_c (R>0 count in arm B), at least 10^5. With D=2 SD(d) ≤ 0.68 per cell
+   (engineering probe, 8,192 replicates/cell; arm B N=4 largest), the
+   |z| > 4 gate detects a pipeline bias |b| ≥ (4+1.2816)·SD/√n ≈ 0.011 with
+   power ≥ 0.9 per cell. Family-wise false-INVALID probability under a
+   correct pipeline ≈ 17·6.3e−5 ≈ 1e−3.
+2. **Budget scope.** One cap covers everything: D=3 cells, D=2 control,
+   sampler-agreement and quadrature gates: 600 CPU s and 512 MiB RSS total.
+   Engineering timing (this sandbox, 2 vCPU, numpy 2.5.3, scipy 1.18.1):
+   ≈123 µs per replicate summed over the 17 stochastic D=3 cells, ≈55 µs for
+   D=2; quadrature ≈10 s for D=2 and D=3 together. 10^5 replicates/cell ⇒
+   ≈20 s total; the cap is not expected to bind but the pilot must re-measure
+   on the executing host.
+3. **Precision vs decision.** n_c is chosen by the 4-SE half-width ≤ 0.01
+   (n_c = ⌈(4·SD̂/0.01)²⌉ from pilot SD̂); classification uses the Bonferroni
+   z below. These are deliberately different: precision targets the
+   reported interval, z controls the family-wise error. In arm B n_c counts
+   R>0 replicates; the total drawn is ⌈n_c / P̂(R>0)⌉ (P(R>0) = 17/35 at N=3
+   exactly).
+4. **Deterministic cells.** Arm A N=2,3 and arm B N=2 have d ≡ 1 (verified in
+   tests: SD = 0). They are classified analytically BELOW and removed from
+   the Bonferroni family, which becomes the 17 stochastic cells: per-cell
+   two-sided z = Φ^(−1)(1 − 0.01/34) ≈ 3.4370. Arm-B N=3 and arm-A N=5 stay
+   in the Monte Carlo family; their quadrature values above serve as an
+   additional exact gate (|MC − quadrature| ≤ 4 SE).
+5. **Additional anchor.** Done as above (χ_3 closed form vs quadrature at
+   D=2,3). Before freezing, the cited formula should be checked against the
+   primary text; the quadrature itself does not depend on it.
+
+Next: later-pass review of this implementation (separate session); then a
+frozen protocol with seed roots, pilot (≤60 CPU s, ≤2,000 replicates/cell)
+and target n_c rule. No deployment, Lightsail/EatSleepFeel or paid API.
