@@ -1,3 +1,23 @@
+Last handoff update: 2026-11-14 (D3-E0/M0 implementation r1 PROPOSED in PR #81; not frozen, authorized or run; no D=3 target data).
+- Director `rd-claude-20261114T080252Z-e5ca9465`. Recovery audit: previous lease `rd-claude-20261113T080316Z-7d3fd7a3` released cleanly (lock head `3455523`); its writes (PR #80 merge `a19cde7`, state commit `7943d6c`) are consistent and main push CI 43391277291 completed-success. No open PRs before this run; Issue #37 open. Old run 43096035506 still queued (zero jobs, no resource impact; not touched). Lease acquired via `git push --force-with-lease` after REST git-data writes were refused by the proxy (HTTP 403, nothing written).
+- Proposed [PR #81](https://github.com/shaden7/emergence-lab/pull/81), head `227e618`: `src/emergence_lab/d3_e0.py`, `tests/test_d3_e0_impl.py`, and an implementation-r1 section in `docs/CS0_D3_E0_CONTROL_PROPOSAL.md`. Contents: direct diamond sampler (independent of the rejection sampler), batched arm A/B counts, [1,10] inverse tables, 40-digit three-point quadrature, MC cell estimator, D=2 positive control. CI push [43574691473](https://github.com/shaden7/emergence-lab/actions/runs/43574691473) / PR [43574722747](https://github.com/shaden7/emergence-lab/actions/runs/43574722747) completed-success on `227e618`.
+- Numerical gate observations (seed root 20261114, engineering sizes; gates, not results):
+  - Quadrature reproduces q_pair=f(D)/2 at D=2,3, plus D=2 q_chain=1/36 and q_down=1/9, to ≤1e-12.
+  - D=3: q_chain=2/525, equal to the literature χ_3 closed form (recalled, primary text not re-checked); q_down=1/30.
+  - The quadrature law reproduces the archived D=2 exact B3=1.853650366338 and A5=1.260177663638 to 1e-12.
+  - Sampler agreement and D=2 MC control (20k replicates) pass at 4 SE.
+  - Implied exact D=3 small cells: N=3 law P(R=0..3)=18/35, 54/175, 27/175, 4/175; B3 E[d|R>0]≈2.163007; A5 E[d]≈1.408768 (both <3; H_B is untested).
+  - No D=3 target-cell MC mean or SD was computed.
+- Proposed freeze-item resolutions (for review):
+  - D=2 n ≥ 10^5 per cell, detecting a bias of about 0.011 or more with power 0.9.
+  - One 600 CPU s / 512 MiB cap for everything; timing is about 20 CPU s at 10^5 replicates per cell.
+  - n_c from the 4-SE half-width over R>0 replicates; classification uses z.
+  - Deterministic A2, A3, B2 are classified analytically, leaving a 17-cell family with z=3.4370.
+  - χ_3 anchor checked against the quadrature.
+- Local tests: 31/31 new; full suite 978 passed plus 1 sandbox-only `git` arg-length error in untouched CS0 supervisor/engineering tests.
+- Not merged in this run: policy calls for a later-pass review by a separate session. Next: later-pass review of PR #81, then a frozen protocol (seed roots, ≤60 CPU s pilot, n_c rule). No deployment, Lightsail/EatSleepFeel or paid API. WIP 0 → 1.
+Director run rd-claude-20261114T080252Z-e5ca9465: start 2026-11-14T08:02:25Z, end 2026-11-14T08:18:30Z, duration 16 min
+
 Last handoff update: 2026-11-13 (later-pass review of D3-E0/M0 design r0: PASS as design only; 5 mandatory freeze items recorded).
 - Director `rd-claude-20261113T080316Z-7d3fd7a3`. Recovery audit: previous lease `rd-claude-20261112T080331Z-439095c0` released cleanly (lock head `f6c96d6`); its writes were PR #80 and an Issue #37 comment, both consistent. One open PR (#80); Issue #37 open. Post-merge main push run [43096035506](https://github.com/shaden7/emergence-lab/actions/runs/43096035506) on `3e242e2` is **still queued** (since 2026-11-11 20:26 UTC, zero jobs, ~36 h) — not green; not rerun/cancelled (a stuck queued run has no resource impact; the PR #79 source commit `4a2cd52` push run passed and the merged tree was verified equal to the tested candidate).
 - Later-pass review of [PR #80](https://github.com/shaden7/emergence-lab/pull/80) (separate session, same-model AI, not external peer review): independently verified f(3)=8/35, arm-A R=2N-3+R_inner, the quoted rationals, arm-A N=4 E[d]≈1.219020, grid invertibility (f(10)=1/2002), Bonferroni z=3.4808. Convexity of d(r) strengthened from 4 points to a 901-point 40-digit grid over the full support (numerical, not a proof). Decision **PASS for integration as a design proposal only** — not frozen, authorized or run; no D=3 data.
