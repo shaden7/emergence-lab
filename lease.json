@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261114T080252Z-e5ca9465",
+  "leaseId": "f59681eac49a662c8defe01bc0398b77",
+  "acquiredAt": "2026-11-14T08:02:52Z",
+  "heartbeatAt": "2026-11-14T08:02:52Z",
+  "expiresAt": "2026-11-14T10:02:52Z",
+  "task": "Director run: orient; next stage per RESEARCH_STATE (D3-E0/M0 implementation)",
   "previousOwner": "rd-claude-20261113T080316Z-7d3fd7a3"
 }
