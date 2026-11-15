@@ -1,3 +1,23 @@
+Last handoff update: 2026-11-15 (later-pass review of D3-E0/M0 implementation r1: PASS as tooling; PR #81 integrated; still not frozen, authorized or run).
+- Director `rd-claude-20261115T080249Z-a27abc18`. Recovery audit: previous lease `rd-claude-20261114T080252Z-e5ca9465` released cleanly (lock head `c5134ab`). Its writes (PR #81 head `227e618`, state commit `3ac4a21`) are consistent; main push CI 43575198519 completed-success. One open PR (#81); Issue #37 open. Lease acquired via `git push --force-with-lease` against the expected head.
+- [Later-pass review record](https://github.com/shaden7/emergence-lab/pull/81#issuecomment-6891458112): separate session, same-model AI, not external peer review. Independent checks (scratch code, not archived):
+  - Exact symbolic integration: q_down(2)=1/9, **q_down(3)=1/30** (now exact rather than a quadrature match), q_down(4)=1/105.
+  - χ_k reduces analytically to 1/(k!)^2 at D=2 and to f(D)/2 at k=2. At D=3, k=3 it gives 2/525 by hand; the primary text is still not re-checked.
+  - Separate-code rejection-sampler MC (seed 777001, 10^6 replicates): the D=3 N=3 law 18/35, 54/175, 27/175, 4/175 holds within |z|≤1.22.
+  - A separate inverse reproduces B3 E[d|R>0]=2.163007462 and A5 E[d]=1.408767847. No new D=3 target-cell MC mean or SD was computed.
+  - Full 17-cell D=2 positive control (seed 20261115, 2·10^4/cell): max|z|=2.04. Arm-A re-run at 3·10^5/cell: Σz²=10.6 on 8 dof (p=0.23).
+  - Negative controls fail the gate as required: wrong-D z=+204; injected arm-A offset bug z=+51.
+  - Local: 119 relevant tests passed.
+  - Decision **PASS** for integration as implementation tooling. Freeze-item resolutions 1–5 accepted as proposals only.
+- Integrated: PR #81 branch updated with main (head `5ee3828`). Exact-head CI push [43692926902](https://github.com/shaden7/emergence-lab/actions/runs/43692926902) / PR [43692932239](https://github.com/shaden7/emergence-lab/actions/runs/43692932239) completed-success. Merged with head-SHA guard as `39db952`; the merge tree is identical to the tested head. WIP 1 → 0.
+- Non-blocking items for the freeze PR:
+  - (a) Frozen runner/manifest must require and pin the `.[reference]` extra (mpmath 1.3.0); `d3_e0` imports it lazily from the core package.
+  - (b) Check the χ_k formula against the primary text.
+  - (c) Optional Welford variance in `estimate_cell`.
+  - (d) Re-measure timing on the executing host in the pilot.
+- Next: one PR with the frozen D3-E0/M0 protocol. It fixes seed roots, the engineering pilot (≤60 CPU s, ≤2,000 replicates/cell, SD only for n_c), the n_c rule, the 17-cell z=3.4370 family plus the analytic A2/A3/B2 cells, D=2 control ≥10^5/cell, and the single 600 CPU s / 512 MiB cap. It must address (a)–(d) and then get its own later-pass review before any separately authorized target run. Nothing was executed on a D=3 target. No deployment, Lightsail/EatSleepFeel or paid API.
+Director run rd-claude-20261115T080249Z-a27abc18: start 2026-11-15T08:02:31Z, end 2026-11-15T08:12:39Z, duration 10 min
+
 Last handoff update: 2026-11-14 (D3-E0/M0 implementation r1 PROPOSED in PR #81; not frozen, authorized or run; no D=3 target data).
 - Director `rd-claude-20261114T080252Z-e5ca9465`. Recovery audit: previous lease `rd-claude-20261113T080316Z-7d3fd7a3` released cleanly (lock head `3455523`); its writes (PR #80 merge `a19cde7`, state commit `7943d6c`) are consistent and main push CI 43391277291 completed-success. No open PRs before this run; Issue #37 open. Old run 43096035506 still queued (zero jobs, no resource impact; not touched). Lease acquired via `git push --force-with-lease` after REST git-data writes were refused by the proxy (HTTP 403, nothing written).
 - Proposed [PR #81](https://github.com/shaden7/emergence-lab/pull/81), head `227e618`: `src/emergence_lab/d3_e0.py`, `tests/test_d3_e0_impl.py`, and an implementation-r1 section in `docs/CS0_D3_E0_CONTROL_PROPOSAL.md`. Contents: direct diamond sampler (independent of the rejection sampler), batched arm A/B counts, [1,10] inverse tables, 40-digit three-point quadrature, MC cell estimator, D=2 positive control. CI push [43574691473](https://github.com/shaden7/emergence-lab/actions/runs/43574691473) / PR [43574722747](https://github.com/shaden7/emergence-lab/actions/runs/43574722747) completed-success on `227e618`.
