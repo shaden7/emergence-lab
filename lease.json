@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261115T080249Z-a27abc18",
-  "leaseId": "479d41f6-2d73-4b7b-b4e2-d1a298de1dff",
-  "acquiredAt": "2026-11-15T08:02:49Z",
-  "heartbeatAt": "2026-11-15T08:02:49Z",
-  "expiresAt": "2026-11-15T10:02:49Z",
-  "task": "Hourly Research Director: review/integrate open PRs (PR #81 D3-E0/M0 impl r1)",
-  "previousOwner": "rd-claude-20261114T080252Z-e5ca9465"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261115T080249Z-a27abc18"
 }
