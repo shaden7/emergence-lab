@@ -8,6 +8,8 @@ Related: [D2-E0 v1 protocol](CS0_D2_E0_PROTOCOL.md),
 [D2-M0 result](experiments/2026-11-07-d2-m0-run.md),
 [Issue #37](https://github.com/shaden7/emergence-lab/issues/37)
 (design candidate in the 2026-11-12 07:35 UTC audit comment).
+Frozen-protocol candidate v1 (proposed 2026-11-16, under review):
+[CS0_D3_E0_PROTOCOL.md](CS0_D3_E0_PROTOCOL.md).
 
 ## Question
 

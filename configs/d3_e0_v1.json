@@ -1,0 +1,26 @@
+{
+  "protocol": "D3-E0/M0 v1",
+  "status": "FROZEN design (pilot and target NOT executed; target needs a separate committed authorization)",
+  "D_target": 3,
+  "grid": [2, 3, 4, 5, 6, 8, 12, 16, 24, 32],
+  "inverse_bracket": [1.0, 10.0],
+  "deterministic_cells": [["A", 2], ["A", 3], ["B", 2]],
+  "seed_roots": {
+    "_derivation": "first 8 bytes (big-endian) of SHA-256 of 'emergence-lab/d3-e0-v1/<name>'",
+    "pilot": 1200746945068229832,
+    "gates": 4350303129085650063,
+    "target": 2631650520979328321
+  },
+  "chunk": 4096,
+  "pilot": {"cpu_s": 60, "positives_per_cell": 1000},
+  "n_c_rule": {"k_se": 4.0, "half_width": 0.01, "floor": 100000, "safety_factor": 1.25},
+  "caps": {"cpu_s": 600, "rss_mib": 512},
+  "gates": {
+    "z_max": 4.0,
+    "quadrature_abs_tol": 1e-11,
+    "sampler": {"pair_replicates": 20000, "chi2_N": [3, 4, 8], "chi2_replicates": 6000,
+                "chi2_p_min": 0.001, "z_max": 4.0}
+  },
+  "decision": {"alpha": 0.01, "family": 17},
+  "required_versions": {"mpmath": "1.3.0"}
+}
