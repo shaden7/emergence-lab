@@ -185,3 +185,45 @@ def test_target_negative_control_offset_bug_is_invalid(tmp_path, monkeypatch):
     assert not man["gates"]["d2_positive_control"]["passed"]
     assert not man["gates"]["d3_mc_vs_quadrature"]["passed"]
     assert man["status"] == "INVALID"
+
+
+def test_steady_cpu_per_positive_corrects_chunk_tail():
+    """Review r1: pilot timing must not count the discarded chunk tail."""
+    res = c.run_cell("A", 5, 3, 100, c.cell_rng(5, "A", 3, 5), 4096)
+    assert res["computed"] == 4096 and res["drawn"] == 100
+    assert c.steady_cpu_per_positive(res) == pytest.approx(res["cpu_s"] / 4096)
+    res = c.run_cell("B", 3, 3, 500, c.cell_rng(5, "B", 3, 3), 256)
+    assert res["computed"] >= res["drawn"] > res["positives"]
+    assert c.steady_cpu_per_positive(res) == pytest.approx(
+        res["cpu_s"] / res["computed"] / (res["positives"] / res["drawn"]))
+
+
+def test_authorization_refuses_uncommitted_ignored_files():
+    """Review r1 adversarial case: a well-formed authorization and a fabricated
+    pilot record under the gitignored results/ directory must be refused."""
+    import subprocess
+    d = c.REPO / "results" / "_review_r1_adversarial"
+    d.mkdir(parents=True, exist_ok=False)
+    try:
+        pilot = d / "pilot_record.json"
+        pilot.write_text(json.dumps({"status": "PILOT_COMPLETE",
+                                     "target_sizes": {"status": "OK", "n_c": {}}}))
+        blobs = {p: subprocess.run(["git", "-C", str(c.REPO), "rev-parse", f"HEAD:{p}"],
+                                   capture_output=True, text=True, check=True).stdout.strip()
+                 for p in c.PINNED_PATHS}
+        if subprocess.run(["git", "-C", str(c.REPO), "status", "--porcelain", "--", *c.PINNED_PATHS],
+                          capture_output=True, text=True).stdout.strip():
+            pytest.skip("pinned paths dirty in this checkout")
+        auth = {"protocol": "D3-E0/M0 v1", "mode": "target", "authorization_id": "adv",
+                "expires_utc": "2999-01-01T00:00:00Z",
+                "config_sha256": c.sha256_file(c.CONFIG), "protocol_sha256": c.sha256_file(c.PROTOCOL),
+                "blobs": blobs, "pilot_record": str(pilot.relative_to(c.REPO)),
+                "pilot_record_sha256": c.sha256_file(pilot)}
+        ap = d / "auth.json"
+        ap.write_text(json.dumps(auth))
+        with pytest.raises(PermissionError, match="authorization file is not committed"):
+            c.check_authorization(ap, c.CONFIG)
+    finally:
+        for f in d.iterdir():
+            f.unlink()
+        d.rmdir()

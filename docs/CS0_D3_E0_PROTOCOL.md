@@ -52,8 +52,10 @@ Seed root: pilot. 1,000 R>0 replicates per stochastic cell at D=3 and at D=2
 (arm B at N=3 draws ≈2,060; within the ≤2,000-per-cell intent up to the R=0
 draws). Pilot also executes the quadrature and sampler gates to time them.
 Cap: **60 CPU s**, 512 MiB peak RSS. Output `pilot_record.json` with per-cell
-SD̂(d), P̂(R=0) (D=3), CPU s per positive replicate (D=3 and D=2), gate CPU, the
-derived n_c and the budget status. **Blinded:** no cell mean is written; pilot
+SD̂(d), P̂(R=0) (D=3), steady-state CPU s per positive replicate (D=3 and D=2:
+CPU per *computed* replicate ÷ observed positive fraction, so the discarded tail
+of the last 4096-chunk is not charged; review r1), gate CPU, the derived n_c and
+the budget status. **Blinded:** no cell mean is written; pilot
 numbers are never reported as results or pooled with target data. Pilot timing
 on the executing host replaces the sandbox timings of r1 (freeze item (d)).
 
@@ -99,7 +101,10 @@ without a new reviewed protocol version.
 git blob ids at HEAD of the pinned paths (this file, config, `d3_e0.py`,
 `d3_e0_campaign.py`, `causal_set_mm.py`, the archived D=2 table), a clean
 worktree for those paths, and the path + SHA-256 of a committed
-`PILOT_COMPLETE` pilot record whose status is not BUDGET_INFEASIBLE. The runner
+`PILOT_COMPLETE` pilot record whose status is not BUDGET_INFEASIBLE. Both the
+authorization file and the pilot record must be tracked at HEAD
+(`git ls-files --error-unmatch`) and unmodified; a gitignored or untracked file
+is refused (review r1). The runner
 then requires the pinned `.[reference]` extra (`mpmath==1.3.0`; freeze item
 (a)) and writes `manifest.json`, `cells.csv` and `raw_counts.npz` (per-replicate
 R as uint16) to a fresh output directory. Archive: manifest and cells in Git;
@@ -122,6 +127,14 @@ the raw NPZ in Git if ≤ 5 MB, otherwise as a release asset referenced by hash.
   the pinned table. No Lightsail, deployment or paid API is involved.
 - Limits from design r0 stand: no D=4, no other estimator, no Poisson-N, no
   full-CS0 or Issue #37 claim.
+
+- **Later-pass review r1 (2026-11-17, separate session, same-model AI):**
+  REVISE, fixed in-PR. (1) `check_authorization` accepted a well-formed but
+  uncommitted authorization and a fabricated pilot record in the gitignored
+  `results/` (reproduced); now refused. (2) Pilot CPU per positive was
+  inflated 4–11× by the uncounted 4096-chunk tail (scratch seed, means not
+  inspected); conservative but could force a spurious CAP_BINDS; corrected.
+  Neither change alters any random stream, seed, n_c rule, gate or decision.
 
 ## 9. Later-pass review checklist
 

@@ -147,10 +147,12 @@ def run_cell(arm: str, n: int, d: int, positives: int, rng: np.random.Generator,
     table = m.inverse_table(n)
     acc = m.Welford()
     drawn = 0
+    computed = 0
     raw = []
     t0 = cpu_seconds()
     while acc.n < positives:
         r = m.arm_counts(arm, n, d, chunk, rng)
+        computed += r.size
         pos_idx = np.flatnonzero(r > 0)
         need = positives - acc.n
         if pos_idx.size >= need:
@@ -162,12 +164,23 @@ def run_cell(arm: str, n: int, d: int, positives: int, rng: np.random.Generator,
             raw.append(r.astype(np.uint16))
     sd = math.sqrt(max(acc.var, 0.0)) if acc.n > 1 else math.nan
     out = {"arm": arm, "N": n, "D": d, "positives": acc.n, "drawn": drawn,
+           "computed": computed,
            "mean_d": acc.mean, "sd_d": sd,
            "se_d": sd / math.sqrt(acc.n) if acc.n > 1 else math.nan,
            "p_r0": 1.0 - acc.n / drawn, "cpu_s": cpu_seconds() - t0}
     if keep_raw:
         out["raw"] = np.concatenate(raw)
     return out
+
+
+def steady_cpu_per_positive(res: dict) -> float:
+    """Steady-state CPU per R>0 replicate (review r1).
+
+    A cell computes whole chunks and discards the tail of the last one, so
+    cpu_s / positives over-counts by up to chunk/positives at pilot sizes (4-11x
+    observed).  Cost per *computed* replicate divided by the observed positive
+    fraction is the cost at target sizes, where the truncated tail is negligible."""
+    return res["cpu_s"] / res["computed"] * res["drawn"] / res["positives"]
 
 
 # --------------------------------------------------------------------------
@@ -332,7 +345,7 @@ def run_pilot(out_dir: Path, cfg_path: Path = CONFIG) -> dict:
                 for d in (3, 2):
                     res = run_cell(arm, n, d, pc["positives_per_cell"],
                                    cell_rng(cfg["seed_roots"]["pilot"], arm, d, n), cfg["chunk"])
-                    rec[f"cpu_per_positive_D{d}"] = res["cpu_s"] / res["positives"]
+                    rec[f"cpu_per_positive_D{d}"] = steady_cpu_per_positive(res)
                     if d == 3:
                         # Blinded: SD and P(R=0) only; the mean is never written.
                         rec["sd_d"] = res["sd_d"]
@@ -349,6 +362,23 @@ def run_pilot(out_dir: Path, cfg_path: Path = CONFIG) -> dict:
         man["status"] = "PILOT_RSS_EXCEEDED"
     (out_dir / "pilot_record.json").write_text(json.dumps(man, indent=2, sort_keys=True))
     return man
+
+
+def _require_committed(path: Path, what: str) -> None:
+    """Review r1: the file must be tracked at HEAD and unmodified.
+
+    `git status --porcelain` alone is silent for gitignored files (e.g. under
+    results/), so an uncommitted authorization or pilot record passed."""
+    try:
+        rel = str(Path(path).resolve().relative_to(REPO))
+    except ValueError as exc:
+        raise PermissionError(f"{what} is outside the repository") from exc
+    try:
+        _git("ls-files", "--error-unmatch", "--", rel)
+    except subprocess.CalledProcessError as exc:
+        raise PermissionError(f"{what} is not committed") from exc
+    if _git("status", "--porcelain", "--", rel):
+        raise PermissionError(f"{what} differs from the committed version")
 
 
 def check_authorization(auth_path: Path, cfg_path: Path) -> dict:
@@ -369,10 +399,9 @@ def check_authorization(auth_path: Path, cfg_path: Path) -> dict:
             raise PermissionError(f"pinned blob mismatch for {p}")
     if _git("status", "--porcelain", "--", *PINNED_PATHS):
         raise PermissionError("pinned paths dirty in the worktree")
-    rel = str(Path(auth_path).resolve().relative_to(REPO))
-    if _git("status", "--porcelain", "--", rel):
-        raise PermissionError("authorization file is not committed")
+    _require_committed(auth_path, "authorization file")
     pilot = Path(REPO / auth["pilot_record"])
+    _require_committed(pilot, "pilot record")
     if sha256_file(pilot) != auth["pilot_record_sha256"]:
         raise PermissionError("pilot record hash mismatch")
     rec = json.loads(pilot.read_text())
