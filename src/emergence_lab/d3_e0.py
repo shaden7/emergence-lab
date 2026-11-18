@@ -253,27 +253,53 @@ class CellEstimate:
     p_r0: float
 
 
+class Welford:
+    """Streaming mean/variance with Chan et al. chunk merging (freeze item c).
+
+    Numerically stable replacement for the sum / sum-of-squares accumulator."""
+
+    __slots__ = ("n", "mean", "m2")
+
+    def __init__(self):
+        self.n = 0
+        self.mean = 0.0
+        self.m2 = 0.0
+
+    def add_batch(self, x: np.ndarray) -> None:
+        x = np.asarray(x, dtype=float)
+        nb = x.size
+        if nb == 0:
+            return
+        mb = float(x.mean())
+        m2b = float(np.sum((x - mb) ** 2))
+        n = self.n + nb
+        delta = mb - self.mean
+        self.mean += delta * nb / n
+        self.m2 += m2b + delta * delta * self.n * nb / n
+        self.n = n
+
+    @property
+    def var(self) -> float:
+        return self.m2 / (self.n - 1) if self.n > 1 else math.nan
+
+
 def estimate_cell(arm: str, n: int, d: int, replicates: int,
                   rng: np.random.Generator, chunk: int = 4096) -> CellEstimate:
     """Mean MM dimension over R>0 replicates (arm A: all), with i.i.d. SE."""
     table = inverse_table(n)
     c = n * (n - 1) // 2
-    s = s2 = 0.0
-    pos = 0
+    acc = Welford()
     rsum = 0
     done = 0
     while done < replicates:
         b = min(chunk, replicates - done)
         r = arm_counts(arm, n, d, b, rng)
         rsum += int(r.sum())
-        dv = table[r[r > 0]]
-        pos += dv.size
-        s += float(dv.sum())
-        s2 += float(np.dot(dv, dv))
+        acc.add_batch(table[r[r > 0]])
         done += b
-    mean = s / pos if pos else math.nan
-    var = (s2 - pos * mean * mean) / (pos - 1) if pos > 1 else math.nan
-    var = max(var, 0.0) if pos > 1 else var
+    pos = acc.n
+    mean = acc.mean if pos else math.nan
+    var = max(acc.var, 0.0) if pos > 1 else math.nan
     sd = math.sqrt(var) if pos > 1 else math.nan
     return CellEstimate(arm, n, d, replicates, pos, mean, sd,
                         sd / math.sqrt(pos) if pos > 1 else math.nan,
