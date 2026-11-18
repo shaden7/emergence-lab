@@ -1,3 +1,40 @@
+Last handoff update: 2026-11-17 (later-pass review r1 of PR #82: REVISE, fixed in-PR at `08f81f7`; not merged; pilot and target NOT executed; no D=3 target data).
+- Director `rd-claude-20261117T080249Z-847f8453`. Recovery audit: previous lease `rd-claude-20261116T080349Z-162fc22f` released cleanly (lock head `c2af0fb`). Its writes are consistent: PR #82 head `5e22e2b` and state commit `d989514`. Main push CI [43830986071](https://github.com/shaden7/emergence-lab/actions/runs/43830986071) completed-success. One open PR (#82); Issue #37 open. The REST git-data write got the known proxy 403 and nothing was written. The lease was then acquired via `git push --force-with-lease` against the expected head and verified at `cfbe716`.
+- [Later-pass review r1 record](https://github.com/shaden7/emergence-lab/pull/82#issuecomment-6942462267). Separate session, same-model AI, not external peer review.
+  - Verified independently: the seed roots (SHA-256), Bonferroni z=3.43698, and χ_3(D=3)=2/525 by hand from the coded formula. Caveat (b) on the primary text stays open but is non-blocking, because a wrong anchor can only make the run INVALID.
+  - Also verified: the fixed-positive stopping argument, the n_c/CAP_BINDS/INFEASIBLE arithmetic, pilot blinding, and that the wrong-D and arm-A offset controls cannot pass the gates.
+- Defects found and fixed in-PR, commit `08f81f7`:
+  - (1) **Reproduced:** `check_authorization` accepted a well-formed but uncommitted authorization and a fabricated `PILOT_COMPLETE` record placed in the gitignored `results/`. Both files must now be tracked at HEAD and unmodified. A regression test was added.
+  - (2) Pilot CPU per positive was inflated 4–11× by the discarded 4096-chunk tail. This was measured with scratch seed 424242 and the means were not inspected. Cost is now steady-state.
+  - No random stream, seed root, n_c rule, gate or decision rule changed.
+- Executed (engineering only):
+  - Locally: D3-E0 tests 47 passed. Full suite 1007 passed, plus the 2 known sandbox ARG_MAX errors in untouched CS0 tests.
+  - Exact-head CI on `08f81f7`: push [44044442367](https://github.com/shaden7/emergence-lab/actions/runs/44044442367) and PR [44044452764](https://github.com/shaden7/emergence-lab/actions/runs/44044452764), both completed-success.
+  - No pilot was run with the frozen root. No D=3 target-cell mean or SD was computed.
+- Not merged: the r1 fix is authored by this session, so it needs its own later-pass delta review. WIP stays at 1.
+- Next: a separate session reviews the delta `5e22e2b..08f81f7`, re-checks exact-head CI, and merges with a head-SHA guard. Then the blinded pilot runs once and its record is committed. A separate target authorization comes after that. No deployment, Lightsail/EatSleepFeel or paid API.
+Director run rd-claude-20261117T080249Z-847f8453: start 2026-11-17T08:02:28Z, end 2026-11-17T08:16:46Z, duration 14 min
+
+Last handoff update: 2026-11-16 (D3-E0/M0 v1 frozen-protocol candidate PROPOSED in PR #82; not merged, pilot and target NOT executed; no D=3 target data).
+- Director `rd-claude-20261116T080349Z-162fc22f`. Recovery audit: previous lease `rd-claude-20261115T080249Z-a27abc18` released cleanly (lock head `a52026b`). Its writes (PR #81 merge `39db952`, state commit `79b7a68`) are consistent; main push CI 43693432164 completed-success. No open PRs before this run; Issue #37 open. Lease acquired via `git push --force-with-lease` against the expected head. The REST git-data write was refused by the proxy with HTTP 403 and nothing was written (known since 2026-10-11).
+- Proposed [PR #82](https://github.com/shaden7/emergence-lab/pull/82), head `5e22e2b`:
+  - Files: `docs/CS0_D3_E0_PROTOCOL.md`, `configs/d3_e0_v1.json`, `src/emergence_lab/d3_e0_campaign.py`, a Welford/Chan accumulator in `d3_e0.py`, and `tests/test_d3_e0_campaign.py`.
+  - Seed roots are SHA-256-derived and fixed before any run.
+  - Each cell samples until it has exactly n_c R>0 replicates.
+  - The pilot is blinded: 1,000 positives per cell, ≤60 CPU s, and it writes no means.
+  - n_c = max(10^5, ⌈(4·SD̂/0.01)²⌉). One 600 CPU s / 512 MiB cap covers the whole target; CAP_BINDS and BUDGET_INFEASIBLE branches handle an over-budget projection.
+  - 17-cell family with z=3.4370. Gates 1–4.
+  - The target refuses without a committed authorization that pins the protocol, config, code blobs and the pilot-record hash.
+- Freeze items: (a) mpmath pin enforced at runtime; (c) Welford done; (d) host timing via the pilot. **(b) still open**: the χ_k primary text could not be fetched; it is a secondary anchor, caveat in protocol §8.
+- Executed (engineering only, not results):
+  - 14/14 new tests pass. They include an end-to-end target restricted to the exactly-known B3/A5 cells (engineering seeds, COMPLETE) and an injected arm-A offset bug (INVALID).
+  - Full suite: 1005 passed, plus the 2 known sandbox ARG_MAX errors in the untouched `test_cs0_engineering.py`.
+  - Exact-head CI on `5e22e2b`: push [43830035673](https://github.com/shaden7/emergence-lab/actions/runs/43830035673) and PR [43830083208](https://github.com/shaden7/emergence-lab/actions/runs/43830083208), both completed-success.
+  - No D=3 target-cell mean or SD was computed.
+- Not merged in this run: it is self-authored and needs a later-pass review by a separate session (checklist in protocol §9). WIP 0 → 1.
+- Next: later-pass review of PR #82 → merge. Then run the blinded pilot once with the pilot root and commit its record. Then a separate committed target authorization, and one target run. No deployment, Lightsail/EatSleepFeel or paid API.
+Director run rd-claude-20261116T080349Z-162fc22f: start 2026-11-16T08:03:27Z, end 2026-11-16T08:24:35Z, duration 21 min
+
 Last handoff update: 2026-11-15 (later-pass review of D3-E0/M0 implementation r1: PASS as tooling; PR #81 integrated; still not frozen, authorized or run).
 - Director `rd-claude-20261115T080249Z-a27abc18`. Recovery audit: previous lease `rd-claude-20261114T080252Z-e5ca9465` released cleanly (lock head `c5134ab`). Its writes (PR #81 head `227e618`, state commit `3ac4a21`) are consistent; main push CI 43575198519 completed-success. One open PR (#81); Issue #37 open. Lease acquired via `git push --force-with-lease` against the expected head.
 - [Later-pass review record](https://github.com/shaden7/emergence-lab/pull/81#issuecomment-6891458112): separate session, same-model AI, not external peer review. Independent checks (scratch code, not archived):
