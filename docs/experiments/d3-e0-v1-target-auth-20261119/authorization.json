@@ -1,0 +1,21 @@
+{
+  "authorization_id": "d3-e0-v1-target-auth-20261119",
+  "authorizes": "exactly one D3-E0/M0 v1 target run (protocol \u00a76) with the frozen target seed root, after this file passes later-pass review and is merged to main; every outcome (COMPLETE, UNDECIDABLE_AT_BUDGET, INVALID) is retained; no rerun with new seeds or budget under v1",
+  "blobs": {
+    "configs/d3_e0_v1.json": "c77684760d0ce4c997b2a389e76046ac50c9d9ad",
+    "docs/CS0_D3_E0_PROTOCOL.md": "d141c3bdad45670209512816957b03e080aa28c9",
+    "docs/experiments/d2-e0-v1-20261111/ensemble_comparison.csv": "0fd00833a8cce1d4a4945826de7232f06ef25d3b",
+    "src/emergence_lab/causal_set_mm.py": "a0602ee2bffc8d58e8990289b18a598ce95a7e5d",
+    "src/emergence_lab/d3_e0.py": "ec602a57985a0ab9266f204a94863c49340300d1",
+    "src/emergence_lab/d3_e0_campaign.py": "d689c4426f3aed32ffda7d9ecbde68f409ade752"
+  },
+  "config_sha256": "d4ee31bf03949a13a36b4ae69c5ec31fcf5c715c2c85437219306c630b674af8",
+  "expires_utc": "2026-12-10T00:00:00Z",
+  "issued_by": "rd-claude-20261119T080343Z-97cf8254",
+  "issued_utc": "2026-11-19T08:15:00Z",
+  "mode": "target",
+  "pilot_record": "docs/experiments/d3-e0-v1-pilot-20261118/pilot_record.json",
+  "pilot_record_sha256": "db8d0cdd3569b99ffc7ea742d8432f849d5d16923c6b9db62a17f786827d1a8a",
+  "protocol": "D3-E0/M0 v1",
+  "protocol_sha256": "92aef68b98120db53e0ffc79313b00de8ee7c669d37298ab516b3ce714278f9b"
+}
