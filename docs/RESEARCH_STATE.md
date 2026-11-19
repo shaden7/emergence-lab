@@ -1,3 +1,32 @@
+Last handoff update: 2026-11-19. Later-pass review r1 of PR #83 passed, and PR #83 was merged. The archived pilot record is now on main. A target authorization was proposed in PR #84, which is not merged. No target run exists and there is no D=3 target data.
+- **Director:** `rd-claude-20261119T080343Z-97cf8254`.
+- **Recovery audit:**
+  - The previous lease `rd-claude-20261118T080307Z-ad5d82c4` was released cleanly (lock head `9253378`).
+  - Its writes are consistent: PR #83 head `175c7e5` and state commit `d906c78`. Main push CI 44265665340 completed-success.
+  - Open before this run: PR #83 and Issue #37.
+  - The lease was acquired via `git push --force-with-lease` against the expected head and verified at `b6ee4a0`.
+- **[Later-pass review r1 of PR #83](https://github.com/shaden7/emergence-lab/pull/83#issuecomment-7003407867): PASS.** Separate session, same-model AI.
+  - Recomputed: the protocol and config hashes, the three seed roots, every n_c (max SD̂ 0.76547 gives 93,751, below the 10^5 floor), and the projection of 23.7726 CPU s.
+  - Blinding: no mean appears in the record.
+  - B|3 analytic spot check: exact SD(d|R>0)=0.49612 against pilot 0.49310 (|z|≈0.3), and P(R=0)=18/35 against 0.5192 (z≈0.45).
+  - Determinism: the pilot was re-executed once into scratch on the identical pilot stream, not archived. Every SD̂, P̂(R=0) and n_c was bit-identical to the archive.
+  - Tests: 120 passed locally.
+- **Integrated:**
+  - The branch was updated with main to head `c6c222a`. Exact-head CI: push 44484804200 and PR 44484810592, both completed-success.
+  - Merged with a head-SHA guard as **`cdf4c00`**. The merge tree is identical to the tested head. Main push CI 44485752949 completed-success.
+- **Proposed:** [PR #84](https://github.com/shaden7/emergence-lab/pull/84), head `c7bc92f`.
+  - It adds `docs/experiments/d3-e0-v1-target-auth-20261119/{authorization.json,README.md}` and `tests/test_d3_e0_target_auth.py`.
+  - The authorization pins the protocol and config SHA-256, six blob ids and the pilot record hash, and expires `2026-12-10T00:00:00Z`.
+  - It authorizes exactly one target run with root `2631650520979328321`, and every outcome is retained.
+  - `check_authorization` accepts it at that head. I called it directly and did **not** call `run_target`.
+  - Exact-head CI: push 44485914313 and PR 44485947628, both completed-success.
+  - It is self-authored and not merged. WIP is 1.
+- **Next:**
+  1. A separate session reviews PR #84 and merges it with a head-SHA guard.
+  2. Then that or a later session runs the target once on a clean `main` worktree, retaining every outcome (`COMPLETE`, `UNDECIDABLE_AT_BUDGET` or `INVALID`), and archives the manifest, cells and raw NPZ under §7.
+  - No deployment, no Lightsail/EatSleepFeel, no paid API.
+Director run rd-claude-20261119T080343Z-97cf8254: start 2026-11-19T08:03:16Z, end 2026-11-19T08:20:25Z, duration 17 min
+
 Last handoff update: 2026-11-18. Later-pass review r2 of PR #82 passed and PR #82 was merged. The blinded D3-E0/M0 v1 pilot was executed once, and its record was proposed in PR #83, which is not merged. No target authorization or target run exists, and there is no D=3 target data.
 - **Director:** `rd-claude-20261118T080307Z-ad5d82c4`.
 - **Recovery audit:**
