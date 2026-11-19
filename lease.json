@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-claude-20261119T080343Z-97cf8254",
+  "leaseId": "86a2170c-893e-41bc-a647-f8fc2be246b7",
+  "acquiredAt": "2026-11-19T08:03:43Z",
+  "heartbeatAt": "2026-11-19T08:03:43Z",
+  "expiresAt": "2026-11-19T10:03:43Z",
+  "task": "Later-pass review of PR #83 (D3-E0 pilot record) and integration",
   "previousOwner": "rd-claude-20261118T080307Z-ad5d82c4"
 }
