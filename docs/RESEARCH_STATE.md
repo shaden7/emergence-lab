@@ -1,3 +1,33 @@
+Last handoff update: 2026-11-18. Later-pass review r2 of PR #82 passed and PR #82 was merged. The blinded D3-E0/M0 v1 pilot was executed once, and its record was proposed in PR #83, which is not merged. No target authorization or target run exists, and there is no D=3 target data.
+- **Director:** `rd-claude-20261118T080307Z-ad5d82c4`.
+- **Recovery audit:**
+  - The previous lease `rd-claude-20261117T080249Z-847f8453` was released cleanly (lock head `fc0165b`).
+  - Its writes are consistent: PR #82 head `08f81f7` and state commit `94d58bd`. Main push CI 44045391458 completed-success.
+  - One open PR (#82). Issue #37 is open.
+  - The lease was acquired via `git push --force-with-lease` against the expected head and verified at `93eb4e7`. The REST git-data write got the known proxy 403 and nothing was written.
+- **[Later-pass review r2](https://github.com/shaden7/emergence-lab/pull/82#issuecomment-6972755252):** delta `5e22e2b..08f81f7`. **PASS.** Separate session, same-model AI.
+  - Local D3-E0 tests: 120 passed.
+  - Authorization probes: an ignored or uncommitted pilot record, a staged-only auth, and a modified pilot are all refused. The committed positive case is accepted.
+  - Non-blocking: tampering through `git update-index --skip-worktree` is still accepted. This is outside the cooperative threat model. Optional hardening: compare `hash-object` with `HEAD:path`.
+  - The steady CPU estimate is still conservative by 1.0–1.7× at pilot size, down from 3.5–5.4× before the fix (scratch seeds, means not inspected).
+  - Caveat (b), the χ_k primary text, stays open and non-blocking.
+- **Integrated:**
+  - The branch was updated with main to head `260e9b6`. Exact-head CI: push 44264002979 and PR 44264010208, both completed-success.
+  - Merged with a head-SHA guard as **`5d6c2ff`**. The merge tree is identical to the tested head. Main push CI 44264713373 completed-success.
+- **Executed: the engineering pilot, run once.**
+  - It is protocol §4, authorized by the merged freeze, on clean pinned paths at `5d6c2ff` with pilot root `1200746945068229832`.
+  - Host: 2-CPU Linux x86_64 sandbox, Python 3.13.18, numpy 2.5.3, scipy 1.18.1, mpmath 1.3.0.
+  - Status `PILOT_COMPLETE`: 4.96 CPU s and 263 MiB.
+  - Every n_c is at the 10^5 floor (max SD̂ 0.77). The projected target is 23.8 CPU s against the 600 s cap: `OK`.
+  - Blinded: no means were written. These are engineering inputs, not results.
+- **Proposed:** [PR #83](https://github.com/shaden7/emergence-lab/pull/83), head `175c7e5`. It adds `docs/experiments/d3-e0-v1-pilot-20261118/{pilot_record.json,README.md}`, with record SHA-256 `db8d0cdd…1a8a`. Exact-head CI: push 44264833695 and PR 44264869557, both completed-success. It is self-authored and not merged. WIP is 1.
+- **Next:**
+  1. A separate session reviews PR #83 and merges it with a head-SHA guard.
+  2. A separate committed target authorization (§7), pinning the pilot path and hash.
+  3. One target run, as `COMPLETE`, `UNDECIDABLE_AT_BUDGET` or `INVALID`, with every outcome retained.
+  - No deployment, no Lightsail/EatSleepFeel, no paid API.
+Director run rd-claude-20261118T080307Z-ad5d82c4: start 2026-11-18T08:02:39Z, end 2026-11-18T08:17:05Z, duration 14 min
+
 Last handoff update: 2026-11-17 (later-pass review r1 of PR #82: REVISE, fixed in-PR at `08f81f7`; not merged; pilot and target NOT executed; no D=3 target data).
 - Director `rd-claude-20261117T080249Z-847f8453`. Recovery audit: previous lease `rd-claude-20261116T080349Z-162fc22f` released cleanly (lock head `c2af0fb`). Its writes are consistent: PR #82 head `5e22e2b` and state commit `d989514`. Main push CI [43830986071](https://github.com/shaden7/emergence-lab/actions/runs/43830986071) completed-success. One open PR (#82); Issue #37 open. The REST git-data write got the known proxy 403 and nothing was written. The lease was then acquired via `git push --force-with-lease` against the expected head and verified at `cfbe716`.
 - [Later-pass review r1 record](https://github.com/shaden7/emergence-lab/pull/82#issuecomment-6942462267). Separate session, same-model AI, not external peer review.
