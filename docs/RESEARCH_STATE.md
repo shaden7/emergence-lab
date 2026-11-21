@@ -1,3 +1,29 @@
+Last handoff update: 2026-11-21. Later-pass review r1 of PR #85 passed, and PR #85 was merged. The D3-E0/M0 v1 target archive is now on main as an integrated **numerical observation**: an estimator control in one flat D=3 diamond. It makes no claim of physical dimensional reduction and does not answer Issue #37. No open PRs remain (WIP 0).
+- **Director:** `rd-claude-20261121T080257Z-1b847642`.
+- **Recovery audit:**
+  - The previous lease `rd-claude-20261120T080308Z-1ae2ac55` was released cleanly (lock head `1b55c72`).
+  - Its writes are consistent: PR #85 head `c220289` and state commit `9343b52`. Main push CI 44701355513 completed-success.
+  - Open before this run: PR #85 and Issue #37.
+  - The REST git-data write got the known proxy 403 and nothing was written. The lease was then acquired via `git push --force-with-lease` against the expected head and verified at `5e050e7`.
+- **[Later-pass review r1 of PR #85](https://github.com/shaden7/emergence-lab/pull/85#issuecomment-7059710653): PASS.** Separate session, same-model AI.
+  - Recomputed: the hashes of all three archive files, the config/protocol hashes against the authorization, and the seed roots (big-endian first 8 bytes of SHA-256).
+  - I independently recomputed all 17 D=3 cells from the raw NPZ with my own Myrheim–Meyer inverse. The maximum difference was 2.2e-15, and the smallest |Δ|/SE was 15.6 (cell B5).
+  - Independent cube-rejection sampler: B3 P(R=0) = 0.51426 ± 0.00025, against the exact 18/35. Means agree for B3, B5 and B6 (|z| ≤ 1.1). One small B6 P(R=0) batch was about −3σ; I logged it, and three further seeds agreed with the archive.
+  - Determinism: I re-executed `run_target` once into scratch on a clean `835eac2` worktree with identical versions. The NPZ was **byte-identical**, and the cells and manifest were identical apart from timing fields. This reproduction was not archived and is not a second run.
+  - Tests: the D3-E0 tests gave 122 passed. The full suite gave 1009 passed and 2 known sandbox-only errors in `test_cs0_engineering.py`.
+- **Integrated:**
+  - Exact-head CI: push 44700497398 and PR 44700536818, both completed-success.
+  - Merged with a head-SHA guard as **`8cff580`**. The merge tree equals the tested head plus the state-doc commit `9343b52`. Main push CI 44883490311 completed-success.
+- **Caveat (b), the χ_k primary text, is still open.** I added numerical evidence only ([Issue #37 comment](https://github.com/shaden7/emergence-lab/issues/37#issuecomment-7059738540)). It came from an independent sampler (scratch only, seed 4242, script in that comment).
+  - P(total order) = k!·χ_k agrees at (D,k) = (3,3), (3,4), (3,5) and (4,3), with z = +1.36, −0.80, −0.07 and +0.53.
+  - This is consistent with the formula, but it is not a proof and does not check the primary text.
+- **Next:**
+  1. With WIP at 0, propose (design only, as one PR) the next Issue #37 control. The candidate is a second, independently calibrated causal-set dimension estimator on the same flat D=2/D=3 diamonds, for example a chain-ratio estimator based on χ_k. It must have a preregistered bias-sign question, a null/positive control and a CPU cap, so that "≥2 calibrated estimators" can be tested.
+  2. Alternatively, resume the HOLD random-tree D2/spectral design.
+  - Do not rerun v1.
+  - No deployment, no Lightsail/EatSleepFeel, no paid API.
+Director run rd-claude-20261121T080257Z-1b847642: start 2026-11-21T08:02:31Z, end 2026-11-21T08:12:58Z, duration 10 min
+
 Last handoff update: 2026-11-20. Later-pass review r1 of PR #84 passed, and PR #84 was merged. The single authorized D3-E0/M0 v1 target run was executed once with status `COMPLETE`, and its archive was proposed in PR #85, which is not merged. Until PR #85 is reviewed, the target result is an unreviewed numerical observation.
 - **Director:** `rd-claude-20261120T080308Z-1ae2ac55`.
 - **Recovery audit:**
