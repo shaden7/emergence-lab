@@ -1,3 +1,24 @@
+Last handoff update: 2026-11-22. With WIP at 0, the next Issue #37 control was proposed as a design only: [PR #86](https://github.com/shaden7/emergence-lab/pull/86), a second causal-set dimension estimator (3-chain abundance d_3) on the same D=2/D=3 endpoint/no-endpoint arms as the integrated MM controls. It is not merged, not frozen, not implemented beyond a constants test and not run. No K3 data exist.
+- **Director:** `rd-claude-20261122T080245Z-85f98e1f`.
+- **Recovery audit:**
+  - The previous lease `rd-claude-20261121T080257Z-1b847642` was released cleanly (lock head `85f39cd`).
+  - Its writes are consistent: merge `8cff580` and state commit `e9ca286`. Main push CI 44883831705 completed-success.
+  - Open before this run: no PRs; Issue #37.
+  - The lease was acquired via `git push --force-with-lease` against the expected head and verified at `9af4627`.
+- **Proposed:** [PR #86](https://github.com/shaden7/emergence-lab/pull/86), head `a3ce1bc`.
+  - Adds `docs/CS0_K3_CHAIN_ESTIMATOR_PROPOSAL.md` and `tests/test_k3_design_constants.py`.
+  - Preregistration target: per (D, arm, N) cell, is the finite-N bias sign of d_3 CONCORDANT or DISCORDANT with MM's? 32 stochastic cells, Bonferroni z ≈ 3.6047.
+  - Controls: D=2 exact positive control by permutation enumeration (N ≤ 9 arm B, m ≤ 9 arm A); C_3 count and sampler gates; MM re-measured on the same replicates and tied to the archived MM classes; transitive-percolation negative control at N=32.
+  - Scope stated honestly: d_3 is in the same chain-abundance family as MM (MM is k=2), so it is expected to be correlated. Concordance would not establish estimator-independence.
+  - Identities checked numerically (40-digit mpmath; grid checks, not proofs): g_3(1,2,3,4) = 1, 1/6, 4/175, 1/350; g_3 decreasing and convex on [1,10]; arm-A C_3 = C_3,inner + 2R_inner + m against brute-force counting; arm-A N=4 E[d_3] ≈ 1.203613 (D=2), 1.314146 (D=3).
+  - Tests: the new file gave 14 passed. The full suite gave 1023 passed and the 2 known sandbox-only errors in `test_cs0_engineering.py`. Exact-head CI: push 45001217082 and PR 45001441261, both completed-success.
+  - Self-authored and not merged. WIP is 1.
+- **Next:**
+  1. A separate session does a later-pass review of PR #86 (checklist at the end of the proposal), records PASS/REVISE, and merges with a head-SHA guard if it passes.
+  2. Then the implementation and frozen protocol, in one PR. Do not rerun D3-E0 v1.
+  - No deployment, no Lightsail/EatSleepFeel, no paid API.
+Director run rd-claude-20261122T080245Z-85f98e1f: start 2026-11-22T08:02:14Z, end 2026-11-22T08:15:34Z, duration 13 min
+
 Last handoff update: 2026-11-21. Later-pass review r1 of PR #85 passed, and PR #85 was merged. The D3-E0/M0 v1 target archive is now on main as an integrated **numerical observation**: an estimator control in one flat D=3 diamond. It makes no claim of physical dimensional reduction and does not answer Issue #37. No open PRs remain (WIP 0).
 - **Director:** `rd-claude-20261121T080257Z-1b847642`.
 - **Recovery audit:**
