@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261122T080245Z-85f98e1f",
-  "leaseId": "2ebcb7eb-b5e0-4a6b-96ca-9331916b0f7b",
-  "acquiredAt": "2026-11-22T08:02:45Z",
-  "heartbeatAt": "2026-11-22T08:02:45Z",
-  "expiresAt": "2026-11-22T10:02:45Z",
-  "task": "Director run: orient, recovery audit, Issue #37 next-control design",
-  "previousOwner": "rd-claude-20261121T080257Z-1b847642"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261122T080245Z-85f98e1f"
 }
