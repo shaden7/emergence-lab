@@ -1,9 +1,14 @@
-# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r0, PROPOSED, NOT frozen)
+# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r1, PROPOSED, NOT frozen)
 
 Status: **design proposal only.** Not preregistered/frozen, not authorized,
-not implemented beyond a constants test, not run. No K3 data exist. Merging
-this file would integrate a design for later-pass review; it is not a result.
-Author: Director `rd-claude-20261122T080245Z-85f98e1f` (2026-11-22).
+not implemented beyond a constants test, not run. No D=3 K3 data exist.
+Merging this file would integrate a design for later-pass review; it is not a
+result.
+Author r0: Director `rd-claude-20261122T080245Z-85f98e1f` (2026-11-22).
+Revision r1: Director `rd-claude-20261123T080344Z-746a46c8` (2026-11-23),
+addressing [later-pass review r1 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7095051265).
+See "Revision r1" at the end of this file. r1 is self-authored by the reviewer
+session and needs a later-pass review r2 by a different session.
 Related: [Issue #37](https://github.com/shaden7/emergence-lab/issues/37),
 [D3-E0/M0 proposal](CS0_D3_E0_CONTROL_PROPOSAL.md),
 [D3-E0/M0 protocol](CS0_D3_E0_PROTOCOL.md),
@@ -73,15 +78,20 @@ strict interior of the future light cone, direct sampler
   against brute-force triple counting in the constants test).
 - **Arm B (no endpoints):** N i.i.d. points; d_3 reported conditional on
   C_3 > 0; P(C_3 = 0) reported separately. Note C_3 > 0 is a **stricter**
-  event than MM's R > 0, so arm-B conditioning differs between estimators;
-  both conditional and joint (R>0 ∧ C_3>0) MM values are reported so that
-  the comparison is not confounded by the conditioning event.
+  event than MM's R > 0 (C_3>0 implies R>0). **Primary comparison (r1):
+  matched conditioning.** In arm B both estimators are evaluated on the same
+  replicates with C_3 > 0; MM | R>0 is reported as a secondary, descriptive
+  value and is used only by gate 3 (tie to the archive).
 
 Counting: for a transitive order, C_3 = Σ_y |past(y)|·|future(y)|
 (O(N²) given the causal matrix). Grid N ∈ {3,4,5,6,8,12,16,24,32}
 (N=2 has no 3-chain). Invertibility: the smallest positive c_3 on the grid is
 1/binom(32,3) ≈ 2.02e−4 ≫ g_3(10) ≈ 5.4e−9, so every positive c_3 is
-invertible on [1,10].
+invertible on [1,10]. **Boundary (r1):** c_3 = 1 (total order) is mapped to
+d_3 = 1 explicitly and not by root finding. In double precision g_3(1)
+evaluates to 1 − 2.2e−16, so a bracketing solver on [1,10] fails there. This
+case has positive probability (arm A N=4; arm B N=3). MM's
+`myrheim_meyer_dimension` already maps r = 1 to 1.
 
 ## Established identities and exact anchors (no sampling)
 
@@ -120,15 +130,17 @@ grid checks, not proofs):
    triple counting on fixed-seed batches; MC mean of c_3 in arm B within 4 SE
    of g_3(D) at N = 4, 8, 32 for D = 2, 3.
 3. **MM re-measurement in the same replicates.** MM d is recomputed on the
-   same sprinklings; its arm/N sign must agree with the archived MM
+   same sprinklings (arm B: conditioned on R>0, as archived); its arm/N sign must agree with the archived MM
    classification wherever that was resolved (D=2 exact; D=3 v1), else
    INVALID. This ties the comparison to integrated evidence instead of a
    second, unreviewed MM run.
 4. **Negative (non-manifold) control.** Transitive percolation (random DAG on
    N=32 labelled elements, edge probability p, transitive closure) with p
-   fixed at freeze such that E[r] ≈ 8/35 (bisection on a separate
-   calibration seed). Hypothesis H_N: MM and d_3 disagree by more than
-   4 SE at N=32 there. Purpose: show the MM–d_3 agreement test has power to
+   fixed at freeze such that |E[r] − 8/35| ≤ 0.005 (bisection, 10^4
+   replicates per step, on a calibration seed root recorded in the frozen
+   config and distinct from every other root). Hypothesis H_N: with
+   n = 10^4 replicates, the mean paired difference d_MM − d_3 exceeds 4
+   paired SEs (SE of the per-replicate difference) in absolute value. Purpose: show the MM–d_3 agreement test has power to
    flag a non-manifoldlike order. Failure of H_N is retained and reported as
    "consistency check uninformative at N=32", not INVALID.
 
@@ -140,19 +152,36 @@ grid checks, not proofs):
 
 ## Decision rules (proposed, to freeze)
 
-Per (D, arm, N) cell: Δ_3 = mean(d_3) − D (arm B: over C_3>0 replicates),
-i.i.d. SE. Stochastic family: 2 D × 2 arms × 9 N − 4 deterministic = 32
-cells; Bonferroni family-wise α = 0.01 ⇒ two-sided z = Φ⁻¹(1 − 0.01/64)
-≈ 3.6047. ABOVE / BELOW / UNRESOLVED as in D3-E0. MM class per cell is taken
-from control 3. CONCORDANT if both resolved with equal sign; DISCORDANT if
-both resolved with opposite sign; else UNRESOLVED. Also report d_3(E[c_3]),
+Per (D, arm, N) cell and per estimator E ∈ {MM, d_3}: Δ_E = mean(d_E) − D,
+i.i.d. SE. In arm B both means are over the **same** C_3>0 replicates
+(matched conditioning, see Arms).
+
+Cell types (r1), 36 cells in total:
+
+- **Deterministic (4):** N=3 in both arms at both D. Here d_3 = 1, and under
+  matched conditioning also d_MM = 1, so both estimators are BELOW.
+- **Exact (9):** classified from exact laws, with no sampling and no z test.
+  - D=2: arm A N ∈ {4,5,6,8} (m ≤ 6 ≤ 9) and arm B N ∈ {4,5,6,8} (N ≤ 9),
+    from full S_N enumeration (gate 1).
+  - D=3: arm A N=4, analytic (C_3 ∈ {2,4}, R_inner ∈ {0,1}).
+- **Stochastic (23):** every other cell.
+
+Family-wise α = 0.01 over the 2 × 23 = 46 two-sided sign tests (both
+estimators) ⇒ z = Φ⁻¹(1 − 0.01/92) ≈ 3.6979. ABOVE / BELOW / UNRESOLVED as
+in D3-E0. CONCORDANT if both estimators are resolved with equal sign;
+DISCORDANT if both are resolved with opposite sign; else UNRESOLVED. The
+secondary values (MM | R>0 in arm B and its archived class) are reported in
+the same table and do not enter the classification. Also report d_3(E[c_3]),
 the Jensen gap, P(C_3=0), and the replicate correlation of (d_MM, d_3).
 
 Outcomes: INVALID (any gate 1–3 fails, budget or provenance failure);
 UNDECIDABLE_AT_BUDGET (any stochastic cell UNRESOLVED at N ≥ 4);
 otherwise COMPLETE with the per-cell table. Interpretation is fixed now:
-any DISCORDANT cell ⇒ "finite-N bias sign is estimator-dependent within
-the chain-abundance family in this flat geometry" (numerical observation);
+any DISCORDANT cell under matched conditioning ⇒ "finite-N bias sign is
+estimator-dependent within the chain-abundance family in this flat geometry"
+(numerical observation). A difference that appears only against the
+secondary MM | R>0 value is attributed to the conditioning event and not to
+the estimator;
 all CONCORDANT ⇒ "sign pattern shared by k=2 and k=3 abundances" (numerical
 observation; not estimator-independence). All cells, failed gates and
 negative outcomes are retained; no rerun with larger budget without a new
@@ -180,8 +209,43 @@ conversion, no claim about any quantum-gravity model.
 ## Review checklist for the later pass
 
 Verify: the g_3 rationals and its monotone/convex grid check; the arm-A
-C_3 identity; invertibility; the Bonferroni count (32 cells, z ≈ 3.6047);
+C_3 identity; invertibility; the Bonferroni count (r1: 23 stochastic cells ×
+2 estimators = 46 tests, z ≈ 3.6979; r0 had 32 cells, z ≈ 3.6047);
 whether conditioning on C_3>0 vs R>0 is handled adequately for a fair
 MM–d_3 comparison; whether the transitive-percolation control is
 well-defined and worth its cost; whether the D=2 enumeration range is
 sufficient as a positive control. Record PASS/REVISE before implementation.
+
+r2 additionally: check that matched conditioning is justified on principle
+(see the disclosure below) and that the exact/deterministic/stochastic cell
+partition and the c_3 = 1 boundary rule are complete.
+
+## Revision r1 (2026-11-23)
+
+This revision responds to [review r1](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7095051265).
+
+- **Arm-B comparator.** r0 did not say which MM conditioning drives the
+  classification. r1 makes the primary comparison **matched** (both
+  estimators on C_3>0). MM | R>0 is secondary and remains the gate-3 tie to
+  the archive. The rationale is a matter of principle: the bias-sign
+  question is about the estimator, so both estimators must be read on the
+  same conditional ensemble. Otherwise the conditioning event (at N=4,
+  P(C_3=0) = 0.58 against P(R=0) = 0.04) is confounded with the estimator.
+- **Disclosure.** The choice was made **after** the reviewer session had
+  computed exact D=2 arm-B values by S_N enumeration (table in review r1).
+  - Those values imply that, at D=2 arm B, the r0 rule (against MM | R>0)
+    would give DISCORDANT at N=4,5.
+  - The r1 rule gives CONCORDANT at N=4,5,8 and DISCORDANT at N=6.
+  - The D=2 exact cells are therefore **not blind**. They are deterministic
+    consequences of the definitions and are reported as such, not as
+    preregistered predictions. Neither rule removes all discordance.
+  - **No D=3 K3 quantity has been computed.**
+- **Cells.** r1 classifies the exactly computable cells (D=2 enumerable N;
+  D=3 arm-A N=4) exactly. The Bonferroni family shrinks to 46 tests,
+  z ≈ 3.6979.
+- **Boundary.** c_3 = 1 maps to d_3 = 1 explicitly.
+- **H_N** now specifies a paired SE, n = 10^4, an E[r] tolerance and its own
+  calibration seed root.
+- **The constants test is extended.** It adds the boundary rule, the r1
+  family size and z, and the D=2 small-N exact arm-B values against the
+  archived MM weights. These are design checks, not K3 target data.

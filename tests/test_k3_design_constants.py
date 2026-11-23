@@ -122,3 +122,61 @@ def test_three_chain_count_formula_and_arm_a_identity():
         r_inner = prec.sum(axis=(1, 2))
         assert np.array_equal(three_chains(causal(full)),
                               three_chains(prec) + 2 * r_inner + n)
+
+
+# --- design r1 additions (review r1 of PR #86) ---------------------------------
+
+def d3_of_c(c):
+    """r1 boundary rule: c_3 = 1 (total order) maps to d_3 = 1 explicitly."""
+    if c == 1:
+        return mp.mpf(1)
+    return d3_inverse(c)
+
+
+def test_r1_boundary_rule_total_order():
+    assert d3_of_c(1) == 1
+    # double-precision g_3(1) is not exactly 1, which is why the rule is explicit
+    assert float(g3(1)) == pytest.approx(1.0, abs=1e-12)
+
+
+def test_r1_cell_partition_and_bonferroni():
+    deterministic = {(d, arm, 3) for d in (2, 3) for arm in "AB"}
+    exact = ({(2, "A", n) for n in GRID_K3 if 4 <= n and n - 2 <= 9}
+             | {(2, "B", n) for n in GRID_K3 if 4 <= n <= 9}
+             | {(3, "A", 4)})
+    assert len(deterministic) == 4 and len(exact) == 9
+    stochastic = 2 * 2 * len(GRID_K3) - len(deterministic) - len(exact)
+    assert stochastic == 23
+    tests = 2 * stochastic
+    assert norm.ppf(1 - 0.01 / (2 * tests)) == pytest.approx(3.6979, abs=1e-4)
+
+
+def _d2_arm_b_exact(n):
+    """Exact D=2 arm-B means by S_n enumeration (permutation <-> light-cone order)."""
+    import itertools
+    from emergence_lab.causal_set_mm import myrheim_meyer_dimension as mm
+    b2, b3 = math.comb(n, 2), math.comb(n, 3)
+    mm_r, mm_c, k3, n_r, n_c = 0.0, 0.0, mp.mpf(0), 0, 0
+    upper = np.triu(np.ones((n, n), bool), 1)
+    for perm in itertools.permutations(range(n)):
+        a = np.array(perm)
+        lt = (a[None, :] > a[:, None]) & upper
+        r, c3 = int(lt.sum()), int((lt.sum(0) * lt.sum(1)).sum())
+        if r > 0:
+            mm_r += mm(r / b2); n_r += 1
+        if c3 > 0:
+            mm_c += mm(r / b2); k3 += d3_of_c(mp.mpf(c3) / b3); n_c += 1
+    return mm_r / n_r, mm_c / n_c, float(k3 / n_c)
+
+
+@pytest.mark.parametrize("n,mm_r_archived,mm_matched,d3_matched", [
+    (4, 2.0731669723898114, 1.52795, 1.59389),
+    (5, 2.102161560251244, 1.78605, 1.88108),
+    (6, 2.0861912679526076, 1.92107, 2.02906),
+])
+def test_r1_d2_arm_b_exact_small_n(n, mm_r_archived, mm_matched, d3_matched):
+    # MM | R>0 reproduces docs/experiments/d2-m0-run-20261107/curve.csv
+    mm_r, mm_c, k3 = _d2_arm_b_exact(n)
+    assert mm_r == pytest.approx(mm_r_archived, abs=1e-9)
+    assert mm_c == pytest.approx(mm_matched, abs=1e-5)
+    assert k3 == pytest.approx(d3_matched, abs=1e-5)
