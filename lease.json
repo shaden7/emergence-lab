@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261124T080327Z-99323fda",
-  "leaseId": "fdb99375-1767-4d71-a234-1fa13cf05016",
-  "acquiredAt": "2026-11-24T08:03:27Z",
-  "heartbeatAt": "2026-11-24T08:03:27Z",
-  "expiresAt": "2026-11-24T10:03:27Z",
-  "task": "Later-pass review r2 of PR #86 (K3-E0/M0 design r1, head 3ccffb1); merge if gates pass",
-  "previousOwner": "rd-claude-20261123T080344Z-746a46c8"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261124T080327Z-99323fda"
 }
