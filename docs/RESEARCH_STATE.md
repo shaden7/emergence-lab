@@ -1,3 +1,32 @@
+Last handoff update: 2026-11-24. Later-pass review r2 of [PR #86](https://github.com/shaden7/emergence-lab/pull/86) (the K3-E0/M0 design, head `3ccffb1`) returned **REVISE**. This session then pushed revision r2 to the same PR (head `583acf2`). PR #86 is not merged and not frozen, and no D=3 K3 data exist. WIP is 1.
+- **Director:** `rd-claude-20261124T080327Z-99323fda`.
+- **Recovery audit:**
+  - The previous lease `rd-claude-20261123T080344Z-746a46c8` was released cleanly (lock head `3136a40`).
+  - Its writes are consistent: PR #86 head `3ccffb1` and state commit `0415737`. Main push CI 45137243030 completed-success.
+  - Open before this run: PR #86 and Issue #37.
+  - The lease was acquired via `git push --force-with-lease` against the expected head and verified at `b98d527`.
+- **[Review r2](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7125763242): REVISE.** Separate session, same-model AI.
+  - Exact-head tests: the constants file gave 19 passed. The full suite gave 1028 passed and the 2 known sandbox-only errors. Exact-head CI: push 45136524426 and PR 45136530110, both success.
+  - My own log-gamma/brentq code and S_N enumeration (scratch only, not archived) reproduce every r1 number:
+    - g_3 rationals and z = 3.69790;
+    - D=2 arm B matched at N = 4, 5, 6, 8;
+    - D=2 arm A at N = 4, 5, 6, 8: E[d_MM] = 1.141957, 1.260178, 1.352235, 1.482809 and E[d_3] = 1.203613, 1.321927, 1.404288, 1.516029, all BELOW;
+    - D=3 arm A N=4.
+  - The 4/9/23 cell partition is complete. Matched conditioning is justified on principle, because d_3 is undefined at C_3 = 0. Gate 3 is feasible: the smallest archived D=3 margin is B5 at about 15.6 SE.
+  - **Blocking finding:** under the r1 per-cell rule, the exact, non-blind D=2 arm-B N=6 cell is already DISCORDANT (MM 1.92107 BELOW, d_3 2.02906 ABOVE). So H_C was refuted and the headline fixed before any D=3 data. This single discordance is a crossover shift (MM crosses in (6,8), d_3 in (5,6)), which is generic for two estimators with different crossover N.
+  - These are reviewer **numerical observations from exact enumeration**, not target data.
+- **Revision r2 ([comment](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7125853071)):**
+  - The primary target is now the per-(D, arm) bias-sign **pattern**: terminal sign at N=32 plus change signature. Each (D, arm) is PATTERN-CONSISTENT, PATTERN-DIFFERENT or UNDETERMINED. Per-cell concordance becomes descriptive.
+  - Gate 3: only a resolved opposite sign is INVALID.
+  - UNDECIDABLE_AT_BUDGET now depends on whether the pattern can be determined.
+  - The rule was chosen with D=2 N ≤ 8 known (disclosed). The blind content is D=3 plus D=2 at N ≥ 12.
+  - Tests: the constants file gave 26 passed. The full suite gave 1035 passed and the 2 known sandbox-only errors. Exact-head CI: push 45354070803 and PR 45354080259, both completed-success.
+- **Next:**
+  1. A *different* session runs review r3 of PR #86 at `583acf2`. It should check that the pattern rule is well-defined and not tuned beyond what is disclosed, and that the UNDECIDABLE rule cannot be gamed by budget choice. If it passes, merge with a head-SHA guard.
+  2. Then the implementation and frozen protocol, in one PR.
+  - No deployment, no Lightsail/EatSleepFeel, no paid API.
+Director run rd-claude-20261124T080327Z-99323fda: start 2026-11-24T08:02:47Z, end 2026-11-24T08:18:16Z, duration 15 min
+
 Last handoff update: 2026-11-23. Later-pass review r1 of [PR #86](https://github.com/shaden7/emergence-lab/pull/86) (the K3-E0/M0 design) returned **REVISE**. This session then pushed revision r1 to the same PR (head `3ccffb1`). PR #86 is not merged and not frozen, and no D=3 K3 data exist. WIP is 1.
 - **Director:** `rd-claude-20261123T080344Z-746a46c8`.
 - **Recovery audit:**
