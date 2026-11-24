@@ -1,4 +1,4 @@
-# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r1, PROPOSED, NOT frozen)
+# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r2, PROPOSED, NOT frozen)
 
 Status: **design proposal only.** Not preregistered/frozen, not authorized,
 not implemented beyond a constants test, not run. No D=3 K3 data exist.
@@ -7,8 +7,11 @@ result.
 Author r0: Director `rd-claude-20261122T080245Z-85f98e1f` (2026-11-22).
 Revision r1: Director `rd-claude-20261123T080344Z-746a46c8` (2026-11-23),
 addressing [later-pass review r1 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7095051265).
-See "Revision r1" at the end of this file. r1 is self-authored by the reviewer
-session and needs a later-pass review r2 by a different session.
+See "Revision r1" at the end of this file.
+Revision r2: Director `rd-claude-20261124T080327Z-99323fda` (2026-11-24),
+addressing [later-pass review r2 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7125763242).
+See "Revision r2" at the end of this file. r2 is self-authored by the r2
+reviewer session and needs a later-pass review r3 by a different session.
 Related: [Issue #37](https://github.com/shaden7/emergence-lab/issues/37),
 [D3-E0/M0 proposal](CS0_D3_E0_CONTROL_PROPOSAL.md),
 [D3-E0/M0 protocol](CS0_D3_E0_PROTOCOL.md),
@@ -43,9 +46,17 @@ c_3 = C_3 / binom(N,3). Define the 3-chain dimension d_3 as the inverse of
     g_3(D) = 3! · χ_3(D),   χ_k(D) = (1/k) (Γ(D+1)/2)^(k-1) Γ(D/2) Γ(D) / (Γ(kD/2) Γ((k+1)D/2))
 
 on [1,10] (g_3 is the probability that three i.i.d. uniform diamond points
-form a chain in some order). **At fixed input D ∈ {2,3}, in arms A and B, is
-the sign of the finite-N bias of d_3 the same as that of MM at every grid
-N?** Answer per cell: CONCORDANT, DISCORDANT, or UNRESOLVED (rules below).
+form a chain in some order). **Primary question (r2): at fixed input
+D ∈ {2,3}, in arms A and B, does d_3 have the same finite-N bias-sign
+*pattern* over the grid as MM?** Here the pattern is (i) the sign at the
+largest grid N and (ii) the number and direction of sign changes over N. The
+answer per (D, arm) is PATTERN-CONSISTENT, PATTERN-DIFFERENT or UNDETERMINED
+(rules below). Per-cell CONCORDANT / DISCORDANT / UNRESOLVED is reported as a
+descriptive table.
+
+The r0/r1 per-cell form ("same sign at **every** grid N?") is already
+answered **no** by exact, non-blind D=2 cells: arm B N=6 is DISCORDANT (see
+Revision r2). It is therefore not a preregistration target.
 
 This is an estimator comparison in one prescribed geometry. It is not a model
 comparison, does not answer Issue #37, and no outcome licenses any statement
@@ -132,7 +143,10 @@ grid checks, not proofs):
 3. **MM re-measurement in the same replicates.** MM d is recomputed on the
    same sprinklings (arm B: conditioned on R>0, as archived); its arm/N sign must agree with the archived MM
    classification wherever that was resolved (D=2 exact; D=3 v1), else
-   INVALID. This ties the comparison to integrated evidence instead of a
+   INVALID. **r2:** the re-measured cell is classified with the same z. Only
+   a resolved **opposite** sign is INVALID. An UNRESOLVED re-measurement is
+   reported and is not INVALID. The smallest archived D=3 margin is cell B5,
+   at about 15.6 SE with n = 10^5. This ties the comparison to integrated evidence instead of a
    second, unreviewed MM run.
 4. **Negative (non-manifold) control.** Transitive percolation (random DAG on
    N=32 labelled elements, edge probability p, transitive closure) with p
@@ -148,7 +162,11 @@ grid checks, not proofs):
 
 - H_A3: E[d_3] < D in arm A at every grid N, D = 2, 3.
 - H_B3: E[d_3 | C_3>0] > D in arm B for N ≥ N_B3 (some small N_B3), D = 2, 3.
-- H_C (main): every cell resolved for both estimators is CONCORDANT.
+- ~~H_C: every cell resolved for both estimators is CONCORDANT.~~ Already
+  refuted, exactly and not blind, at D=2 arm B N=6 (Revision r2). Retained
+  only as a record.
+- H_P (main, r2): PATTERN-CONSISTENT in every (D, arm) at D=3. D=2 is
+  reported the same way, but its N ≤ 8 cells are not blind.
 
 ## Decision rules (proposed, to freeze)
 
@@ -174,18 +192,56 @@ secondary values (MM | R>0 in arm B and its archived class) are reported in
 the same table and do not enter the classification. Also report d_3(E[c_3]),
 the Jensen gap, P(C_3=0), and the replicate correlation of (d_MM, d_3).
 
-Outcomes: INVALID (any gate 1–3 fails, budget or provenance failure);
-UNDECIDABLE_AT_BUDGET (any stochastic cell UNRESOLVED at N ≥ 4);
-otherwise COMPLETE with the per-cell table. Interpretation is fixed now:
-any DISCORDANT cell under matched conditioning ⇒ "finite-N bias sign is
-estimator-dependent within the chain-abundance family in this flat geometry"
-(numerical observation). A difference that appears only against the
-secondary MM | R>0 value is attributed to the conditioning event and not to
-the estimator;
-all CONCORDANT ⇒ "sign pattern shared by k=2 and k=3 abundances" (numerical
-observation; not estimator-independence). All cells, failed gates and
-negative outcomes are retained; no rerun with larger budget without a new
-reviewed protocol.
+**Sign pattern (r2, primary).** For each (D, arm, estimator), take the
+per-cell labels over the grid N = 3, …, 32 in order. Deterministic and exact
+cells contribute their exact labels. Let s be the subsequence of resolved
+labels, with UNRESOLVED removed. Define:
+
+- (i) the terminal sign: the label at N = 32;
+- (ii) the change signature: the ordered list of sign changes in s (for
+  example "B→A once"), each with its **crossover bracket**, i.e. the two
+  adjacent resolved grid N between which the change occurs.
+
+Per (D, arm):
+
+- **UNDETERMINED** if, for either estimator, the N = 32 cell is UNRESOLVED,
+  or an UNRESOLVED cell lies between two resolved cells of the **same** sign
+  (it could hide a pair of changes).
+- Otherwise **PATTERN-CONSISTENT** if both estimators have the same terminal
+  sign and the same change signature, counted and directed, with the
+  brackets allowed to differ.
+- Otherwise **PATTERN-DIFFERENT**.
+
+The pattern is a function of the 46 per-cell sign tests and the exact
+labels, so the family-wise α = 0.01 bound carries over and there is no extra
+multiplicity. DISCORDANT cells that lie strictly between the two estimators'
+crossover brackets are reported as a **crossover shift**, not as a pattern
+difference.
+
+Outcomes:
+
+- INVALID: any gate 1–3 fails, or a budget or provenance failure.
+- UNDECIDABLE_AT_BUDGET (r2): any (D, arm) is UNDETERMINED. A single
+  UNRESOLVED cell next to a crossover does not by itself make the run
+  undecidable.
+- Otherwise COMPLETE, with the per-(D, arm) pattern table and the per-cell
+  table.
+
+Interpretation is fixed now:
+
+- Any PATTERN-DIFFERENT (D, arm) ⇒ "the finite-N bias-sign pattern is
+  estimator-dependent within the chain-abundance family in this flat
+  geometry" (numerical observation).
+- All PATTERN-CONSISTENT ⇒ "the sign pattern is shared by the k=2 and k=3
+  abundances; crossover positions as reported" (numerical observation, not
+  estimator-independence).
+- A difference that appears only against the secondary MM | R>0 value is
+  attributed to the conditioning event, not to the estimator.
+- Because the D=2 N ≤ 8 cells are not blind, the blind content of the
+  verdict is D=3, plus the D=2 cells at N ≥ 12.
+
+All cells, failed gates and negative outcomes are retained; no rerun with
+larger budget without a new reviewed protocol.
 
 ## Budget, seeds, pilot
 
@@ -218,7 +274,13 @@ sufficient as a positive control. Record PASS/REVISE before implementation.
 
 r2 additionally: check that matched conditioning is justified on principle
 (see the disclosure below) and that the exact/deterministic/stochastic cell
-partition and the c_3 = 1 boundary rule are complete.
+partition and the c_3 = 1 boundary rule are complete. (Done in review r2:
+both pass.)
+
+r3 additionally: check that the r2 sign-pattern rule (terminal sign, change
+signature, UNDETERMINED cases) is well-defined, not tuned to the known D=2
+cells beyond what is disclosed, and that the UNDECIDABLE rule cannot be
+gamed by budget choice.
 
 ## Revision r1 (2026-11-23)
 
@@ -249,3 +311,42 @@ This revision responds to [review r1](https://github.com/shaden7/emergence-lab/p
 - **The constants test is extended.** It adds the boundary rule, the r1
   family size and z, and the D=2 small-N exact arm-B values against the
   archived MM weights. These are design checks, not K3 target data.
+
+## Revision r2 (2026-11-24)
+
+This revision responds to [review r2](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7125763242).
+
+- **The headline was predetermined.** The exact D=2 arm-B values under
+  matched conditioning (independently re-derived in review r2) are:
+
+  | N | E[d_MM \| C_3>0] | E[d_3 \| C_3>0] | cell |
+  |---|---|---|---|
+  | 4 | 1.52795 (B) | 1.59389 (B) | CONCORDANT |
+  | 5 | 1.78605 (B) | 1.88108 (B) | CONCORDANT |
+  | 6 | 1.92107 (B) | 2.02906 (A) | DISCORDANT |
+  | 8 | 2.02070 (A) | 2.11941 (A) | CONCORDANT |
+
+  The N=6 cell alone refutes the r1 per-cell H_C and triggers its fixed
+  interpretation before any D=3 data exist, so the r1 rule could not change
+  its own headline. One-cell discordance between two crossovers is also
+  generic. Here MM crosses in (6, 8) and d_3 in (5, 6).
+- **Primary target changed to the sign pattern per (D, arm).** The pattern
+  is the terminal sign at N=32 plus the change signature. Per-cell
+  concordance is now descriptive. On the known D=2 cells the two estimators
+  have the same change signature so far (MM B,B,B,A; d_3 B,B,A,A at
+  N = 4, 5, 6, 8; arm A all B for both at N = 3–8). The verdict therefore
+  still depends on blind cells (D=3 and D=2 N ≥ 12).
+- **Disclosure.** This rule was chosen with the D=2 N ≤ 8 exact cells
+  known, as in r1. The "terminal sign + change signature" form was chosen
+  because it is the coarsest description that separates "crossover shift"
+  from "different pattern". It was not fitted to make D=2 come out
+  consistent: D=2 at N ≥ 12 is still blind for d_3 and for matched MM.
+  **No D=3 K3 quantity has been computed.**
+- **Gate 3:** only a resolved opposite sign is INVALID; an UNRESOLVED
+  re-measurement is reported.
+- **UNDECIDABLE_AT_BUDGET** now depends on whether the pattern can be
+  determined, not on every cell.
+- **The constants test is extended** with the D=2 arm-B N=8 and arm-A
+  N = 4, 5, 6, 8 exact values and the sign-pattern rule applied to the
+  exact D=2 cells. These are design checks, not K3 target data.
+

@@ -180,3 +180,95 @@ def test_r1_d2_arm_b_exact_small_n(n, mm_r_archived, mm_matched, d3_matched):
     assert mm_r == pytest.approx(mm_r_archived, abs=1e-9)
     assert mm_c == pytest.approx(mm_matched, abs=1e-5)
     assert k3 == pytest.approx(d3_matched, abs=1e-5)
+
+
+# --- design r2 additions (review r2 of PR #86) ---------------------------------
+
+def _d2_exact_cached(n, arm):
+    """Exact D=2 means for arm A (tips + n-2 interior) or arm B (matched C_3>0).
+
+    Same permutation <-> light-cone-order correspondence as above; d_3 and MM
+    inverses are cached per distinct count so N=8 stays fast."""
+    import itertools
+    from emergence_lab.causal_set_mm import myrheim_meyer_dimension as mm
+    b2, b3 = math.comb(n, 2), math.comb(n, 3)
+    m = n - 2 if arm == "A" else n
+    cache_mm, cache_k3 = {}, {}
+    s_mm = s_k3 = 0.0
+    count = 0
+    upper = np.triu(np.ones((m, m), bool), 1)
+    for perm in itertools.permutations(range(m)):
+        a = np.array(perm)
+        lt = (a[None, :] > a[:, None]) & upper
+        r, c3 = int(lt.sum()), int((lt.sum(0) * lt.sum(1)).sum())
+        if arm == "A":
+            r, c3 = r + 2 * m + 1, c3 + 2 * r + m  # tips: identity C_3 = C_3,in + 2R_in + m
+        if c3 == 0:
+            continue
+        if r not in cache_mm:
+            cache_mm[r] = mm(r / b2)
+        if c3 not in cache_k3:
+            cache_k3[c3] = float(d3_of_c(mp.mpf(c3) / b3))
+        s_mm += cache_mm[r]
+        s_k3 += cache_k3[c3]
+        count += 1
+    return s_mm / count, s_k3 / count
+
+
+@pytest.mark.parametrize("n,arm,mm_exact,d3_exact", [
+    (8, "B", 2.02070, 2.11941),
+    (4, "A", 1.141957, 1.203613),
+    (5, "A", 1.260178, 1.321927),
+    (6, "A", 1.352235, 1.404288),
+    (8, "A", 1.482809, 1.516029),
+])
+def test_r2_d2_exact_cells(n, arm, mm_exact, d3_exact):
+    mm_v, k3_v = _d2_exact_cached(n, arm)
+    assert mm_v == pytest.approx(mm_exact, abs=1e-5)
+    assert k3_v == pytest.approx(d3_exact, abs=1e-5)
+
+
+def sign_pattern(labels):
+    """r2 rule. labels: list over the grid in N order, each 'A', 'B' or 'U'.
+
+    Returns (terminal, changes) or None if UNDETERMINED. changes is a tuple of
+    (from, to) pairs; crossover brackets are not part of the comparison."""
+    if labels[-1] == "U":
+        return None
+    resolved = [(i, s) for i, s in enumerate(labels) if s != "U"]
+    for (i, a), (j, b) in zip(resolved, resolved[1:]):
+        if a == b and j - i > 1:  # an UNRESOLVED gap between equal signs may hide two changes
+            return None
+    changes = tuple((a, b) for (_, a), (_, b) in zip(resolved, resolved[1:]) if a != b)
+    return labels[-1], changes
+
+
+def compare_patterns(mm_labels, k3_labels):
+    p, q = sign_pattern(mm_labels), sign_pattern(k3_labels)
+    if p is None or q is None:
+        return "UNDETERMINED"
+    return "PATTERN-CONSISTENT" if p == q else "PATTERN-DIFFERENT"
+
+
+def test_r2_pattern_rule_cases():
+    # crossover shift only: consistent despite a DISCORDANT cell
+    assert compare_patterns(list("BBBBAAAAA"), list("BBBAAAAAA")) == "PATTERN-CONSISTENT"
+    # different terminal sign
+    assert compare_patterns(list("BBBBAAAAA"), list("BBBBBBBBB")) == "PATTERN-DIFFERENT"
+    # same terminal sign, different number of changes
+    assert compare_patterns(list("BBBBBBBBB"), list("BBAABBBBB")) == "PATTERN-DIFFERENT"
+    # UNRESOLVED next to a crossover is harmless
+    assert compare_patterns(list("BBBUAAAAA"), list("BBUAAAAAA")) == "PATTERN-CONSISTENT"
+    # UNRESOLVED between equal signs, or at N=32, is UNDETERMINED
+    assert compare_patterns(list("BBUBAAAAA"), list("BBBBAAAAA")) == "UNDETERMINED"
+    assert compare_patterns(list("BBBBAAAAU"), list("BBBBAAAAA")) == "UNDETERMINED"
+
+
+def test_r2_known_d2_cells_are_crossover_shift_not_pattern_difference():
+    # exact D=2 labels at N = 3, 4, 5, 6, 8 (N=3 deterministic B); N >= 12 is blind
+    mm_b = ["B"] + ["A" if v > 2 else "B" for v in (1.52795, 1.78605, 1.92107, 2.02070)]
+    k3_b = ["B"] + ["A" if v > 2 else "B" for v in (1.59389, 1.88108, 2.02906, 2.11941)]
+    assert mm_b == list("BBBBA") and k3_b == list("BBBAA")
+    assert [a != b for a, b in zip(mm_b, k3_b)] == [False, False, False, True, False]
+    # on the known prefix the change signatures agree (one B->A each)
+    assert sign_pattern(mm_b)[1] == sign_pattern(k3_b)[1] == (("B", "A"),)
