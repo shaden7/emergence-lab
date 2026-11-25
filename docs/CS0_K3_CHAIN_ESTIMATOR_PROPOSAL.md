@@ -275,7 +275,7 @@ outcomes. In arm A all draws are accepted. In arm B, both SDs are calculated
 on the **same matched `C_3>0` subset** used for the primary MM–d_3
 comparison; MM conditioned only on `R>0` remains secondary and does not
 enter sizing. If a cell has too few accepted draws to estimate both SDs, or
-its one-sided 97.5% Wilson lower bound `p_L` for `P(C_3>0)` is zero, sizing
+its one-sided 97.5% Clopper–Pearson lower bound `p_L` for `P(C_3>0)` is zero, sizing
 fails and no target run starts.
 
 For each non-deterministic cell, the shared target is
@@ -284,14 +284,16 @@ replicates**. This is a pilot-based planning target for a four-SE
 half-width of 0.01 for both estimators, not a confidence bound on the unknown
 target SD. The realized target SDs and SEs are computed from the target sample
 and used in the frozen classification. Arm A requires `n_c` total
-draws. Arm B's planned total-draw limit `N_total` is the smallest integer
-`n` for which `Pr[Binomial(n, p_L) >= n_c] >= 0.975`, where `p_L` is
-the pilot's one-sided **97.5% Wilson lower bound** for the acceptance
-probability. This
-allows for both uncertainty in the pilot acceptance estimate and binomial
-variation in the target draws: by a union bound, the probability that
-`p_L <= p` and that `N_total` draws yield at least `n_c` accepts is at
-least 95%, assuming independent draws with a stable acceptance probability.
+draws. For arm B, let `k` be the pilot's accepted count out of `n_p` total
+draws. Set `p_L = Beta^{-1}(0.025; k, n_p-k+1)` (and `p_L=0` if `k=0`),
+the exact one-sided 97.5% Clopper–Pearson lower bound for the acceptance
+probability. The planned total-draw limit `N_total` is the smallest integer
+`n` for which `Pr[Binomial(n, p_L) >= n_c] >= 0.975`. This allows for
+both uncertainty in the pilot acceptance estimate and binomial variation
+in the target draws: by a union bound, the probability that `p_L <= p`
+and that `N_total` draws yield at least `n_c` accepts is at least 95%,
+assuming independent pilot/target draws with a stable acceptance
+probability.
 The runner stops when `n_c` accepted draws are obtained or `N_total` total
 draws are reached. If the accepted count is still short at that limit, the
 cell is INVALID and no target verdict is issued. Both attempted and accepted
