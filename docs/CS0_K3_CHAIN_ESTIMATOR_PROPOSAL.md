@@ -284,10 +284,18 @@ replicates**. Thus both estimators meet the same four-SE 0.01 precision
 criterion on their respective matched sample. Arm A requires `n_c` total
 draws. Arm B plans at most `ceil(n_c/p_L)` total draws, where `p_L` is
 the pilot's one-sided 95% Wilson lower bound for the acceptance probability;
-the runner stops when `n_c` accepted draws are obtained or that total-draw
-limit is reached. Both attempted and accepted counts are reported. The
-pilot's SDs and acceptance estimate are used only for sizing, never for the
-target sign classification.
+the planned total-draw limit `N_total` is the smallest integer `n` for
+which `Pr[Binomial(n, p_L) >= n_c] >= 0.975`. Here `p_L` is the pilot's
+one-sided **97.5% Wilson lower bound** for the acceptance probability. This
+allows for both uncertainty in the pilot acceptance estimate and binomial
+variation in the target draws: by a union bound, the probability that
+`p_L <= p` and that `N_total` draws yield at least `n_c` accepts is at
+least 95%, assuming independent draws with a stable acceptance probability.
+The runner stops when `n_c` accepted draws are obtained or `N_total` total
+draws are reached. If the accepted count is still short at that limit, the
+cell is INVALID and no target verdict is issued. Both attempted and accepted
+counts are reported. The pilot's SDs and acceptance estimate are used only
+for sizing, never for the target sign classification.
 
 **Gate 1 count convention.** The D=2 positive-control Monte Carlo uses
 `10^4 total draws per (arm, N) cell`, not `10^4` accepted positives.
@@ -443,7 +451,7 @@ This revision responds to [review r3](https://github.com/shaden7/emergence-lab/p
 This revision responds to [later-pass review r4](https://github.com/shaden7/emergence-lab/pull/86#pullrequestreview-6065253424).
 
 - **Shared pilot sizing is explicit.** The blinded pilot emits separate `SD_MM` and `SD_d3` per cell. The shared target uses their maximum, so neither estimator receives less than the specified four-SE precision on the matched sample.
-- **Matched conditioning and count semantics are explicit.** In arm B both SDs and both primary means use the same `C_3>0` replicates. Pilot and gate-1 budgets are stated as total draws; the target `n_c` is accepted positive replicates. Both total and accepted counts are retained. The secondary MM `|R>0` result is excluded from sizing.
+- **Matched conditioning and count semantics are explicit.** In arm B both SDs and both primary means use the same `C_3>0` replicates. Pilot and gate-1 budgets are stated as total draws; the target `n_c` is accepted positive replicates. Both total and accepted counts are retained. Arm-B total draws use a 97.5% Wilson lower bound plus a 97.5% binomial completion tail (at least 95% combined assurance by union bound). The secondary MM `|R>0` result is excluded from sizing.
 - **Gate-1 enumeration is normalized.** Every non-deterministic D=2 cell in the exact-enumerable range is included: arm B N=4…9 and arm A N=4…11. The asymmetry follows from enumerating N points versus N−2 interior points, not from selective omission.
 - **CPU feasibility is preregistered.** Pilot (≤60 CPU s), exact enumeration, gate 1, negative control and target share the 600 CPU s cap. A 1.25× target-runtime projection is checked before target execution; a failed budget gate prevents the run.
 - **Jensen wording is qualified.** The 91-point convexity check remains numerical only. No global convexity theorem or Jensen bound is claimed, and the Jensen gap is not used by any gate or classification.
