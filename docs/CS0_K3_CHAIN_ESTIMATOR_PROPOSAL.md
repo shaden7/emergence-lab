@@ -127,10 +127,9 @@ grid checks, not proofs):
   ensemble; any additional Jensen-gap interpretation is conditional on the
   unproved convexity above. The sign remains the target.
 - Arm A: E[c_3] = (binom(m,3) g_3 + 2 binom(m,2) f + m)/binom(N,3) > g_3 at
-  every grid N for D = 2,3, hence d_3(E[c_3]) < D because d_3 is decreasing
-  on the sampled grid. The endpoint shift is exact; interpreting the
-  difference E[d_3] − d_3(E[c_3]) as a nonnegative Jensen gap remains
-  conditional on convexity and is not assumed.
+  every grid N for D = 2,3. This is an exact mean-abundance identity; it does
+  not by itself determine E[d_3] − D. No global monotonicity or convexity
+  claim, inverse-mean sign inference, or Jensen bound is used by the gates.
 - Deterministic cells: arm A N=3 (c_3 = 1) and arm B N=3 | C_3>0 (c_3 = 1)
   give d_3 = 1 exactly at both D; classified analytically BELOW.
 - Arm A N=4: C_3 ∈ {2,4}, c_3 ∈ {1/2, 1}, P(c_3=1) = f(D). With
@@ -324,9 +323,10 @@ conversion, no claim about any quantum-gravity model.
 
 ## Review checklist for the later pass
 
-Verify: the g_3 rationals and its monotone/convex grid check; the arm-A
-C_3 identity; invertibility; the Bonferroni count (r1: 23 stochastic cells ×
-2 estimators = 46 tests, z ≈ 3.6979; r0 had 32 cells, z ≈ 3.6047);
+Verify: the g_3 rationals and the scope of its finite-grid monotone/convex
+check (do not infer a continuum theorem); the arm-A C_3 identity; invertibility;
+the Bonferroni count (r1: 23 stochastic cells × 2 estimators = 46 tests,
+z ≈ 3.6979; r0 had 32 cells, z ≈ 3.6047);
 whether conditioning on C_3>0 vs R>0 is handled adequately for a fair
 MM–d_3 comparison; whether the transitive-percolation control is
 well-defined and worth its cost; whether the D=2 enumeration range is
