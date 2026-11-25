@@ -115,14 +115,22 @@ grid checks, not proofs):
 - g_3(1) = 1, g_3(2) = 1/6, g_3(3) = 4/175, g_3(4) = 1/350. g_3(3) = 4/175
   equals the D3-E0 quadrature value P(R=3) at N=3 (independent of the χ_k
   formula). 2χ_2 = f (MM ordering fraction) at D = 2,3,4.
-- g_3 is strictly decreasing and convex on a 91-point grid in [1,10], so
-  d_3(c) is decreasing and convex there; Jensen then gives E[d_3] ≥ d_3(E[c_3]).
+- A 91-point numerical grid in [1,10] shows sampled values of g_3 decreasing
+  and convex. This is a finite-grid observation, not a proof or interval
+  certificate on the continuum. No global convexity claim is made here.
+  The Jensen inequality E[d_3(c_3)] ≥ d_3(E[c_3]) is valid only if d_3 is
+  convex on the support of c_3; that condition has not been proved or
+  interval-certified. The Jensen gap is therefore exploratory/descriptive
+  only and is not used by any gate or sign classification.
 - Arm B: E[c_3] = g_3(D) for every N ≥ 3 (linearity), but
-  E[c_3 | C_3>0] > g_3(D) whenever P(C_3=0) > 0. As for MM, the conditioning
-  (lowers d) and the Jensen gap (raises d) compete; the sign is the target.
+  E[c_3 | C_3>0] > g_3(D) whenever P(C_3=0) > 0. Conditioning changes the
+  ensemble; any additional Jensen-gap interpretation is conditional on the
+  unproved convexity above. The sign remains the target.
 - Arm A: E[c_3] = (binom(m,3) g_3 + 2 binom(m,2) f + m)/binom(N,3) > g_3 at
-  every grid N for D = 2,3, hence d_3(E[c_3]) < D; endpoint shift and Jensen
-  gap compete.
+  every grid N for D = 2,3, hence d_3(E[c_3]) < D because d_3 is decreasing
+  on the sampled grid. The endpoint shift is exact; interpreting the
+  difference E[d_3] − d_3(E[c_3]) as a nonnegative Jensen gap remains
+  conditional on convexity and is not assumed.
 - Deterministic cells: arm A N=3 (c_3 = 1) and arm B N=3 | C_3>0 (c_3 = 1)
   give d_3 = 1 exactly at both D; classified analytically BELOW.
 - Arm A N=4: C_3 ∈ {2,4}, c_3 ∈ {1/2, 1}, P(c_3=1) = f(D). With
@@ -251,16 +259,62 @@ larger budget without a new reviewed protocol.
 
 ## Budget, seeds, pilot
 
-One cap for everything (gates, D=2 enumeration, controls, target):
-**600 CPU s, 512 MiB RSS** on the executing host; no Lightsail, deployment
-or paid API. The largest exact step is enumerating 9! ≈ 3.6·10^5
-permutations (arm B N=9; arm A m=9), expected well inside budget — to be
-measured by the pilot. Seeds: numpy `SeedSequence`, recorded roots
-distinct from all D3-E0 roots; spawn keys (D, arm, N, chunk). A blinded
-engineering pilot (≤ 60 CPU s, ≤ 2,000 replicates/cell, own root, no means
-recorded) fixes n_c = ⌈(4·SD̂/0.01)²⌉ with a 10^5 floor (arm B counts
-C_3>0 replicates). Manifest with code commit, config hash, versions, per-cell
-counts/sums/sums of squares, and raw per-replicate (R, C_3) as integers.
+One cap for everything (exact enumeration, gate 1, pilot, negative control
+and target): **600 CPU s and 512 MiB RSS** on the executing host. The
+engineering pilot is included in that cap and has a **60 CPU s sub-cap**.
+No Lightsail, deployment or paid API. The largest exact step is enumerating
+9! ≈ 3.6·10^5 permutations (arm B N=9; arm A m=9); its CPU time is measured
+and charged to the same cap. Seeds use numpy `SeedSequence`, with recorded
+roots distinct from all D3-E0 roots and spawn keys (D, arm, N, chunk).
+
+The blinded engineering pilot uses its own seed root and at most **2,000
+total draws per non-deterministic target cell** (not 2,000 accepted positives),
+within 60 CPU s. Its separate output contains only, for each (D, arm, N):
+`SD_MM`, `SD_d3`, total draws, accepted `C_3>0` draws, and CPU seconds.
+It contains no means, sums, per-replicate values, sign labels or target
+outcomes. In arm A all draws are accepted. In arm B, both SDs are calculated
+on the **same matched `C_3>0` subset** used for the primary MM–d_3
+comparison; MM conditioned only on `R>0` remains secondary and does not
+enter sizing. If a cell has too few accepted draws to estimate both SDs, or
+its one-sided 95% Wilson lower bound `p_L` for `P(C_3>0)` is zero, sizing
+fails and no target run starts.
+
+For each non-deterministic cell, the shared target is
+`n_c = max(10^5, ceil((4·max(SD_MM, SD_d3)/0.01)^2))` **accepted
+replicates**. Thus both estimators meet the same four-SE 0.01 precision
+criterion on their respective matched sample. Arm A requires `n_c` total
+draws. Arm B plans at most `ceil(n_c/p_L)` total draws, where `p_L` is
+the pilot's one-sided 95% Wilson lower bound for the acceptance probability;
+the runner stops when `n_c` accepted draws are obtained or that total-draw
+limit is reached. Both attempted and accepted counts are reported. The
+pilot's SDs and acceptance estimate are used only for sizing, never for the
+target sign classification.
+
+**Gate 1 count convention.** The D=2 positive-control Monte Carlo uses
+`10^4 total draws per (arm, N) cell`, not `10^4` accepted positives.
+For arm B, `d_MM` (primary) and `d_3` means and their SEs use only the
+matched accepted `C_3>0` subset; `P(C_3=0)` uses all total draws, and
+secondary MM `| R>0` is reported separately. For arm A, all total draws
+are accepted. Gate-1 counts are never mixed into target data.
+
+Gate 1 now covers **every non-deterministic N for which exact permutation
+enumeration is feasible in each arm**: arm B N = 4, 5, 6, 7, 8, 9; arm A
+N = 4, …, 11. The ranges differ because arm B enumerates N points, whereas
+arm A enumerates m = N−2 interior points. The larger arm-A range is therefore
+not a selective omission; all off-grid enumerable cells are included. These
+are D=2 controls only and do not enter the target classification.
+
+Before target execution, the runner projects target CPU time from each cell's
+pilot seconds per total draw and its planned total-draw count. It measures
+exact enumeration, gate 1, pilot and negative-control time separately, then
+requires `measured_pre_target_CPU + 1.25 × projected_target_CPU ≤ 600 s`.
+If this preflight fails, no target starts and the outcome is INVALID (budget
+gate failed). The runner also stops at the hard 600 CPU s / 512 MiB limits,
+retains partial outputs, and reports INVALID rather than silently dropping
+cells. The target manifest records code commit, config hash, versions,
+per-cell counts/sums/sums of squares and raw per-replicate (R, C_3) integers;
+the blinded pilot artifact remains separate and restricted as specified
+above.
 
 ## Exclusions
 
@@ -383,3 +437,17 @@ This revision responds to [review r3](https://github.com/shaden7/emergence-lab/p
   It writes no means or labels.
 - **No D=3 K3 quantity has been computed.**
 
+
+## Revision r4 (2026-11-25)
+
+This revision responds to [later-pass review r4](https://github.com/shaden7/emergence-lab/pull/86#pullrequestreview-6065253424).
+
+- **Shared pilot sizing is explicit.** The blinded pilot emits separate `SD_MM` and `SD_d3` per cell. The shared target uses their maximum, so neither estimator receives less than the specified four-SE precision on the matched sample.
+- **Matched conditioning and count semantics are explicit.** In arm B both SDs and both primary means use the same `C_3>0` replicates. Pilot and gate-1 budgets are stated as total draws; the target `n_c` is accepted positive replicates. Both total and accepted counts are retained. The secondary MM `|R>0` result is excluded from sizing.
+- **Gate-1 enumeration is normalized.** Every non-deterministic D=2 cell in the exact-enumerable range is included: arm B N=4…9 and arm A N=4…11. The asymmetry follows from enumerating N points versus N−2 interior points, not from selective omission.
+- **CPU feasibility is preregistered.** Pilot (≤60 CPU s), exact enumeration, gate 1, negative control and target share the 600 CPU s cap. A 1.25× target-runtime projection is checked before target execution; a failed budget gate prevents the run.
+- **Jensen wording is qualified.** The 91-point convexity check remains numerical only. No global convexity theorem or Jensen bound is claimed, and the Jensen gap is not used by any gate or classification.
+- The constants-test helper docstring now names the r3 rule. The exhaustive 3^8 finite-grid check remains the stated scope; no arbitrary-grid theorem is claimed.
+- **No D=3 K3 quantity has been computed.** This remains a design revision only; it is not a frozen protocol, authorization, implementation or result.
+
+This revision was authored by the r4 review session. A later-pass review by a different session is required before merge.
