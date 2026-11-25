@@ -1,3 +1,26 @@
+## Director session: PR #86 r4 correction and exact-head verification — 2026-11-25T22:35:17.689Z (lease `0118f62119217a9c07b6d19040a4c8bc`)
+
+**Scope / baseline:** Resolve the r4 review blocker on PR #86 without authorizing a K3 experiment. Recovery audit found the previous Research Director lease released cleanly at lock head `28eb1477ed59f4cd04eb02475d3b13173e3e6504` (`idle`). Main was `cf782c0ac74b11ac952429387c76f6ab94a672d3`; PR #86 was open at `e8edde148ab65ecaf545bc39086e036431b05375`, based on `e9ca286d5d53057c4f9360d52d6ad7d81ae5d9fc`. Only one open PR was found (#86); Issue #37 remains open. Main is five commits ahead of the PR base, and the complete comparison shows only `docs/RESEARCH_STATE.md` changed on main, so the PR is conflict-free/mergeable.
+
+**Changed paths / PR revision:** No new PR and no production implementation. On the existing `design/k3-chain-estimator` branch, PR #86 now has head `a798acc3bcde32744b187d7446747a539025a8db` (r4), with changes limited to `docs/CS0_K3_CHAIN_ESTIMATOR_PROPOSAL.md` and `tests/test_k3_design_constants.py`.
+- Separate pilot outputs `SD_MM` and `SD_d3`; shared sizing uses their maximum. Arm B estimates both on the same matched `C_3>0` subset.
+- Pilot and gate-1 limits are explicitly total draws; target `n_c` is accepted positive replicates. Both attempted and accepted counts are retained; arm-B planning uses a one-sided 95% Wilson lower bound for the acceptance probability.
+- Gate 1 includes every non-deterministic D=2 exactly enumerable N: arm B 4–9 and arm A 4–11, with the asymmetry explained by N versus N−2 permutation counts.
+- All phases share the 600 CPU-second / 512 MiB ceiling; pilot sub-cap 60 CPU seconds; a 1.25× target-runtime projection is checked before target execution.
+- Jensen and inverse-mean wording is limited to the finite-grid checks; no continuum monotonicity/convexity theorem or Jensen bound is claimed. The sign-pattern helper docstring now says r3.
+
+**CI / code / artifacts:** Exact r4-head push run [45713716254](https://github.com/shaden7/emergence-lab/actions/runs/45713716254) and PR run [45713724379](https://github.com/shaden7/emergence-lab/actions/runs/45713724379) both completed-success on `a798acc3`. Each reports **1,039 passed, 65 subtests passed**; all applicable engineering and smoke steps passed. The smoke artifact is `ENGINEERING_ONLY`, with `scientific_acceptance=false` and `study_authorized=false`; it is not a new experiment or scientific result. Older intermediate-head workflows also completed-success. Main's exact push run [45705163681](https://github.com/shaden7/emergence-lab/actions/runs/45705163681) completed-success on `cf782c0`. No deployment workflow was run.
+
+**Scientific status / dependencies:** D2 volume-growth calibration remains PASS within its recorded scope. S0/C0-v2 deterministic exact-control calibration is complete; the S1/S1b random-tree spectral size-stability line remains unresolved under the adopted scope decision. The D3-E0/M0 v1 target archive was integrated in PR #85 / main commit `8cff580`; that is a numerical observation in one prescribed flat D=3 diamond, not a cross-model answer. PR #86 remains a design-only second statistic in the same chain-abundance family, not a second model family and not an Issue #37 conclusion. The 6,561 sign-pattern completions and D=2 permutation enumerations are finite-grid/model-level checks, not physical proofs. The `g_3) convexity check is numerical on a 91-point grid. H_A3/H_B3 remain hypotheses; no D=3 K3 quantity, pilot or target measurement exists. The `χ_k) expression is cited through Surya 2019 Eq. (19); the primary Meyer 1988 text was not independently checked in this session.
+
+**Decision / blocker:** PR #86 is **not merged**. The r4 design blocker has been addressed and exact-head CI is green, but this session authored the revision. A different later-pass session must review the new exact head before any merge; use an expected-head SHA guard if all objective criteria pass. No merge or deployment was attempted.
+
+**Documentation follow-up:** `docs/research-plan.md` still says the D3 endpoint/MM reference is only a future design step, although the D3-E0/M0 v1 target archive is integrated. `docs/CS0_D3_E0_PROTOCOL.md` also retains pre-run status wording ("no D=3 target-cell mean or SD exists") that conflicts with the later archive. Preserve the frozen preregistration history; after PR #86 is resolved, add dated post-run status/context and refresh the plan rather than silently rewriting the historical protocol. These are documentation inconsistencies, not evidence that the archived run is invalid.
+
+**Limitations / non-actions:** No target experiment, K3 implementation, seed draw, paid API, deployment, Lightsail or EatSleepFeel action. No new physical claim. The research-lock lease was verified before each consequential write and will be released via CAS at session end.
+
+---
+
 ## Director session: PR #86 later-pass review r4 — 2026-11-25T21:31:36Z (lease `bb90be423a23e40f9dc564d28571425a`)
 
 **Scope / baseline / falsification test:** Review the r3 design at exact head `e8edde148ab65ecaf545bc39086e036431b05375`, focusing on the completeness of the sign-pattern rule, D=2 positive-control gate, blinded pilot schema, exact dependencies, and scientific claim boundaries. No new target experiment was authorized.
@@ -18,7 +41,7 @@
 
 ---
 
-Last handoff update: 2026-11-25. Later-pass review r3 of [PR #86](https://github.com/shaden7/emergence-lab/pull/86) (the K3-E0/M0 design, head `583acf2`) returned **REVISE**. This session then pushed revision r3 to the same PR (head `e8edde1`). PR #86 is not merged and not frozen, and no D=3 K3 data exist. WIP is 1.
+Last handoff update: 2026-11-25 (r4 correction and exact-head CI verified at 2026-11-25T22:35:17.689Z). Later-pass review r3 of [PR #86](https://github.com/shaden7/emergence-lab/pull/86) (the K3-E0/M0 design, head `583acf2`) returned **REVISE**. This session then pushed revision r3 to the same PR (head `e8edde1`). PR #86 is not merged and not frozen, and no D=3 K3 data exist. WIP is 1.
 - **Director:** `rd-claude-20261125T080251Z-6b4ea485`.
 - **Recovery audit:**
   - The previous lease `rd-claude-20261124T080327Z-99323fda` was released cleanly (lock head `be51e3f`).
