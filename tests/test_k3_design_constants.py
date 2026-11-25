@@ -229,7 +229,7 @@ def test_r2_d2_exact_cells(n, arm, mm_exact, d3_exact):
 
 
 def sign_pattern(labels):
-    """r2 rule. labels: list over the grid in N order, each 'A', 'B' or 'U'.
+    """r3 rule. labels: list over the grid in N order, each 'A', 'B' or 'U'.
 
     Returns (terminal, changes) or None if UNDETERMINED. changes is a tuple of
     (from, to) pairs; crossover brackets are not part of the comparison."""
