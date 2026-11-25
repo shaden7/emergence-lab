@@ -239,6 +239,8 @@ def sign_pattern(labels):
     for (i, a), (j, b) in zip(resolved, resolved[1:]):
         if a == b and j - i > 1:  # an UNRESOLVED gap between equal signs may hide two changes
             return None
+        if a != b and j - i > 2:  # r3: >= 2 UNRESOLVED between opposite signs may hide two more
+            return None
     changes = tuple((a, b) for (_, a), (_, b) in zip(resolved, resolved[1:]) if a != b)
     return labels[-1], changes
 
@@ -272,3 +274,37 @@ def test_r2_known_d2_cells_are_crossover_shift_not_pattern_difference():
     assert [a != b for a, b in zip(mm_b, k3_b)] == [False, False, False, True, False]
     # on the known prefix the change signatures agree (one B->A each)
     assert sign_pattern(mm_b)[1] == sign_pattern(k3_b)[1] == (("B", "A"),)
+
+
+# --- design r3 additions (review r3 of PR #86) ---------------------------------
+
+def test_r3_two_unresolved_between_opposite_signs_is_undetermined():
+    # r2 rule returned PATTERN-CONSISTENT here although BBBABAAAA is a compatible truth
+    assert compare_patterns(list("BBBUUAAAA"), list("BBBBBAAAA")) == "UNDETERMINED"
+    assert compare_patterns(list("BBBABAAAA"), list("BBBBBAAAA")) == "PATTERN-DIFFERENT"
+
+
+def test_r3_rule_accepts_only_uniquely_determined_labellings():
+    """Exhaustive over all 3^8 labellings of N=4..32 (N=3 fixed 'B'): the rule
+    returns a pattern iff every filling of the UNRESOLVED cells gives that
+    same (terminal, changes) signature."""
+    import itertools
+
+    def sig(full):
+        ch = tuple((a, b) for a, b in zip(full, full[1:]) if a != b)
+        return full[-1], ch
+
+    for tail in itertools.product("ABU", repeat=8):
+        labels = ["B", *tail]
+        u = [i for i, s in enumerate(labels) if s == "U"]
+        sigs = set()
+        for fill in itertools.product("AB", repeat=len(u)):
+            full = list(labels)
+            for i, s in zip(u, fill):
+                full[i] = s
+            sigs.add(sig(full))
+        got = sign_pattern(labels)
+        if len(sigs) == 1:
+            assert got == next(iter(sigs)), labels
+        else:
+            assert got is None, labels

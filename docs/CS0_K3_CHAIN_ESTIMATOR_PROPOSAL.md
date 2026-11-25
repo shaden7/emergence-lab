@@ -1,4 +1,4 @@
-# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r2, PROPOSED, NOT frozen)
+# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r3, PROPOSED, NOT frozen)
 
 Status: **design proposal only.** Not preregistered/frozen, not authorized,
 not implemented beyond a constants test, not run. No D=3 K3 data exist.
@@ -10,8 +10,11 @@ addressing [later-pass review r1 (REVISE)](https://github.com/shaden7/emergence-
 See "Revision r1" at the end of this file.
 Revision r2: Director `rd-claude-20261124T080327Z-99323fda` (2026-11-24),
 addressing [later-pass review r2 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7125763242).
-See "Revision r2" at the end of this file. r2 is self-authored by the r2
-reviewer session and needs a later-pass review r3 by a different session.
+See "Revision r2" at the end of this file.
+Revision r3: Director `rd-claude-20261125T080251Z-6b4ea485` (2026-11-25),
+addressing [later-pass review r3 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7156580424).
+See "Revision r3" at the end of this file. r3 is self-authored by the r3
+reviewer session and needs a later-pass review r4 by a different session.
 Related: [Issue #37](https://github.com/shaden7/emergence-lab/issues/37),
 [D3-E0/M0 proposal](CS0_D3_E0_CONTROL_PROPOSAL.md),
 [D3-E0/M0 protocol](CS0_D3_E0_PROTOCOL.md),
@@ -205,8 +208,11 @@ labels, with UNRESOLVED removed. Define:
 Per (D, arm):
 
 - **UNDETERMINED** if, for either estimator, the N = 32 cell is UNRESOLVED,
-  or an UNRESOLVED cell lies between two resolved cells of the **same** sign
-  (it could hide a pair of changes).
+  or (r3) for two consecutive resolved labels a, b at grid positions i < j:
+  a = b and j − i ≥ 2 (one or more UNRESOLVED cells between equal signs), or
+  a ≠ b and j − i ≥ 3 (two or more UNRESOLVED cells between opposite signs).
+  Either gap could hide a pair of sign changes. A single UNRESOLVED cell
+  between opposite signs hides none (exactly one change) and is allowed.
 - Otherwise **PATTERN-CONSISTENT** if both estimators have the same terminal
   sign and the same change signature, counted and directed, with the
   brackets allowed to differ.
@@ -280,7 +286,12 @@ both pass.)
 r3 additionally: check that the r2 sign-pattern rule (terminal sign, change
 signature, UNDETERMINED cases) is well-defined, not tuned to the known D=2
 cells beyond what is disclosed, and that the UNDECIDABLE rule cannot be
-gamed by budget choice.
+gamed by budget choice. (Done in review r3: the UNDETERMINED rule was
+incomplete and is fixed in r3. Tuning and budget gaming pass.)
+
+r4 additionally: check that the r3 UNDETERMINED rule is complete (every
+labelling it accepts has a unique change signature over all fillings of its
+UNRESOLVED cells), and that the gate-1 MC set and pilot schema are adequate.
 
 ## Revision r1 (2026-11-23)
 
@@ -349,4 +360,26 @@ This revision responds to [review r2](https://github.com/shaden7/emergence-lab/p
 - **The constants test is extended** with the D=2 arm-B N=8 and arm-A
   N = 4, 5, 6, 8 exact values and the sign-pattern rule applied to the
   exact D=2 cells. These are design checks, not K3 target data.
+
+## Revision r3 (2026-11-25)
+
+This revision responds to [review r3](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7156580424).
+
+- **UNDETERMINED rule completed.** The r2 rule did not cover two or more
+  consecutive UNRESOLVED cells between opposite signs. The r2 test function
+  returned PATTERN-CONSISTENT for MM `BBBUUAAAA` vs d_3 `BBBBBAAAA`. But
+  `BBBABAAAA` is a compatible MM truth with three changes, so the correct
+  answer is UNDETERMINED. The rule now reads as above. The fix only adds
+  UNDETERMINED cases. It does not change any verdict on fully resolved
+  sequences or on the known D=2 cells (no D=2 exact cell is UNRESOLVED).
+- **Gate 1 MC set (clarification).** Exact cells are classified from the
+  exact laws only. Gate 1 additionally draws Monte Carlo at every
+  enumerated N (arm B N = 4, 5, 6, 8, 9; arm A N = 4, …, 11), with
+  n = 10^4 replicates per N on the gate seed root, and compares the MC mean
+  of d_MM, the MC mean of d_3 and P(C_3=0) with the exact values within 4 SE.
+  These draws never enter the target classification.
+- **Pilot blinding (requirement for the implementation PR).** The pilot
+  output schema is restricted, in code, to per-cell SDs, counts and timings.
+  It writes no means or labels.
+- **No D=3 K3 quantity has been computed.**
 
