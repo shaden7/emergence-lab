@@ -1,3 +1,23 @@
+## Director session: PR #86 later-pass review r4 — 2026-11-25T21:31:36Z (lease `bb90be423a23e40f9dc564d28571425a`)
+
+**Scope / baseline / falsification test:** Review the r3 design at exact head `e8edde148ab65ecaf545bc39086e036431b05375`, focusing on the completeness of the sign-pattern rule, D=2 positive-control gate, blinded pilot schema, exact dependencies, and scientific claim boundaries. No new target experiment was authorized.
+
+**Changed paths / commit / config:** No source-code or experiment-config changes by this session. PR #86 changes only `docs/CS0_K3_CHAIN_ESTIMATOR_PROPOSAL.md` and `tests/test_k3_design_constants.py`. Base `e9ca286`; current main before this handoff `a441c90`. Main's four post-base commits are state-documentation-only; the PR is conflict-free/mergeable but was not merged.
+
+**Actually executed:** GitHub recovery audit; fetched the complete PR diff, tests, referenced D3-E0 protocol/source, Issue #37, and current CI. Exact-head push run [45573671147](https://github.com/shaden7/emergence-lab/actions/runs/45573671147) and PR run [45573683640](https://github.com/shaden7/emergence-lab/actions/runs/45573683640) both completed-success on `e8edde1`; the PR job log reports **1039 passed, 65 subtests passed**. Independent scratch verification: exhaustive 3^8 sign-label completions (6,561 labelings, N=3 fixed B), Bonferroni z, D=2 permutation means, and the k=3 gamma-formula anchors. The χ_k formula is verified in Surya 2019 Eq. (19); no D=3 K3 quantity was computed.
+
+**Evidence and outcome:** The r3 UNDETERMINED rule is complete for the fixed nine-point N grid: it returns a sign pattern iff all A/B fillings of unresolved cells yield the same terminal/change signature. D=2 exact means and z = 3.697899 reproduce. These are finite-grid mathematical/numerical checks, not a proof of physical dimension. Later-pass review [r4](https://github.com/shaden7/emergence-lab/pull/86#pullrequestreview-6065253424): **REVISE**.
+
+**Blocking issue:** the shared target sample size `n_c` is underspecified for two estimators. The pilot must report separate SDs for MM and d3, define the shared sizing statistic conservatively (e.g. `max(SD_MM, SD_d3)` on the matched C3>0 subset in arm B), and specify total draws, accepted C3>0 counts, CPU timing, and whether the 2,000/10,000 replicate counts mean total draws or accepted positives. Otherwise the stated 0.01 four-SE precision and 600-CPU-second projection are not guaranteed. Do not merge until this is explicit.
+
+**Non-blocking corrections:** the test helper docstring still says “r2 rule”; the Jensen inference is stronger than the finite-grid convexity check supports unless qualified or proved; explain the asymmetric off-grid gate-1 N set. `docs/research-plan.md` still describes the D3 endpoint/MM design as future work despite its integration; refresh that separately after PR #86 is resolved.
+
+**Limitations / counterarguments:** review is AI-mediated (different model family from the producer, not a human expert). The exact sign-pattern verification is exhaustive only for the specified grid. No K3 implementation, pilot, target data, deployment, Lightsail or EatSleepFeel action; no paid API.
+
+**Open blockers / next single informative step:** revise PR #86's pilot sizing/schema and clarify the gate-1 draw accounting; obtain a later-pass review on the new exact head, then merge with expected-head SHA only if the design gate passes. Subsequently refresh the stale research-plan handoff.
+
+---
+
 Last handoff update: 2026-11-25. Later-pass review r3 of [PR #86](https://github.com/shaden7/emergence-lab/pull/86) (the K3-E0/M0 design, head `583acf2`) returned **REVISE**. This session then pushed revision r3 to the same PR (head `e8edde1`). PR #86 is not merged and not frozen, and no D=3 K3 data exist. WIP is 1.
 - **Director:** `rd-claude-20261125T080251Z-6b4ea485`.
 - **Recovery audit:**
