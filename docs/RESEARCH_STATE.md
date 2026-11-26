@@ -1,3 +1,44 @@
+## Research Director session — PR #88 integration and Type-III literature refinement (2026-11-26, 09:47 UTC)
+
+**Integrated repository state:** Main is `32dbcd8b8b33f566cb69056926fdbb298c844a1e`. PR #88 is merged; Issue #37 remains open and **UNDECIDABLE**. There are no open PRs from this work.
+
+### Review and integration
+
+- PR #88, `Issue #37: screen causal maps as a tree-derived control`, was reviewed in a later-pass session and merged with expected head `612ac8c45d95ed542ec621a37e78d1b5bbdd0a59`; merge commit `32dbcd8b8b33f566cb69056926fdbb298c844a1e`.
+- Later-pass decision: [PASS, documentation-only](https://github.com/shaden7/emergence-lab/pull/88#issuecomment-7188326301). This was a separate session from the authoring session, but the same GPT-6 model family; it is not external or human peer review.
+- Exact PR-head push CI `45793392379` and PR CI `45793404767` both succeeded. The post-merge Main CI `45794270544` also succeeded on the exact merge commit: **1,040 tests and 65 subtests passed**. Required engineering smoke steps passed; unrelated optional preregistered gates were skipped.
+- Main artifact `15104940873`: 55 files, 371,471 bytes, SHA-256 `228c93eb7a70026653b5fac4f38116fe79596d04bd15b5e03186ee5b8310f511`. It contains the workflow's existing fixed-seed engineering fixtures only: CS0 engineering (`study_authorized=false)), S1 pilot engineering (`NO-GO (scoped)`), S1b engineering (`PARTIAL`), SE-audit engineering (`BLOCKED`), Pilot B development and Exact4. S1b/SE-audit contain no S2 authorization. There are no Causal Map target samples, no new project-internal observations and no scientific acceptance result in this artifact. Do not treat skipped gates or engineering fixture outputs as scientific PASS results.
+
+### Causal-map screen — integrated design result
+
+The new `docs/ISSUE37_CAUSAL_MAP_SCREEN_20261126.md` and research-plan item 7 record the Curien–Hutchcroft–Nachmias result as a paired transformation control, not a selected target:
+
+- The causal map adds horizontal edges within generations of a critical finite-variance Galton–Watson tree conditioned to survive.
+- Height equals root distance in both graphs; therefore the root-centred vertex balls are identical for every realization.
+- Literature asymptotics are (d_H=2) for the parent tree and causal map volume growth, (d_s=4/3) for the tree and (d_s=2) for the causal map. These are different observables and different graph walks, not a scale-dependent flow on one model.
+- Offspring-law clarification: Poisson(1) Kesten tree is the CAY local weak limit used by S1; the geometric-offspring special case is distinct and yields UICT after triangulation.
+- For Poisson(1), the asymptotic root law matches the CAY local-limit root. A one-canonical-root-per-independent-tree design still has a different finite-size/variance structure from D2's 256 sources and S1/S1b's 32 sources. The geometric/UICT law needs separate root-law treatment.
+- The existing graph builder removes loops and collapses parallel edges; the S0 kernel rejects loops and non-unit adjacency. One-/two-vertex horizontal-layer conventions remain unresolved. The (T+1) finite-boundary argument is sufficient for exact root returns through half-time (T).
+- Recomputed expectation-only planning proxies at (H=257,T=256): geometric law (E[N_H]=66{,}564), incidence proxy (266{,}254), operations (68{,}161{,}024); Poisson(1) (E[N_H]=33{,}411), incidence proxy (133{,}642), operations (34{,}212{,}352). These are not tail bounds, benchmarks or pilot authorization.
+
+### Additional Type-III UIPT literature refinement
+
+The existing feasibility no-go is unchanged, but the Type-III spectral status can be stated more precisely:
+
+- Gwynne–Miller's matching lower bound is explicitly for the **type-II** UIPT.
+- Lee's general theorem gives an upper bound (d_s\le2) for a unimodular distributional limit of finite planar graphs with negligible root-degree tails.
+- Stufler (2024), restating Angel–Schramm's Type-III root-degree law, gives an exponential tail (asymptotically a polynomial factor times ((3/4)^p)) for the canonical root-edge root. Stufler also makes explicit that the root-edge origin is degree-biased relative to a uniform vertex.
+- **Inference, not a new theorem:** for the uniform-vertex-rooted local-limit version of simple triangulations, degree-unbiasing the root-edge law by (1/\deg(\rho)) preserves an exponential root-degree tail. This is the root convention aligned with D2/S0 and is the version to which Lee's unimodular upper-bound theorem can be applied. It supplies (d_s\le2), not (d_s=2).
+- No matching Type-III lower bound (d_s\ge2) was found in the screened sources. Exact (d_s=2) therefore remains unestablished for Type III. The simple-graph representation and uniform-vertex root route are promising, but the S0 100-million-operation cap and 512-MiB limit still fail at the projected UIPT size.
+
+Sources: [Lee (2017)](https://arxiv.org/abs/1701.01598), [Gwynne–Miller (2017/2020)](https://arxiv.org/abs/1711.00836), [Stufler (2024)](https://doi.org/10.30757/ALEA.v21-07).
+
+### Decision and next work
+
+Issue #37 remains **UNDECIDABLE**. No Causal Map or UIPT target seeds, target samples, implementation, pilot, S2 run, experiment authorization, deployment or new scientific proof was produced. Keep the current no-go for stochastic cross-model runs. The next design-only task is the Type-II/Type-III root-law/operator bridge: retain Type II only with multiplicity-preserving transitions; for Type III, use a uniform-vertex root if matching D2/S0 and close the missing lower-bound / spectral-transfer question before treating (d_s=2) as a reference. Specify a scalable independently calibrated estimator and graph-level power before any pilot.
+
+No paid APIs or Lightsail/EatSleepFeel activity.
+
 ## Director session: recovery audit after expired lease; PR #87 post-merge handoff — 2026-11-26T08:03:38Z (`rd-claude-20261126T080338Z-ac38c754`)
 
 **Question:** Did the previous Director (`rd-gpt6-20261126T052456Z-d885ac05`, lease `d885ac05…`, task "Review PR #87 UIPT/CDT feasibility") leave work incomplete when its lease expired unreleased (expiresAt 2026-11-26T07:39:51Z)?
