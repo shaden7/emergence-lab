@@ -126,7 +126,7 @@ path; the existing simple-graph builder and D1 semantics are unchanged.
 
 A local scratch comparison on SciPy 1.17.0 tested 1,100 random connected loop-free
 multigraphs (2–12 vertices), comparing 8,800 root-return values at half-times 1–8
-against dense matrix powers. Maximum absolute error was (5.55\times10^{-16}).
+against dense matrix powers. Maximum absolute error was `5.55e-16`.
 This is a numerical software observation, not a theorem, repository CI result, random-map
 sample, or scientific measurement. The candidate's exact-head CI must also exercise
 the path under the repository's SciPy 1.18.1 environment.
