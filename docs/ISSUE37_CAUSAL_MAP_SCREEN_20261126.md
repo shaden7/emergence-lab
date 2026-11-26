@@ -17,13 +17,13 @@ Curien, Hutchcroft and Nachmias study the infinite planar map \(\mathsf{Causal}(
 
 Their results in *Geometric and spectral properties of causal maps* (arXiv:1710.03137; JEMS 22 (2020), 3997–4024) include:
 
-The offspring law matters when relating the model to the project's CAY work. The S1 preregistration (§2) identifies the local limit of a uniformly rooted finite CAY tree as the Kesten tree of a critical Poisson(1) Galton–Watson process. Since the causal-map theorem applies to every critical finite-variance offspring law, μ=Poisson(1) gives a CAY-matched causal-map variant. The geometric law μ(k)=2^{-(k+1)} is a different special case; its triangulated version gives UICT. These offspring laws must not be conflated.
-
 - For the causal map, the spectral dimension is \(d_s=2\) almost surely and the typical displacement exponent is \(\nu=1/2\).
 - The underlying conditioned tree has \(d_s=4/3\) and \(\nu=1/3\).
 - The causal map has rooted volume-growth exponent \(\mathfrak g=2\).
 - Horizontal distances at height \(r\) are sublinear but not polynomially smaller: the level diameter is \(o(r)\) and \(r^{1-o(1)}\). Under \(1/r\) metric rescaling, the local Gromov–Hausdorff limit collapses to a semi-infinite line.
 - For the geometric offspring law, the triangulated construction gives the uniform infinite causal triangulation (UICT); the paper states that the causal-map and causal-triangulation geometries are qualitatively similar and that its results transfer to the triangulated version.
+
+The offspring law matters when relating the model to the project's CAY work. The S1 preregistration (§2) identifies the local limit of a uniformly rooted finite CAY tree as the Kesten tree of a critical Poisson(1) Galton–Watson process. Since the causal-map theorem applies to every critical finite-variance offspring law, μ=Poisson(1) gives a CAY-matched causal-map variant. The geometric law μ(k)=2^{-(k+1)} is a different special case; its triangulated version gives UICT. These offspring laws must not be conflated.
 
 Primary source: https://arxiv.org/abs/1710.03137  
 Published version: https://doi.org/10.4171/JEMS/1001  
@@ -65,7 +65,7 @@ The existing Issue #37 feasibility decision explicitly excludes 2D CDT as an ind
 
 ### 2. Root law and estimator compatibility
 
-The infinite model is canonically rooted at the spine root of (T_\infty). The root-law relation to the existing CAY work depends on the offspring law:
+The infinite model is canonically rooted at the spine root of T∞. The root-law relation to the existing CAY work depends on the offspring law:
 
 - For μ=Poisson(1), the rooted Kesten tree is exactly the local weak limit of a uniformly rooted finite CAY tree; this is the relationship stated in `docs/SPECTRAL_S1_PREREGISTRATION.md` §2. The Poisson causal-map variant therefore does not introduce a different asymptotic root law from CAY.
 - The geometric law μ(k)=2^{-(k+1)} is a different conditioned-tree law (the UICT special case after triangulation), not the CAY Poisson law.
@@ -104,7 +104,7 @@ For the mean-one geometric offspring law \(\mu(k)=2^{-(k+1)}\), the variance is 
 
 At \(H=257\), \(\mathbb E[N_H]=66{,}564\). If the horizontal construction contributes at most one edge per vertex per generation, the undirected edge count is at most \(2N_H-1\), giving a directed-incidence upper estimate \(4N_H-2\). At the **expected** vertex count this is \(266{,}254\); multiplying by \(T=256\) gives an expected S0-style work proxy of \(68{,}161{,}024\), below the existing \(100{,}000{,}000\) proxy limit.
 
-For comparison, the CAY-matched Poisson(1) law has variance (1), so \\(\mathbb E[Z_n]=1+n\\) and \\(\mathbb E[N_H]=(H+1)(H+2)/2=33{,}411\\) at (H=257). The same incidence bound gives an expected proxy of (133{,}642\times256=34{,}212{,}352) transition operations. This is a separate expectation-based estimate; the geometric-law proxy above must not be transferred to Poisson(1), or vice versa.
+For comparison, the CAY-matched Poisson(1) law has variance 1, so E[Z_n]=1+n and E[N_H]=(H+1)(H+2)/2=33,411 at H=257. The same incidence bound gives an expected proxy of 133,642 × 256 = 34,212,352 transition operations. This is a separate expectation-based estimate; the geometric-law proxy above must not be transferred to Poisson(1), or vice versa.
 
 These are only conditional planning arithmetic. They assume the stated edge-count convention, do not resolve the one-/two-vertex layer issue, and are not worst-case bounds. Kesten-tree size is random; no tail probability, graph-level variance, high-quantile memory, wall-time benchmark, or power calculation has been measured. The current kernel still rejects any multiplicity-bearing representation. Therefore neither proxy is a feasibility PASS and neither authorizes a pilot.
 
