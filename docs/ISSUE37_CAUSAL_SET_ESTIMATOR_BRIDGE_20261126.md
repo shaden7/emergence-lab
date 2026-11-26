@@ -48,11 +48,11 @@ This factor is a finite-occupancy effect, not a numerical approximation.
 
 Thus the often-quoted two-element D_M=2 floor is not reproduced by the current CS0 inverse. This is not a defect in CS0: it is a different normalization/estimand. It does mean that CS0 v0.2 alone cannot reproduce the finite-volume endpoint in Abajian–Carlip.
 
-For an edgeless interval R=0, the Meyer inverse is out of range. Abajian–Carlip explicitly compare assigning such intervals dimension zero with discarding them. Discarding is a selection rule; it changes the conditional sample and must never be silently applied.
+For an edgeless interval R=0, the Meyer inverse is out of range. At N=2, R is either 0 or 1. Conditional on retaining only R>0 intervals, R/N²=1/4 deterministically, irrespective of the background dimension; the inclusion probability is r_D. Thus the conditional estimate is exactly D_M=2 for every background D, while the unconditional mean remains (N-1)f(D)/N. This is an exact finite-occupancy selection mechanism, not a UV theorem. Abajian–Carlip explicitly compare assigning such intervals dimension zero with discarding them. Discarding is a selection rule; it changes the conditional sample and must never be silently applied.
 
 ## 2. What the nested-interval literature actually reports
 
-Abajian and Carlip study successively smaller subdiamonds inside large Minkowski sprinklings in D=3,4,5, averaging over 10,000 sprinklings. They report transition volumes of roughly 8, 16, and 22 elements respectively. At small volumes:
+Abajian and Carlip study successively smaller subdiamonds inside large Poisson Minkowski sprinklings in D=3,4,5, averaging over 10,000 sprinklings. Each subdiamond therefore has random occupancy; this differs from CS0 v0.2's fixed-N sampling conditional on N. They report transition volumes of roughly 8, 16, and 22 elements respectively. At small volumes:
 
 - assigning edgeless causal sets dimension zero drives the minimum toward zero;
 - discarding edgeless sets gives minima 2.08±0.26, 2.13±0.39, and 2.19±0.40 for backgrounds D=3,4,5.
@@ -77,7 +77,7 @@ Endpoint inclusion, treatment of tied midpoints, empty subintervals, and averagi
 
 The phrase “causal-set spectral dimension” does not identify a unique diffusion operator.
 
-1. **Full Hasse-diagram walk.** Eichhorn–Mizera use an undirected walk that chooses uniformly among all link-neighbours, in both future and past directions. It does not respect causal time orientation. In infinite Minkowski sprinklings, Lorentz invariance plus discreteness gives unbounded/infinite link valency; finite calculations require an infrared link-length cutoff. Their reported small-diffusion-time behaviour is an increase d_s>D, attributed to nonlocal superdiffusion.
+1. **Full Hasse-diagram walk.** Eichhorn–Mizera use an undirected walk that chooses uniformly among all link-neighbours, in both future and past directions. It does not respect causal time orientation. In infinite Minkowski sprinklings, Lorentz invariance plus discreteness gives unbounded/infinite link valency; the finite-region simulations in the paper introduce an infrared link-length cutoff to control this nonlocality. Their reported small-diffusion-time behaviour is an increase d_s>D, attributed to nonlocal superdiffusion.
 2. **Causal spectral dimension.** The same paper defines a different quantity from the meeting probability of two forward-in-time causal walkers:
    \[
    d_{cs}(\sigma)=-2\frac{d\ln P_{\rm meet}(\sigma)}{d\ln\sigma}.
@@ -113,7 +113,7 @@ A later-pass review should decide whether a versioned CS0 v0.3 / CS1 design is w
 - a predeclared dimension-resolution censor for midpoint bins where D=2,3,4 controls are not separable (the Reid result suggests N<10 is not informative, but the project's own calibration must set the gate);
 - null partial orders and an independent stored-artifact recheck.
 
-The three estimators can be evaluated on the same sprinkled samples, but their paired dependence must be reported; “independent estimator” means a different calibrated statistic, not statistically independent samples. The CS0 v0.2 global calibration is not a substitute for this scale-resolved design.
+The two relation-count normalizations R/binom(N,2) and R/N² are deterministic transforms of the same R,N and **do not count as independent estimators**. Midpoint scaling is the distinct statistic. These can be evaluated on the same sprinkled samples, but paired dependence must be reported; “independent estimator” means a separately calibrated statistic, not statistically independent samples. The CS0 v0.2 global calibration is not a substitute for this scale-resolved design.
 
 Do not draw seeds, add a run authorization, or start a full study until the design and a full containment/authorization runner receive later-pass review. The UIPT Type-II/Type-III bridge remains a valid alternative design candidate; this note does not reject it.
 
