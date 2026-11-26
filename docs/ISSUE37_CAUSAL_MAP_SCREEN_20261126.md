@@ -17,6 +17,8 @@ Curien, Hutchcroft and Nachmias study the infinite planar map \(\mathsf{Causal}(
 
 Their results in *Geometric and spectral properties of causal maps* (arXiv:1710.03137; JEMS 22 (2020), 3997–4024) include:
 
+The offspring law matters when relating the model to the project's CAY work. The S1 preregistration (§2) identifies the local limit of a uniformly rooted finite CAY tree as the Kesten tree of a critical Poisson(1) Galton–Watson process. Since the causal-map theorem applies to every critical finite-variance offspring law, μ=Poisson(1) gives a CAY-matched causal-map variant. The geometric law μ(k)=2^{-(k+1)} is a different special case; its triangulated version gives UICT. These offspring laws must not be conflated.
+
 - For the causal map, the spectral dimension is \(d_s=2\) almost surely and the typical displacement exponent is \(\nu=1/2\).
 - The underlying conditioned tree has \(d_s=4/3\) and \(\nu=1/3\).
 - The causal map has rooted volume-growth exponent \(\mathfrak g=2\).
@@ -57,20 +59,20 @@ This is an exact deterministic identity, not a numerical observation. Root-centr
 
 ### 1. Model independence and scope
 
-The causal map is a distinct planar-map geometry, but its construction is a deterministic horizontal augmentation of the Kesten/Galton–Watson tree. The tree/map pair is therefore a paired transformation control, not two independent random generators. It cannot by itself satisfy the project's requirement for a second independent model family, and a tree-versus-map spectral batch would revisit the terminal S1/S1b line.
+The Poisson(1) causal map is a distinct planar-map graph, but it is a deterministic horizontal augmentation of the same Kesten-tree local limit underlying the terminal S1/S1b CAY line. The tree/map pair is therefore a paired transformation control, not two independent random generators. It cannot by itself establish robustness across independent generators, and a tree-versus-map spectral batch would revisit the terminal random-tree spectral line. The geometric-offspring UICT special case uses a different offspring law, but remains tree-derived and closely related to 1+1 CDT.
 
-The geometric-offspring case is also closely related to 1+1 CDT/UICT. The existing Issue #37 feasibility decision explicitly excludes 2D CDT as an independent replacement for the tree line. The causal-map presentation is not identical to the triangulated UICT graph, but the shared conditioned-tree substrate and the paper's transfer result mean it should not be presented as an unrelated model family.
+The existing Issue #37 feasibility decision explicitly excludes 2D CDT as an independent replacement for the tree line. The causal-map presentation is not identical to the triangulated UICT graph, but the shared conditioned-tree construction and the paper's transfer result mean it should not be presented as an unrelated model family.
 
 ### 2. Root law and estimator compatibility
 
-The infinite model is canonically rooted at the distinguished root of the conditioned-to-survive tree (the spine-root construction). This is not a uniform vertex of a finite truncation.
+The infinite model is canonically rooted at the spine root of (T_\infty). The root-law relation to the existing CAY work depends on the offspring law:
 
-- The S0 single-source kernel can in principle evaluate a fixed root's return probability.
-- S0's proposed multi-source convention and the frozen D2 estimator use uniformly sampled vertices.
-- The D2 calibration therefore does not automatically validate a root-only volume estimator on the Kesten root.
-- A future finite rooted study must specify the root construction, whether only the canonical root is measured, and a root-specific finite-size rule. It must not silently substitute uniform-vertex sources.
+- For μ=Poisson(1), the rooted Kesten tree is exactly the local weak limit of a uniformly rooted finite CAY tree; this is the relationship stated in `docs/SPECTRAL_S1_PREREGISTRATION.md` §2. The Poisson causal-map variant therefore does not introduce a different asymptotic root law from CAY.
+- The geometric law μ(k)=2^{-(k+1)} is a different conditioned-tree law (the UICT special case after triangulation), not the CAY Poisson law.
+- D2 sampled 256 uniform vertices per finite CAY tree; S1/S1b sampled 32. A direct Kesten-tree construction supplies one canonical root per independent tree. The local root law is matched in the Poisson case, but D2's multi-source volume uncertainty model and S1's finite-size spectral power analysis do not automatically validate a one-root-per-tree design. A separate finite-size and graph-level variance/power plan would still be required.
+- The S0 kernel can evaluate a fixed root, but its deterministic lattice calibration does not validate the causal-map random-walk operator: horizontal edges change degrees and transitions.
 
-The root is part of the model definition, not an implementation convenience.
+The exact root-ball identity means volume counts are unchanged by the map augmentation; the new observable is diffusion, not volume growth. The root is part of the model definition, not an implementation convenience.
 
 ### 3. Horizontal-edge convention and current graph code
 
@@ -102,7 +104,9 @@ For the mean-one geometric offspring law \(\mu(k)=2^{-(k+1)}\), the variance is 
 
 At \(H=257\), \(\mathbb E[N_H]=66{,}564\). If the horizontal construction contributes at most one edge per vertex per generation, the undirected edge count is at most \(2N_H-1\), giving a directed-incidence upper estimate \(4N_H-2\). At the **expected** vertex count this is \(266{,}254\); multiplying by \(T=256\) gives an expected S0-style work proxy of \(68{,}161{,}024\), below the existing \(100{,}000{,}000\) proxy limit.
 
-This is only conditional planning arithmetic. It assumes the simple-edge incidence convention for the count, does not resolve the one-/two-vertex layer issue, and is not a worst-case bound. Kesten-tree size is random; no tail probability, graph-level variance, high-quantile memory, wall-time benchmark, or power calculation has been measured. The current kernel still rejects any multiplicity-bearing representation. Therefore this arithmetic is not a feasibility PASS and does not authorize a pilot.
+For comparison, the CAY-matched Poisson(1) law has variance (1), so \\(\mathbb E[Z_n]=1+n\\) and \\(\mathbb E[N_H]=(H+1)(H+2)/2=33{,}411\\) at (H=257). The same incidence bound gives an expected proxy of (133{,}642\times256=34{,}212{,}352) transition operations. This is a separate expectation-based estimate; the geometric-law proxy above must not be transferred to Poisson(1), or vice versa.
+
+These are only conditional planning arithmetic. They assume the stated edge-count convention, do not resolve the one-/two-vertex layer issue, and are not worst-case bounds. Kesten-tree size is random; no tail probability, graph-level variance, high-quantile memory, wall-time benchmark, or power calculation has been measured. The current kernel still rejects any multiplicity-bearing representation. Therefore neither proxy is a feasibility PASS and neither authorizes a pilot.
 
 ## Decision and gates for any reconsideration
 
@@ -112,7 +116,7 @@ Before reconsideration, require all of the following in a separate reviewed desi
 
 1. Explicit acceptance that this tree-derived planar map is a sufficiently distinct model class for the intended comparison; do not count the parent tree and its deterministic transform as independent families.
 2. Exact definition of the horizontal-edge convention for generation sizes one and two, with multiplicity and loop handling matched to the cited model.
-3. A root-law specification and a root-based volume estimator; do not transfer the uniform-source D2 calibration without a new argument.
+3. Specify the offspring and root law. For μ=Poisson(1), use the CAY local-limit relationship explicitly; for the geometric/UICT variant, treat the offspring law separately. The exact root-ball identity means the volume observable is unchanged, but a one-root-per-tree design still needs its own finite-size and graph-level variance/power plan; D2's S=256 multi-source uncertainty calibration is not automatically transferable.
 4. A multiplicity-preserving random-walk operator if required by the source definition, with exact dense-matrix controls on small multigraphs.
 5. A finite truncation proof for every requested return time, including the complete boundary generations and finite-volume/mixing censoring.
 6. A non-gated resource and graph-size-tail plan with hard caps, followed by graph-level power analysis. No walker or source count may be treated as an independent graph replicate.
