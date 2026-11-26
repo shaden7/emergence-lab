@@ -183,8 +183,10 @@ grid checks, not proofs):
   unproved convexity above. The sign remains the target.
 - Arm A: E[c_3] = (binom(m,3) g_3 + 2 binom(m,2) f + m)/binom(N,3) > g_3 at
   every grid N for D = 2,3. This is an exact mean-abundance identity; it does
-  not by itself determine E[d_3] − D. No global monotonicity or convexity
-  claim, inverse-mean sign inference, or Jensen bound is used by the gates.
+  not by itself determine E[d_3] − D. The strict monotonicity of g_3
+  established above is used only to define its unique inverse; no global
+  convexity of d_3, inverse-mean sign inference, or Jensen bound is used by
+  the gates.
 - Deterministic cells: arm A N=3 (c_3 = 1) and arm B N=3 | C_3>0 (c_3 = 1)
   give d_3 = 1 exactly at both D; classified analytically BELOW.
 - Arm A N=4: C_3 ∈ {2,4}, c_3 ∈ {1/2, 1}, P(c_3=1) = f(D). With
@@ -215,8 +217,8 @@ grid checks, not proofs):
    second, unreviewed MM run.
 4. **Negative (non-manifold) control.** Transitive percolation (random DAG on
    N=32 labelled elements, edge probability p, transitive closure) with p
-   calibrated by bisection to |E[r] − 8/35| ≤ 0.005, using exactly 10^4 total
-   DAG draws per bisection step on a calibration seed root. Freeze p before
+   calibrated by bisection to a sample mean |E[r] − 8/35| ≤ 0.005, using
+   exactly 10^4 total DAG draws per bisection step on a calibration seed root. Freeze p before
    evaluation; the calibration root and H_N evaluation root are distinct from
    each other and every other seed root.
 
@@ -436,6 +438,10 @@ UNRESOLVED cells), and that the gate-1 MC set and pilot schema are adequate.
 r5 additionally: verify the fixed `n_p=2,000` pilot and fail-closed 60 CPU-second
 sub-cap; verify the `alpha_p=alpha_c=0.025/12` allocation across all 12
 stochastic arm-B cells and the campaign-wide 95% completion guarantee.
+
+r6 additionally: verify the strict-monotonicity certificate for the inverse
+\(g_3\) map and the matched \(C_3>0\), total-draw and paired-SE convention
+for the transitive-percolation negative control.
 
 ## Revision r1 (2026-11-23)
 
