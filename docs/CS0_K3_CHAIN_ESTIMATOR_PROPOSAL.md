@@ -1,4 +1,4 @@
-# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r3, PROPOSED, NOT frozen)
+# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r5, PROPOSED, NOT frozen)
 
 Status: **design proposal only.** Not preregistered/frozen, not authorized,
 not implemented beyond a constants test, not run. No D=3 K3 data exist.
@@ -13,8 +13,15 @@ addressing [later-pass review r2 (REVISE)](https://github.com/shaden7/emergence-
 See "Revision r2" at the end of this file.
 Revision r3: Director `rd-claude-20261125T080251Z-6b4ea485` (2026-11-25),
 addressing [later-pass review r3 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7156580424).
-See "Revision r3" at the end of this file. r3 is self-authored by the r3
-reviewer session and needs a later-pass review r4 by a different session.
+See "Revision r3" at the end of this file.
+Revision r4: Director `rd-gpt6-20261125T212603Z-3ab547cb` (2026-11-25),
+addressing [later-pass review r4 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#pullrequestreview-6065253424).
+See "Revision r4" at the end of this file.
+Revision r5: Director `rd-gpt6-20261126T012619Z-7c4e91b2` (2026-11-26),
+addressing [later-pass review r5 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7179815896).
+See "Revision r5" at the end of this file. r5 was authored by this later-pass
+reviewer session; a subsequent later-pass review by a different session is
+required before merge.
 Related: [Issue #37](https://github.com/shaden7/emergence-lab/issues/37),
 [D3-E0/M0 proposal](CS0_D3_E0_CONTROL_PROPOSAL.md),
 [D3-E0/M0 protocol](CS0_D3_E0_PROTOCOL.md),
@@ -266,17 +273,22 @@ No Lightsail, deployment or paid API. The largest exact step is enumerating
 and charged to the same cap. Seeds use numpy `SeedSequence`, with recorded
 roots distinct from all D3-E0 roots and spawn keys (D, arm, N, chunk).
 
-The blinded engineering pilot uses its own seed root and at most **2,000
-total draws per non-deterministic target cell** (not 2,000 accepted positives),
-within 60 CPU s. Its separate output contains only, for each (D, arm, N):
-`SD_MM`, `SD_d3`, total draws, accepted `C_3>0` draws, and CPU seconds.
-It contains no means, sums, per-replicate values, sign labels or target
-outcomes. In arm A all draws are accepted. In arm B, both SDs are calculated
-on the **same matched `C_3>0` subset** used for the primary MM–d_3
-comparison; MM conditioned only on `R>0` remains secondary and does not
-enter sizing. If a cell has too few accepted draws to estimate both SDs, or
-its one-sided 97.5% Clopper–Pearson lower bound `p_L` for `P(C_3>0)` is zero, sizing
-fails and no target run starts.
+The blinded engineering pilot uses its own seed root and exactly **2,000
+total draws per non-deterministic target cell** (`n_p=2,000`; not 2,000
+accepted positives), with this fixed draw count predeclared for every cell.
+It does not stop early per cell. Its 60 CPU-second sub-cap is fail-closed:
+if all 2,000 draws for every stochastic cell are not completed before the
+sub-cap, the entire pilot is INVALID, partial outputs are retained only for
+audit, and no SD, acceptance bound, target sample size, feasibility decision
+or target authorization may use them. Its separate output contains only,
+for each (D, arm, N): `SD_MM`, `SD_d3`, total draws (=2,000), accepted
+`C_3>0` draws, and CPU seconds. It contains no means, sums, per-replicate
+values, sign labels or target outcomes. The SDs are sample standard
+deviations (`ddof=1`). In arm A all 2,000 draws are accepted. In arm B,
+both SDs are calculated on the **same matched `C_3>0` subset** used for the
+primary MM–d_3 comparison; MM conditioned only on `R>0` remains secondary
+and does not enter sizing. Require at least `k=2` accepted draws in arm B
+to define both SDs; if `k<2`, sizing fails and no target run starts.
 
 For each non-deterministic cell, the shared target is
 `n_c = max(10^5, ceil((4·max(SD_MM, SD_d3)/0.01)^2))` **accepted
@@ -284,10 +296,23 @@ replicates**. This is a pilot-based planning target for a four-SE
 half-width of 0.01 for both estimators, not a confidence bound on the unknown
 target SD. The realized target SDs and SEs are computed from the target sample
 and used in the frozen classification. Arm A requires `n_c` total
-draws. For arm B, let `k` be the pilot's accepted count out of `n_p` total
-draws. Set `p_L = Beta^{-1}(0.025; k, n_p-k+1)` (and `p_L=0` if `k=0`),
-the exact one-sided 97.5% Clopper–Pearson lower bound for the acceptance
+draws. There are **12 stochastic arm-B cells** in the current 36-cell grid. To
+obtain a campaign-wide completion guarantee, allocate `alpha_p =
+alpha_c = 0.025/12` to each of these cells. For each arm-B cell, let `k`
+be the accepted count out of the fixed `n_p=2,000` total pilot draws. Set
+`p_L = Beta^{-1}(alpha_p; k, n_p-k+1)` (and `p_L=0` if `k=0`), the exact
+one-sided `(1-alpha_p)` Clopper–Pearson lower bound for the acceptance
 probability. The planned total-draw limit `N_total` is the smallest integer
+`n` for which `Pr[Binomial(n, p_L) >= n_c] >= 1-alpha_c`. Across the 12
+cells, a union bound gives at least 97.5% simultaneous coverage of all
+`p_L` bounds and, conditional on that event, at least 97.5% probability
+that every target cell obtains `n_c` accepts by its own `N_total`. A second
+union bound therefore gives at least **95% campaign-wide completion
+assurance** that all 12 arm-B cells reach `n_c`, assuming independent
+pilot/target draws within each cell and a stable acceptance probability.
+No independence between cells is needed for these union bounds. This
+completion allocation is separate from the sign-test family-wise
+`alpha=0.01` over 46 estimator/cell tests. The planned total-draw limit `N_total` is the smallest integer
 `n` for which `Pr[Binomial(n, p_L) >= n_c] >= 0.975`. This allows for
 both uncertainty in the pilot acceptance estimate and binomial variation
 in the target draws: by a union bound, the probability that `p_L <= p`
@@ -357,6 +382,10 @@ incomplete and is fixed in r3. Tuning and budget gaming pass.)
 r4 additionally: check that the r3 UNDETERMINED rule is complete (every
 labelling it accepts has a unique change signature over all fillings of its
 UNRESOLVED cells), and that the gate-1 MC set and pilot schema are adequate.
+
+r5 additionally: verify the fixed `n_p=2,000` pilot and fail-closed 60 CPU-second
+sub-cap; verify the `alpha_p=alpha_c=0.025/12` allocation across all 12
+stochastic arm-B cells and the campaign-wide 95% completion guarantee.
 
 ## Revision r1 (2026-11-23)
 
@@ -462,3 +491,16 @@ This revision responds to [later-pass review r4](https://github.com/shaden7/emer
 - **No D=3 K3 quantity has been computed.** This remains a design revision only; it is not a frozen protocol, authorization, implementation or result.
 
 This revision was authored by the r4 review session. A later-pass review by a different session is required before merge.
+
+
+## Revision r5 (2026-11-26)
+
+This revision responds to [later-pass review r5](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7179815896).
+
+- **Pilot stopping rule fixed.** Every stochastic cell has exactly `n_p=2,000` predeclared total draws. There is no per-cell early stopping. If the 60 CPU-second pilot sub-cap prevents completion of all cells, the whole pilot is INVALID; partial outputs cannot be used for sizing or authorization. Arm-B sample SDs use the accepted `C_3>0` subset with `ddof=1`, and at least two accepts are required.
+- **Completion assurance made campaign-wide.** There are 12 stochastic arm-B cells. Each receives `alpha_p=alpha_c=0.025/12` for its Clopper–Pearson lower bound and binomial completion tail. The two union bounds give at least 95% probability that all 12 cells obtain their required accepted count, under the stated within-cell pilot/target independence and stable-acceptance assumptions. This is separate from the 46-test sign-classification family at `alpha=0.01`.
+- **Arithmetic fixture.** For `n_p=2,000`, `k=800`, `n_c=100,000`, the lower bound is `p_L=0.36869188218750115`; the smallest `N_total` is 273,187 (completion tail 0.9979201115; at 273,186 it is 0.9979105108). This is a calculation check, not an observed pilot.
+- The obsolete r0 Bonferroni test for 32 cells was removed; the current 23-cell / 46-test partition remains checked.
+- Header and revision metadata now identify r5 as the current design revision.
+
+This revision was authored by the r5 later-pass reviewer session. A subsequent later-pass review by a different session is required before merge. No K3 experiment or target run was authorized or executed.
