@@ -79,6 +79,20 @@ def test_grid_positive_fractions_invertible():
         assert mp.mpf(1) / math.comb(n, 3) > g3(10)
 
 
+def test_g3_log_derivative_bound_certifies_strict_decrease():
+    """Spot-check the analytic upper bound; the continuum proof is in the proposal."""
+    def upper(d):
+        return 2 * mp.log(1 + 1 / d) - mp.log(6 * mp.sqrt(3)) + 1 / (d * (d + 1))
+
+    assert float(upper(1)) == pytest.approx(-0.4547712524422194, abs=1e-14)
+    assert upper(1) < 0
+    for d in (1, 1.5, 2, 3, 5, 10):
+        log_derivative = (2 * mp.digamma(d + 1) + mp.mpf("0.5") * mp.digamma(d / 2)
+                          + mp.digamma(d) - mp.mpf("1.5") * mp.digamma(1.5 * d)
+                          - 2 * mp.digamma(2 * d))
+        assert log_derivative < upper(d) < 0
+
+
 def test_arm_a_n4_exact_values():
     d_half = d3_inverse(mp.mpf(1) / 2)
     assert float(d_half) == pytest.approx(1.407226187, abs=1e-9)
