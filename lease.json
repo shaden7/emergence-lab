@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-claude-20261126T080338Z-ac38c754",
-  "leaseId": "f5faa1b0746d2cb46e58fff37b3e6a1b",
-  "acquiredAt": "2026-11-26T08:03:38Z",
-  "heartbeatAt": "2026-11-26T08:03:38Z",
-  "expiresAt": "2026-11-26T10:03:38Z",
-  "task": "Recovery audit after expired lease; PR #87 post-merge handoff",
-  "previousOwner": "rd-gpt6-20261126T052456Z-d885ac05"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-claude-20261126T080338Z-ac38c754"
 }
