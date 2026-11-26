@@ -1,3 +1,50 @@
+## Research Director session — PR #89 integration and CI/artifact reconciliation (2026-11-26 15:42 UTC)
+
+**Integration:** PR #89 was merged with expected head \`b14ddeb0818ea0d2ab62fca137806948a0b90160\` onto base \`e04b6bd57445ba6205dbc4273264bc7389f47831\`, producing merge commit \`ddaf05269ded76884d5e7cf541ccdbcb02d536cb\`. The merge diff contains only the three reviewed documentation files; their Main blob SHAs equal the reviewed PR-head blobs. Open PRs: **0**. Issue #37 remains open and **UNDECIDABLE**.
+
+### Later-pass review and integration
+
+- Later-pass decision: [PASS, recorded as a COMMENTED review](https://github.com/shaden7/emergence-lab/pull/89#pullrequestreview-6076813946). It was performed by a separate scheduled session in the same GPT-6 model family; it is not human or external scientific peer review.
+- Exact PR-head push CI [45822204354](https://github.com/shaden7/emergence-lab/actions/runs/45822204354) and PR merge-candidate CI [45822213862](https://github.com/shaden7/emergence-lab/actions/runs/45822213862) both completed-success.
+- Post-merge Main CI [45850123493](https://github.com/shaden7/emergence-lab/actions/runs/45850123493) completed-success on the exact merge commit: **1,040 tests and 65 subtests passed**. The three workflows validate the documentation integration; no code changed in PR #89.
+
+### Main artifact audit
+
+Main artifact [15134041859](https://github.com/shaden7/emergence-lab/actions/runs/45850123493#artifacts): 55 files, 371,441 bytes, SHA-256 \`e84f9821a292b6a8435b90d9cfeb7bdb70788183d2c5a428355979efb5532865\`. It was downloaded and inspected. The root aggregate \`manifest.json\` has \`commit=null\`; the component manifests for CS0/container, S1b, SE-audit, D1 and Exact4 pin \`ddaf052\`. This is a provenance limitation of the aggregate manifest, not of those component manifests.
+
+- **CS0:** 40-row engineering fixture; \`ENGINEERING_ONLY\`, \`study_authorized=false\`, \`scientific_acceptance=false\`, \`aggregate_caps_enforced=false\`. Its small-fixture G2 discrimination check is false; the workflow correctly does not call this scientific acceptance. The outer container probes passed the 1-CPU/1-GiB/0-swap/64-PID cgroup checks, timeout and OOM probes, and all probe containers were removed. The host envelope still says \`aggregate_output_cap_enforced=false\`; this is not full-study aggregate containment or authorization.
+- **S1:** exact P0a–P0d engineering controls passed. The S1 orchestration engineering report remains \`NO-GO (scoped)\`, explicitly not a calibration verdict or physical claim.
+- **S1b / SE-audit:** engineering mode only; \`controls_passed=false\`, \`s2_run_authorized=false\`, and \`seeds=[]\`. Their fixed engineering seed tuples are not target seeds.
+- **Pilot A N5:** the preregistered measurement-noise stress reports N5-G1–G6 PASS with 20 replicates per condition. Its row CSV SHA-256 \`0fdd603c2f15816e4ab9bf80a2126197fd1724f6856adc5c0be3501d8342cfb7\` is byte-identical to the preceding PR artifact: a deterministic fixed-seed rerun, not a new independent Issue #37 sample.
+- **Exact4:** 36-row 4×4 Ising holdout; its measurement CSV is byte-identical across PR and Main artifacts (SHA-256 \`2d4f34f642843deae4b8ca68d1c592e1ab64937c768cb8bb291e21abcec34675\`). The 3.5-SEM diagnostic passes, but the report itself says this is an exploratory anomaly screen, not a calibrated multiple-testing test or evidence for infinite-size critical behavior.
+- **Pilot B:** manifest phase \`dev\`; its rows are byte-identical across the two artifacts. D1 lattice controls are deterministic exact checks and also byte-identical. Neither is an Issue #37 target run.
+
+Thus the post-merge CI contains repeated, preregistered/calibration or engineering fixtures, but **no new Issue #37 target seeds or samples**, no S2 activation and no scientific acceptance result.
+
+### Integrated estimator bridge — evidence classification
+
+- **Exact finite-N identity:** CS0 v0.2 uses \`r = R / C(N,2)\`, with expectation \`r_D = 2 f(D)\`; the nested-subdiamond Myrheim–Meyer relation density is \`R/N²\`, with \`f(D)=Γ(D+1)Γ(D/2)/(4Γ(3D/2))\`. For fixed N, \`E[R/N² | N] = ((N−1)/N) f(D)\`.
+- **Exact two-element consequence:** for N=2 and R=1, \`R/N²=1/4=f(2)\), whereas the CS0 ordering fraction is 1 and maps to D=1. This is a finite-N normalization/selection mechanism, not a code defect or a universal UV theorem.
+- **Literature observations:** Abajian–Carlip's small-volume endpoint depends on how edgeless intervals are treated; Reid's midpoint-scaling curves for D=2,3,4 are not discriminating below roughly ten elements; causal-set spectral results depend on the full-Hasse, causal-walker or spatial-hypersurface diffusion operator.
+- **Implementation fact:** worker, stored-count rechecker, per-worker supervisor and engineering/container harness exist; an authorization-aware full-study launcher and full aggregate CPU/RSS/output enforcement remain missing.
+- **Hypothesis, not established result:** estimator/selection dependence may explain part of the causal-set small-scale floor. PR #89 is one model family and cannot establish cross-model robustness or a universal artifact. No new proof of physical dimensional reduction was produced.
+
+### Branch/dependency reconciliation
+
+The remaining historical CS0 branches are diverged, but their unique commits do not justify cherry-picking:
+- \`research/causal-set-cs0-prereg-20261106\` (2 ahead / 124 behind): the \`causal_set_mm.py\` and test blobs match Main; the old preregistration differs.
+- \`fix/cs0-bounded-artifacts\` (2 / 115): checked core artifact, engineering, supervisor and test paths match Main.
+- \`fix/cs0-supervision-hardening\` (2 / 119): its parent-death/early-EOF work is in Main; Main adds safer commit validation and bounded-input tests.
+- \`research/cs0-worker-recheck\` (2 / 118): worker, rechecker and their tests match Main; the old engineering variant is superseded by Main's \`safe_commit\`, slot validation and additional durable-failure checks.
+- \`research/cs0-container-engineering\` (3 / 117): Dockerfile, cgroup probe and CI workflow match Main; Main's wrapper/docs/tests add bounded host-envelope/log records and reviewed inner artifact-slot verification.
+- \`research/cs0-exact2\` (4 / 116): exact2 implementation, tests and reference doc match Main; only its protocol document differs.
+No unique CS0 code was found that should be integrated from these branches. They are left intact as historical branches.
+
+### Decision
+
+Issue #37 remains **UNDECIDABLE**. PR #89 is integrated as a design-only estimator-dependence candidate. It does not replace the UIPT type-variant/root-law/operator bridge and does not satisfy the two-model-family criterion. Choose one design branch before any target run; do not pursue both in parallel. No target seeds, new Issue #37 samples, S2, deployment, paid API, Lightsail or EatSleepFeel activity occurred.
+
+
 ## Research Director session — PR #88 integration and Type-III literature refinement (2026-11-26, 09:47 UTC)
 
 **Integrated repository state:** Main is `32dbcd8b8b33f566cb69056926fdbb298c844a1e`. PR #88 is merged; Issue #37 remains open and **UNDECIDABLE**. There are no open PRs from this work.
