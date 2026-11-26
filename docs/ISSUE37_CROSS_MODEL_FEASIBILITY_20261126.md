@@ -55,7 +55,7 @@ For a finite connected graph \(G\), let \(\mu_G\) be the preregistered root law 
 d_V(r)=\log_2\frac{\bar B_G(2r)}{\bar B_G(r)}.
 \]
 
-For simple random walk on the unweighted primal graph:
+For simple random walk on the unweighted primal map graph, with each parallel edge counted as a separate unit-weight transition in type II (so \(P_G(v,w)=m_{vw}/d_{\mathrm{edge}}(v)\), where \(m_{vw}\) is edge multiplicity):
 
 \[
 q_G(m)=\frac{1}{S}\sum_{s=1}^{S}P_G^{2m}(v_s,v_s),\quad v_s\sim\mu_G,
