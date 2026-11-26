@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261126T1524089-0bbaff30",
   "leaseId": "0bbaff307a5e2efc0714e4902b1e6641ec850951e8769312d2948c31bbe2c3ea",
   "acquiredAt": "2026-11-26T15:24:08.915Z",
-  "heartbeatAt": "2026-11-26T15:24:08.915Z",
-  "expiresAt": "2026-11-26T17:24:08.915Z",
+  "heartbeatAt": "2026-11-26T15:39:48.640Z",
+  "expiresAt": "2026-11-26T17:39:48.640Z",
   "task": "Recover expired Research Director lease; reconcile open PRs, CI, artifacts and Issue #37 handoff",
   "previousOwner": "rd-gpt6-20261126T122535Z-03500ec4"
 }
