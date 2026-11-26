@@ -147,6 +147,14 @@ positive terms and the lower bound to negative terms gives
 U(D):=2\ln(1+1/D)-\ln(6\sqrt3)+\frac{1}{D(D+1)}.
 \]
 
+
+Direct substitution gives the tighter upper bound
+\[
+V(D):=2\ln(1+1/D)-\ln(6\sqrt3)+\frac{1-D}{2D(D+1)}.
+\]
+Since \(U(D)=V(D)+1/(2D)>V(D)\), the displayed \(U\) is a valid, looser
+upper bound.
+
 Now
 \(U'(D)=-2/[D(D+1)]-(2D+1)/[D^2(D+1)^2]<0\) for \(D>0\), and
 \(U(1)=2\ln2-\ln(6\sqrt3)+1/2\approx-0.4547712524<0\).
@@ -218,9 +226,12 @@ grid checks, not proofs):
 4. **Negative (non-manifold) control.** Transitive percolation (random DAG on
    N=32 labelled elements, edge probability p, transitive closure) with p
    calibrated by bisection to \(|\bar r_{\rm calib} - 8/35|\le0.005\), using
-   exactly \(10^4\) total DAG draws per bisection step on a calibration seed root. Freeze p before
-   evaluation; the calibration root and H_N evaluation root are distinct from
-   each other and every other seed root.
+   exactly \(10^4\) total DAG draws per bisection step on a calibration seed root.
+   Here \(r=R/\binom{32}{2}\) is the unordered relation fraction. Before a frozen
+   implementation, specify the per-step seed/common-random-number schedule, a
+   maximum iteration count and fail-closed behavior if the tolerance is not
+   reached. Freeze p before evaluation; the calibration root and H_N evaluation
+   root are distinct from each other and every other seed root.
 
    H_N evaluation uses exactly 10^4 **total** DAG draws, with no early
    stopping. For every draw record R and C_3; report total draws, accepted
@@ -261,9 +272,11 @@ Cell types (r1), 36 cells in total:
   - D=3: arm A N=4, analytic (C_3 ∈ {2,4}, R_inner ∈ {0,1}).
 - **Stochastic (23):** every other cell.
 
-Family-wise α = 0.01 over the 2 × 23 = 46 two-sided sign tests (both
-estimators) ⇒ z = Φ⁻¹(1 − 0.01/92) ≈ 3.6979. ABOVE / BELOW / UNRESOLVED as
-in D3-E0. CONCORDANT if both estimators are resolved with equal sign;
+Using the nominal normal/CLT approximation, family-wise α = 0.01 over
+the 2 × 23 = 46 two-sided sign tests (both estimators) gives
+z = Φ⁻¹(1 − 0.01/92) ≈ 3.6979. This is not an exact finite-sample guarantee;
+before any freeze, justify or calibrate the approximation at the planned
+target sample sizes. ABOVE / BELOW / UNRESOLVED as in D3-E0.
 DISCORDANT if both are resolved with opposite sign; else UNRESOLVED. The
 secondary values (MM | R>0 in arm B and its archived class) are reported in
 the same table and do not enter the classification. Also report d_3(E[c_3]),
@@ -577,6 +590,10 @@ This revision responds to [later-pass review r6 (REVISE)](https://github.com/sha
   draws make H_N uninformative, not a primary-target failure.
 - No K3 pilot, target measurement, freeze, or authorization was added.
 
-The r6 review and these corrections were performed in the same GPT-6 session;
-a subsequent later-pass review by a different session is required before merge.
-No K3 experiment or target run was authorized or executed.
+A subsequent later-pass r7 review by a separate GPT-6 session returned
+PASS for design-only integration ([review comment](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7181846458)).
+This was the same model family, not external peer review. PR #86 was merged to
+main as 46f1aa10687358f8404469359c86a2057d064d66 on 2026-11-26.
+Before any freeze/implementation, resolve the H_N bisection seed/iteration/
+failure rules and justify or calibrate the nominal normal/CLT sign-test
+threshold. No K3 experiment or target run was authorized or executed.

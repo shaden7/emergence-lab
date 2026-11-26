@@ -72,3 +72,37 @@ External theorems, previously reviewed numerical observations, proposed toleranc
 The original suggested endpoint t=256 would require q(512). On the 256-by-256 torus, the existing graph kernel checks max(half_times) * adjacency.nnz: 512 * (4 * 256^2) = 134,217,728, exceeding its unchanged 100,000,000-operation cap before propagation. The suggested slope endpoint is therefore reduced to t=128, requiring q(256) and 67,108,864 edge-steps. This is a static feasibility correction, not an executed C0 result or measured runtime. Keep the kernel cap unchanged. A preregistration must distinguish slope times from required return times and verify this budget before execution.
 
 Review decision: **PASS for design only after the endpoint correction.** Later session checked the complete one-file diff, Issue #37, D2 conditions and S0 definitions against the actual graph-kernel cap. The independent-observable distinction and refusal of an arbitrary radius/time mapping are appropriate. This is AI-mediated review, not external peer review. No C0 kernel execution or fresh literature verification is claimed; theorem values are carried from the reviewed repository references. The separate preregistration remains required. The endpoint fix is a reviewer-authored amendment.
+
+
+## Post-run status (2026-11-26)
+
+The deterministic C0 exact-control comparison described above is complete, not
+a future calibration task. It was preregistered in
+[DIMENSION_C0_PREREGISTRATION.md](DIMENSION_C0_PREREGISTRATION.md), authorized
+in [C0_V2_RUN_AUTHORIZATION.md](C0_V2_RUN_AUTHORIZATION.md), and executed once
+under the v2 authorization. The archived result
+[2026-11-04-c0-v2.md](experiments/2026-11-04-c0-v2.md) records PASS for the
+specified deterministic controls, report/provenance checks and two
+byte-identical worker outputs. The manifest pins execution commit
+7352c56e5c89df90f301bb6bb78fe05026d95f1e, numerical SHA-256
+c28c52a1ce4fa5a1913933bb732c11f617091cf6846c56d8524f2c44c626c0b0,
+0.863192 aggregate child CPU seconds and 67,808 KiB maximum child RSS.
+The separate recheck records 36 independent integer walk/ball checks and
+maximum return absolute error 5.55e-17. Actual raw output bytes are 26,373;
+the manifest's 26,348 count is 25 bytes low and this is disclosed in the
+result note. C0-v1 remains INCOMPLETE (provenance); its original bytes and
+adjudication are unchanged.
+
+C0 PASS validates only deterministic finite-control reporting. It does not
+resolve random-tree spectral size stability, create a cross-model result,
+authorize S2 or support a physical-spacetime claim. Do not repeat C0.
+
+The next step is a design-only feasibility/power decision for a distinct,
+affordable model/observable comparison, following
+[S1_SPECTRAL_NEXT_DECISION.md](S1_SPECTRAL_NEXT_DECISION.md). Keep the
+terminal S1/S1b random-tree size-equivalence outcome unchanged. Before any
+stochastic comparison, define independent graph replicates, D2 design-effect
+sensitivity, paired graph-level covariance, per-observable finite-size/window
+controls, matched nulls, a justified scale map only if needed, and a fixed
+resource budget. No new seeds or samples until a separate reviewed
+preregistration and authorization.
