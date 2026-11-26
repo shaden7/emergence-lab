@@ -20,7 +20,7 @@ r_D = \frac{\Gamma(D+1)\Gamma(D/2)}{2\Gamma(3D/2)}.
 
 For N i.i.d. uniform points in a fixed D-dimensional Minkowski diamond, each unordered pair is related with probability r_D. Therefore \(\mathbb E[r]=r_D\) exactly for every fixed N≥2. The current causal_set_mm.myrheim_meyer_dimension function inverts this r_D relation.
 
-The finite-volume estimator used in the nested-subdiamond literature is instead based on the Meyer ratio
+The finite-volume estimator used in the nested-subdiamond literature is instead based on the Meyer-type relation-density ratio
 
 \[
 f(D)=\frac{\Gamma(D+1)\Gamma(D/2)}{4\Gamma(3D/2)}
@@ -44,7 +44,7 @@ This factor is a finite-occupancy effect, not a numerical approximation.
 **Exact two-element check.** For a two-element chain, N=2 and R=1:
 
 - CS0 ordering fraction: r=1, hence the current inverse maps it to D=1.
-- Meyer ratio: R/N²=1/4=f(2), hence the literature convention maps it to D=2.
+- Meyer-type relation-density ratio: R/N²=1/4=f(2), hence the literature convention maps it to D=2.
 
 Thus the often-quoted two-element D_M=2 floor is not reproduced by the current CS0 inverse. This is not a defect in CS0: it is a different normalization/estimand. It does mean that CS0 v0.2 alone cannot reproduce the finite-volume endpoint in Abajian–Carlip.
 
