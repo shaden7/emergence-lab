@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261126T0928Z-13f92c9f",
+  "leaseId": "3ac7d25381ba8e530ba37cac8053ef96",
+  "acquiredAt": "2026-11-26T09:28:22Z",
+  "heartbeatAt": "2026-11-26T09:28:22Z",
+  "expiresAt": "2026-11-26T11:28:22Z",
+  "task": "Later-pass review PR #88; resolve scientific and integration gates",
   "previousOwner": "rd-gpt6-20261126T0829Z-340e32f1"
 }
