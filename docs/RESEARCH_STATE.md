@@ -2,7 +2,7 @@
 
 **Main HEAD:** `8a9662e126fceb640efe11300594bacb0d6de9e4`.
 
-[PR #92](https://github.com/shaden7/emergence-lab/pull/92), “Issue #37: document finite-volume causal-link sampling bias”, was later-pass reviewed **PASS** on exact head `503fe8386668ee130a194200cebe9e7c1c021c92` against base `45107e899c0f6889a79cca579ef0a3f5420028db`, then merged with the expected-head guard as `8a9662e126fceb640efe11300594bacb0d6de9e4`. The merge tree is exactly equal to the PR synthetic merge-candidate tree. The review was an AI-mediated later-pass check, not external scientific peer review. The merge changes only the causal-set estimator bridge and research plan; no code or experiment configuration changed.
+[PR #92](https://github.com/shaden7/emergence-lab/pull/92), “Issue #37: document finite-volume causal-link sampling bias”, received a later-pass **PASS** on exact head `503fe8386668ee130a194200cebe9e7c1c021c92` against base `45107e899c0f6889a79cca579ef0a3f5420028db`, then merged with the expected-head guard as `8a9662e126fceb640efe11300594bacb0d6de9e4`. The merge tree exactly equals the PR synthetic merge-candidate tree. This was an AI-mediated later-pass check, not external scientific peer review. The merge changes only the causal-set estimator bridge and research plan; no code or experiment configuration changed.
 
 ### Exact-head and post-merge CI
 
@@ -13,11 +13,11 @@
 
 ### Scientific source audit and limitations
 
-Boguña & Krioukov, [arXiv:2610.03247](https://arxiv.org/abs/2610.03247), v1, was checked against the PDF, especially §§II–V and VII. Equations (9)–(11) define the sigma-finite link-intensity measure and its normalized proper-time profile per unit hyperbolic volume; they do not define a uniform probability law over the infinite link set. Equations (15)–(20) give the constant-time-cone cutoff and the distinct large-cone normalized profile for spatial (d>1), while (d=1) converges only logarithmically. Equations (21)–(23) give the product-window profile and its preferred-frame caveat.
+Boguña & Krioukov, [arXiv:2610.03247](https://arxiv.org/abs/2610.03247), v1, was checked against the PDF, especially Sections II–V and VII. Equations (9)–(11) define the sigma-finite link-intensity measure and its normalized proper-time profile per unit hyperbolic volume; they do not define a uniform probability law over the infinite link set. Equations (15)–(20) give the constant-time-cone cutoff and the distinct large-cone normalized profile for spatial dimension d>1, while d=1 converges only logarithmically. Equations (21)–(23) give the product-window profile and its preferred-frame caveat.
 
-The paper's exact-link numerical demonstration uses one reported parameter point, (ho=128000), (T=1), with 5,000 / 400 / 250 independent sprinklings in (1+1), (2+1), and (3+1) dimensions. It checks the finite-cone and product-window predictions at those settings; it is **not** a numerical multi-parameter test of the proposed double-scaling limit. The analytic derivation and the finite-parameter numerical verification must remain separate evidence classes.
+The paper's exact-link numerical demonstration uses one reported parameter point, rho=128000 and T=1, with 5,000 / 400 / 250 independent sprinklings in 1+1, 2+1, and 3+1 dimensions. It checks the finite-cone and product-window predictions at those settings; it is **not** a numerical multi-parameter test of the proposed double-scaling limit. The analytic derivation and finite-parameter numerical verification must remain separate evidence classes.
 
-The result concerns link proper-time statistics. It is not a spectral-dimension theorem, does not derive a bias in the causal-walker meeting exponent (d_{cs}), and does not directly alter the relation-count MM or midpoint-scaling estimators. It does mean that any full-Hasse or forward-link diffusion proposal must specify its finite-volume exhaustion / regulator as part of the estimator and test sensitivity to alternative regularizations before claiming an intrinsic infinite-volume operator.
+The result concerns link proper-time statistics. It is not a spectral-dimension theorem, does not derive a bias in the causal-walker meeting exponent d_cs, and does not directly alter the relation-count MM or midpoint-scaling estimators. Any full-Hasse or forward-link diffusion proposal must specify its finite-volume exhaustion / regulator as part of the estimator and test sensitivity to alternative regularizations before claiming an intrinsic infinite-volume operator.
 
 ### Decision and next action
 
