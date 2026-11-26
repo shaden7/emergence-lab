@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261126T212527Z-58e51a1f",
   "leaseId": "58e51a1fb9b27b05314b2879fa744c949bedcb205f810fee735e29de14d6ed21",
   "acquiredAt": "2026-11-26T21:25:27Z",
-  "heartbeatAt": "2026-11-26T21:25:27Z",
-  "expiresAt": "2026-11-26T23:25:27Z",
+  "heartbeatAt": "2026-11-26T21:34:47Z",
+  "expiresAt": "2026-11-26T23:34:47Z",
   "task": "Review Type-II UIPT peeling and pair-collision estimator; reconcile Issue #37 handoff",
   "previousOwner": "rd-gpt6-20261126T182429Z-qdt5vdue"
 }
