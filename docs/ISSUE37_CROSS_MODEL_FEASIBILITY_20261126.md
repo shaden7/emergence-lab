@@ -6,9 +6,122 @@ PR #90 was merged with expected head 80d246add91d6056de767921fce527511a67623c as
 
 Post-merge Main CI 45877702564 completed-success: 1,047 tests and 65 subtests passed in 97.89 seconds. Artifact 15146036271 contains 55 files / 371,236 bytes, SHA-256 dd87d652ecb761a589f9e19214547604c2f0ce575e3b076d9a8bd6105018799d. Component manifests pin the merge commit; the aggregate root manifest still has commit=null. CS0 remains ENGINEERING_ONLY and study_authorized=false; S1b is PARTIAL, SE-audit BLOCKED, S1 orchestration NO-GO (scoped), and coverage/finite-size gates were skipped. No Issue #37 target-map data or S2 authorization is present.
 
-The Type-II UIPT has a direct infinite-volume spectral-dimension theorem: Gwynne–Miller Theorem 1.6 includes maps with no self-loops and parallel edges allowed and proves d_s=2. This is not a finite-N acceptance window or validation of our estimator. Type III still lacks a direct d_s=2 theorem in the cited literature; its annealed root-law exponent transfer is derived below. The exact S0 kernel still exceeds its 100,000,000-operation and 512 MiB limits at projected target sizes. No uniform rooted Type-II map sampler, planar embedding/provenance, finite-size calibration, scalable estimator or graph-level power calculation exists.
+The Type-II UIPT has a direct infinite-volume spectral-dimension theorem: Gwynne–Miller Theorem 1.6 includes maps with no self-loops and parallel edges allowed and proves d_s=2. This is not a finite-N acceptance window or validation of our estimator. Type III still lacks a direct d_s=2 theorem in the cited literature; its annealed root-law exponent transfer is derived below. The current projected target still exceeds the documented 100,000,000-operation and 512 MiB S0 caps; no target-scale benchmark has been run. **Literature correction:** Angel (2003), Section 2, already gives an exact local peeling sampler for the infinite Type-II UIPT. The missing item is a repository implementation, not a sampler in the literature. Angel's construction samples finite neighborhoods of the infinite UIPT; it is not a finite-N uniform spherical-triangulation generator. An implementation needs a combinatorial-map state with cyclic boundary order / rotation-system data and explicit finite-component fillings; Euclidean coordinates are not needed for the random-walk observable. Finite-size calibration, a scalable estimator with a predeclared power calculation, and target data remain absent.
 
-The older sections below preserve the original feasibility rationale; the current implementation status and root-law result above supersede pre-PR #90 statements about Type-II representation and the Type-III annealed root-law exponent.
+## Type-II UIPT: exact local peeling sampler and S0 return-probability cross-check
+
+**Evidence class: published sampling construction plus a derived estimator identity; no repository implementation, target seed, or target run.**
+
+### Exact local sampler (Angel, 2003)
+
+Angel studies Type-II triangulations: double / parallel edges are allowed, self-loops are not. For a current unexplored outer face with boundary length \(m+2\), let \(C_m\) denote the infinite-side limiting weight and \(Z_m\) the partition function of finite free triangulations. With \(\alpha=27/2\), the probability that the triangle incident to a selected boundary edge introduces a new vertex is
+
+\[
+p_{\mathrm{new}}(m)=\frac{C_{m+1}}{\alpha C_m}
+=\frac{2m+3}{3m+3}.
+\]
+
+If the third vertex is an existing boundary vertex \(x_i\), \(1\le i\le m\), the two orientations distinguish which of the two resulting components is infinite. Angel's equation (2.4) gives
+
+\[
+\mathbb P(y=x_i,\ T_2\ \text{infinite})
+=\frac{C_{m-i}Z_{i-1}}{C_m},
+\]
+
+and reflection gives the other orientation,
+
+\[
+\mathbb P(y=x_i,\ T_1\ \text{infinite})
+=\frac{Z_{m-i}C_{i-1}}{C_m}.
+\]
+
+The finite component is filled by an independent free Boltzmann triangulation; the infinite component is a UIPT of the remaining polygon. The convention \(\varphi_{0,0}=1\) is essential: it allows a 2-gon to close by gluing its two boundary edges without adding an interior vertex.
+
+Exact rational examples from these formulae:
+
+| \(m\) | Boundary length | \(p_{\mathrm{new}}\) | Total closure probability |
+|---:|---:|---:|---:|
+| 0 | 2 | \(1\) | \(0\) |
+| 1 | 3 | \(5/6\) | \(1/6\) |
+| 2 | 4 | \(7/9\) | \(2/9\) |
+| 3 | 5 | \(3/4\) | \(1/4\) |
+
+Theorem 1.10 supplies the spatial Markov property and conditional independence of the finite and infinite components. Angel explicitly notes that the next boundary edge may be chosen adaptively from the explored state. To sample a radius-\(r\) neighborhood, peel while any boundary vertex has distance less than \(r\) from the root; this terminates almost surely for fixed \(r\). Thus the literature sampler is already exact for local Type-II UIPT neighborhoods. It is not a finite-\(N\) generator.
+
+For the S0 half-kernel identity, write
+
+\[
+q_t(\rho)=P^{2t}(\rho,\rho)
+=d_\rho\sum_x\frac{P^t(\rho,x)^2}{d_x}.
+\]
+
+Every endpoint \(x\) of a \(t\)-step walk is within graph distance \(t\), and its full degree \(d_x\) enters the identity. Sampling to radius \(r=t+1\) leaves every vertex at distance at most \(t\) in the interior, so all required degrees are known. This is an exact locality statement, not a finite-size approximation.
+
+### Pair-collision U-statistic (derived; same spectral observable)
+
+Conditional on one fixed undirected loop-free graph, let \(X_1,\ldots,X_W\) be independent endpoints of \(W\) simple random walks of \(t\) steps from \(\rho\). Then
+
+\[
+\widehat q_t
+=\frac{d_\rho}{\binom W2}
+\sum_{a<b}\frac{\mathbf 1\{X_a=X_b\}}{d_{X_a}}
+\]
+
+is an unbiased U-statistic for the same \(q_t(\rho)\) used by S0. With
+\(h(x,y)=d_\rho\mathbf 1\{x=y\}/d_x\),
+\(\zeta_1=\operatorname{Var}(\mathbb E[h(X_1,X_2)\mid X_1])\), and
+\(\zeta_2=\operatorname{Var}(h(X_1,X_2))\), its exact conditional variance is
+
+\[
+\operatorname{Var}(\widehat q_t\mid G)
+=\frac{4(W-2)}{W(W-1)}\zeta_1
++\frac{2}{W(W-1)}\zeta_2.
+\]
+
+A deterministic exact-rational control on the multigraph with adjacency
+
+\[
+A=\begin{pmatrix}
+0&2&0&1\\
+2&0&1&0\\
+0&1&0&1\\
+1&0&1&0
+\end{pmatrix},
+\quad d=(3,3,2,2),\quad \rho=0,\quad t=2,\quad W=3
+\]
+
+has \(P^t(\rho,\cdot)=(11/18,0,7/18,0)\), \(q_t=389/648\), and exact enumeration of all \(W\)-endpoint tuples gives
+\(\mathbb E[\widehat q_t]=389/648\) and
+\(\operatorname{Var}(\widehat q_t)=49511/419904\), matching the U-statistic variance formula. This is a finite-graph algebraic control, not a random-map sample or target measurement.
+
+For a random graph ensemble,
+\(\operatorname{Var}(\widehat q_t)
+=\mathbb E[\operatorname{Var}(\widehat q_t\mid G)]
++\operatorname{Var}(q_t(G))\); walkers on one map do not replace independent map replicates for graph-level uncertainty. Endpoint degrees must be fully exposed, which the radius-\(t+1\) local sample guarantees.
+
+**Scope restriction:** this is a second computational estimator of the same random-walk return observable, not an independent dimension family. Under the adopted S1 spectral next-decision note, algorithmic re-implementations / re-aggregations of the same spectral observable are internal robustness checks and do not satisfy Issue #37's distinct-estimator requirement. No numerical variance-reduction ratio is accepted: earlier scratch ratios have no archived script, graph construction, seed manifest, or raw output.
+
+### Walk-adaptive peeling: implementation proposal, not a result
+
+Because Angel permits the next boundary edge to be chosen from the explored state, a walk-coupled lazy exploration is plausible: if the current walker vertex is on the boundary, peel incident boundary edges until its full star is known, then choose uniformly among its incident half-edges. For the pair-collision estimator, expose each endpoint's star after the \(t\)-step walk. Multiple walkers can be interleaved on the same lazily sampled map, using independent transition randomness.
+
+This is a derived implementation plan, not an already implemented or benchmarked Type-II routine. The implementation must test the conditional-law invariant under adaptive peeling, termination, half-edge multiplicity, endpoint-degree completeness, and graph-level independence. The published walk/peeling construction of Benjamini–Curien (2013) is for the UIPQ; it is an analogue, not direct Type-II UIPT evidence. No resource saving is claimed.
+
+### Root convention and resource consequences
+
+For a finite spherical Type-II triangulation with \(N\) vertices, \(E=3N-6\) and \(\bar d_N=2E/N=6-12/N\). Conditional on the map, the origin of a uniformly selected oriented root edge has law \(P_E(v)=d(v)/(2E)\), whereas a uniform vertex has law \(P_V(v)=1/N\). Hence
+
+\[
+\frac{dP_V}{dP_E}(v)=\frac{\bar d_N}{d(v)}.
+\]
+
+This exact reweighting matters for finite-\(N\) annealed means and variances. Gwynne–Miller's Type-II \(d_s=2\) theorem is already an almost-sure infinite-volume statement under the natural rooted-map law; they also note that, when the spectral-dimension limit exists, it does not depend on the chosen starting vertex. That does not make finite-\(N\) root averages interchangeable.
+
+Angel's Theorem 1.2 gives Type-II UIPT ball-volume growth exponent 4 with polylogarithmic bounds. This is a mathematical volume statement, not a runtime or memory benchmark. A full local sample can therefore remain large; lazy walk-coupled peeling may reduce explored volume, but its cost has not been measured. The CSR MultiGraph added by PR #90 is the random-walk adjacency representation after sampling; it does not itself retain the planar boundary order needed by the peeling state.
+
+**Decision:** the literature sampler removes the claim that Type-II local sampling is unknown, but not the implementation, finite-size/power, or resource gates. Pair collision is eligible as an S0 cross-check only, not as Issue #37's independent second estimator. No target work is authorized by this note.
+
+Sources: Angel (2003), *Growth and Percolation on the Uniform Infinite Planar Triangulation*, Sections 1.2.2 and 2, equations (2.3)–(2.4), Theorem 1.10, Theorem 1.2: https://arxiv.org/abs/math/0208123. Gwynne–Miller (2020), *Random walk on random planar maps: spectral dimension, resistance, and displacement*, Section 1.3, equations (1.9)–(1.10), Theorem 1.6: https://arxiv.org/abs/1711.00836. Benjamini–Curien (2013), UIPQ walk/peeling analogue: https://arxiv.org/abs/1202.5454.
 
 ## Root-law exponent transfer for finite Type-III triangulations (derived; not a finite-N acceptance rule)
 

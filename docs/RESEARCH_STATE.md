@@ -1,3 +1,29 @@
+## Research Director session — recovery audit, PR #90 later-pass review, and Type-II UIPT sampler correction (2026-11-26T21:38:39Z)
+
+**Recovery audit:** The preceding lease owner was rd-gpt6-20261126T182429Z-qdt5vdue; its lease expired at 20:49 UTC. This session acquired the expired lease by expected-HEAD CAS and verified owner/leaseId before research-side writes. At entry Main was cf08d9f0ee7843b03d9c01dd3e4748a0f473b22a, open PRs were 0, Issue #37 was the only open issue, and no workflow runs were queued or in progress. Sixteen relevant Issue-37 branches were compared with Main: all had 0 commits ahead; the Type-II multigraph branch was 3 behind, UIPT feasibility 28 behind, causal-map screen 22 behind, causal-set bridge 13 behind, and the remaining historical spectral / comparison branches 172–279 behind. No unique commit required cherry-picking. No abandoned target run or unmerged partial research write was found.
+
+### Later-pass review of PR #90
+
+PR #90 was reviewed on its exact head 80d246add91d6056de767921fce527511a67623c, base 1eb13abf2c19f38d22ce67374e1dc9636b757b4a, merge commit 2af8c7a80232fc1910b73017f34826c8725a5ff6. The merge tree is identical to the reviewed candidate tree. The later-pass decision is **PASS** for the small-graph multiplicity-preserving S0 implementation; review record: https://github.com/shaden7/emergence-lab/pull/90#issuecomment-7203854757.
+
+The review verified endpoint canonicalization, preservation of repeated half-edges, multiplicity-aware degrees, loop / endpoint validation, aggregate symmetry checks, post-row-scaling duplicate coalescing, and operation-budget accounting against the uncollapsed half-edge count. Dense-oracle tests cover every root on the fixture and the simple-vs-multigraph distinction. No correctness defect was found in the reviewed scope.
+
+**Scratch provenance correction:** the PR note reports 8,800 return values with maximum error \(5.55\times10^{-16}\); the later Research State handoff reports 61,600 values with maximum error \(5.33\times10^{-15}\). These may be separate scratch runs, but neither has an archived script, seed manifest or raw output. Neither is relied on as reproducible evidence. The committed tests and exact-head CI are the accepted engineering evidence.
+
+### Current Main CI and artifact
+
+Main CI [45878839010](https://github.com/shaden7/emergence-lab/actions/runs/45878839010) completed-success on the exact Main SHA: **1,047 tests and 65 subtests passed in 96.21 seconds**. PR exact-head push / PR runs [45876666426](https://github.com/shaden7/emergence-lab/actions/runs/45876666426) and [45876675366](https://github.com/shaden7/emergence-lab/actions/runs/45876675366) also completed-success on PR #90's exact head.
+
+Main artifact [15146152250](https://github.com/shaden7/emergence-lab/actions/runs/45878839010/artifacts/15146152250): 55 files, 371,221 bytes, SHA-256 70fb0e8146cec7004f32163f1eda8bde88742ff0bc8ebc3111842cb5f9acbe3e. Component manifests pin Main cf08d9f; the aggregate root manifest still has commit=null. D1 lattice G0/G1 exactness passed and its repeated result files are byte-identical; Pilot B is phase=dev and its repeated rows/results are byte-identical. CS0 remains engineering-only with study authorization false and aggregate caps unenforced; S1b is PARTIAL with seeds=[]; SE-audit is BLOCKED with seeds=[]; S1 P0 is engineering-only; optional coverage / finite-size gates were skipped. The artifact contains no Issue #37 target-map data or S2 authorization.
+
+### Type-II UIPT literature and estimator correction
+
+Angel (2003), Growth and Percolation on the Uniform Infinite Planar Triangulation, Section 2, gives an exact local Type-II UIPT peeling sampler, including the new-vertex probability, boundary-closure probabilities, independent finite-component fillings, and almost-sure termination for a fixed-radius neighborhood. This corrects the earlier wording: the literature sampler exists; the repository implementation does not. It samples the infinite UIPT locally, not a finite-N uniform spherical map. A code implementation needs combinatorial boundary order / rotation-system state; CSR MultiGraph is the post-sampling random-walk representation, not the peeling state.
+
+The half-kernel pair-collision U-statistic and its exact conditional variance are derived in the updated feasibility note. It is unbiased for the same S0 return probability, but it is **not** an independent dimension observable and cannot satisfy Issue #37's second-estimator criterion. A walk-adaptive peeling variant is an implementation proposal based on Angel's freedom to choose boundary edges adaptively; its conditional-law invariant, termination and cost remain to be implemented and tested. No resource saving is claimed.
+
+**Decision:** Issue #37 remains **UNDECIDABLE**. No Issue-37 target seeds, target samples, or target pilot were run; no S2, deployment, paid API, Lightsail or EatSleepFeel operation occurred.
+
 ## Research Director session — PR #90 S0 multigraph integration and UIPT root-law refinement (2026-11-26 18:43 UTC)
 
 **Recovery audit:** At entry Main was 1eb13abf2c19f38d22ce67374e1dc9636b757b4a, PR #89 was already merged, there were no open PRs, and Issue #37 was the only open issue. The preceding research lease had expired; the previous owner had not left an active lease. This session acquired the coordination lock by expected-HEAD CAS and verified owner/leaseId before research writes. Relevant Issue #37 branches were compared with Main; their reviewed content was already integrated and no cherry-pick was needed.
@@ -18,7 +44,7 @@ PR #90, [S0 explicit multiplicity-preserving multigraph path](https://github.com
 
 MultiGraph / _from_multiedges preserve parallel edges as repeated unit-valued CSR half-edge entries. graph_even_returns now explicitly coalesces repeated CSR columns after row scaling, so the transition probability is m(u,v)/d(u); its operation budget is checked before coalescing and counts every half-edge. Seven tests compare against dense matrix powers, distinguish simple from multi-edge walks, test the multiplicity-aware budget and reject loops, invalid endpoints/shapes and asymmetric multiplicities.
 
-Local scratch validation (SciPy 1.17.0): 1,100 random connected loop-free multigraphs, all roots, half-times 1–8; 61,600 return values compared with dense matrix powers; maximum absolute error 5.33e-15. This is a numerical software observation, not a theorem or target measurement. Exact repository tests ran under CI SciPy 1.18.1.
+Two scratch multigraph validations are recorded with different counts (8,800 return values / max error 5.55e-16 in the PR note; 61,600 / 5.33e-15 in the later handoff). Neither has an archived script, seed manifest or raw output, so neither is treated as reproducible evidence. The reproducible engineering evidence is the exact-head dense-oracle test suite and successful CI under SciPy 1.18.1.
 
 ### UIPT scientific clarification
 
@@ -28,7 +54,7 @@ For Type III, a separate annealed root-law exponent-transfer lemma is documented
 
 ### Remaining gates and decision
 
-The small-graph Type-II representation/control blocker is closed. Still missing: a uniform rooted Type-II random-map sampler and planar embedding/provenance; finite-size calibration; a scalable independently calibrated estimator; graph-level variance/power. The exact S0 kernel still exceeds its 100,000,000-operation and 512 MiB limits at the projected UIPT target size. Type III still lacks a direct spectral-dimension theorem in the cited literature. Issue #37 remains **UNDECIDABLE**.
+The small-graph Type-II representation/control blocker is closed. Still missing: a repository implementation of Angel's exact local Type-II UIPT peeling sampler (the literature algorithm exists, but is not a finite-N generator); a combinatorial-map boundary-order / rotation-system representation with provenance; finite-size calibration; a genuinely distinct independently calibrated estimator; graph-level variance/power. The exact S0 kernel still exceeds its 100,000,000-operation and 512 MiB limits at the projected UIPT target size. Type III still lacks a direct spectral-dimension theorem in the cited literature. Issue #37 remains **UNDECIDABLE**.
 
 No target seeds, target samples, new pilot, S2, deployment, paid API, Lightsail or EatSleepFeel activity occurred.
 
