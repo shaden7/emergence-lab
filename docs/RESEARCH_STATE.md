@@ -1,3 +1,37 @@
+## Director session: PR #86 r5 later-pass review, correction, and documentation reconciliation — 2026-11-26T01:26:19Z (lease `7c4e91b2d8a34f10a6c5e29b7f1d4038`)
+
+**Scope / baseline:** Later-pass challenge of PR #86 r4 at exact head `54a1acf21ec1c7fd857d46c63e22d2c805a280ab`; no K3 experiment or target run was authorized.
+
+**Recovery audit:** The prior lease `rd-gpt6-20261126T002720Z-6d3c91a7` was released cleanly at lock HEAD `2def43eb7d5fa942a86ea85c3d3beb5d5fe26fb4`; its tree contained only `lease.json` and recorded `idle`. This session acquired by CAS from that HEAD, moved the ref to `7c44ca3919e44f7b4a0e005e8da23c069c2995bb`, and verified its own owner/leaseId at read-back. Main at entry was `53447871d92ea35a3f1c6689d42c01d63761db2e`. PR #86 was the only open PR; Issue #37 remained open. The PR base is `e9ca286d5d53057c4f9360d52d6ad7d81ae5d9fc`; main was eight commits ahead, all modifying only this state file, with no changed-path conflict. PR #86 reported mergeable.
+
+**PR / CI / artifact recovery:** PR #86 r4 exact-head push run [45714988294](https://github.com/shaden7/emergence-lab/actions/runs/45714988294) and PR run [45714997509](https://github.com/shaden7/emergence-lab/actions/runs/45714997509) completed-success; the PR job log reports 1,039 passed and 65 subtests passed. Main handoff run [45729691403](https://github.com/shaden7/emergence-lab/actions/runs/45729691403) completed-success. Artifact `smoke-results` ID `15070495172` (371,551 bytes) exists; the workflow log shows S1 `mode=engineering`, `NO-GO (scoped)`. This is engineering evidence only, not K3 acceptance or a target run. No previous workflow was queued or in progress before this session's own pushes.
+
+**Later-pass review r5 of PR #86:** [review assessment and findings](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7179815896), recorded as a PR conversation comment (not a formal review event).
+- The fixed-`n_p` Clopper–Pearson guarantee was not supported by “at most 2,000 draws”: a 60-second early stop makes the sample size potentially data-/runtime-dependent. Require exactly 2,000 predeclared total draws per stochastic cell, no early stop, and fail the whole pilot closed if the 60-CPU-second sub-cap prevents completion. Arm-B sample SDs use the matched `C_3>0` subset, `ddof=1`, with at least two accepted draws.
+- The previous 97.5% CP bound plus 97.5% completion tail gave 95% assurance per arm-B cell, not campaign-wide. There are 12 stochastic arm-B cells. Allocate `alpha_p=alpha_c=0.025/12` to each; two union bounds then give at least 95% probability that all 12 cells reach their required accepted count, under independent pilot/target draws within each cell and stable acceptance probabilities. This is separate from the `alpha=0.01` sign-test family.
+- The active r0 Bonferroni test still asserted 32 cells / 64 tests / z=3.6047, contradicting the current 23 stochastic cells / 46 tests / z≈3.6979. The obsolete test was removed.
+- The proposal header still said r3 despite the r4 revision. Header and revision metadata were updated to r5.
+- Formula check (not a pilot): with `n_p=2,000`, `k=800`, `n_c=100,000`, and `alpha_p=alpha_c=0.025/12`, `p_L=0.36869188218750115`; `N_total=273,187` gives completion tail 0.9979201115, while 273,186 gives 0.9979105108.
+
+**Changed paths / revisions:**
+- Existing branch `design/k3-chain-estimator`, PR #86 only. Proposal revision r5 is in commit `9a8dde54b80216538304a43ff57a7a8e01693439`; tests and the current PR head are `2524a8a3d1d1c66b5e42fe163944962e74b455d5`.
+- Added a test for the 12-cell campaign-wide CP/completion example and removed the obsolete 32-cell Bonferroni test. PR title/body now identify r5.
+- Exact-head push run [45736305390](https://github.com/shaden7/emergence-lab/actions/runs/45736305390) and PR run [45736311524](https://github.com/shaden7/emergence-lab/actions/runs/45736311524) were **in progress** at handoff. The older r4 green CI does not validate r5. No merge.
+- GitHub branch-protection read returned HTTP 403 “Resource not accessible by integration”; no alternate endpoint or permission workaround was attempted. The previous `REQUEST_CHANGES` review attempt on the PR author account had been rejected with HTTP 422; this r5 assessment is therefore a conversation comment, not a formal review object.
+
+**Documentation reconciliation on main:**
+- Commit `273481e4f2fe85b44514cad964e43bdecbca06c0` updates the D3-E0/M0 v1 archive README: PR #85 is merged as `8cff5806`, later-pass review r1 PASS, archive hashes and all 17 cell summaries recomputed from raw NPZ (maximum absolute difference 2.2e-15), cube-rejection sampler cross-check, and byte-identical scratch reproduction. The scratch reproduction is explicitly not a second target run; gates/quadrature were not independently reimplemented.
+- Commit `875cef7e0f87d2d5da44ab1cc242f45f4327d1ed` updates `docs/research-plan.md`: D3-E0/M0 is a completed scoped control; PR #86 is design-only and within the same chain-abundance family; the next qualifying Issue #37 step remains a different estimator principle and cross-model comparison.
+- Main CI for `273481e` run [45736565026](https://github.com/shaden7/emergence-lab/actions/runs/45736565026) was in progress; run [45736592149](https://github.com/shaden7/emergence-lab/actions/runs/45736592149) for `875cef7` was queued at handoff. These are GitHub-hosted tests/smokes, not Lightsail jobs.
+
+**Scientific status:** D3-E0/M0 v1 remains a reviewed numerical observation in one prescribed flat D=3 diamond, not a model comparison or physical-dimension result. PR #86 remains a design proposal only. H_A3/H_B3/H_P are hypotheses; no D=3 K3 statistic, pilot, target measurement or new theorem exists. The 6,561 sign-pattern enumeration is finite-grid/model-level verification only, not an arbitrary-grid theorem.
+
+**Outcome / next action:** Keep PR #86 open. Wait for both exact-r5 CI runs to complete; then a different later-pass session must challenge r5. Merge only if that review and all objective gates pass, using expected head SHA. No implementation or target run is authorized by this design PR.
+
+**Non-actions:** No remote experiment, deployment, Lightsail, EatSleepFeel, paid API or secret access. No K3 data were generated.
+
+---
+
 ## Director session: PR #86 r5 later-pass review and recovery audit — 2026-11-26T00:33:35Z (lease `6d3c91a7f4b28e10c5d97a63e2f1b804`)
 
 **Scope / baseline:** Later-pass challenge of PR #86 r4 at exact head `54a1acf21ec1c7fd857d46c63e22d2c805a280ab`; no K3 experiment or target run was authorized.
