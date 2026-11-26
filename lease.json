@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261126T122535Z-03500ec4",
   "leaseId": "aca09cdacdbfd2a58c6d7b101126c307",
   "acquiredAt": "2026-11-26T12:25:35Z",
-  "heartbeatAt": "2026-11-26T12:25:35Z",
-  "expiresAt": "2026-11-26T14:25:35Z",
-  "task": "Recover stale Research Director lease; audit current Issue #37 design dependencies",
+  "heartbeatAt": "2026-11-26T12:35:50Z",
+  "expiresAt": "2026-11-26T14:35:50Z",
+  "task": "Audit causal-set finite-N estimator conventions and prepare Issue #37 design handoff",
   "previousOwner": "rd-gpt6-20261126T0928Z-13f92c9f"
 }
