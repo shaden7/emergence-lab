@@ -1,4 +1,4 @@
-# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r5, PROPOSED, NOT frozen)
+# K3-E0/M0 — second causal-set dimension estimator (3-chain abundance) on the D=2/D=3 endpoint/no-endpoint arms (design r6, PROPOSED, NOT frozen)
 
 Status: **design proposal only.** Not preregistered/frozen, not authorized,
 not implemented beyond a constants test, not run. No D=3 K3 data exist.
@@ -22,6 +22,11 @@ addressing [later-pass review r5 (REVISE)](https://github.com/shaden7/emergence-
 See "Revision r5" at the end of this file. r5 was authored by this later-pass
 reviewer session; a subsequent later-pass review by a different session is
 required before merge.
+Revision r6: Director `rd-gpt6-20261126T022453Z-8d217724` (2026-11-26),
+addressing [later-pass review r6 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7180873410).
+See "Revision r6" at the end of this file. The r6 review and corrections were
+performed in the same session; a subsequent later-pass review is required
+before merge, preferably from a different model family if available.
 Related: [Issue #37](https://github.com/shaden7/emergence-lab/issues/37),
 [D3-E0/M0 proposal](CS0_D3_E0_CONTROL_PROPOSAL.md),
 [D3-E0/M0 protocol](CS0_D3_E0_PROTOCOL.md),
@@ -114,6 +119,49 @@ evaluates to 1 − 2.2e−16, so a bracketing solver on [1,10] fails there. This
 case has positive probability (arm A N=4; arm B N=3). MM's
 `myrheim_meyer_dimension` already maps r = 1 to 1.
 
+**Monotonicity certificate (r6; uniqueness of inversion).** The DLMF Binet
+representation (Eq. 5.9.15) gives, for \(x>0\),
+
+\[
+\psi(x)=\ln x-\frac{1}{2x}
+-2\int_0^\infty\frac{t}{(t^2+x^2)(e^{2\pi t}-1)}\,dt.
+\]
+
+Since \(e^{2\pi t}-1>2\pi t\) for \(t>0\), the integral term lies strictly
+between \(0\) and \(1/(2x)\). Hence
+\(\ln x-1/x<\psi(x)<\ln x-1/(2x)\). Writing
+
+\[
+g_3(D)=\frac{\Gamma(D+1)^2\Gamma(D/2)\Gamma(D)}
+{2\Gamma(3D/2)\Gamma(2D)},
+\]
+
+its logarithmic derivative is
+\(2\psi(D+1)+\tfrac12\psi(D/2)+\psi(D)
+-\tfrac32\psi(3D/2)-2\psi(2D)\). Applying the upper digamma bound to
+positive terms and the lower bound to negative terms gives
+
+\[
+\frac{d}{dD}\ln g_3(D)
+<
+U(D):=2\ln(1+1/D)-\ln(6\sqrt3)+\frac{1}{D(D+1)}.
+\]
+
+Now
+\(U'(D)=-2/[D(D+1)]-(2D+1)/[D^2(D+1)^2]<0\) for \(D>0\), and
+\(U(1)=2\ln2-\ln(6\sqrt3)+1/2\approx-0.4547712524<0\).
+Thus \(g_3\) is strictly decreasing for all \(D\ge1\). Together with
+continuity and \(g_3(1)=1\), this proves a unique inverse on \([1,10]\)
+for every \(c_3\in[g_3(10),1]\). The smallest positive grid value
+\(1/\binom{32}{3}\approx2.02\cdot10^{-4}\) exceeds \(g_3(10)\), so every
+positive \(c_3\) used by this design has exactly one inverse. This
+monotonicity certificate does not establish convexity; the finite-grid
+convexity check remains numerical only.
+
+Source for the Binet representation: NIST DLMF, Eq. 5.9.15,
+https://dlmf.nist.gov/5.9.E15.
+
+
 ## Established identities and exact anchors (no sampling)
 
 Checked numerically in `tests/test_k3_design_constants.py` (40-digit mpmath;
@@ -167,12 +215,21 @@ grid checks, not proofs):
    second, unreviewed MM run.
 4. **Negative (non-manifold) control.** Transitive percolation (random DAG on
    N=32 labelled elements, edge probability p, transitive closure) with p
-   fixed at freeze such that |E[r] − 8/35| ≤ 0.005 (bisection, 10^4
-   replicates per step, on a calibration seed root recorded in the frozen
-   config and distinct from every other root). Hypothesis H_N: with
-   n = 10^4 replicates, the mean paired difference d_MM − d_3 exceeds 4
-   paired SEs (SE of the per-replicate difference) in absolute value. Purpose: show the MM–d_3 agreement test has power to
-   flag a non-manifoldlike order. Failure of H_N is retained and reported as
+   calibrated by bisection to |E[r] − 8/35| ≤ 0.005, using exactly 10^4 total
+   DAG draws per bisection step on a calibration seed root. Freeze p before
+   evaluation; the calibration root and H_N evaluation root are distinct from
+   each other and every other seed root.
+
+   H_N evaluation uses exactly 10^4 **total** DAG draws, with no early
+   stopping. For every draw record R and C_3; report total draws, accepted
+   C_3>0 draws, and P(C_3=0). Since C_3>0 implies R>0, compute both d_MM and
+   d_3 on the same matched C_3>0 subset. For its k accepted draws, define
+   delta_i = d_MM_i − d_3_i and SE(mean(delta)) = s_delta/sqrt(k), where
+   s_delta is the sample standard deviation of the paired differences. If
+   k<2, H_N is UNINFORMATIVE (no paired SE can be computed); do not change
+   the conditioning or invalidate the primary target. H_N passes only if
+   |mean(delta)| > 4 SE(mean(delta)). It is one descriptive negative-control
+   diagnostic, not part of the 46 sign tests. Failure of H_N remains
    "consistency check uninformative at N=32", not INVALID.
 
 ## Hypotheses (to be tested, not assumed)
@@ -497,3 +554,22 @@ This revision responds to [later-pass review r5](https://github.com/shaden7/emer
 - Header and revision metadata now identify r5 as the current design revision.
 
 This revision was authored by the r5 later-pass reviewer session. A subsequent later-pass review by a different session is required before merge. No K3 experiment or target run was authorized or executed.
+
+## Revision r6 (2026-11-26)
+
+This revision responds to [later-pass review r6 (REVISE)](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7180873410).
+
+- Added an analytic strict-monotonicity certificate for \(g_3\) on \(D\ge1\),
+  using the DLMF Binet representation and elementary bounds on its integral.
+  The unique inverse claim is now supported; the convexity claim remains only
+  a finite-grid numerical observation.
+- Defined the transitive-percolation negative-control sample as 10,000 total
+  DAG draws, with matched \(C_3>0\) evaluation, zero-chain reporting, explicit
+  accepted counts, and the paired-difference SE \(s_\delta/\sqrt{k}\).
+  The calibration and evaluation roots are separate. Fewer than two accepted
+  draws make H_N uninformative, not a primary-target failure.
+- No K3 pilot, target measurement, freeze, or authorization was added.
+
+The r6 review and these corrections were performed in the same GPT-6 session;
+a subsequent later-pass review by a different session is required before merge.
+No K3 experiment or target run was authorized or executed.
