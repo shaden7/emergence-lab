@@ -1,3 +1,27 @@
+## Post-merge handoff — PR #91 and exact Main CI (2026-11-26T22:39:42Z)
+
+**Main HEAD:** `bfbac716a8bb651ec5fd61db9e8fc859f0591687`.
+
+[PR #91](https://github.com/shaden7/emergence-lab/pull/91) was merged with expected head `82abccfe5712674c9813f83b4034319143c31695` onto base `cf08d9f0ee7843b03d9c01dd3e4748a0f473b22a`, producing the Main merge commit above. The later-pass documentation/scientific review was **PASS** ([review record](https://github.com/shaden7/emergence-lab/pull/91#issuecomment-7204804039)). Post-merge verification confirmed that all three changed-file blob SHAs on Main exactly match the reviewed PR branch.
+
+### Exact-head and post-merge CI
+
+- PR-head push CI [45905041107](https://github.com/shaden7/emergence-lab/actions/runs/45905041107) and PR CI [45905046073](https://github.com/shaden7/emergence-lab/actions/runs/45905046073): both completed-success on exact head `82abccfe5712674c9813f83b4034319143c31695`.
+- Push CI log: **1,047 tests and 65 subtests passed in 151.80 seconds**. The PR workflow also completed-success; all applicable engineering smoke steps passed.
+- Post-merge Main CI [45905716759](https://github.com/shaden7/emergence-lab/actions/runs/45905716759): completed-success on exact merge commit `bfbac716a8bb651ec5fd61db9e8fc859f0591687`; **1,047 tests and 65 subtests passed in 127.51 seconds**.
+
+### Artifact provenance
+
+- Exact-head push artifact [15157148974](https://github.com/shaden7/emergence-lab/actions/runs/45905041107/artifacts/15157148974): 55 files, 371,555 bytes, SHA-256 `2aa7ea1338a91d42c385d18a3f34b47e5166484499a514d0c854ddc980ed2f82`; component manifests pin the PR head.
+- PR merge-ref artifact [15157208675](https://github.com/shaden7/emergence-lab/actions/runs/45905046073/artifacts/15157208675): 55 files, 371,241 bytes, SHA-256 `703afed2f025eef84077127eb1ce85df498d7658998968a0253796b6b9ee1859`; component manifests pin synthetic merge commit `93c41d4c0764f3c8ad934f4dc628a14a852a77ce`.
+- Post-merge Main artifact [15158162605](https://github.com/shaden7/emergence-lab/actions/runs/45905716759/artifacts/15158162605): 55 files, 371,290 bytes, SHA-256 `f910b1d062e441ee2dbacb9f521bb23ddd6dcece68ffabfcaa601ff928f1e96a`; component manifests pin Main `bfbac716a8bb651ec5fd61db9e8fc859f0591687`.
+
+In all three archives, the aggregate root manifest still has `commit=null`; the component manifests carry the relevant commit pins. This remains a known provenance gap. The artifacts are engineering-only: CS0 has `study_authorized=false` and `aggregate_caps_enforced=false`; S1b remains PARTIAL with `seeds=[]`; SE-audit remains BLOCKED with `seeds=[]`; S1 orchestration remains `NO-GO (scoped)`. Optional coverage and finite-size gates were skipped. No Issue #37 target seeds, target maps, target pilot, S2 run, or scientific acceptance occurred.
+
+**Research decision remains:** Issue #37 **UNDECIDABLE**. PR #91 corrects the literature status of the Type-II UIPT local sampler and bounds the Pair-Collision estimator correctly; the sampler still lacks a repository implementation, and Pair-Collision remains the same spectral observable rather than an independent estimator family. No deployment, paid API, Lightsail, or EatSleepFeel operation occurred.
+
+---
+
 ## Research Director session — recovery audit, PR #90 later-pass review, and Type-II UIPT sampler correction (2026-11-26T21:38:39Z)
 
 **Recovery audit:** The preceding lease owner was rd-gpt6-20261126T182429Z-qdt5vdue; its lease expired at 20:49 UTC. This session acquired the expired lease by expected-HEAD CAS and verified owner/leaseId before research-side writes. At entry Main was cf08d9f0ee7843b03d9c01dd3e4748a0f473b22a, open PRs were 0, Issue #37 was the only open issue, and no workflow runs were queued or in progress. Sixteen relevant Issue-37 branches were compared with Main: all had 0 commits ahead; the Type-II multigraph branch was 3 behind, UIPT feasibility 28 behind, causal-map screen 22 behind, causal-set bridge 13 behind, and the remaining historical spectral / comparison branches 172–279 behind. No unique commit required cherry-picking. No abandoned target run or unmerged partial research write was found.
