@@ -47,10 +47,10 @@ Two-dimensional CDT is not an adequate substitute for an independent random-geom
 
 ## Observable definitions required for any future UIPT comparison
 
-For a finite connected graph \(G\), with roots sampled uniformly over vertices (not from the degree-weighted stationary distribution), the candidate graph-level observables are:
+For a finite connected graph \(G\), let \(\mu_G\) be the preregistered root law and draw \(v_s\sim\mu_G\). The root law is part of the model definition, not an implementation detail. In the UIPT, finite triangulations are rooted by a uniformly selected oriented root edge; the root vertex is therefore degree-biased. This differs from the frozen D2 source rule and the S0 multi-source extension, which require uniform vertex sources. The two laws are not interchangeable. Until their exponent-equivalence is proved or a reviewed method revision is made, the UIPT literature exponents cannot be treated as direct acceptance targets for the current D2/S0 source convention. The candidate graph-level observables are:
 
 \[
-\bar B_G(r)=\frac{1}{S}\sum_{s=1}^{S}|B_G(v_s,r)|,
+\bar B_G(r)=\frac{1}{S}\sum_{s=1}^{S}|B_G(v_s,r)|,\quad v_s\sim\mu_G,
 \qquad
 d_V(r)=\log_2\frac{\bar B_G(2r)}{\bar B_G(r)}.
 \]
@@ -58,12 +58,12 @@ d_V(r)=\log_2\frac{\bar B_G(2r)}{\bar B_G(r)}.
 For simple random walk on the unweighted primal graph:
 
 \[
-q_G(m)=\frac{1}{S}\sum_{s=1}^{S}P_G^{2m}(v_s,v_s),
+q_G(m)=\frac{1}{S}\sum_{s=1}^{S}P_G^{2m}(v_s,v_s),\quad v_s\sim\mu_G,
 \qquad
 d_s(m)=-2\log_2\frac{q_G(2m)}{q_G(m)}.
 \]
 
-Average return probabilities before taking logarithms. Preserve the same root sample across times and, where possible, across volume and spectral measurements. Do not substitute a degree-weighted heat-kernel trace. Report the two running curves separately; do not require \(d_V=d_s\).
+Average return probabilities before taking logarithms. Preserve the same root sample across times and, where possible, across volume and spectral measurements. Keep the root law \(\mu_G\) separate from the random-walk transition operator; do not silently substitute uniform-vertex roots for the UIPT's canonical root-edge law or vice versa. Report the two running curves separately; do not require \(d_V=d_s\). For a causal-set Hasse graph, a uniform-event root is a natural candidate, but it is a different model-specific law and any cross-model comparison must state how root-law differences are handled.
 
 For a causal-set Hasse graph these definitions remain representation-level diagnostics only. A common graph observable does not, by itself, establish a common physical metric or diffusion operator.
 
@@ -84,7 +84,7 @@ The D2 design-effect sensitivity floor of 3 was established for its tree familie
 
 ## Required gates before any future run
 
-1. **Representation/observable bridge:** decide whether the causal-set Hasse graph is an acceptable graph-level comparison object. If not, define a causal-set-native diffusion or volume observable and prove/justify the mapping; do not force a graph analogy.
+1. **Representation and root-law bridge:** decide whether the causal-set Hasse graph is an acceptable graph-level comparison object, and specify its root law. Resolve the UIPT canonical root-edge law versus the frozen D2/S0 uniform-vertex source convention; either justify exponent equivalence or make a separately reviewed method revision. If the Hasse graph is not acceptable, define a causal-set-native diffusion or volume observable and justify the mapping; do not force a graph analogy.
 2. **Exact finite ensemble:** pin the finite UIPT approximation, root law, boundary treatment, size sequence and finite-volume radius/time cutoffs.
 3. **Independent calibration:** calibrate volume growth and spectral return separately on exact controls, then test their finite-size behavior on the chosen random-map ensemble. The existing tree-only D2 calibration and deterministic-graph S0 calibration do not suffice.
 4. **Scalable spectral estimator:** specify the random-walk estimator, paired-time covariance, return-count stopping/zero-return handling, uniform-root averaging and error propagation. Do not treat walkers as independent maps.
@@ -100,6 +100,7 @@ The next work item is a **design-only operator/representation bridge plus a scal
 
 ## Literature screened (not a full line-by-line source audit)
 
+- O. Angel and O. Schramm, *Uniform Infinite Planar Triangulations* (2003): https://arxiv.org/abs/math/0207153
 - O. Angel, *Growth and Percolation on the Uniform Infinite Planar Triangulation* (2003): https://arxiv.org/abs/math/0208123
 - J. R. Lee, *Conformal growth rates and spectral geometry on distributional limits of graphs* (2017): https://arxiv.org/abs/1701.01598
 - E. Gwynne and J. Miller, *Random walk on random planar maps: spectral dimension, resistance, and displacement* (2017; revised 2020): https://arxiv.org/abs/1711.00836
