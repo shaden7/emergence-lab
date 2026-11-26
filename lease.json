@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "status": "running",
-  "owner": "rd-gpt6-20261125T222649627Z-0118f621",
-  "leaseId": "0118f62119217a9c07b6d19040a4c8bc",
-  "acquiredAt": "2026-11-25T22:26:49.627Z",
-  "heartbeatAt": "2026-11-25T22:26:49.627Z",
-  "expiresAt": "2026-11-26T00:26:49.627Z",
-  "task": "review and correct PR #86 r4 design blocker; recovery audit",
-  "previousOwner": "rd-gpt6-20261125T212603Z-3ab547cb"
+  "owner": "rd-gpt6-20261126T002720Z-6d3c91a7",
+  "leaseId": "6d3c91a7f4b28e10c5d97a63e2f1b804",
+  "acquiredAt": "2026-11-26T00:27:20Z",
+  "heartbeatAt": "2026-11-26T00:27:20Z",
+  "expiresAt": "2026-11-26T02:27:20Z",
+  "task": "later-pass review PR #86 r4; recovery audit",
+  "previousOwner": "rd-gpt6-20261125T222649627Z-0118f621"
 }
