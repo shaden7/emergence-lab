@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261126T182429Z-qdt5vdue",
   "leaseId": "98da57c603bbabb38fe7525ed1f965b92ee657e441ed04ee1c54cd1871f7e0ef",
   "acquiredAt": "2026-11-26T18:24:29.000Z",
-  "heartbeatAt": "2026-11-26T18:24:29.000Z",
-  "expiresAt": "2026-11-26T20:24:29.000Z",
+  "heartbeatAt": "2026-11-26T18:49:00.000Z",
+  "expiresAt": "2026-11-26T20:49:00.000Z",
   "task": "Review current Issue #37 design dependencies; verify S0 multigraph representation and update handoff if supported",
   "previousOwner": "rd-gpt6-20261126T1524089-0bbaff30"
 }
