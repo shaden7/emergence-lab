@@ -1,5 +1,45 @@
 # Issue #37 — cross-model feasibility screen
 
+## Current status after PR #90 — 2026-11-26
+
+PR #90 was merged with expected head 80d246add91d6056de767921fce527511a67623c as Main commit 2af8c7a80232fc1910b73017f34826c8725a5ff6. The original Graph / _from_edges builder remains simple, but the new MultiGraph / _from_multiedges path preserves parallel edges as repeated unit-valued CSR half-edges; graph_even_returns explicitly coalesces duplicates after row scaling. Exact small-graph dense-oracle tests pass on SciPy 1.18.1. This closes the small-graph Type-II representation/control blocker, not target-scale feasibility.
+
+Post-merge Main CI 45877702564 completed-success: 1,047 tests and 65 subtests passed in 97.89 seconds. Artifact 15146036271 contains 55 files / 371,236 bytes, SHA-256 dd87d652ecb761a589f9e19214547604c2f0ce575e3b076d9a8bd6105018799d. Component manifests pin the merge commit; the aggregate root manifest still has commit=null. CS0 remains ENGINEERING_ONLY and study_authorized=false; S1b is PARTIAL, SE-audit BLOCKED, S1 orchestration NO-GO (scoped), and coverage/finite-size gates were skipped. No Issue #37 target-map data or S2 authorization is present.
+
+The Type-II UIPT has a direct infinite-volume spectral-dimension theorem: Gwynne–Miller Theorem 1.6 includes maps with no self-loops and parallel edges allowed and proves d_s=2. This is not a finite-N acceptance window or validation of our estimator. Type III still lacks a direct d_s=2 theorem in the cited literature; its annealed root-law exponent transfer is derived below. The exact S0 kernel still exceeds its 100,000,000-operation and 512 MiB limits at projected target sizes. No uniform rooted Type-II map sampler, planar embedding/provenance, finite-size calibration, scalable estimator or graph-level power calculation exists.
+
+All pre-merge statements below that the S0 implementation cannot represent Type II are superseded by this status note. They remain historical descriptions of the pre-PR-#90 simple-Graph path. The current scientific decision for Issue #37 remains UNDECIDABLE.
+
+## Root-law exponent transfer for finite Type-III triangulations (derived; not a finite-N acceptance rule)
+
+Let T_N be a uniform simple spherical triangulation with N vertices. Write d(v) for vertex degree and dbar_N=2E/N=6-12/N. Let V be a uniformly selected vertex and U the origin of a uniformly selected oriented root edge. Conditional on T_N,
+\[
+\mathbb P(U=v\mid T_N)=\frac{d(v)}{2E}
+=\frac{d(v)}{N\bar d_N}.
+\]
+For Q_t(v)=P^{2t}(v,v) in [0,1], define the annealed returns q_V(N,t)=E[(1/N) sum_v Q_t(v)] and q_E(N,t)=E[(1/(2E)) sum_v d(v)Q_t(v)]. Then
+\[
+q_E(N,t)=\frac{\mathbb E[d(V)Q_t(V)]}{\bar d_N}.
+\]
+Since every vertex of a simple triangulation has degree at least 3,
+\[
+q_E(N,t)\ge \frac{3}{\bar d_N}q_V(N,t).
+\]
+For every p>1, Hölder and Q_t<=1 give
+\[
+q_E(N,t)\le
+\frac{(\mathbb E[d(V)^p])^{1/p}}{\bar d_N}
+q_V(N,t)^{1-1/p}.
+\]
+Stufler (2024), Proposition 10.1 (restating Angel–Schramm 2003, Lemma 4.1), proves a uniform exponential tail
+\(\mathbb P(d(U)=k)\le C(3/4+\varepsilon)^k\) for the origin of the uniform root edge in T_N, uniformly in N. Hence all root-edge degree moments are uniformly bounded. The exact size-bias identity
+\(\mathbb E[d(V)^p]=\bar d_N\,\mathbb E[d(U)^{p-1}]\), together with \(3\le\bar d_N<6\), gives uniform moments under the uniform-vertex law as well.
+
+Consequently, if q_V(N,t) has a polynomial return exponent t^{-alpha+o(1)} in a specified joint finite-size regime, the two inequalities and p→infinity imply q_E(N,t)=t^{-alpha+o(1)}. This is an annealed exponent-transfer lemma, conditional on the same regime and uniform moment bounds. It does not prove alpha=1, does not set an admissible finite-N window, and does not make finite-N means, variances or root samples interchangeable. A finite estimator must still state whether it samples root edges or vertices and, if reweighted, account for the induced variance/design effect. It is not a Type-III spectral-dimension proof.
+
+Source: Stufler (2024), Proposition 10.1 (https://alea.impa.br/articles/v21/21-07.pdf), which cites Angel–Schramm (2003), Lemma 4.1 (https://arxiv.org/abs/math/0207153).
+
+
 **Date:** 2026-11-26  
 **Status:** design-only feasibility decision; no UIPT/CDT target seeds, target samples, model implementation, or experiment authorization. Standard PR CI runs the repository's existing fixed-seed engineering/development fixtures on disposable GitHub runners; those outputs are not UIPT/CDT target data or scientific acceptance evidence.
 
@@ -109,30 +149,10 @@ The next work item is a **design-only type-II/type-III and root-law bridge, toge
 - F. Caceffo and G. Clemente, *Spectral analysis of causal dynamical triangulations via finite element method*, Phys. Rev. D 107, 074501 (2023): https://doi.org/10.1103/PhysRevD.107.074501
 
 
-## Implementation update — 2026-11-26 (S0 multigraph candidate; not yet integrated)
+## Implementation update — 2026-11-26 (PR #90 integrated)
 
-The earlier statement that the frozen `Graph` representation is simple remains true for
-`Graph` and `_from_edges`: that builder removes loops and collapses parallel edges.
-It is not, however, a complete description of what the S0 CSR kernel can process.
+The original Graph / _from_edges API remains simple. MultiGraph / _from_multiedges now preserve each parallel edge as a repeated unit-valued CSR half-edge. graph_even_returns validates loop-free, aggregate-symmetric, unit-entry, connected CSR input; row scaling followed by explicit sum_duplicates() creates the multiplicity-weighted transition matrix. The operation budget is checked before coalescing, so all half-edge incidences count.
 
-A loop-free undirected multigraph can be represented by one unit-valued CSR entry per
-half-edge, including repeated column indices. In this representation,
-`degree = diff(indptr)` counts edge multiplicity. The S0 symmetry check compares the
-aggregate adjacency, while the unit-data check still sees one unit per stored half-edge.
-Row scaling and CSR duplicate coalescing then produce
-`P(u,v)=m(u,v)/degree(u)`. The candidate implementation makes duplicate coalescing
-explicit after row scaling and adds a dedicated `MultiGraph` / `_from_multiedges`
-path; the existing simple-graph builder and D1 semantics are unchanged.
+Seven new tests compare the S0 half-kernel with dense matrix powers, distinguish simple from multi-edge walks, check multiplicity-aware budgeting, and reject loops, invalid endpoints/shapes and asymmetric multiplicities. Local scratch validation on SciPy 1.17.0 exercised 1,100 random connected loop-free multigraphs (2–12 vertices), all roots and half-times 1–8: 61,600 return values versus dense matrix powers, maximum absolute error 5.33e-15. This is a numerical software observation, not a theorem, repository CI result or random-map sample.
 
-A local scratch comparison on SciPy 1.17.0 tested 1,100 random connected loop-free
-multigraphs (2–12 vertices), comparing 8,800 root-return values at half-times 1–8
-against dense matrix powers. Maximum absolute error was `5.55e-16`.
-This is a numerical software observation, not a theorem, repository CI result, random-map
-sample, or scientific measurement. The candidate's exact-head CI must also exercise
-the path under the repository's SciPy 1.18.1 environment.
-
-This only repairs the small-graph representation/control path. It does **not** solve
-the existing 100,000,000 transition-operation cap or 512 MiB S0 memory budget at
-the projected UIPT target size, does not provide a uniform Type-II random-map sampler,
-and does not authorize target seeds, a pilot, or S2. A scalable independently calibrated
-estimator and graph-level power assessment remain separate gates.
+The implementation closes the small-graph representation/control blocker for Type II. It does not solve the 100,000,000 transition-operation cap or 512 MiB S0 memory budget at projected UIPT target size; it supplies no uniform Type-II map sampler, planar embedding/provenance, finite-size calibration, scalable estimator or graph-level power. No target seeds, target samples, pilot or S2 are authorized by this implementation.

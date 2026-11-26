@@ -1,3 +1,38 @@
+## Research Director session — PR #90 S0 multigraph integration and UIPT root-law refinement (2026-11-26 18:43 UTC)
+
+**Recovery audit:** At entry Main was 1eb13abf2c19f38d22ce67374e1dc9636b757b4a, PR #89 was already merged, there were no open PRs, and Issue #37 was the only open issue. The preceding research lease had expired; the previous owner had not left an active lease. This session acquired the coordination lock by expected-HEAD CAS and verified owner/leaseId before research writes. Relevant Issue #37 branches were compared with Main; their reviewed content was already integrated and no cherry-pick was needed.
+
+### Integration
+
+PR #90, [S0 explicit multiplicity-preserving multigraph path](https://github.com/shaden7/emergence-lab/pull/90), was merged with expected head 80d246add91d6056de767921fce527511a67623c onto base 1eb13abf2c19f38d22ce67374e1dc9636b757b4a, producing Main merge commit 2af8c7a80232fc1910b73017f34826c8725a5ff6. It changes only dimension_d1.py, spectral_dimension.py, a new S0 multigraph test file and the Issue #37 feasibility note. Existing Graph / _from_edges simple-graph behavior is unchanged.
+
+### Review, CI and artifact
+
+- Producing-session self-review: PASS, recorded as a COMMENTED review; it is not independent or external peer review.
+- Exact-head push CI [45876666426](https://github.com/shaden7/emergence-lab/actions/runs/45876666426) and PR CI [45876675366](https://github.com/shaden7/emergence-lab/actions/runs/45876675366): completed-success.
+- Post-merge Main CI [45877702564](https://github.com/shaden7/emergence-lab/actions/runs/45877702564): completed-success on exact merge commit; 1,047 tests and 65 subtests passed in 97.89 seconds.
+- Post-merge artifact [15146036271](https://github.com/shaden7/emergence-lab/actions/runs/45877702564/artifacts/15146036271): 55 files, 371,236 bytes, SHA-256 dd87d652ecb761a589f9e19214547604c2f0ce575e3b076d9a8bd6105018799d. Component manifests pin 2af8c7a; aggregate root manifest has commit=null.
+- Artifact controls remain engineering/calibration only: CS0 ENGINEERING_ONLY, study_authorized=false, aggregate_caps_enforced=false; S1b PARTIAL; SE-audit BLOCKED; S1 orchestration NO-GO (scoped); existing S1 coverage/finite-size gates skipped. Pilot B is dev; D1 G0/G1 and Exact4 are existing fixtures. No Issue #37 target-map data, target seeds or S2 authorization.
+
+### Integrated implementation result
+
+MultiGraph / _from_multiedges preserve parallel edges as repeated unit-valued CSR half-edge entries. graph_even_returns now explicitly coalesces repeated CSR columns after row scaling, so the transition probability is m(u,v)/d(u); its operation budget is checked before coalescing and counts every half-edge. Seven tests compare against dense matrix powers, distinguish simple from multi-edge walks, test the multiplicity-aware budget and reject loops, invalid endpoints/shapes and asymmetric multiplicities.
+
+Local scratch validation (SciPy 1.17.0): 1,100 random connected loop-free multigraphs, all roots, half-times 1–8; 61,600 return values compared with dense matrix powers; maximum absolute error 5.33e-15. This is a numerical software observation, not a theorem or target measurement. Exact repository tests ran under CI SciPy 1.18.1.
+
+### UIPT scientific clarification
+
+Gwynne–Miller Theorem 1.6 directly includes the Type-II UIPT (no self-loops, parallel edges allowed) and proves its infinite-volume spectral dimension is 2. This does not give a finite-N acceptance window or validate our estimator.
+
+For Type III, a separate annealed root-law exponent-transfer lemma is documented in the feasibility note. Stufler (2024), Proposition 10.1, gives a uniform exponential tail for the degree of the origin of the uniformly rooted edge in finite simple triangulations. Combined with dbar_N=6-12/N, minimum degree 3, the exact size-bias identity and Hölder, this gives equality of polynomial annealed return exponents under uniform-vertex and root-edge laws, conditional on the same finite-size regime and uniform degree moments. This does not prove d_s=2 for Type III, does not make finite-N means/variance interchangeable, and does not remove the need to sample or reweight the canonical root law.
+
+### Remaining gates and decision
+
+The small-graph Type-II representation/control blocker is closed. Still missing: a uniform rooted Type-II random-map sampler and planar embedding/provenance; finite-size calibration; a scalable independently calibrated estimator; graph-level variance/power. The exact S0 kernel still exceeds its 100,000,000-operation and 512 MiB limits at the projected UIPT target size. Type III still lacks a direct spectral-dimension theorem in the cited literature. Issue #37 remains **UNDECIDABLE**.
+
+No target seeds, target samples, new pilot, S2, deployment, paid API, Lightsail or EatSleepFeel activity occurred.
+
+
 ## Research Director session — PR #89 integration and CI/artifact reconciliation (2026-11-26 15:42 UTC)
 
 **Integration:** PR #89 was merged with expected head `b14ddeb0818ea0d2ab62fca137806948a0b90160` onto base `e04b6bd57445ba6205dbc4273264bc7389f47831`, producing merge commit `ddaf05269ded76884d5e7cf541ccdbcb02d536cb`. The merge diff contains only the three reviewed documentation files; their Main blob SHAs equal the reviewed PR-head blobs. Open PRs: **0**. Issue #37 remains open and **UNDECIDABLE**.
