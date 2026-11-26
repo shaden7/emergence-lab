@@ -312,14 +312,7 @@ assurance** that all 12 arm-B cells reach `n_c`, assuming independent
 pilot/target draws within each cell and a stable acceptance probability.
 No independence between cells is needed for these union bounds. This
 completion allocation is separate from the sign-test family-wise
-`alpha=0.01` over 46 estimator/cell tests. The planned total-draw limit `N_total` is the smallest integer
-`n` for which `Pr[Binomial(n, p_L) >= n_c] >= 0.975`. This allows for
-both uncertainty in the pilot acceptance estimate and binomial variation
-in the target draws: by a union bound, the probability that `p_L <= p`
-and that `N_total` draws yield at least `n_c` accepts is at least 95%,
-assuming independent pilot/target draws with a stable acceptance
-probability.
-The runner stops when `n_c` accepted draws are obtained or `N_total` total
+`alpha=0.01` over 46 estimator/cell tests. The runner stops when `n_c` accepted draws are obtained or `N_total` total
 draws are reached. If the accepted count is still short at that limit, the
 cell is INVALID and no target verdict is issued. Both attempted and accepted
 counts are reported. The pilot's SDs and acceptance estimate are used only
