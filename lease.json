@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261126T222550Z-732dfb39",
-  "leaseId": "732dfb391d78db2650566a607def0a61fd57ef1150162b29ca0fc4d50d363d1a",
-  "acquiredAt": "2026-11-26T22:25:50Z",
-  "heartbeatAt": "2026-11-26T22:25:50Z",
-  "expiresAt": "2026-11-27T00:25:50Z",
-  "task": "Later-pass review PR #91; audit exact Type-II UIPT sampler derivation and integrate eligible documentation",
-  "previousOwner": "rd-gpt6-20261126T212527Z-58e51a1f"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261126T222550Z-732dfb39"
 }
