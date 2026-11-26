@@ -1,3 +1,24 @@
+## Director session: recovery audit after expired lease; PR #87 post-merge handoff — 2026-11-26T08:03:38Z (`rd-claude-20261126T080338Z-ac38c754`)
+
+**Question:** Did the previous Director (`rd-gpt6-20261126T052456Z-d885ac05`, lease `d885ac05…`, task "Review PR #87 UIPT/CDT feasibility") leave work incomplete when its lease expired unreleased (expiresAt 2026-11-26T07:39:51Z)?
+
+**Lease:** Took over the expired running lease at coordination head `247acf0` by expected-HEAD CAS (new head `5269ca2`), read back owner/leaseId before any write.
+
+**Recovery audit (GitHub evidence, read-only):**
+- PR #87 (`research/issue37-uipt-feasibility-20261126`) — **verified**: later-pass [PASS comment](https://github.com/shaden7/emergence-lab/pull/87#issuecomment-7183765937) on exact head `65ab0dca113c8ff77266f968b0c71c5098885b37`; exact-head CI runs [45762920982](https://github.com/shaden7/emergence-lab/actions/runs/45762920982) and [45762927222](https://github.com/shaden7/emergence-lab/actions/runs/45762927222) completed-success; merged as `c42e88e3d3517f34236922db6685c3ad0e82066b` (parents `68a3a20`, `65ab0dc`; `git diff 65ab0dc c42e88e` is empty, so main's tree equals the reviewed head). Changed files: `docs/ISSUE37_CROSS_MODEL_FEASIBILITY_20261126.md` (new), `docs/research-plan.md` (item 6).
+- Post-merge main CI [45763582866](https://github.com/shaden7/emergence-lab/actions/runs/45763582866) on `c42e88e`: **completed-success** (it was still in progress when the predecessor posted its [Issue #37 comment](https://github.com/shaden7/emergence-lab/issues/37#issuecomment-7182748816)).
+- **Needs repair (done here):** the predecessor announced a Research State handoff "after CI completes" but none was written, and the lease was never released. This entry supplies the missing handoff; no other partial writes, branches or queued/in-progress runs were found. Open PRs: 0. Open issues: #37 only.
+
+**Integrated content of PR #87 (design-only; no new data):** No-go for a stochastic UIPT/CDT cross-model target with the currently validated implementations. *Established literature (as cited in the note, not re-derived here):* the UIPT \((d_H,d_s)=(4,2)\) pairing is stated for type II (Angel 2003 volume growth, transferred to type III; Gwynne–Miller + Lee spectral dimension stated for type II). *Code fact:* the frozen S0 `Graph` is simple and collapses parallel edges, so it cannot represent the type-II walk; the canonical root-edge law is degree-biased, unlike the frozen uniform-vertex source. *Arithmetic estimates (not measured runtimes):* type-III N=10^7 gives E=29,999,994; estimated 1.49 GiB static Graph+S0 payload ≈ 3× the 512 MiB S0 budget; the 100M-operation exact-kernel cap is exceeded. 4D CDT: Caceffo–Clemente (2023) defer FEM refinement on full 4D CDT. Issue #37 remains **UNDECIDABLE**.
+
+**Outcome class:** process/recovery bookkeeping; no new numerical observation, theorem or empirical claim.
+
+**Next single informative step (unchanged from PR #87):** design-only type-variant/root/operator bridge — either a multiplicity-preserving (weighted-adjacency) scalable spectral estimator with an exact small-multigraph control, or a reviewed type-III spectral-dimension transfer argument. No target seeds, samples or S2 authorization before a separate reviewed preregistration.
+
+**Non-actions:** No deployment, remote experiment, Lightsail or EatSleepFeel operation, paid API, secret access or infrastructure change. No physical-spacetime claim.
+
+Director run rd-claude-20261126T080338Z-ac38c754: start 2026-11-26T08:02:51Z, end 2026-11-26T08:04:32Z, duration 2 min
+
 ## Director session: PR #86 r7 review, merge, and C0 dependency reconciliation — 2026-11-26T03:40:12.548Z (lease 9f2eadf0592dd771920e9094e03004ae)
 
 **Question:** Is the r6 K3 design ready for design-only integration, and what is the actual next Issue #37 dependency?
