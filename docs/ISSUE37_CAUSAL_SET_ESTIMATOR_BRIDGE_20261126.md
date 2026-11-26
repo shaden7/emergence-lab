@@ -90,53 +90,53 @@ The literature therefore already contains a strong **estimator/operator-dependen
 
 ### 4.1 Finite-volume link cutoffs are part of the estimator
 
-Boguña & Krioukov (2026, arXiv:2610.03247; preprint submitted 2 October 2026) analyze the link set from a root event in a Poisson sprinkling of \\(d+1\\)-dimensional Minkowski spacetime. They derive the link-intensity measure
+Boguña & Krioukov (2026, arXiv:2610.03247; preprint submitted 2 October 2026) analyze the link set from a root event in a Poisson sprinkling of \(d+1\)-dimensional Minkowski spacetime. They derive the link-intensity measure
 
-\\[
-d\\Lambda_{e_0}=\\rho\\,\\tau^d e^{-\\rho v_d\\tau^{d+1}}\\,d\\tau\\,dV_{\\mathbb H^d},
-\\]
+\[
+d\Lambda_{e_0}=\rho\,\tau^d e^{-\rho v_d\tau^{d+1}}\,d\tau\,dV_{\mathbb H^d},
+\]
 
-whose total mass is infinite because \\(\\operatorname{Vol}(\\mathbb H^d)=\\infty\\). The normalized proper-time profile per unit hyperbolic volume is
+whose total mass is infinite because \(\operatorname{Vol}(\mathbb H^d)=\infty\). The normalized proper-time profile per unit hyperbolic volume is
 
-\\[
-q(\\hat\\tau)=(d+1)\\hat\\tau^d e^{-\\hat\\tau^{d+1}},
-\\]
+\[
+q(\hat\tau)=(d+1)\hat\tau^d e^{-\hat\tau^{d+1}},
+\]
 
 but this is **not** a probability distribution for a uniformly chosen link from the full infinite link set: no such uniform probability measure exists.
 
-For the finite future cone \\(t<T\\), the rapidity cutoff depends on proper time,
-\\(\\chi_c(\\tau)=\\operatorname{arcosh}(T/\\tau)\\). For spatial dimension \\(d>1\\), the hyperbolic-volume factor contributes \\(\\mathcal V_d(\\chi_c)\\propto(T/\\tau)^{d-1}\\), changing the normalized large-cone limit to
+For the finite future cone \(t<T\), the rapidity cutoff depends on proper time,
+\(\chi_c(\tau)=\operatorname{arcosh}(T/\tau)\). For spatial dimension \(d>1\), the hyperbolic-volume factor contributes \(\mathcal V_d(\chi_c)\propto(T/\tau)^{d-1}\), changing the normalized large-cone limit to
 
-\\[
-p_T(\\hat\\tau)=\\frac{d+1}{\\Gamma(2/(d+1))}\\,\\hat\\tau e^{-\\hat\\tau^{d+1}},\\qquad d>1.
-\\]
+\[
+p_T(\hat\tau)=\frac{d+1}{\Gamma(2/(d+1))}\,\hat\tau e^{-\hat\tau^{d+1}},\qquad d>1.
+\]
 
-This remains different from \\(q(\\hat\\tau)\\) as the cone grows. In \\(d=1\\), the cutoff dependence is logarithmic and convergence to the intensity profile is slow. Thus the finite-cone bias is dimension-dependent and does not behave like an ordinary correction that disappears merely by increasing the region.
+This remains different from \(q(\hat\tau)\) as the cone grows. In \(d=1\), the cutoff dependence is logarithmic and convergence to the intensity profile is slow. Thus the finite-cone bias is dimension-dependent and does not behave like an ordinary correction that disappears merely by increasing the region.
 
-The preprint proposes an event-centred product window with independent proper-time and rapidity cutoffs, \\(0<\\tau<\\tau_c\\) and \\(0<\\chi<\\chi_c\\), where \\(\\chi_c\\) is independent of \\(\\tau\\). Its truncated intensity profile is
+The preprint proposes an event-centred product window with independent proper-time and rapidity cutoffs, \(0<\tau<\tau_c\) and \(0<\chi<\chi_c\), where \(\chi_c\) is independent of \(\tau\). Its truncated intensity profile is
 
-\\[
-p_{\\rm pw}(\\hat\\tau)=
-\\frac{(d+1)\\hat\\tau^d e^{-\\hat\\tau^{d+1}}}
-{1-e^{-\\hat\\tau_c^{d+1}}},
-\\qquad
-\\hat\\tau_c=(\\rho v_d)^{1/(d+1)}\\tau_c.
-\\]
+\[
+p_{\rm pw}(\hat\tau)=
+\frac{(d+1)\hat\tau^d e^{-\hat\tau^{d+1}}}
+{1-e^{-\hat\tau_c^{d+1}}},
+\qquad
+\hat\tau_c=(\rho v_d)^{1/(d+1)}\tau_c.
+\]
 
-The profile approaches \\(q\\) when \\(\\rho v_d\\tau_c^{d+1}\\gg1\\). However, a finite rapidity cutoff is defined relative to a timelike reference direction and introduces a preferred frame; this is a controlled **intensity-profile estimator**, not an automatic Lorentz-invariant random-walk prescription. The authors' exact-link simulations in 1+1, 2+1 and 3+1 dimensions (5,000, 400 and 250 independent sprinklings respectively) agree with their finite-cone and product-window predictions. These are the preprint's numerical observations, not Emergence Lab measurements.
+The profile approaches \(q\) when \(\rho v_d\tau_c^{d+1}\gg1\). However, a finite rapidity cutoff is defined relative to a timelike reference direction and introduces a preferred frame; this is a controlled **intensity-profile estimator**, not an automatic Lorentz-invariant random-walk prescription. The authors' exact-link simulations in 1+1, 2+1 and 3+1 dimensions (5,000, 400 and 250 independent sprinklings respectively) agree with their finite-cone and product-window predictions. These are the preprint's numerical observations, not Emergence Lab measurements.
 
 **Implications and limits for Issue #37**
 
 - A full-Hasse simple random walk on the infinite sprinkling has no canonical uniform-neighbour transition rule. Any finite-region implementation defines a cutoff-dependent kernel; the cutoff geometry and its scaling are part of the estimator, not incidental implementation details.
-- For \\(d\\ge2\\), a constant-time-cone exhaustion retains a different normalized link proper-time profile even as the cone grows. A finite-cone Hasse-walk or forward causal-walker study must therefore specify its exhaustion and link cutoff, and test sensitivity to alternative regularizations before claiming an intrinsic infinite-volume spectral observable.
-- The same concern is **potentially** relevant to forward causal walkers because they also select future links, but this preprint does not derive their meeting probability or a bias in \\(d_{cs}\\). It does not directly analyze the spatial-hypersurface operator.
-- The finite-cone profile has leading power \\(\\hat\\tau^1\\) for every \\(d>1\\), unlike the intensity-profile power \\(\\hat\\tau^d\\). Fitting the former as if it were the latter could produce an apparent lower-dimensional link statistic. That is a sampling consequence, **not** evidence of physical ultraviolet dimensional reduction.
+- For \(d\ge2\), a constant-time-cone exhaustion retains a different normalized link proper-time profile even as the cone grows. A finite-cone Hasse-walk or forward causal-walker study must therefore specify its exhaustion and link cutoff, and test sensitivity to alternative regularizations before claiming an intrinsic infinite-volume spectral observable.
+- The same concern is **potentially** relevant to forward causal walkers because they also select future links, but this preprint does not derive their meeting probability or a bias in \(d_{cs}\). It does not directly analyze the spatial-hypersurface operator.
+- The finite-cone profile has leading power \(\hat\tau^1\) for every \(d>1\), unlike the intensity-profile power \(\hat\tau^d\). Fitting the former as if it were the latter could produce an apparent lower-dimensional link statistic. That is a sampling consequence, **not** evidence of physical ultraviolet dimensional reduction.
 - This result does not directly alter CS0's Myrheim–Meyer relation count or the midpoint-scaling statistic: neither selects a uniformly random link. No such bias should be imputed to those estimators without a separate derivation.
 
 
 ## 5. Current repository dependency audit
 
-At main e04b6bd57445ba6205dbc4273264bc7389f47831:
+At main 45107e899c0f6889a79cca579ef0a3f5420028db:
 
 - src/emergence_lab/causal_set_mm.py and its tests implement the fixed-N ordering-fraction reference.
 - src/emergence_lab/cs0_worker.py is a row producer for the full 728-row grid (720 stochastic rows plus 8 exact controls) and a 40-row engineering fixture.
