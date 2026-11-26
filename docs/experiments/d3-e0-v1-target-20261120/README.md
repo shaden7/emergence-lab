@@ -1,4 +1,4 @@
-# D3-E0/M0 v1 target run — 2026-11-20 (PROPOSED archive; awaiting later-pass review)
+# D3-E0/M0 v1 target run — 2026-11-20 (ARCHIVED; later-pass review r1 PASS)
 
 - **What:** this is the single target run authorized by `docs/experiments/d3-e0-v1-target-auth-20261119/authorization.json`. That file was merged in PR #84 as `835eac2` after later-pass review r1 PASS.
 - **How it ran:**
@@ -35,12 +35,17 @@
 
 The cells A2, A3 and B2 are deterministic, with d ≡ 1. All 17 stochastic cells resolved, so none is UNRESOLVED. Sign-reversal set: **N ∈ {6, 8, 12, 16, 24, 32}**. The SEs are in `cells.csv`; the largest is 0.0025. d(E[r]) and the Jensen gap are reported in `cells.csv` alongside these values, not substituted for them.
 
-**Interpretation (hypothesis-level, not yet reviewed):**
+**Interpretation (hypothesis-level; later-pass reviewed, not a physical-dimension result):**
 - The design-r0 hypotheses H_A (arm A below 3 at every grid N) and H_B (arm B above 3 for N ≥ N_B) are consistent with this run, with N_B = 6 on this grid.
 - At D=2 the archived table has the no-endpoint conditional mean above 2 from N = 4 onward. The qualitative ensemble dependence of the sign therefore recurs at D=3, with a later onset.
 - This is an estimator/instrument control in one prescribed flat Alexandrov diamond. It is not a model comparison and does not answer Issue #37. It licenses no statement about physical dimensional reduction (protocol §1).
 
-**Not done:**
-- No later-pass review of this archive yet.
-- No independent reimplementation.
+**Later-pass review r1 (PR #85): PASS** ([review record](https://github.com/shaden7/emergence-lab/pull/85#issuecomment-7059710653)).
+- The reviewer recomputed SHA-256 for `manifest.json`, `cells.csv` and `raw_counts.npz`; all matched the README and manifest.
+- An independent Myrheim–Meyer inverse reproduced all 17 D=3 cell summaries (`positives`, `drawn`, `mean_d`, `sd_d`, `p_r0`) from the raw NPZ, with maximum absolute difference 2.2e-15.
+- A different cube-rejection sampler cross-check covered B3, B5 and B6; the first small B6 fluctuation and subsequent seeds were retained in the review record.
+- One scratch reproduction of the authorized target run was byte-identical in `raw_counts.npz`. This is a reproducibility check, **not a second target run**; the scratch output is not archived and does not enter the result.
+
+**Remaining limitations:**
+- The gates and quadrature were not independently reimplemented; this is a later-pass AI-mediated review, not human/external expert review.
 - No rerun: v1 allows none.
