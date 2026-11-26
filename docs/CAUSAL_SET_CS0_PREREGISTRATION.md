@@ -68,11 +68,20 @@ This is instrument calibration. The dimension D is put in by construction, so a 
   - 50 MB of output.
   - Exceeding any cap means INCOMPLETE.
 - **Execution location:** CI or a local runner only. **Not on the shared Lightsail host.**
-- **Missing component (blocks authorization).** This PR contains only the reference library and tests, not a gated runner. Before any run authorization, a separately reviewed runner must:
-  - enforce the aggregate CPU, RSS and output caps above in a supervised child process;
-  - write a durable INCOMPLETE manifest on any cap breach or setup or provenance failure;
-  - refuse to run unless the checkout is clean at the pinned exact commit.
-  The run authorization must pin that commit and the seed entropy E.
+- **Missing component (blocks authorization; implementation status clarified 2026-11-26, no design/gate changes).** The earlier statement that the repository contains only the reference library and tests is stale and is withdrawn. At main e04b6bd, the repository also contains:
+  - `src/emergence_lab/cs0_worker.py`: full-grid row producer (720 stochastic rows plus 8 exact controls) and a 40-row engineering fixture; it is not an authorization-aware study launcher;
+  - `src/emergence_lab/cs0_recheck.py`: persisted-row rechecker, which cannot certify that source relations were partial orders or that sprinkled points were inside the diamond;
+  - `src/emergence_lab/cs0_supervisor.py`: per-worker supervision building block;
+  - `src/emergence_lab/cs0_engineering.py`: engineering-only orchestration, whose manifest explicitly says `aggregate_caps_enforced=false`;
+  - `docs/CS0_CONTAINER_ENGINEERING.md` and the Docker wrapper: engineering-only cgroup/containment checks, not the full-study budget.
+  
+  The **full CS0 study launcher remains missing**. Before any run authorization, a separately reviewed launcher must:
+  - validate a committed, versioned run-authorization file and its frozen seed entropy E;
+  - refuse a dirty checkout or any commit other than the exact pinned commit;
+  - enforce the aggregate 10 CPU-minute, 1 GiB peak-RSS and 50 MB total-output caps (per-worker RLIMITs alone are not aggregate enforcement);
+  - write a durable INCOMPLETE manifest on any cap breach or setup/provenance failure.
+  
+  The lower-level worker's `--mode full` CLI is not an authorization gate and must not be invoked directly as a study run. No full-run authorization exists and no CS0 full-grid seeds have been drawn. The run authorization must pin the reviewed code commit and seed entropy E.
 
 ## 7. Artifacts and provenance
 
