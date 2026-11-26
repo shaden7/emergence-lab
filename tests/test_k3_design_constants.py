@@ -10,7 +10,7 @@ import math
 import mpmath as mp
 import numpy as np
 import pytest
-from scipy.stats import norm
+from scipy.stats import beta, binom, norm
 
 from emergence_lab.causal_set_mm import expected_ordering_fraction as f
 from emergence_lab.d3_e0 import direct_sample, k_chain_probability
@@ -96,12 +96,6 @@ def test_arm_a_mean_c3_exceeds_g3(d):
         assert d3_inverse(mean_c3) < d
 
 
-def test_bonferroni_z_for_32_stochastic_cells():
-    # 2 dimensions x 2 arms x 9 N, minus the 4 cells with d3 = 1 identically.
-    assert 2 * 2 * len(GRID_K3) - 4 == 32
-    assert norm.ppf(1 - 0.01 / 64) == pytest.approx(3.6047, abs=1e-4)
-
-
 def test_three_chain_count_formula_and_arm_a_identity():
     rng = np.random.default_rng(20261122)
     for d in (2, 3):
@@ -149,6 +143,21 @@ def test_r1_cell_partition_and_bonferroni():
     assert stochastic == 23
     tests = 2 * stochastic
     assert norm.ppf(1 - 0.01 / (2 * tests)) == pytest.approx(3.6979, abs=1e-4)
+
+
+def test_r5_arm_b_campaign_wide_completion_example():
+    # 18 arm-B grid cells minus 2 deterministic N=3 cells and 4 exact D=2 cells.
+    n_arm_b_stochastic = 2 * len(GRID_K3) - 2 - 4
+    assert n_arm_b_stochastic == 12
+    alpha = 0.025 / n_arm_b_stochastic
+    n_p, k, n_c = 2_000, 800, 100_000
+    p_l = beta.ppf(alpha, k, n_p - k + 1)
+    assert p_l == pytest.approx(0.36869188218750115, abs=1e-12)
+    p_complete = binom.sf(n_c - 1, 273_187, p_l)
+    p_previous = binom.sf(n_c - 1, 273_186, p_l)
+    assert p_complete == pytest.approx(0.9979201115430086, abs=1e-12)
+    assert p_previous == pytest.approx(0.9979105107957897, abs=1e-12)
+    assert p_complete >= 1 - alpha > p_previous
 
 
 def _d2_arm_b_exact(n):
