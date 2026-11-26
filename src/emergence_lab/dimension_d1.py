@@ -81,6 +81,13 @@ class Graph:
         return self._csr
 
 
+class MultiGraph(Graph):
+    """Undirected loop-free multigraph in CSR form.
+
+    Each stored index is one incident edge; repeated indices encode parallel edges.
+    """
+
+
 def _from_edges(n: int, u: np.ndarray, v: np.ndarray, info: dict | None = None) -> Graph:
     """Simple undirected graph from an edge list; drops self-loops and collapses duplicates.
     Returns the graph with info['self_loops_removed'] and info['duplicate_edges_removed'].
@@ -113,6 +120,49 @@ def _from_edges(n: int, u: np.ndarray, v: np.ndarray, info: dict | None = None) 
     info = dict(info or {})
     info.update(self_loops_removed=n_loops, duplicate_edges_removed=n_dup)
     return Graph(indptr, dst, info)
+
+
+def _from_multiedges(
+    n: int, u: np.ndarray, v: np.ndarray, info: dict | None = None
+) -> MultiGraph:
+    """Build an undirected loop-free multigraph from one row per edge.
+
+    Parallel edges are preserved as repeated CSR indices. Each input pair is
+    one undirected edge regardless of endpoint order; self-loops are rejected.
+    """
+    if not isinstance(n, (int, np.integer)) or n < 2 or n > np.iinfo(np.int32).max:
+        raise ValueError("n must fit positive int32 vertex indices")
+    u, v = np.asarray(u), np.asarray(v)
+    if u.ndim != 1 or v.ndim != 1 or u.shape != v.shape:
+        raise ValueError("u and v must be equally sized one-dimensional arrays")
+    if u.size and (not np.issubdtype(u.dtype, np.integer)
+                   or not np.issubdtype(v.dtype, np.integer)):
+        raise ValueError("edge endpoints must be integers")
+    u = u.astype(np.int64, copy=False)
+    v = v.astype(np.int64, copy=False)
+    if np.any(u < 0) or np.any(v < 0) or np.any(u >= n) or np.any(v >= n):
+        raise ValueError("edge endpoint out of range")
+    if np.any(u == v):
+        raise ValueError("self-loops are not supported")
+
+    key = np.minimum(u, v) * np.int64(n) + np.maximum(u, v)
+    key.sort()
+    unique_edges = (0 if key.size == 0 else
+                    int(np.count_nonzero(np.r_[True, key[1:] != key[:-1]])))
+    parallel_copies = int(key.size - unique_edges)
+    lo, hi = (key // n).astype(np.int32), (key % n).astype(np.int32)
+    src = np.concatenate([lo, hi])
+    dst = np.concatenate([hi, lo])
+    counts = np.bincount(src, minlength=n)
+    indptr = np.zeros(n + 1, dtype=np.int64)
+    np.cumsum(counts, out=indptr[1:])
+    order = np.argsort(src, kind="stable")
+    indices = dst[order]
+
+    info = dict(info or {})
+    info.update(self_loops_removed=0, duplicate_edges_removed=0,
+                parallel_edge_copies_preserved=parallel_copies)
+    return MultiGraph(indptr, indices, info)
 
 
 def torus_lattice(d: int, L: int) -> Graph:

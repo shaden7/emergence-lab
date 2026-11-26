@@ -12,14 +12,14 @@ from collections.abc import Iterable
 import numpy as np
 from scipy.sparse.csgraph import connected_components
 
-from emergence_lab.dimension_d1 import Graph
+from emergence_lab.dimension_d1 import Graph, MultiGraph
 
 
 MAX_TRANSITION_OPS = 100_000_000
 
 
 def graph_even_returns(
-    graph: Graph,
+    graph: Graph | MultiGraph,
     source: int,
     half_times: Iterable[int],
     *,
@@ -27,9 +27,11 @@ def graph_even_returns(
 ) -> dict[int, float]:
     """Return P^(2t)[source,source] from the reversible half-kernel identity.
 
-    The graph must be connected, undirected and simple with no isolated
-    vertices. Operation limit is a conservative directed-edge-step proxy,
-    not an exact CPU or peak-memory measurement. Uses one float64 CSR kernel.
+    The graph must be connected, undirected, loop-free and unweighted, with
+    no isolated vertices. A MultiGraph stores one unit entry per half-edge;
+    repeated CSR column indices therefore encode parallel edges. Operation
+    limit is a conservative directed-edge-step proxy, not an exact CPU or
+    peak-memory measurement. Uses one float64 CSR transition kernel.
     """
     times = list(half_times)
     if not times or any(not isinstance(t, (int, np.integer)) or t < 1 for t in times):
@@ -52,6 +54,9 @@ def graph_even_returns(
 
     inverse_degree = 1.0 / degree.astype(np.float64)
     transition = a.multiply(inverse_degree[:, None]).tocsr()
+    # Coalesce repeated CSR columns into multiplicity-weighted transitions.
+    # The operation budget above intentionally counts the uncollapsed half-edges.
+    transition.sum_duplicates()
     row = np.zeros(graph.n, dtype=np.float64)
     row[int(source)] = 1.0
     wanted = set(times)

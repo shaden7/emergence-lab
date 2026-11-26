@@ -107,3 +107,32 @@ The next work item is a **design-only type-II/type-III and root-law bridge, toge
 - B. Durhuus, T. Jonsson and J. F. Wheater, *On the spectral dimension of causal triangulations* (2009): https://arxiv.org/abs/0908.3643
 - D. N. Coumbe and J. Jurkiewicz, *Evidence for Asymptotic Safety from Dimensional Reduction in Causal Dynamical Triangulations* (2014): https://arxiv.org/abs/1411.7712
 - F. Caceffo and G. Clemente, *Spectral analysis of causal dynamical triangulations via finite element method*, Phys. Rev. D 107, 074501 (2023): https://doi.org/10.1103/PhysRevD.107.074501
+
+
+## Implementation update — 2026-11-26 (S0 multigraph candidate; not yet integrated)
+
+The earlier statement that the frozen `Graph` representation is simple remains true for
+`Graph` and `_from_edges`: that builder removes loops and collapses parallel edges.
+It is not, however, a complete description of what the S0 CSR kernel can process.
+
+A loop-free undirected multigraph can be represented by one unit-valued CSR entry per
+half-edge, including repeated column indices. In this representation,
+`degree = diff(indptr)` counts edge multiplicity. The S0 symmetry check compares the
+aggregate adjacency, while the unit-data check still sees one unit per stored half-edge.
+Row scaling and CSR duplicate coalescing then produce
+`P(u,v)=m(u,v)/degree(u)`. The candidate implementation makes duplicate coalescing
+explicit after row scaling and adds a dedicated `MultiGraph` / `_from_multiedges`
+path; the existing simple-graph builder and D1 semantics are unchanged.
+
+A local scratch comparison on SciPy 1.17.0 tested 1,100 random connected loop-free
+multigraphs (2–12 vertices), comparing 8,800 root-return values at half-times 1–8
+against dense matrix powers. Maximum absolute error was `5.55e-16`.
+This is a numerical software observation, not a theorem, repository CI result, random-map
+sample, or scientific measurement. The candidate's exact-head CI must also exercise
+the path under the repository's SciPy 1.18.1 environment.
+
+This only repairs the small-graph representation/control path. It does **not** solve
+the existing 100,000,000 transition-operation cap or 512 MiB S0 memory budget at
+the projected UIPT target size, does not provide a uniform Type-II random-map sampler,
+and does not authorize target seeds, a pilot, or S2. A scalable independently calibrated
+estimator and graph-level power assessment remain separate gates.
