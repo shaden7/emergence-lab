@@ -217,14 +217,15 @@ grid checks, not proofs):
    second, unreviewed MM run.
 4. **Negative (non-manifold) control.** Transitive percolation (random DAG on
    N=32 labelled elements, edge probability p, transitive closure) with p
-   calibrated by bisection to a sample mean |E[r] − 8/35| ≤ 0.005, using
-   exactly 10^4 total DAG draws per bisection step on a calibration seed root. Freeze p before
+   calibrated by bisection to \(|\bar r_{\rm calib} - 8/35|\le0.005\), using
+   exactly \(10^4\) total DAG draws per bisection step on a calibration seed root. Freeze p before
    evaluation; the calibration root and H_N evaluation root are distinct from
    each other and every other seed root.
 
    H_N evaluation uses exactly 10^4 **total** DAG draws, with no early
    stopping. For every draw record R and C_3; report total draws, accepted
-   C_3>0 draws, and P(C_3=0). Since C_3>0 implies R>0, compute both d_MM and
+   \(C_3>0\) draws (count \(k\)), zero-chain count \(n_0\), and
+   \(\widehat P(C_3=0)=n_0/10^4\). Since \(C_3>0\Rightarrow R>0\), compute both \(d_{MM}\) and
    d_3 on the same matched C_3>0 subset. For its k accepted draws, define
    delta_i = d_MM_i − d_3_i and SE(mean(delta)) = s_delta/sqrt(k), where
    s_delta is the sample standard deviation of the paired differences. If
