@@ -1,3 +1,30 @@
+## Post-merge handoff — PR #92 and exact Main CI (2026-11-26T23:26:59Z)
+
+**Main HEAD:** `8a9662e126fceb640efe11300594bacb0d6de9e4`.
+
+[PR #92](https://github.com/shaden7/emergence-lab/pull/92), “Issue #37: document finite-volume causal-link sampling bias”, was later-pass reviewed **PASS** on exact head `503fe8386668ee130a194200cebe9e7c1c021c92` against base `45107e899c0f6889a79cca579ef0a3f5420028db`, then merged with the expected-head guard as `8a9662e126fceb640efe11300594bacb0d6de9e4`. The merge tree is exactly equal to the PR synthetic merge-candidate tree. The review was an AI-mediated later-pass check, not external scientific peer review. The merge changes only the causal-set estimator bridge and research plan; no code or experiment configuration changed.
+
+### Exact-head and post-merge CI
+
+- PR-head push CI [45906433124](https://github.com/shaden7/emergence-lab/actions/runs/45906433124) and PR CI [45906484435](https://github.com/shaden7/emergence-lab/actions/runs/45906484435) completed-success on exact head `503fe8386668ee130a194200cebe9e7c1c021c92`: respectively **1,047 tests + 65 subtests in 149.74 s** and **1,047 tests + 65 subtests in 130.99 s**.
+- Post-merge Main CI [45910671491](https://github.com/shaden7/emergence-lab/actions/runs/45910671491) completed-success on exact merge commit `8a9662e126fceb640efe11300594bacb0d6de9e4`: **1,047 tests + 65 subtests in 89.40 s**. All applicable engineering containment/smoke steps passed; optional coverage and finite-size gates were skipped.
+- Main artifact [15159634864](https://github.com/shaden7/emergence-lab/actions/runs/45910671491/artifacts/15159634864): 55 files, 371,075 bytes, SHA-256 `bad4023830a008de623b0e7c9e3f813e31573a70c46b158c3e7aa0b1339d8dbf`. I downloaded and inspected it. All 11 component manifests pin Main `8a9662e`; the aggregate root manifest still has `commit=null`, a known provenance gap.
+- CS0 remains `mode=engineering`, `study_authorized=false`, `aggregate_caps_enforced=false`; S1b remains PARTIAL with `seeds=[]`; SE-audit remains BLOCKED with `seeds=[]`; S1 P0a–P0d pass, while S1 orchestration remains `NO-GO (scoped)`. No Issue #37 target seeds/samples, full CS0 study, or S2 authorization occurred.
+
+### Scientific source audit and limitations
+
+Boguña & Krioukov, [arXiv:2610.03247](https://arxiv.org/abs/2610.03247), v1, was checked against the PDF, especially §§II–V and VII. Equations (9)–(11) define the sigma-finite link-intensity measure and its normalized proper-time profile per unit hyperbolic volume; they do not define a uniform probability law over the infinite link set. Equations (15)–(20) give the constant-time-cone cutoff and the distinct large-cone normalized profile for spatial (d>1), while (d=1) converges only logarithmically. Equations (21)–(23) give the product-window profile and its preferred-frame caveat.
+
+The paper's exact-link numerical demonstration uses one reported parameter point, (ho=128000), (T=1), with 5,000 / 400 / 250 independent sprinklings in (1+1), (2+1), and (3+1) dimensions. It checks the finite-cone and product-window predictions at those settings; it is **not** a numerical multi-parameter test of the proposed double-scaling limit. The analytic derivation and the finite-parameter numerical verification must remain separate evidence classes.
+
+The result concerns link proper-time statistics. It is not a spectral-dimension theorem, does not derive a bias in the causal-walker meeting exponent (d_{cs}), and does not directly alter the relation-count MM or midpoint-scaling estimators. It does mean that any full-Hasse or forward-link diffusion proposal must specify its finite-volume exhaustion / regulator as part of the estimator and test sensitivity to alternative regularizations before claiming an intrinsic infinite-volume operator.
+
+### Decision and next action
+
+Issue #37 remains **UNDECIDABLE**. The Type-II UIPT and causal-set routes remain design candidates, not target experiments. The next design-only comparison should pair non-link causal-set observables (MM and a separately calibrated midpoint statistic) with a genuinely distinct map-family observable pair (volume growth and spectral return), while preserving the model-family independence criterion. Do not treat Pair-Collision as an independent dimension estimator; do not start a full-Hasse walk without a frozen regulator; do not draw target seeds or authorize S2. No deployment, paid API, Lightsail, or EatSleepFeel operation occurred.
+
+---
+
 ## Post-merge handoff — PR #91 and exact Main CI (2026-11-26T22:39:42Z)
 
 **Main HEAD:** `bfbac716a8bb651ec5fd61db9e8fc859f0591687`.
