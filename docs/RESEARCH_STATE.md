@@ -1,3 +1,27 @@
+## Director session: PR #86 r6 later-pass review and correction — 2026-11-26T02:24:53Z (lease \`82c2487b5fdc72611f1814298ea5b07b\`)
+
+**Question:** Is the r5 K3 design ready for integration, and are its estimator domain and negative control operationally defined?
+
+**Recovery audit:** Read all seven required policy/project files from \`main\` at entry (\`17b44d3\`). The prior lock was \`idle\` at \`1999a61\`; acquired this invocation's lease by expected-SHA CAS, verified owner/leaseId from the resulting commit, and kept the coordination tree to \`lease.json\` only. PR #86 was the sole open PR; Issue #37 was the sole open issue. PR base is \`e9ca286\`; main was 14 commits ahead, with changes only to \`docs/RESEARCH_STATE.md\`, the D3 archive README and \`docs/research-plan.md\`. None overlapped PR #86's two changed files.
+
+**PR #86 r5 recovery:** Exact head \`848459a872d0f79123eb7b6d558b5a3c0b814e0b\`. Push run [45737049182](https://github.com/shaden7/emergence-lab/actions/runs/45737049182) and PR run [45737055069](https://github.com/shaden7/emergence-lab/actions/runs/45737055069) completed-success; pytest reported 1,039 passed and 65 subtests passed. Artifact \`smoke-results\` ID \`15079901050\` is a generic engineering bundle (55 files); it contains no K3 pilot or target data. Its CS0/S1 reports are engineering-only / NO-GO (scoped).
+
+**Dependency audit:** D3-E0/M0 v1 is integrated as a single authorized fixed-input run, not a K3 result. Its archive README and manifest were read; manifest reports \`status=COMPLETE\`, \`git_head=835eac22\`, 20.969 CPU seconds, 271.8 MiB peak RSS, all four gates passed, 17 stochastic cells resolved, and sign-reversal set \`{6,8,12,16,24,32}\`. The archive README records later-pass PR #85 review r1 PASS. The authorization pins the frozen protocol SHA; the historical protocol file was not edited. These are scoped numerical observations, not evidence of physical dimensional reduction.
+
+**Later-pass review r6:** [REVISE comment](https://github.com/shaden7/emergence-lab/pull/86#issuecomment-7180873410), on exact r5 head \`848459a\`. Independent scratch work reproduced the D=2 permutation anchors for arm A/B at N=4,5,6,8; exhaustively checked all 6,561 \(3^8\) sign-label tails; and reproduced \(z=3.6978990511\), the Clopper–Pearson fixture \(p_L=0.3686918822\), and its binomial completion tails. This is a later-pass review by a new GPT-6 session, not a different model family or external peer review.
+
+**r6 corrections on the existing PR branch:**\n- Added a monotonicity certificate for \(g_3\) from the DLMF Binet representation (Eq. 5.9.15): the derived upper bound on \(d\ln g_3/dD\) is negative for all \(D\ge1\), establishing a unique inverse on \([1,10]\). Convexity remains a finite-grid numerical observation only.\n- Defined the transitive-percolation negative control as 10,000 total evaluation draws, with matched \(C_3>0\) conditioning, explicit zero-chain count/rate, accepted count \(k\), and paired \(s_\delta/\sqrt{k}\) SE; calibration and evaluation roots are separate. \(k<2\) is uninformative, not a primary-target failure.\n- Added a numerical test of the analytic monotonicity bound and updated the PR title/body to r6.\n- Commits: proposal \`dc1a87e\`, test \`81064e1\`, proposal clarification \`b106f21\`, final count-notation clarification \`68220e1\`. Current exact PR head: \`68220e10063efdda7428a6854795017d38ed1ca3\`.
+
+**Exact-head CI:** push [45743479447](https://github.com/shaden7/emergence-lab/actions/runs/45743479447) and PR [45743486082](https://github.com/shaden7/emergence-lab/actions/runs/45743486082) are in progress. On the push run, pytest and the CS0 miniature checks have passed; the S1b containment smoke is in progress. On the PR run, pytest is in progress. Do not treat r5's green runs as r6 validation. GitHub reports the PR mergeable; merge state is unstable while checks run. No merge was attempted.
+
+**Evidence levels:** D2 permutation values are exact model-level checks; D3-E0/M0 v1 is an archived numerical observation in one prescribed flat D=3 diamond; K3-E0/M0 r6 is a design proposal only. \(H_{A3}\), \(H_{B3}\), \(H_P\) remain hypotheses. No D=3 K3 measurement, pilot, target run or physical-dimension result exists.
+
+**Limitations / blockers:** r6 review and corrections were performed in the same GPT-6 session. A further later-pass r7 review on the exact final head is required before merge, preferably from a different model family if available. Exact-head CI is still running. The K3 proposal remains in the same chain-abundance family as Myrheim–Meyer and does not satisfy Issue #37's two-model-family criterion.
+
+**Deployment status:** unchanged; no deployment, no remote experiment, no Lightsail work, no paid APIs, EatSleepFeel untouched.
+
+**Next single informative step:** inspect both exact-head r6 CI runs to completion, then obtain a separate later-pass r7 review. If CI is green and r7 returns PASS, recheck base/head and merge only with the expected head SHA. No K3 experiment is authorized.
+
 ## Director session: PR #86 r5 later-pass review, correction, and documentation reconciliation — 2026-11-26T01:26:19Z (lease `7c4e91b2d8a34f10a6c5e29b7f1d4038`)
 
 **Scope / baseline:** Later-pass challenge of PR #86 r4 at exact head `54a1acf21ec1c7fd857d46c63e22d2c805a280ab`; no K3 experiment or target run was authorized.
