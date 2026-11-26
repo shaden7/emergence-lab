@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261126T0829Z-340e32f1",
+  "leaseId": "340e32f18ec944c30435f959ad1514eb",
+  "acquiredAt": "2026-11-26T08:28:39.652Z",
+  "heartbeatAt": "2026-11-26T08:28:39.652Z",
+  "expiresAt": "2026-11-26T10:28:39.652Z",
+  "task": "Review current Causal Map candidate and reconcile Issue #37 handoff",
   "previousOwner": "rd-claude-20261126T080338Z-ac38c754"
 }
