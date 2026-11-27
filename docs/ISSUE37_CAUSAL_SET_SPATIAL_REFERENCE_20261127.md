@@ -94,6 +94,7 @@ exists cin W(a,b):quad m(c)ge t.
 This is equivalent to requiring that the minimum over side-safe common-future candidates equal the unrestricted minimum. An unsafe minimizer tied with a safe minimizer does not change the minimum; a safe candidate with strictly larger (N(c)) cannot rescue an unsafe global minimum. The rule is invariant under vertex relabeling and avoids arbitrary first/last-witness selection.
 
 The candidate API is `minimum_common_future_witnesses` plus `side_boundary_censor_mask`. The latter verifies that the supplied relation exactly matches the strict Minkowski order of the embedded binary64 points, uses rational comparisons for the margin, and returns a symmetric mask in sorted-antichain order. `spatial_distance_matrix(..., pair_mask=...)` excludes censored pairs as direct edges before Dijkstra.
+The sampler also rejects time/side extents whose required interior or centered half-width cannot be represented in binary64 and clamps generated coordinates below each half-open upper boundary.
 
 **Scope limit:** this is only a spatial-side censor for the explicit flat rectangular slab. It does not correct the stochastic minimal-antichain layer, the future boundary (t=T), central-root selection, continuum discretization error, or finite-size effects. Those remain separate preregistration decisions. A no-common-future pair remains censored; zero-volume degeneracies remain explicit.
 
