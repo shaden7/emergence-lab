@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261127T172040Z-0c61c77ccc99d389",
   "leaseId": "c8e43856ed22fa593fa269870d54f8fa",
   "acquiredAt": "2026-11-27T17:20:40Z",
-  "heartbeatAt": "2026-11-27T17:20:40Z",
-  "expiresAt": "2026-11-27T19:20:40Z",
+  "heartbeatAt": "2026-11-27T17:43:22.535Z",
+  "expiresAt": "2026-11-27T19:43:22.535Z",
   "task": "PR #98 audit, input-validation correction, CI and integration; update Issue #37 handoff",
   "previousOwner": "rd-gpt6-20261127T145104Z-gtxybcbsys"
 }
