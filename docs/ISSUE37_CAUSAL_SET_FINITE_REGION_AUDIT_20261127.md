@@ -55,14 +55,14 @@ The strict Minkowski relation is evaluated exactly for the represented IEEE-754 
 
 The project-defined rectangular slab has timelike side boundaries and is not causally convex. The full minimal antichain can therefore include side-boundary-induced minimal elements; it must not be described as a uniformly sampled \(t=0\) slice.
 
-For a continuum-distance comparison, the exact geometry API now exposes **all tied minimizing common-future witnesses**, rather than selecting an arbitrary first witness. PR #98 implements the pair-level spatial-side censor: retain a pair only when at least one global minimum-volume witness has its entire past cone down to \(t=0\) inside the spatial rectangle:
+For a continuum-distance comparison, the exact geometry API now exposes **all tied minimizing common-future witnesses**, rather than selecting an arbitrary first witness. The `minimum_common_future_witnesses` and `side_boundary_censor_mask` APIs implement the pair-level spatial-side censor: retain a pair only when at least one global minimum-volume witness has its entire past cone down to \(t=0\) inside the spatial rectangle:
 
 \[
 \exists c\in W(a,b):
 m(c)=
 \min\!\left(
-x+L_x/2,\ L_x/2-x,
-y+L_y/2,\ L_y/2-y
+x_c+L_x/2,\ L_x/2-x_c,
+y_c+L_y/2,\ L_y/2-y_c
 \right)
 \geq t_c,
 \]
