@@ -9,12 +9,13 @@ conditioning, truncation, or resampling is performed.
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 
 import numpy as np
 
-from .causal_set_mm import causal_matrix
+from .causal_set_spatial import MAX_REFERENCE_ELEMENTS
 
-MAX_SLAB_ELEMENTS = 256
+MAX_SLAB_ELEMENTS = MAX_REFERENCE_ELEMENTS
 
 
 class PoissonDrawExceedsLimit(RuntimeError):
@@ -97,8 +98,12 @@ def poisson_sprinkle_minkowski_slab(
         not isinstance(max_elements, (int, np.integer))
         or isinstance(max_elements, (bool, np.bool_))
         or max_elements < 0
+        or max_elements > MAX_SLAB_ELEMENTS
     ):
-        raise ValueError("max_elements must be a nonnegative integer")
+        raise ValueError(
+            f"max_elements must be a nonnegative integer no greater than "
+            f"{MAX_SLAB_ELEMENTS}"
+        )
 
     t = _positive_finite("time_extent", time_extent)
     lx = _positive_finite("x_extent", x_extent)
@@ -122,15 +127,44 @@ def poisson_sprinkle_minkowski_slab(
 
 
 def minkowski_slab_causal_relation(points: np.ndarray) -> np.ndarray:
-    """Return the strict 2+1 Minkowski order for (t, x, y) coordinates.
+    """Return the strict 2+1 Minkowski order for binary64 (t, x, y) points.
 
-    This is the ordinary timelike relation dt > sqrt(dx**2 + dy**2), delegated
-    to the already calibrated Minkowski relation helper after shape/finite
-    validation. Null-related pairs are not included.
+    The exact rational values represented by the input float64 coordinates are
+    compared pairwise. This avoids overflow in coordinate differences/squares
+    and avoids rounding a near-null pair across the light cone. The dense
+    relation is bounded by the same 256-element cap as the spatial oracle.
     """
     coordinates = np.asarray(points, dtype=np.float64)
     if coordinates.ndim != 2 or coordinates.shape[1] != 3:
         raise ValueError("points must have shape (N, 3) in (t, x, y) order")
     if not np.all(np.isfinite(coordinates)):
         raise ValueError("points must contain only finite coordinates")
-    return causal_matrix(coordinates)
+    n = coordinates.shape[0]
+    if n > MAX_SLAB_ELEMENTS:
+        raise ValueError(
+            f"exact slab relation is limited to N <= {MAX_SLAB_ELEMENTS}"
+        )
+
+    times = [Fraction.from_float(float(value)) for value in coordinates[:, 0]]
+    xs = [Fraction.from_float(float(value)) for value in coordinates[:, 1]]
+    ys = [Fraction.from_float(float(value)) for value in coordinates[:, 2]]
+    relation = np.zeros((n, n), dtype=np.bool_)
+
+    # Every unordered pair has at most one future direction. Fractions preserve
+    # the exact binary64 input values, including differences outside float64's
+    # finite range and strict exclusion of exactly null-related pairs.
+    for i in range(n):
+        for j in range(i + 1, n):
+            dt = times[j] - times[i]
+            if dt == 0:
+                continue
+            if dt > 0:
+                source, target = i, j
+            else:
+                source, target = j, i
+                dt = -dt
+            dx = xs[j] - xs[i]
+            dy = ys[j] - ys[i]
+            if dt * dt > dx * dx + dy * dy:
+                relation[source, target] = True
+    return relation

@@ -9,6 +9,7 @@ from emergence_lab.causal_set_spatial import (
     spatial_distance_matrix,
 )
 from emergence_lab.causal_set_slab import (
+    MAX_SLAB_ELEMENTS,
     PoissonDrawExceedsLimit,
     expected_poisson_count,
     minkowski_slab_causal_relation,
@@ -207,3 +208,54 @@ def test_poisson_slab_sample_runs_through_exact_spatial_geometry_oracle():
     assert np.all(np.diag(distance) == 0.0)
     assert np.all(predistance >= 0.0)
     assert np.all(distance >= 0.0)
+
+
+
+@pytest.mark.parametrize("limit", [MAX_SLAB_ELEMENTS + 1, 10**9])
+def test_sampler_cannot_raise_the_dense_reference_allocation_cap(limit):
+    rng = np.random.default_rng(20261127)
+    state_before = rng.bit_generator.state
+    with pytest.raises(ValueError, match="no greater than"):
+        poisson_sprinkle_minkowski_slab(
+            rng,
+            density=1.0,
+            time_extent=1.0,
+            x_extent=1.0,
+            y_extent=1.0,
+            max_elements=limit,
+        )
+    # Invalid caps are rejected before consuming the Poisson draw.
+    assert rng.bit_generator.state == state_before
+
+
+def test_slab_relation_rejects_more_than_the_dense_reference_cap():
+    points = np.zeros((MAX_SLAB_ELEMENTS + 1, 3), dtype=np.float64)
+    with pytest.raises(ValueError, match="limited to N"):
+        minkowski_slab_causal_relation(points)
+
+
+def test_slab_relation_is_exact_for_large_finite_coordinates_and_overflowing_differences():
+    squared_overflow = np.array(
+        [[0.0, 0.0, 0.0], [1e200, 2.5e199, 0.0]], dtype=np.float64
+    )
+    assert minkowski_slab_causal_relation(squared_overflow)[0, 1]
+
+    difference_overflow = np.array(
+        [[-1e308, 0.0, 0.0], [1e308, 1e308, 0.0]], dtype=np.float64
+    )
+    assert minkowski_slab_causal_relation(difference_overflow)[0, 1]
+
+
+def test_slab_relation_excludes_exact_null_pairs_and_keeps_strict_timelike_pairs():
+    just_above_five = np.nextafter(5.0, np.inf)
+    points = np.array(
+        [
+            [0.0, 0.0, 0.0],
+            [5.0, 3.0, 4.0],
+            [just_above_five, 3.0, 4.0],
+        ],
+        dtype=np.float64,
+    )
+    relation = minkowski_slab_causal_relation(points)
+    assert not relation[0, 1]  # exactly null: 5^2 == 3^2 + 4^2
+    assert relation[0, 2]  # strictly timelike by one binary64 step
