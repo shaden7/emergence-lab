@@ -423,10 +423,11 @@ def test_sampler_rejects_unrepresentable_half_extents_and_time_interior():
     base = dict(
         density=1.0, time_extent=1.0, x_extent=1.0, y_extent=1.0
     )
-    with pytest.raises(ValueError, match="half-extents"):
-        poisson_sprinkle_minkowski_slab(
-            np.random.default_rng(0), **{**base, "x_extent": smallest}
-        )
+    for extent in (smallest, 3.0 * smallest):
+        with pytest.raises(ValueError, match="half-extents"):
+            poisson_sprinkle_minkowski_slab(
+                np.random.default_rng(0), **{**base, "x_extent": extent}
+            )
     with pytest.raises(ValueError, match="positive coordinate"):
         poisson_sprinkle_minkowski_slab(
             np.random.default_rng(0), **{**base, "time_extent": smallest}
