@@ -29,9 +29,10 @@ class SelfInclusiveKernel:
     degree k_v = deg_A(v) + 1, and its source-specific return floor is
     k_source / sum_{x in C(source)} k_x.
 
-    The memory guard is a conservative estimate for the graph copy, closed
-    adjacency, transition CSR and O(n) work vectors. It is not an OS-enforced
-    RSS limit. The operation guard counts transition nonzeros per full step.
+    The memory guard estimates the source CSR, two working CSR matrices and
+    O(n) arrays before constructing them. It excludes Python/SciPy allocator
+    overhead and is not an OS-enforced RSS limit. The operation guard counts
+    transition nonzeros per full step.
     """
 
     def __init__(
@@ -49,26 +50,31 @@ class SelfInclusiveKernel:
                 or max_memory_bytes < 1):
             raise ValueError("max_memory_bytes must be a positive integer")
 
-        base = graph.csr()
         n = graph.n
-        if base.shape != (n, n):
-            raise ValueError("graph adjacency must be square and match graph.n")
-
-        # Check the estimated peak before making the working CSR copies.
-        base_bytes = int(base.data.nbytes + base.indices.nbytes + base.indptr.nbytes)
-        closed_nnz_upper = int(base.nnz + n)
-        index_bytes = max(base.indices.dtype.itemsize, np.dtype(np.int32).itemsize)
-        indptr_bytes = max(base.indptr.dtype.itemsize, np.dtype(np.int32).itemsize)
+        raw_nnz = int(graph.indices.size)
+        index_bytes = max(graph.indices.dtype.itemsize, np.dtype(np.int32).itemsize)
+        indptr_bytes = max(graph.indptr.dtype.itemsize, np.dtype(np.int32).itemsize)
+        source_arrays_bytes = int(graph.indices.nbytes + graph.indptr.nbytes)
+        base_csr_bytes = (
+            raw_nnz * (np.dtype(np.float64).itemsize + index_bytes)
+            + (n + 1) * np.dtype(np.int32).itemsize
+        )
+        closed_nnz_upper = raw_nnz + n
         closed_csr_bytes = (
             closed_nnz_upper * (np.dtype(np.float64).itemsize + index_bytes)
             + (n + 1) * indptr_bytes
         )
         vector_bytes = n * (6 * np.dtype(np.float64).itemsize + 2 * index_bytes)
         vector_bytes += (n + 1) * indptr_bytes
-        estimated_peak_bytes = base_bytes + 2 * closed_csr_bytes + vector_bytes
+        estimated_peak_bytes = (
+            source_arrays_bytes + base_csr_bytes + 2 * closed_csr_bytes + vector_bytes
+        )
         if estimated_peak_bytes > int(max_memory_bytes):
             raise ValueError("estimated kernel memory budget exceeded")
 
+        base = graph.csr()
+        if base.shape != (n, n):
+            raise ValueError("graph adjacency must be square and match graph.n")
         adjacency = base.copy().tocsr()
         adjacency.sum_duplicates()
         adjacency.eliminate_zeros()
