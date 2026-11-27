@@ -125,9 +125,13 @@ def poisson_sprinkle_minkowski_slab(
     half_x = lx / 2.0
     half_y = ly / 2.0
     if half_x == 0.0 or half_y == 0.0:
-        raise ValueError("x_extent and y_extent must have representable positive half-extents")
+        raise ValueError(
+            "x_extent and y_extent must have representable positive half-extents"
+        )
     if np.nextafter(t, 0.0) == 0.0:
-        raise ValueError("time_extent must have a representable positive coordinate below its upper bound")
+        raise ValueError(
+            "time_extent must have a representable positive coordinate below its upper bound"
+        )
     rho = _positive_finite("density", density)
     mean = expected_poisson_count(
         density=rho, time_extent=t, x_extent=lx, y_extent=ly
@@ -268,7 +272,15 @@ def side_boundary_censor_mask(
     if not np.all(np.isfinite(coordinates)):
         raise ValueError("points must contain only finite coordinates")
 
-    relation = np.asarray(prec)
+    if not isinstance(prec, np.ndarray):
+        raise TypeError("prec must be a NumPy boolean strict-order matrix")
+    if prec.ndim != 2 or prec.shape[0] != prec.shape[1]:
+        raise ValueError("prec must be a square matrix")
+    if prec.shape[0] > MAX_SLAB_ELEMENTS:
+        raise ValueError(
+            f"exact slab censor is limited to N <= {MAX_SLAB_ELEMENTS}"
+        )
+    relation = prec
     if relation.dtype != np.bool_:
         raise TypeError("prec must be a boolean strict-order matrix")
     if relation.shape != (coordinates.shape[0], coordinates.shape[0]):
