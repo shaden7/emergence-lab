@@ -1,3 +1,54 @@
+## Research Director handoff — PR #98 integrated; recovery and Issue #37 criteria audit (2026-11-27T20:26:41Z)
+
+**Main code commit:** `c38d89c3127cea6cc9563870f5b5cd33276ff868` (squash merge of [PR #98](https://github.com/shaden7/emergence-lab/pull/98)); expected PR head `7542fdfac1df56fa891aef9bfaaed9f78c932847`. Previous Main was `2c545636a664ce7605d4aa5b018c8c8aac0adadd` (PR #97).
+
+### Recovery and repository audit
+
+The previous Director lease (`rd-gpt6-20261127T172040Z-0c61c77ccc99d389`) expired at `2026-11-27T19:43:22.535Z`. This session acquired the now-expired lease by expected-HEAD CAS from lock HEAD `aa9df3809daa63d7c99e2d1431504c7094374923`, then read back and verified its own owner/lease ID and the canonical lock tree containing only root `lease.json`. No predecessor lease was inherited.
+
+At recovery: **0 open PRs**, Issue #37 is the only open issue, and no queued/in-progress jobs were present among the latest 100 Actions runs. The latest code merge and all its exact-head / post-merge runs are complete-success.
+
+Relevant branch reconciliation against Main:
+- `research/issue37-causal-set-estimator-bridge-20261126`, `research/issue37-causal-map-screen-20261126`, `research/issue37-uipt-feasibility-20261126`, `research/uipt-local-sampler-review-20261126`, `research/type-ii-multigraph-s0-20261126`, and `research/issue37-joint-profile-20261127` have zero commits ahead of Main.
+- The historical Poisson-slab and spatial-reference branches are divergent because their feature commits were squash-integrated and later amended by PR #98. Their remaining blob differences are older versions of files now present on Main; no unintegrated implementation was found and no cherry-pick is warranted.
+- No queued or running workflow was cancelled or rerun.
+
+### PR #98 — integrated engineering result
+
+PR #98 added complete tied minimum-common-future witness enumeration and a project-defined spatial-side censor for the explicit rectangular (2+1)-Minkowski slab. It retains a pair iff at least one *global* minimum-volume witness is side-safe. A safe higher-volume candidate cannot rescue an unsafe global minimum. Equality (m(c)=t_c) is retained because the strict timelike past cone is open.
+
+The earlier complex-input defect is fixed in Main: `_real_binary64_coordinates` rejects complex dtypes and object arrays containing complex scalars before `float64` conversion. Regression tests cover both public coordinate APIs and both input forms. The exact finite rule and tangent case have deterministic fixtures. This is an AI-mediated later-pass engineering review, not external scientific peer review: [review #6091690473](https://github.com/shaden7/emergence-lab/pull/98#pullrequestreview-6091690473).
+
+Validation on exact PR head `7542fdf...` and merged Main:
+- Push CI [46043255333](https://github.com/shaden7/emergence-lab/actions/runs/46043255333): completed-success; review record reports 1,115 tests + 65 subtests.
+- PR CI [46043259225](https://github.com/shaden7/emergence-lab/actions/runs/46043259225): completed-success; review record reports 1,115 tests + 65 subtests.
+- Post-merge Main CI [46044173530](https://github.com/shaden7/emergence-lab/actions/runs/46044173530): completed-success on exact Main `c38d89c...`; every job step completed successfully except the preregistered study gates, which were correctly skipped.
+
+Post-merge artifact [15221363606](https://github.com/shaden7/emergence-lab/actions/runs/46044173530/artifacts/15221363606): 55 entries, 12 JSON manifests, 371,833 bytes; SHA-256 `a7f92a80810f7ec1dee891c2c726b0dfad8b84b712c741c2554064d3728d07eb`. The archive was downloaded and inspected in this session. All 12 manifests pin Main `c38d89c...`. Pilot B `result.json` / `rows.csv` and D1 `result.json` / `ball_counts.csv` are byte-identical within their respective repeat pairs.
+
+The artifact remains engineering/calibration-only: CS0 reports `mode=engineering` and `study_authorized=false`; Pilot B is `phase=dev`; S1b and SE-audit manifests contain empty seed lists. Optional M4, finite-size and other preregistered study gates were skipped. These are engineering/provenance observations, not Issue-37 target measurements.
+
+### Integrated geometry dependency chain
+
+- PR #95: separate self-inclusive disconnected reversible-walk kernel.
+- PR #96: bounded exact order-theoretic ESV spatial-geometry oracle ((N\leq256)).
+- PR #97: explicit project-owned rectangular (2+1)-Minkowski slab with an unconditioned Poisson count draw using (ho\,\mathrm{Vol}(M)), exact strict order on represented binary64 coordinates, and a 256-element cap.
+- PR #98: tied-witness enumeration and spatial-side censor before Dijkstra path minimization.
+
+The PR #98 censor corrects only spatial side clipping. Still absent or uncalibrated: scalable bitset/CSR suspended-volume calculation; SWB/SIL acceleration against unrestricted Dijkstra; stochastic minimal-antichain generation and its boundary hugging; future-boundary convention; central-root selection; uncensored-pair fraction; continuum-distance error; discrete-asymptotic-silence and mesoscopic windows; and spatial-neighbour / (d_H^{\mathrm{eff}}) calibration. The dense oracle is not a production-scale solver and the slab is not an exact reconstruction of the paper's underspecified finite 3D coordinate patch.
+
+### Issue #37 acceptance criterion — interpretation remains open
+
+The issue body requires the same scale-dependent behaviour in at least two model classes and at least two independently calibrated estimators. It does **not** explicitly say that both estimators must estimate one identical scalar. However, (d_H) and (d_s) are different exponents and must never be described as two estimates of one (D). PR #94's joint ((d_H,d_s)) proposal is a vector profile; its current primary cross-model test is the (d_s) transport trend, with (d_H) as a companion. A (d_s)-only result would support at most a *transport-channel-specific* statement, not full two-channel robustness.
+
+Conservative operational recommendation (not yet an amendment or acceptance decision): calibrate both geometry and transport channels separately on known-answer controls in each model class; preregister within-model scale-flow statistics relative to each model's own admissible IR anchor; report paired covariance where both channels share a realization; and require the same predeclared qualitative UV trend in both channels and both model classes for the full **ROBUST** label. If only (d_s) exhibits the trend, report it narrowly as transport-channel robustness; if channels disagree, treat that as estimator/observable dependence; if power or scale windows are inadequate, retain **UNDECIDABLE**. Do not compare raw (d_H) and (d_s) values or assume a one-to-one conversion between causal-set and UIPT scales.
+
+No target seeds, target maps, S2, scientific acceptance, deployment, paid APIs, Lightsail or EatSleepFeel operation occurred.
+
+**Next single informative step:** settle and freeze the two-channel versus transport-only acceptance rule on Issue #37 before any target seed or map is drawn. Then design the smallest calibration/power experiment that can falsify the selected rule under the existing CPU/memory ceilings.
+
+---
+
 ## Research Director handoff — PR #96 spatial reference integrated (2026-11-27T09:46:23.282Z)
 
 **Main code commit:** `25e77cc3f99bd406f6070c91858ee52111fe4914` (squash merge of [PR #96](https://github.com/shaden7/emergence-lab/pull/96)); expected PR head `26d6017755e93264c39ce72b54bfa4af888e7777`. The merge used an expected-head guard. Main branch metadata reported `protected=false`; no branch-protection bypass was attempted.

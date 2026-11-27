@@ -71,7 +71,7 @@ The predistance need not satisfy the triangle inequality. For a meso-cutoff \(\e
 
 The implementation in `src/emergence_lab/causal_set_spatial.py` is deliberately a **full-path reference oracle** using Dijkstra. It does not implement ESV's SWB/SIL search-space accelerations. A later optimized implementation must be checked against this unrestricted reference on small posets before being used at larger sizes.
 
-## Witness enumeration and side-boundary censor (PR #98 candidate)
+## Witness enumeration and side-boundary censor (PR #98 merged)
 
 The minimum in \(V(a,b)\) is over a finite set and the integer-valued \(N(c)\) can have multiple minimizers. Let
 
@@ -93,7 +93,7 @@ A pair is retained by the side-boundary censor iff at least one global minimizer
 
 This is equivalent to requiring that the minimum over side-safe common-future candidates equal the unrestricted minimum. An unsafe minimizer tied with a safe minimizer does not change the minimum; a safe candidate with strictly larger \(N(c)\) cannot rescue an unsafe global minimum. The rule is invariant under vertex relabeling and avoids arbitrary first/last-witness selection.
 
-The candidate API is minimum_common_future_witnesses plus side_boundary_censor_mask. The latter verifies that the supplied relation exactly matches the strict Minkowski order of the embedded binary64 points, uses rational comparisons for the margin, and returns a symmetric mask in sorted-antichain order. spatial_distance_matrix(..., pair_mask=...) excludes censored pairs as direct edges before Dijkstra. Both public coordinate APIs accept real-valued coordinates only: complex arrays and object arrays containing complex scalars are rejected before float64 conversion, avoiding silent loss of imaginary components. The equality case m(c)=t_c is safe because the strict timelike past cone is open; only null-boundary points touch the side.
+The API is minimum_common_future_witnesses plus side_boundary_censor_mask. The latter verifies that the supplied relation exactly matches the strict Minkowski order of the embedded binary64 points, uses rational comparisons for the margin, and returns a symmetric mask in sorted-antichain order. spatial_distance_matrix(..., pair_mask=...) excludes censored pairs as direct edges before Dijkstra. Both public coordinate APIs accept real-valued coordinates only: complex arrays and object arrays containing complex scalars are rejected before float64 conversion, avoiding silent loss of imaginary components. The equality case m(c)=t_c is safe because the strict timelike past cone is open; only null-boundary points touch the side.
 
 The sampler also rejects time/side extents whose required interior or centered half-width cannot be represented exactly in binary64 and clamps generated coordinates below each half-open upper boundary.
 
@@ -130,14 +130,15 @@ Do not conflate the two scales: (d_m) is the strict (widetilde d < d_m) cutoff i
 
 - PR #96 merged by squash as `25e77cc3f99bd406f6070c91858ee52111fe4914` with expected head `26d6017755e93264c39ce72b54bfa4af888e7777`.
 - PR #97 merged by squash as `2c545636a664ce7605d4aa5b018c8c8aac0adadd` with expected head `35c0c191f482b77b2bc4a92f251f57e381df1cc7`; exact-head push/PR CI each passed 1,099 tests + 65 subtests, and post-merge Main CI passed. The Main artifact has 55 files / 12 manifests, all pinning the merge commit; SHA-256 `c61448d85ca966f3c37910b042c21042742bc80ccdc455d8307da18f1c94c6a9`.
-- PR #98 is a design/engineering candidate; its merge gates are exact-head CI, later-pass review and post-merge Main CI. It does not authorize target data.
+- PR #98 merged by squash as `c38d89c3127cea6cc9563870f5b5cd33276ff868` with expected head `7542fdfac1df56fa891aef9bfaaed9f78c932847`. Later-pass engineering review [#6091690473](https://github.com/shaden7/emergence-lab/pull/98#pullrequestreview-6091690473), exact-head push CI [46043255333](https://github.com/shaden7/emergence-lab/actions/runs/46043255333), exact-head PR CI [46043259225](https://github.com/shaden7/emergence-lab/actions/runs/46043259225), and post-merge Main CI [46044173530](https://github.com/shaden7/emergence-lab/actions/runs/46044173530) completed-success. The downloaded Main artifact [15221363606](https://github.com/shaden7/emergence-lab/actions/runs/46044173530/artifacts/15221363606) has 55 files / 12 manifests, all pinning Main; SHA-256 `a7f92a80810f7ec1dee891c2c726b0dfad8b84b712c741c2554064d3728d07eb`. These are engineering/provenance checks, not target measurements.
+- PR #98 is integrated; its deterministic fixtures and CI validate only the bounded engineering contract. It does not authorize target data.
 
 ## Evidence classification
 
 - **Mathematical fact:** minimal elements of a finite poset form an inextendible antichain; Dijkstra computes the minimum path sum for nonnegative edge weights.
 - **Literature definition:** the exclusive suspended count, minimum-common-future predistance and meso-cutoff path metric above.
 - **Engineering observation (merged code):** PR #97's 1,099-test + 65-subtest CI passed on exact push, PR merge-ref and post-merge Main runs. The downloaded Main artifact contains 55 files and 12 manifests; all manifests pin the exact merge commit. These checks validate implementation and provenance, not continuum geometry.
-- **Candidate engineering observations (PR #98):** exact small embedded fixtures exhibit (i) two tied global minimizers with one safe and one unsafe witness, and (ii) an unsafe global minimum with a safe but higher-volume candidate. The rule retains the first pair and censors the second; these are deterministic controls, not target measurements.
+- **Deterministic engineering observations from merged PR #98:** exact small embedded fixtures exhibit (i) two tied global minimizers with one safe and one unsafe witness, and (ii) an unsafe global minimum with a safe but higher-volume candidate. The rule retains the first pair and censors the second; these are deterministic controls, not target measurements.
 - **Not established:** that a generated antichain hugs the intended continuum boundary, that the distance converges to the continuum metric for a selected finite region, or that any UV dimensional reduction is robust.
 
 Issue #37 remains **UNDECIDABLE** until the model-specific calibration, independent graph-level uncertainty/power plan, criterion settlement, preregistration and separate authorization are complete.
