@@ -1,5 +1,3 @@
-## Research Director handoff — PR #95 self-inclusive kernel integration (2026-11-27T05:42:45Z)
-
 ## Research Director handoff — PR #96 spatial reference integrated (2026-11-27T09:46:23.282Z)
 
 **Main code commit:** `25e77cc3f99bd406f6070c91858ee52111fe4914` (squash merge of [PR #96](https://github.com/shaden7/emergence-lab/pull/96)); expected PR head `26d6017755e93264c39ce72b54bfa4af888e7777`. The merge used an expected-head guard. Main branch metadata reported `protected=false`; no branch-protection bypass was attempted.
@@ -35,6 +33,7 @@ Next: recover and freeze the exact finite 2+1 Minkowski region and boundary/cens
 
 ---
 
+## Research Director handoff — PR #95 self-inclusive kernel integration (2026-11-27T05:42:45Z)
 
 **Main code commit:** `b153fd3373b8599cdf691ddf477645d42e023e0b` (squash merge of PR #95). **Previous Main:** `23725d74e5ff2ffbfeba223cf750c8436d558a16`. **PR head:** `c00ef9ea3b6ee05df3c34f065a235ba21fab18bb`.
 
