@@ -192,3 +192,53 @@ def test_geometry_is_invariant_under_vertex_relabeling():
         relabelled_distance, original_distance[np.ix_(order, order)],
         rtol=0.0, atol=1e-14,
     )
+
+
+
+def test_minimum_common_future_witnesses_returns_all_tied_minimizers():
+    relation = _closure(
+        5,
+        [
+            (0, 2),  # predecessor of both common-future candidates, but not common future
+            (0, 3), (1, 3), (2, 3),
+            (0, 4), (1, 4), (2, 4),
+        ],
+    )
+    witnesses = spatial.minimum_common_future_witnesses(relation, [0, 1])
+    assert witnesses[(0, 1)] == (3, 4)
+    assert spatial.predistance_matrix(relation, [0, 1])[0, 1] > 0.0
+
+
+def test_minimum_common_future_witnesses_reports_empty_common_future():
+    relation = _closure(4, [(0, 1), (2, 3)])
+    assert spatial.minimum_common_future_witnesses(relation, [0, 2])[(0, 2)] == ()
+
+
+def test_spatial_distance_pair_mask_excludes_direct_edges_before_dijkstra():
+    relation = _closure(3, [(0, 2), (1, 2)])
+    allowed = np.eye(2, dtype=np.bool_)
+    distance = spatial.spatial_distance_matrix(
+        relation, meso_cutoff=1.0, pair_mask=allowed
+    )
+    assert distance[0, 1] == math.inf
+    assert np.array_equal(np.diag(distance), np.zeros(2))
+
+
+def test_spatial_distance_pair_mask_validation():
+    relation = _closure(3, [(0, 2), (1, 2)])
+    with pytest.raises(TypeError, match="boolean"):
+        spatial.spatial_distance_matrix(
+            relation, meso_cutoff=1.0, pair_mask=np.ones((2, 2), dtype=np.int8)
+        )
+    with pytest.raises(ValueError, match="symmetric"):
+        spatial.spatial_distance_matrix(
+            relation,
+            meso_cutoff=1.0,
+            pair_mask=np.array([[True, True], [False, True]], dtype=bool),
+        )
+    with pytest.raises(ValueError, match="diagonal"):
+        spatial.spatial_distance_matrix(
+            relation,
+            meso_cutoff=1.0,
+            pair_mask=np.array([[False, False], [False, True]], dtype=bool),
+        )
