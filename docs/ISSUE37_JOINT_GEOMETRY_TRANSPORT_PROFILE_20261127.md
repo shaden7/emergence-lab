@@ -35,9 +35,13 @@ Use the **spatial-hypersurface diffusion** construction of Eichhorn, Surya and V
   The published walk includes \(e\) itself and chooses uniformly from \(\mathcal N_c(e)\), so \(P(e,e')=1/|\mathcal N_c(e)|\). The effective graph has variable degree and can split into small disconnected islands.
 - The paper is explicitly **kinematical**: it averages sprinklings into flat \(\mathbb M^3\), not the causal-set path integral. The flat \(2+1\) background, antichain choice, and dimension-dependent distance reconstruction are assumptions, not emergent results.
 
-The published geometry channel is the scaling of the spatial-neighbour count with \(d_c\), \(\overline{|\mathcal N_c|}\sim d_c^{d_H}\), above the discrete-asymptotic-silence scale. The published transport channel is the return probability of the self-inclusive, variable-degree walk, with \(d_s(\sigma)=-2\,d\ln P_r/d\ln\sigma\).
+The published geometry channel is the scaling of the spatial-neighbour count with \(d_c\), \(\overline{|\mathcal N_c|}\sim d_c^{d_H}\), above the discrete-asymptotic-silence scale. For a project estimate, define \(\bar n(d_c)\) as the mean of \(|\mathcal N_c(e)|\) over uniformly sampled antichain roots and use a local slope such as \(\log_2[\bar n(2d_c)/\bar n(d_c)]\). This is not the same metric observable as UIPT graph-hop ball growth; report the two geometry channels separately.
 
-Eichhorn–Surya–Versteegen report \(d_H=2\) behaviour at intermediate spatial scales and numerical indications of small-scale spectral reduction. They also explicitly identify disconnected islands and finite-antichain boundary equilibration as limitations. The limit \(d_c\to0\), where every vertex is isolated and \(d_s=0\), is a **degenerate no-transport limit**, not by itself evidence for a nontrivial ultraviolet scaling regime.
+The published transport channel is the return probability of the self-inclusive, variable-degree walk. The paper uses the finite-difference estimator in its Eq. (10), with smoothing span \(n=2\) or \(3\), rather than the dyadic slope below. A project dyadic slope is a common analysis convention, not an exact reproduction of the published estimator; retain the paper's \(n=2,3\) formula as a sensitivity / replication arm.
+
+The published numerical design used ten \(2+1\)-Minkowski sprinklings with about 1,600 antichain elements each, 30 starting points per antichain, and up to \(7\\cdot10^4\) walks per start. A roughly 5% drop in mean neighbour count was used to flag finite-boundary onset. The paper reports a plateau near \(d_s=2\) for \(d_c\\approx5.9\) and \(7.9\), while \(d_c\\approx3.5\) has no plateau and its walkers equilibrate on small islands; \(d_c\\approx9.8\) reaches the finite-boundary cutoff by \(\sigma\\approx7\). These are published finite-sample observations, not new project measurements or asymptotic theorems.
+
+The regular-lattice control in the same paper is important: below one lattice spacing the graph consists of singleton islands and \(d_s=0\); at the lattice spacing it becomes connected and the intermediate-time value is \(d_s=2\). The limit \(d_c\\to0\), where every vertex is isolated and \(d_s=0\), is therefore a **degenerate no-transport limit**, not by itself evidence for a nontrivial ultraviolet scaling regime. The causal-set IR reference for a future finite study must be a predeclared boundary-free, continuum-like plateau (if one exists), not the thermodynamic limit of this finite antichain.
 
 The 2026 Boguña–Krioukov finite-cone link-statistics preprint concerns full-Hasse link sampling. It does **not** directly derive a bias for this spatial-hypersurface operator. It is an additional reason not to substitute an unqualified full-Hasse walk for the selected finite-neighbour spatial operator.
 
@@ -63,16 +67,19 @@ The two components are reported separately for each model.
 
 ### Geometry: volume growth
 
-For a metric ball-volume observable \(\overline V_M(r)\), define a local dyadic slope
+Use separate local slopes for the two metric observables:
 
 \[
-d_H^{\mathrm{eff}}(r)=\log_2\frac{\overline V_M(2r)}{\overline V_M(r)}.
+d_{H,\mathrm{UIPT}}^{\mathrm{eff}}(r)=
+\log_2\frac{\overline B(2r)}{\overline B(r)},
+\qquad
+d_{H,\mathrm{CS}}^{\mathrm{eff}}(d_c)=
+\log_2\frac{\bar n(2d_c)}{\bar n(d_c)}.
 \]
 
-- On UIPT, \(\overline V_M(r)\) is the mean graph-ball cardinality under the frozen root law.
-- On the causal-set antichain, use the induced spatial metric and report the neighbour-count / spatial-ball growth as a function of \(d_c\). Do not silently substitute graph-hop distance for the published induced spatial distance.
-- The causal-set distance formula uses the assumed \(2+1\)-dimensional flat background and \(\zeta_3\). Its \(d_H\) channel is therefore a kinematical geometry control, not an independent derivation of spatial dimension.
-- Existing D2 calibration on CAY/UST does not automatically validate either new model. UIPT graph-ball growth is closest to D2's observable; the causal-set induced-distance count needs its own exact controls and a reviewed transfer argument.
+Here \(\overline B(r)\) is the mean Type-II graph-ball cardinality under the frozen root law, while \(\bar n(d_c)\) is the causal-set spatial-neighbour count defined above. They are both volume-growth channels, but use different intrinsic metrics and scale parameters; do not identify their axes or pool their raw values.
+
+The causal-set distance formula uses the assumed \(2+1\)-dimensional flat background and \(\zeta_3\). Its \(d_H\) channel is therefore a kinematical geometry control, not an independent derivation of spatial dimension. Existing D2 calibration on CAY/UST does not automatically validate either new model. UIPT graph-ball growth is closest to D2's observable; the causal-set induced-distance count needs its own exact controls and a reviewed transfer argument.
 
 ### Transport: return probability
 
@@ -82,13 +89,13 @@ For the specified reversible walk, let \(Q_M(s)\) be the root-averaged return pr
 d_s^{\mathrm{eff}}(s)=-2\log_2\frac{Q_M(2s)}{Q_M(s)}.
 \]
 
-For UIPT, use even physical times to avoid bipartite parity effects and preserve the Type-II half-edge multiplicity. For the causal-set spatial walk, retain the published self-inclusive transition rule as the primary replication target; also preregister any loop-free or constant-laziness variant as a **different operator**, not a silent implementation change.
+For UIPT, use even physical times to avoid bipartite parity effects and preserve the Type-II half-edge multiplicity. For the causal-set spatial walk, retain the published self-inclusive transition rule as the primary replication target; also preregister any loop-free or constant-laziness variant as a **different operator**, not a silent implementation change. The common dyadic slope is a proposed cross-model analysis convention; reproduce the paper's Eq. (10) with \(n=2,3\) separately so that the published finite-difference choice is not silently replaced.
 
 The current S0 kernel rejects self-loops and disconnected graphs. It cannot be applied unchanged to the causal-set spatial graph. A separate reversible-kernel path must support self-inclusive transitions, variable stationary weights, disconnected components, and component-specific stationary floors. For the published causal-set transition rule, the stationary weight within a component is proportional to \(|\mathcal N_c(e)|\). Singleton components have return probability one and stationary floor one; they must be classified as **trapped / no admissible scaling window**, not converted into a positive dimension estimate.
 
 ## What counts as a cross-model result
 
-The common question is whether the **transport** component \(d_s^{\mathrm{eff}}\) decreases toward the ultraviolet relative to each model's own infrared reference. The geometry component \(d_H^{\mathrm{eff}}\) is a separately calibrated companion that shows whether transport changes while geometric volume growth remains stable; it is not a second vote for the same scalar.
+The common question is whether the **transport** component \(d_s^{\mathrm{eff}}\) decreases toward the ultraviolet relative to each model's own infrared reference. For the finite causal-set sprinkling, that reference means a predeclared continuum-like plateau inside a boundary-free window (the published (d_c\approx5.9,7.9) plateaux are literature observations, not project tolerances); if no such window exists, no UV comparison is made. For UIPT, (d_s=2) is an asymptotic theorem anchor, while finite-time convergence to it must be calibrated. The geometry component \(d_H^{\mathrm{eff}}\) is a separately calibrated companion that shows whether transport changes while geometric volume growth remains stable; it is not a second vote for the same scalar.
 
 - **Robust within these two model classes:** both model families show a predeclared, statistically resolved ultraviolet decrease in \(d_s^{\mathrm{eff}}\) relative to their own infrared reference, in non-degenerate windows, and the result survives each model's finite-size, boundary, root-law and operator/cutoff controls. Report the two geometry profiles alongside it. Do not require the raw \(d_H\) and \(d_s\) values to agree.
 - **Model-/estimator-dependent:** the decrease appears only in one model family, only for one operator or cutoff convention, or disappears when island trapping, finite-volume equilibration, or boundary effects are excluded. Distinguish a model-specific effect from an estimator artifact; they are not synonyms.
@@ -107,7 +114,7 @@ Do not identify \(d_c\) with \(r\), \(\sigma\) with \(s\), or set \(r=\sqrt{s}\)
 
 ## Calibration, uncertainty and controls
 
-1. **Causal-set exact controls:** small antichains with explicit induced-distance matrices; a regular 2D lattice with the same self-inclusive transition convention; exact dense transition-matrix return probabilities; singleton, disconnected-island and finite-boundary adversaries. Check the spatial-volume count against exact lattice balls. Preserve all isolated vertices in the primary record.
+1. **Causal-set exact controls:** small antichains with explicit induced-distance matrices; a regular 2D lattice with the same self-inclusive transition convention (including the published threshold control: singleton islands below one lattice spacing, connected walk at the spacing); exact dense transition-matrix return probabilities; singleton, disconnected-island and finite-boundary adversaries. Check the spatial-volume count against exact lattice balls. Preserve all isolated vertices in the primary record.
 2. **UIPT exact controls:** retain the existing small Type-II multigraph dense-oracle tests; add deterministic finite-map ball-count oracles and root-reweight tests. The exact local sampler must be checked against its peeling transition probabilities, 2-gon closure convention and adaptive-boundary invariance.
 3. **Root and replicate structure:** independent sprinklings / independent UIPT maps are the graph-level units. Roots and walkers are nested measurements, not independent graph replicates. Report graph-level uncertainty, within-graph source variation, and the paired covariance of geometry and transport measurements on the same map.
 4. **Finite-size windows:** for causal sets, preregister the \(d_c,d_m,\sigma\) grid, the 5% boundary-loss check (or a stricter calibrated alternative), component-size distribution, stationary floors and a minimum admissible scaling-window rule. For UIPT, preregister local radius, complete endpoint-degree requirements, root weights, finite-map/boundary censoring, and a graph-level power calculation.
