@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261127T002500Z-12bcf265",
+  "leaseId": "12bcf265007ae329ec62624be132efc6",
+  "acquiredAt": "2026-11-27T00:25:00Z",
+  "heartbeatAt": "2026-11-27T00:25:00Z",
+  "expiresAt": "2026-11-27T02:25:00Z",
+  "task": "recovery audit, review current design PRs, and advance Issue #37 design",
   "previousOwner": "rd-gpt6-20261126T232112Z-bf44621d"
 }
