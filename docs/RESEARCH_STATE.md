@@ -1,3 +1,43 @@
+## Research Director handoff — PR #93 artifact provenance repair and Issue #37 design audit (2026-11-27T00:43:00Z)
+
+**Main HEAD:** `3fe672262f119209c98482ede615733fd27a6dbf`.
+
+### Recovery and branch audit
+
+At entry Main was `decac131e3b0fd5ca47e2dd22cb7234ad391dbe0`, there were no open PRs, and Issue #37 was the only open issue. The preceding Main CI [45911110233](https://github.com/shaden7/emergence-lab/actions/runs/45911110233) had completed-success. Twenty relevant Issue #37 branches were compared with Main: 18 had zero commits ahead. The two historical branches with unique commit IDs were not actionable integration candidates: `research/cs0-supervisor-20261106` had only an old state-handoff commit ahead, while `research/causal-set-cs0-prereg-20261106` carried an obsolete preregistration blob; its current `causal_set_mm.py` and test blobs are identical to Main. No unique implementation was cherry-picked.
+
+### PR #93 — root artifact provenance repair
+
+[PR #93](https://github.com/shaden7/emergence-lab/pull/93) was reviewed PASS and merged with expected head `a54a355a834e49deed4f0d07e845d18b7a9ab22d` onto base `decac131e3b0fd5ca47e2dd22cb7234ad391dbe0`, producing Main merge commit `3fe672262f119209c98482ede615733fd27a6dbf`. The merge tree exactly equals the PR synthetic merge-candidate tree, and both changed-file blob SHAs on Main match the reviewed branch.
+
+**Root cause:** `src/emergence_lab/cli.py` already writes `os.getenv("GIT_SHA")` into the root smoke `manifest.json`; the corresponding `emergence-lab --config configs/smoke.json --output results` step in `.github/workflows/ci.yml` did not set `GIT_SHA`. PR #93 supplies `github.sha` to that step and adds a regression test that the CLI persists the supplied SHA.
+
+**Review scope:** same-session critical review, not a separate later-pass or external peer review. Review record: [PR #93 PASS](https://github.com/shaden7/emergence-lab/pull/93#issuecomment-7206549297). The follow-up records exact-head push completion: [PR #93 CI/artifact update](https://github.com/shaden7/emergence-lab/pull/93#issuecomment-7206582977).
+
+### Exact-head, PR and post-merge CI
+
+- Exact-head push CI [45916832582](https://github.com/shaden7/emergence-lab/actions/runs/45916832582): completed-success on `a54a355a834e49deed4f0d07e845d18b7a9ab22d`.
+- PR CI [45916855353](https://github.com/shaden7/emergence-lab/actions/runs/45916855353): completed-success; the run's candidate head is the same SHA and its synthetic merge tree equals the eventual Main merge tree.
+- Post-merge Main CI [45917338419](https://github.com/shaden7/emergence-lab/actions/runs/45917338419): completed-success on exact Main merge commit `3fe672262f119209c98482ede615733fd27a6dbf`. Pytest, CS0 engineering/recheck, container containment, S1b/SE-audit containment, Exact4, Pilot A/B development, D1 G0/G1, S1 P0 and S1 orchestration engineering smokes passed. Dispatch-only coverage and finite-size gates were skipped as intended.
+
+### Artifact provenance read-back
+
+All three archives were downloaded and inspected; each contains 55 entries and 12 root/component manifests. Every manifest's `commit` or `code_commit` field pins the commit actually checked out by that workflow.
+
+- Exact-head push artifact [15162622673](https://github.com/shaden7/emergence-lab/actions/runs/45916832582/artifacts/15162622673): 371,487 bytes; SHA-256 `eecd0c5a3edade9bd5da3c54256ac569c6005036f3960b3411778c4da7ccdb0b`; all 12 manifests pin candidate head `a54a355a834e49deed4f0d07e845d18b7a9ab22d`.
+- PR merge-ref artifact [15162688235](https://github.com/shaden7/emergence-lab/actions/runs/45916855353/artifacts/15162688235): 371,232 bytes; SHA-256 `ff8e14e940337bd5b95ecbd8431342a861bf5964fc0bd27eb1f121a0c755b507`; all 12 manifests pin synthetic merge commit `fbefe7986725a98a482cc3a6b5da2398dee91bd7`, matching the PR merge-candidate tree.
+- Post-merge Main artifact [15162574802](https://github.com/shaden7/emergence-lab/actions/runs/45917338419/artifacts/15162574802): 371,357 bytes; SHA-256 `1c88d412e5fca519ae2ce3b595952d1bddd2f2bc837282c2082bcec51ac52970`; all 12 manifests, including the aggregate root manifest, pin Main `3fe672262f119209c98482ede615733fd27a6dbf`.
+
+The previously reported root `commit=null` gap is therefore **fixed and verified on Main**. The aggregate manifest and the Pilot B `code_commit` fields both pin the exact checked-out commit. These are engineering/calibration artifacts, not Issue #37 target data.
+
+### Issue #37 design audit and decision
+
+The design-only comparability issue is recorded in [Issue #37 comment](https://github.com/shaden7/emergence-lab/issues/37#issuecomment-7206565387): causal-set MM and midpoint are distinct but paired/correlated estimators of continuum (D); Type-II UIPT volume growth (d_H) and spectral return (d_s) are different exponents, not two estimates of one scalar. Do not count them as two votes for one (D). The scale variables are not directly interchangeable, and the tree-derived causal map remains a transformation control rather than an independent generator.
+
+**Research decision:** Issue #37 remains **UNDECIDABLE**. No target seeds, target maps, new scientific measurements, full CS0 study, or S2 authorization occurred. The next step is design-only: settle whether the UIPT row is accepted as a joint geometry/transport profile or needs a second separately calibrated estimator of the same target quantity. No deployment, paid API, Lightsail, or EatSleepFeel operation occurred.
+
+---
+
 ## Post-merge handoff — PR #92 and exact Main CI (2026-11-26T23:26:59Z)
 
 **Main HEAD:** `8a9662e126fceb640efe11300594bacb0d6de9e4`.
