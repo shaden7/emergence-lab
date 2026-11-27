@@ -98,8 +98,10 @@ def test_self_inclusive_operation_budget_counts_all_transition_entries():
 
 def test_self_inclusive_memory_estimate_is_checked_before_kernel_construction():
     graph = _graph(2, [(0, 1)])
+    assert getattr(graph, "_csr", None) is None
     with pytest.raises(ValueError, match="memory"):
         SelfInclusiveKernel(graph, max_memory_bytes=1)
+    assert getattr(graph, "_csr", None) is None
 
 
 def test_self_inclusive_rejects_multigraph_and_malformed_adjacencies():
