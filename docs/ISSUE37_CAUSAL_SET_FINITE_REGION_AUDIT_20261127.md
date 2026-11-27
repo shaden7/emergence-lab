@@ -55,21 +55,21 @@ The strict Minkowski relation is evaluated exactly for the represented IEEE-754 
 
 The project-defined rectangular slab has timelike side boundaries and is not causally convex. The full minimal antichain can therefore include side-boundary-induced minimal elements; it must not be described as a uniformly sampled \(t=0\) slice.
 
-For a continuum-distance comparison, the exact geometry API now exposes **all tied minimizing common-future witnesses**, rather than selecting an arbitrary first witness. PR #98 implements the pair-level spatial-side censor: retain a pair only when at least one global minimum-volume witness has its entire past cone down to \\(t=0\\) inside the spatial rectangle:
+For a continuum-distance comparison, the exact geometry API now exposes **all tied minimizing common-future witnesses**, rather than selecting an arbitrary first witness. PR #98 implements the pair-level spatial-side censor: retain a pair only when at least one global minimum-volume witness has its entire past cone down to \(t=0\) inside the spatial rectangle:
 
-\\[
-\\exists c\\in W(a,b):
+\[
+\exists c\in W(a,b):
 m(c)=
-\\min\\!\\left(
-x+L_x/2,\\ L_x/2-x,
-y+L_y/2,\\ L_y/2-y
-\\right)
-\\geq t_c,
-\\]
+\min\!\left(
+x+L_x/2,\ L_x/2-x,
+y+L_y/2,\ L_y/2-y
+\right)
+\geq t_c,
+\]
 
-where \\(W(a,b)\\) is the set of all common-future witnesses attaining the unrestricted minimum suspended volume. A safe tied minimizer is sufficient; a safe candidate with strictly larger suspended volume cannot rescue an unsafe global minimum. The symmetric pair mask is applied to direct graph edges before Dijkstra path minimization. This corrects spatial-side clipping for the bounded reference only; it does not remove side-induced minimal elements from the sampled initial antichain or resolve the future boundary. Pairs with no common future in the finite slab remain censored as \\(+\\infty\\); no finite distance is imputed.
+where \(W(a,b)\) is the set of all common-future witnesses attaining the unrestricted minimum suspended volume. A safe tied minimizer is sufficient; a safe candidate with strictly larger suspended volume cannot rescue an unsafe global minimum. The symmetric pair mask is applied to direct graph edges before Dijkstra path minimization. This corrects spatial-side clipping for the bounded reference only; it does not remove side-induced minimal elements from the sampled initial antichain or resolve the future boundary. Pairs with no common future in the finite slab remain censored as \(+\infty\); no finite distance is imputed.
 
-Still to freeze before any target batch: the future boundary \\(t=T\\), central-root selection, and the minimum accepted uncensored-pair fraction.
+Still to freeze before any target batch: the future boundary \(t=T\), central-root selection, and the minimum accepted uncensored-pair fraction.
 
 Keep the two scales separate:
 - \(d_m\): strict path-edge rule \(\widetilde d<d_m\) in the spatial metric.
@@ -84,9 +84,9 @@ Keep the two scales separate:
 
 ## 5. Next discriminating work
 
-1. Freeze one explicit \\(T,L_x,L_y,\\rho\\), central-root rule, future-boundary policy, and minimum retained-pair fraction in a separate preregistration before drawing target seeds.
+1. Freeze one explicit \(T,L_x,L_y,\rho\), central-root rule, future-boundary policy, and minimum retained-pair fraction in a separate preregistration before drawing target seeds.
 2. Implement the stochastic minimal-antichain / root-selection layer and quantify boundary-induced minimal elements and the retained-pair fraction against predeclared acceptance limits.
 3. Only then implement a scalable bitset/CSR relation and SWB/SIL path routine, checking every small case against unrestricted Dijkstra.
-4. Connect the loop-free off-diagonal \\(d\\leq d_c\\) graph to the PR #95 self-inclusive kernel only after graph-level connectivity, power and resource gates pass.
+4. Connect the loop-free off-diagonal \(d\leq d_c\) graph to the PR #95 self-inclusive kernel only after graph-level connectivity, power and resource gates pass.
 
 No target seeds or maps were drawn for this change. Issue #37 remains **UNDECIDABLE**.
