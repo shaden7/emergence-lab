@@ -5,8 +5,10 @@ import pytest
 from emergence_lab.causal_set_mm import check_partial_order
 from emergence_lab.causal_set_spatial import (
     minimal_antichain,
+    minimum_common_future_witnesses,
     predistance_matrix,
     spatial_distance_matrix,
+    suspended_volumes,
 )
 from emergence_lab.causal_set_slab import (
     MAX_SLAB_ELEMENTS,
@@ -15,6 +17,7 @@ from emergence_lab.causal_set_slab import (
     minkowski_slab_causal_relation,
     minkowski_slab_volume,
     poisson_sprinkle_minkowski_slab,
+    side_boundary_censor_mask,
 )
 
 
@@ -281,3 +284,150 @@ def test_slab_relation_rejects_oversized_sized_input_before_array_conversion():
 
     with pytest.raises(ValueError, match="limited to N"):
         minkowski_slab_causal_relation(OversizedSequence())
+
+
+
+def _mixed_safe_unsafe_minimizer_fixture():
+    # For antichain pair (0, 7), witnesses 2 and 6 tie at V=1.
+    # Witness 2 is side-clipped; witness 6 is safe. The pair must be retained
+    # without choosing a witness by its arbitrary vertex index.
+    return np.array(
+        [
+            [0.41512569403879285, 3.347997377836343, 0.7167858080893694],
+            [7.3397917361079745, -4.090912161765893, 1.8755478700098998],
+            [11.958872634957238, 6.290149216477133, -6.958618907894124],
+            [5.717426491438222, -7.039629366675912, -13.142902247407664],
+            [10.64249926223192, -6.788792145618759, -9.46089575028697],
+            [1.8223630624294436, 2.097147214375184, 0.8269351893954653],
+            [7.81732640911207, 3.7510027118713722, 4.319114819943504],
+            [0.7747522947481045, 7.311049218825975, -0.46177947442382816],
+        ],
+        dtype=np.float64,
+    )
+
+
+def _unsafe_minimum_safe_higher_volume_fixture():
+    # For pair (5, 14), witness 2 is the unsafe global minimum (V=1).
+    # Element 13 is safe but has V=2, so it must not rescue the pair.
+    return np.array(
+        [
+            [8.302614569350215, 1.0020836258342634, 0.11589781566519619],
+            [7.828567801773363, -8.909068639968124, -1.4527672380367935],
+            [10.393171340501102, -3.895437190736663, 8.009697914295558],
+            [9.05455136502443, -5.390736008512942, -3.117008701066746],
+            [11.171410687623425, -10.875904224664968, 4.697105098908473],
+            [1.8688531975013767, -5.554186256112281, 3.794166049721131],
+            [2.1444969765136697, -14.494424424831235, 7.475025783743657],
+            [8.91063589422582, 9.854012311721732, 8.811429682301963],
+            [0.9887559627135776, -11.415516783808918, 13.578437911239835],
+            [1.8986709241640791, 5.020040067942116, -14.127728152688729],
+            [3.611807116163703, -2.806067927948847, -13.148209058708199],
+            [4.663035743448916, 6.645292572334842, 9.843540184511586],
+            [4.315609918838547, 0.4502184882108544, 4.16181143568334],
+            [11.21899866069256, 3.212443601932467, 0.7606826334606751],
+            [0.5471081168136003, 3.130920328106786, 3.517780824643328],
+        ],
+        dtype=np.float64,
+    )
+
+
+def test_side_boundary_censor_keeps_pair_with_one_safe_tied_minimizer():
+    points = _mixed_safe_unsafe_minimizer_fixture()
+    relation = minkowski_slab_causal_relation(points)
+    antichain = minimal_antichain(relation)
+    assert antichain.tolist() == [0, 1, 3, 7]
+
+    witnesses = minimum_common_future_witnesses(relation, antichain)
+    assert witnesses[(0, 7)] == (2, 6)
+    volumes = suspended_volumes(relation, antichain)
+    assert volumes[2] == volumes[6] == 1
+
+    mask = side_boundary_censor_mask(
+        points, relation, antichain,
+        time_extent=12.0, x_extent=30.0, y_extent=30.0,
+    )
+    # Antichain order is [0, 1, 3, 7], so pair (0, 7) is [0, 3].
+    assert mask[0, 3]
+    assert np.array_equal(mask, mask.T)
+    assert np.all(np.diag(mask))
+
+
+def test_side_boundary_censor_rejects_unsafe_minimum_even_with_safe_higher_candidate():
+    points = _unsafe_minimum_safe_higher_volume_fixture()
+    relation = minkowski_slab_causal_relation(points)
+    antichain = minimal_antichain(relation)
+    assert antichain.tolist() == [1, 5, 6, 8, 9, 10, 11, 14]
+
+    witnesses = minimum_common_future_witnesses(relation, antichain)
+    assert witnesses[(5, 14)] == (2,)
+    volumes = suspended_volumes(relation, antichain)
+    assert volumes[2] == 1
+    assert volumes[13] == 2  # safe, but not a global minimizer
+
+    mask = side_boundary_censor_mask(
+        points, relation, antichain,
+        time_extent=12.0, x_extent=30.0, y_extent=30.0,
+    )
+    # Pair (5, 14) occupies antichain positions (1, 7).
+    assert not mask[1, 7]
+
+
+def test_side_boundary_censor_is_invariant_under_vertex_relabeling():
+    points = _mixed_safe_unsafe_minimizer_fixture()
+    relation = minkowski_slab_causal_relation(points)
+    antichain = minimal_antichain(relation)
+    original = side_boundary_censor_mask(
+        points, relation, antichain,
+        time_extent=12.0, x_extent=30.0, y_extent=30.0,
+    )
+
+    permutation = np.array([5, 2, 7, 0, 6, 3, 1, 4])
+    inverse = np.empty_like(permutation)
+    inverse[permutation] = np.arange(permutation.size)
+    permuted_points = points[permutation]
+    permuted_relation = minkowski_slab_causal_relation(permuted_points)
+    permuted_antichain = minimal_antichain(permuted_relation)
+    mapped_antichain = inverse[antichain]
+    order = np.argsort(mapped_antichain)
+    permuted = side_boundary_censor_mask(
+        permuted_points, permuted_relation, permuted_antichain,
+        time_extent=12.0, x_extent=30.0, y_extent=30.0,
+    )
+    assert np.array_equal(permuted, original[np.ix_(order, order)])
+
+
+def test_side_boundary_censor_rejects_relation_not_matching_embedding():
+    points = _mixed_safe_unsafe_minimizer_fixture()
+    relation = minkowski_slab_causal_relation(points)
+    wrong = relation.copy()
+    wrong[0, 1] = True
+    with pytest.raises(ValueError, match="Minkowski relation"):
+        side_boundary_censor_mask(
+            points, wrong, time_extent=12.0, x_extent=30.0, y_extent=30.0
+        )
+
+
+def test_side_boundary_censor_rejects_points_outside_declared_slab():
+    points = _mixed_safe_unsafe_minimizer_fixture()
+    relation = minkowski_slab_causal_relation(points)
+    outside = points.copy()
+    outside[0, 1] = 15.0  # upper x boundary is excluded
+    with pytest.raises(ValueError, match="half-open slab"):
+        side_boundary_censor_mask(
+            outside, relation, time_extent=12.0, x_extent=30.0, y_extent=30.0
+        )
+
+
+def test_sampler_rejects_unrepresentable_half_extents_and_time_interior():
+    smallest = np.nextafter(0.0, 1.0)
+    base = dict(
+        density=1.0, time_extent=1.0, x_extent=1.0, y_extent=1.0
+    )
+    with pytest.raises(ValueError, match="half-extents"):
+        poisson_sprinkle_minkowski_slab(
+            np.random.default_rng(0), **{**base, "x_extent": smallest}
+        )
+    with pytest.raises(ValueError, match="positive coordinate"):
+        poisson_sprinkle_minkowski_slab(
+            np.random.default_rng(0), **{**base, "time_extent": smallest}
+        )
