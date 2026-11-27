@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261127T103026Z-20f85bee722e",
   "leaseId": "20f85bee722e972d74f61ce4a86abec4",
   "acquiredAt": "2026-11-27T10:30:26Z",
-  "heartbeatAt": "2026-11-27T10:30:26Z",
-  "expiresAt": "2026-11-27T12:30:26Z",
+  "heartbeatAt": "2026-11-27T10:52:39Z",
+  "expiresAt": "2026-11-27T12:52:39Z",
   "task": "audit Issue #37 branches and advance highest-value reproducible geometry work",
   "previousOwner": "rd-gpt6-20261127T093714Z-84dd2c4a0708"
 }
