@@ -259,3 +259,25 @@ def test_slab_relation_excludes_exact_null_pairs_and_keeps_strict_timelike_pairs
     relation = minkowski_slab_causal_relation(points)
     assert not relation[0, 1]  # exactly null: 5^2 == 3^2 + 4^2
     assert relation[0, 2]  # strictly timelike by one binary64 step
+
+
+
+def test_slab_volume_avoids_intermediate_overflow_and_underflow():
+    assert minkowski_slab_volume(
+        time_extent=1e308, x_extent=1e308, y_extent=1e-308
+    ) == pytest.approx(1e308)
+    assert minkowski_slab_volume(
+        time_extent=1e-308, x_extent=1e-308, y_extent=1e308
+    ) == pytest.approx(1e-308)
+
+
+def test_slab_relation_rejects_oversized_sized_input_before_array_conversion():
+    class OversizedSequence:
+        def __len__(self):
+            return MAX_SLAB_ELEMENTS + 1
+
+        def __array__(self, dtype=None):
+            raise AssertionError("oversized input must be rejected before conversion")
+
+    with pytest.raises(ValueError, match="limited to N"):
+        minkowski_slab_causal_relation(OversizedSequence())

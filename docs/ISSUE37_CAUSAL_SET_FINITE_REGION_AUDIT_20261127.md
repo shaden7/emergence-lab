@@ -47,6 +47,8 @@ The initial/past antichain is the set of all minimal elements of the resulting f
 
 The \(N\leq256\) allocation guard is a hard API limit shared with the dense exact spatial-geometry oracle: callers may choose a smaller \(max\_elements\), but cannot raise it above 256. The causal-relation API independently rejects more than 256 points before allocating its dense matrix. If the single sampled count exceeds the guard, the sampler raises PoissonDrawExceedsLimit with the realized count and allocates no coordinates. This is an explicit resource refusal, not a change to the Poisson law.
 
+The slab volume is also formed as an exact rational product of the represented binary64 extents before conversion to float, so a valid finite final volume is not rejected because an intermediate multiplication overflowed or underflowed. Sized list-like relation inputs above the cap are rejected before conversion to a temporary NumPy array.
+
 The strict Minkowski relation is evaluated exactly for the represented IEEE-754 binary64 coordinate values using rational arithmetic. This avoids overflow in coordinate differences and squares and preserves the strict exclusion of null-related pairs. It is exact for the stored binary64 points, not for unrounded ideal real-valued random coordinates. The bounded \(N\leq256\) cap keeps this exact pairwise reference calculation tractable.
 
 ## 3. Boundary and censoring rules still required before a target run

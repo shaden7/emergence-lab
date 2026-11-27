@@ -52,7 +52,15 @@ def minkowski_slab_volume(
     t = _positive_finite("time_extent", time_extent)
     lx = _positive_finite("x_extent", x_extent)
     ly = _positive_finite("y_extent", y_extent)
-    volume = t * lx * ly
+    exact_volume = (
+        Fraction.from_float(t)
+        * Fraction.from_float(lx)
+        * Fraction.from_float(ly)
+    )
+    try:
+        volume = float(exact_volume)
+    except OverflowError:
+        raise ValueError("slab volume must be finite and positive") from None
     if not math.isfinite(volume) or volume <= 0.0:
         raise ValueError("slab volume must be finite and positive")
     return volume
@@ -133,7 +141,23 @@ def minkowski_slab_causal_relation(points: np.ndarray) -> np.ndarray:
     compared pairwise. This avoids overflow in coordinate differences/squares
     and avoids rounding a near-null pair across the light cone. The dense
     relation is bounded by the same 256-element cap as the spatial oracle.
+    Sized inputs are rejected before conversion when they already exceed the
+    cap, avoiding an unnecessary large temporary array for list-like inputs.
     """
+    if isinstance(points, np.ndarray):
+        if points.ndim == 2 and points.shape[0] > MAX_SLAB_ELEMENTS:
+            raise ValueError(
+                f"exact slab relation is limited to N <= {MAX_SLAB_ELEMENTS}"
+            )
+    else:
+        try:
+            input_length = len(points)
+        except (TypeError, AttributeError):
+            input_length = None
+        if input_length is not None and input_length > MAX_SLAB_ELEMENTS:
+            raise ValueError(
+                f"exact slab relation is limited to N <= {MAX_SLAB_ELEMENTS}"
+            )
     coordinates = np.asarray(points, dtype=np.float64)
     if coordinates.ndim != 2 or coordinates.shape[1] != 3:
         raise ValueError("points must have shape (N, 3) in (t, x, y) order")
