@@ -1,8 +1,8 @@
 # Issue #37 — joint spatial geometry/transport profile
 
-**Status: design proposal only (2026-11-27).** No code, seeds, target samples, simulation, run authorization, or scientific acceptance result. This note resolves the estimator-semantics question left by the 2026-11-27 handoff; it does not change Issue #37's owner-proposed guiding question.
+**Status: design proposal only (2026-11-27).** No code, seeds, target samples, simulation, run authorization, or scientific acceptance result. This note proposes an operational resolution to the estimator-semantics question left by the 2026-11-27 handoff; it does not resolve or change Issue #37's owner-proposed acceptance criterion.
 
-## Decision
+## Proposed design choice
 
 Use a **joint spatial geometry/transport profile** as the comparison object:
 
