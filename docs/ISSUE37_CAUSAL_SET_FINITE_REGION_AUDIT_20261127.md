@@ -55,18 +55,21 @@ The strict Minkowski relation is evaluated exactly for the represented IEEE-754 
 
 The project-defined rectangular slab has timelike side boundaries and is not causally convex. The full minimal antichain can therefore include side-boundary-induced minimal elements; it must not be described as a uniformly sampled \(t=0\) slice.
 
-For a continuum-distance comparison, a future geometry API should expose the minimizing common-future witness \(c_*(a,b)\). A conservative pair-level side-boundary censor is then to retain a pair only when the entire past cone of that witness down to \(t=0\) lies inside the spatial rectangle:
+For a continuum-distance comparison, the exact geometry API now exposes **all tied minimizing common-future witnesses**, rather than selecting an arbitrary first witness. PR #98 implements the pair-level spatial-side censor: retain a pair only when at least one global minimum-volume witness has its entire past cone down to \\(t=0\\) inside the spatial rectangle:
 
-\[
-m(c_*)=
-\min\!\left(
-x_*+L_x/2,\ L_x/2-x_*,
-y_*+L_y/2,\ L_y/2-y_*
-\right)
-\geq t_*.
-\]
+\\[
+\\exists c\\in W(a,b):
+m(c)=
+\\min\\!\\left(
+x+L_x/2,\\ L_x/2-x,
+y+L_y/2,\\ L_y/2-y
+\\right)
+\\geq t_c,
+\\]
 
-This condition prevents the candidate's past-cone base from being clipped by a spatial side. It is not yet implemented: causal_set_spatial.py currently returns distances, not witness indices. Pairs with no common future in the finite slab remain censored as \(+\infty\), as in the exact reference; no finite distance is imputed. The future boundary \(t=T\), central-root selection, and the accepted uncensored-pair fraction must be frozen before any target batch.
+where \\(W(a,b)\\) is the set of all common-future witnesses attaining the unrestricted minimum suspended volume. A safe tied minimizer is sufficient; a safe candidate with strictly larger suspended volume cannot rescue an unsafe global minimum. The symmetric pair mask is applied to direct graph edges before Dijkstra path minimization. This corrects spatial-side clipping for the bounded reference only; it does not remove side-induced minimal elements from the sampled initial antichain or resolve the future boundary. Pairs with no common future in the finite slab remain censored as \\(+\\infty\\); no finite distance is imputed.
+
+Still to freeze before any target batch: the future boundary \\(t=T\\), central-root selection, and the minimum accepted uncensored-pair fraction.
 
 Keep the two scales separate:
 - \(d_m\): strict path-edge rule \(\widetilde d<d_m\) in the spatial metric.
@@ -75,16 +78,15 @@ Keep the two scales separate:
 ## 4. Evidence classification
 
 - **Mathematical facts:** the rectangular volume \(T L_x L_y\); the homogeneous Poisson count law; conditional iid-uniform coordinates; transitivity of the strict Minkowski timelike relation; and the finite-poset property of the set of minimal elements.
-- **Engineering observations:** deterministic tests of the one-draw Poisson implementation, coordinate bounds, strict partial-order validity and explicit resource refusal. These are unit tests, not target measurements.
+- **Engineering observations:** deterministic tests of the one-draw Poisson implementation, coordinate bounds, strict partial-order validity, explicit resource refusal, tied-witness enumeration and the PR #98 side-censor fixtures. These are unit tests, not target measurements.
 - **Hypotheses, not tested here:** that a sufficiently large central uncensored subset of the chosen slab recovers the flat Euclidean spatial distance at a mesoscale; that the resulting neighbour graph has a stable transport window.
 - **Not proved or established:** exact reproduction of the ESV finite patch, continuum convergence, dimensional reduction, cross-model robustness, or any Issue-37 conclusion.
 
 ## 5. Next discriminating work
 
-1. Add minimizing-witness indices to the exact geometry oracle without changing its distance outputs.
-2. Test the witness-based side-boundary censor on exact small posets and embedded-coordinate fixtures.
-3. Freeze one explicit \(T,L_x,L_y,\rho\), central-root rule, future-boundary policy, and minimum retained-pair fraction in a separate preregistration before drawing target seeds.
-4. Only then implement a scalable bitset/CSR relation and SWB/SIL path routine, checking every small case against unrestricted Dijkstra.
-5. Connect the loop-free off-diagonal \(d\leq d_c\) graph to the PR #95 self-inclusive kernel only after graph-level connectivity, power and resource gates pass.
+1. Freeze one explicit \\(T,L_x,L_y,\\rho\\), central-root rule, future-boundary policy, and minimum retained-pair fraction in a separate preregistration before drawing target seeds.
+2. Implement the stochastic minimal-antichain / root-selection layer and quantify boundary-induced minimal elements and the retained-pair fraction against predeclared acceptance limits.
+3. Only then implement a scalable bitset/CSR relation and SWB/SIL path routine, checking every small case against unrestricted Dijkstra.
+4. Connect the loop-free off-diagonal \\(d\\leq d_c\\) graph to the PR #95 self-inclusive kernel only after graph-level connectivity, power and resource gates pass.
 
 No target seeds or maps were drawn for this change. Issue #37 remains **UNDECIDABLE**.
