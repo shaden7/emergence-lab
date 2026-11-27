@@ -51,6 +51,25 @@ def _positive_finite(name: str, value: float) -> float:
     return result
 
 
+def _real_binary64_coordinates(points: np.ndarray) -> np.ndarray:
+    """Convert real-valued coordinates without silently discarding complex parts."""
+    raw = np.asarray(points)
+    if raw.dtype.kind == "c" or (
+        raw.dtype.kind == "O"
+        and any(
+            isinstance(value, (complex, np.complexfloating))
+            for value in raw.flat
+        )
+    ):
+        raise TypeError(
+            "points must contain real coordinates; complex values are not supported"
+        )
+    try:
+        return np.asarray(raw, dtype=np.float64)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise TypeError("points must contain real numeric coordinates") from exc
+
+
 def minkowski_slab_volume(
     *, time_extent: float, x_extent: float, y_extent: float
 ) -> float:
@@ -187,7 +206,7 @@ def minkowski_slab_causal_relation(points: np.ndarray) -> np.ndarray:
             raise ValueError(
                 f"exact slab relation is limited to N <= {MAX_SLAB_ELEMENTS}"
             )
-    coordinates = np.asarray(points, dtype=np.float64)
+    coordinates = _real_binary64_coordinates(points)
     if coordinates.ndim != 2 or coordinates.shape[1] != 3:
         raise ValueError("points must have shape (N, 3) in (t, x, y) order")
     if not np.all(np.isfinite(coordinates)):
@@ -269,7 +288,7 @@ def side_boundary_censor_mask(
                 f"exact slab censor is limited to N <= {MAX_SLAB_ELEMENTS}"
             )
 
-    coordinates = np.asarray(points, dtype=np.float64)
+    coordinates = _real_binary64_coordinates(points)
     if coordinates.ndim != 2 or coordinates.shape[1] != 3:
         raise ValueError("points must have shape (N, 3) in (t, x, y) order")
     if not np.all(np.isfinite(coordinates)):
