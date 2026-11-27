@@ -52,8 +52,8 @@ def minkowski_slab_volume(
     lx = _positive_finite("x_extent", x_extent)
     ly = _positive_finite("y_extent", y_extent)
     volume = t * lx * ly
-    if not math.isfinite(volume):
-        raise ValueError("slab volume must be finite")
+    if not math.isfinite(volume) or volume <= 0.0:
+        raise ValueError("slab volume must be finite and positive")
     return volume
 
 
@@ -65,8 +65,12 @@ def expected_poisson_count(
     mean = rho * minkowski_slab_volume(
         time_extent=time_extent, x_extent=x_extent, y_extent=y_extent
     )
-    if not math.isfinite(mean) or mean > np.iinfo(np.int64).max / 4:
-        raise ValueError("Poisson mean is too large for a safe integer count")
+    if (
+        not math.isfinite(mean)
+        or mean <= 0.0
+        or mean > np.iinfo(np.int64).max / 4
+    ):
+        raise ValueError("Poisson mean must be positive, finite and safe")
     return mean
 
 
