@@ -73,30 +73,31 @@ The implementation in `src/emergence_lab/causal_set_spatial.py` is deliberately 
 
 ## Witness enumeration and side-boundary censor (PR #98 candidate)
 
-The minimum in (V(a,b)) is over a finite set and the integer-valued (N(c)) can have multiple minimizers. Let
+The minimum in \(V(a,b)\) is over a finite set and the integer-valued \(N(c)\) can have multiple minimizers. Let
 
-[
-W(a,b)={cin F(a,b):N(c)=V(a,b)}.
-]
+\[
+W(a,b)=\{c\in F(a,b):N(c)=V(a,b)\}.
+\]
 
-The implementation exposes **all** members of (W(a,b)); it does not select the lowest array index or otherwise invent a geometric tie-break. For a point (c=(t,x,y)) in the project-defined slab, define its spatial side margin
+The implementation exposes **all** members of \(W(a,b)\); it does not select the lowest array index or otherwise invent a geometric tie-break. For a point \(c=(t,x,y)\) in the project-defined slab, define its spatial side margin
 
-[
-m(c)=min(x+L_x/2, L_x/2-x, y+L_y/2, L_y/2-y).
-]
+\[
+m(c)=\min(x+L_x/2,\ L_x/2-x,\ y+L_y/2,\ L_y/2-y).
+\]
 
 A pair is retained by the side-boundary censor iff at least one global minimizer is safe:
 
-[
-exists cin W(a,b):quad m(c)ge t.
-]
+\[
+\exists c\in W(a,b):\quad m(c)\ge t.
+\]
 
-This is equivalent to requiring that the minimum over side-safe common-future candidates equal the unrestricted minimum. An unsafe minimizer tied with a safe minimizer does not change the minimum; a safe candidate with strictly larger (N(c)) cannot rescue an unsafe global minimum. The rule is invariant under vertex relabeling and avoids arbitrary first/last-witness selection.
+This is equivalent to requiring that the minimum over side-safe common-future candidates equal the unrestricted minimum. An unsafe minimizer tied with a safe minimizer does not change the minimum; a safe candidate with strictly larger \(N(c)\) cannot rescue an unsafe global minimum. The rule is invariant under vertex relabeling and avoids arbitrary first/last-witness selection.
 
-The candidate API is `minimum_common_future_witnesses` plus `side_boundary_censor_mask`. The latter verifies that the supplied relation exactly matches the strict Minkowski order of the embedded binary64 points, uses rational comparisons for the margin, and returns a symmetric mask in sorted-antichain order. `spatial_distance_matrix(..., pair_mask=...)` excludes censored pairs as direct edges before Dijkstra.
-The sampler also rejects time/side extents whose required interior or centered half-width cannot be represented in binary64 and clamps generated coordinates below each half-open upper boundary.
+The candidate API is minimum_common_future_witnesses plus side_boundary_censor_mask. The latter verifies that the supplied relation exactly matches the strict Minkowski order of the embedded binary64 points, uses rational comparisons for the margin, and returns a symmetric mask in sorted-antichain order. spatial_distance_matrix(..., pair_mask=...) excludes censored pairs as direct edges before Dijkstra.
 
-**Scope limit:** this is only a spatial-side censor for the explicit flat rectangular slab. It does not correct the stochastic minimal-antichain layer, the future boundary (t=T), central-root selection, continuum discretization error, or finite-size effects. Those remain separate preregistration decisions. A no-common-future pair remains censored; zero-volume degeneracies remain explicit.
+The sampler also rejects time/side extents whose required interior or centered half-width cannot be represented exactly in binary64 and clamps generated coordinates below each half-open upper boundary.
+
+**Scope limit:** this is only a spatial-side censor for the explicit flat rectangular slab. It does not correct the stochastic minimal-antichain layer, the future boundary \(t=T\), central-root selection, continuum discretization error, or finite-size effects. Those remain separate preregistration decisions. A no-common-future pair remains censored; zero-volume degeneracies remain explicit.
 
 ## Implemented reference contract (merged on main)
 
