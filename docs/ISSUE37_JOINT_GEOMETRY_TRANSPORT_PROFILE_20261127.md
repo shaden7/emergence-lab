@@ -99,7 +99,7 @@ The common question is whether the **transport** component \(d_s^{\mathrm{eff}}\
 
 - **Robust within these two model classes:** both model families show a predeclared, statistically resolved ultraviolet decrease in \(d_s^{\mathrm{eff}}\) relative to their own infrared reference, in non-degenerate windows, and the result survives each model's finite-size, boundary, root-law and operator/cutoff controls. Report the two geometry profiles alongside it. Do not require the raw \(d_H\) and \(d_s\) values to agree.
 - **Model-/estimator-dependent:** the decrease appears only in one model family, only for one operator or cutoff convention, or disappears when island trapping, finite-volume equilibration, or boundary effects are excluded. Distinguish a model-specific effect from an estimator artifact; they are not synonyms.
-- **Undecidable:** no admissible common within-model scale window, inadequate graph-level replication/power, unbounded resource projection, or unresolved operator/root-law mismatch.
+- **Undecidable:** no admissible within-model scale window in one or both model families, inadequate graph-level replication/power, unbounded resource projection, or unresolved operator/root-law mismatch.
 
 This is an interpretation of Issue #37's “independently calibrated estimators” as **distinct operational geometry and transport estimators**, consistent with the adopted S1/C0 design. It does not satisfy a stricter reading that demands two independent estimators of the *same scalar* in each model family. If that stricter reading is adopted, Issue #37's criterion must be explicitly amended before any target run; pair-collision, heat-kernel trace, or a quenched re-aggregation of the same return data cannot fill that gap.
 
