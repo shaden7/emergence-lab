@@ -22,17 +22,17 @@ The previous proposed 2×2 pairing of causal-set Myrheim–Meyer / midpoint with
 
 Use the **spatial-hypersurface diffusion** construction of Eichhorn, Surya and Versteegen (2019), not a full-Hasse-graph walk.
 
-- Start with the paper's \(2+1\)-dimensional Minkowski sprinkling and a maximal / inextendible antichain \(\mathcal A\). Freeze the finite spacetime region, sprinkling count law (unconditioned Poisson versus fixed-\(N\) conditional Poisson), antichain extraction and boundary convention from the source paper. The current repository's \`causal_set_mm.sprinkle_diamond(n, 3, ...)\` draws exactly \(N\) i.i.d. uniform points in a 3D diamond (fixed-\(N\), i.e. Poisson conditioned on \(N\)) and \`causal_matrix\` constructs their order; neither extracts the required antichain nor constructs the induced spatial distance. Do not silently substitute a greedy maximal antichain or treat fixed-\(N\) sampling as an unconditioned Poisson process.
+- Start with the paper's \(2+1\)-dimensional Minkowski sprinkling and a maximal / inextendible antichain \(\mathcal A\). Freeze the finite spacetime region, sprinkling count law (unconditioned Poisson versus fixed-\(N\) conditional Poisson), antichain extraction and boundary convention from the source paper. The current repository's `causal_set_mm.sprinkle_diamond(n, 3, ...)` draws exactly \(N\) i.i.d. uniform points in a 3D diamond (fixed-\(N\), i.e. Poisson conditioned on \(N\)) and `causal_matrix` constructs their order; neither extracts the required antichain nor constructs the induced spatial distance. Do not silently substitute a greedy maximal antichain or treat fixed-\(N\) sampling as an unconditioned Poisson process.
 - For \(p,q\in\mathcal A\), let \(r_m(p,q)\in J^+(p)\cap J^+(q)\) minimize \(V(r)\), where \(V(r)\) is the order-count analogue of \(\operatorname{vol}(J^-(r)\cap J^+(\Sigma))\) above the antichain, with the paper's strict endpoint convention. The published flat-background predistance is
   \[
   \widetilde{\mathbf d}(p,q)=2\left(\frac{V(r_m(p,q))}{\zeta_3}\right)^{1/3},
   \]
-  followed by path minimisation over segments bounded by the paper's meso-scale \(\epsilon\) (called \(d_m\) in this project). Freeze the conversion and units explicitly.
+  followed by path minimisation over segments bounded by the paper's meso-scale \(\epsilon\) (called \(d_m\) in this project). Freeze the conversion and units explicitly. The direct predistance is not assumed to satisfy the triangle inequality; the segmented path construction is part of the metric definition.
 - For a spatial cutoff \(d_c\), define
   \[
   \mathcal N_c(e)=\{e'\in\mathcal A:\mathbf d(e,e')\le d_c\}.
   \]
-  The published walk includes \(e\) itself and chooses uniformly from \(\mathcal N_c(e)\), so \(P(e,e')=1/|\mathcal N_c(e)|\). The effective graph has variable degree and can split into small disconnected islands.
+  The published walk includes \(e\) itself and chooses uniformly from \(\mathcal N_c(e)\), so \(P(e,e')=1/|\mathcal N_c(e)|\). The effective graph has variable degree and can split into small disconnected islands. With (k_e=|\mathcal N_c(e)|) (counting the self-choice once), each component (C) has stationary law (pi_C(e)=k_e/\sum_{x\in C}k_x). A singleton component has return probability and stationary floor 1: it is trapped, not evidence for a non-degenerate zero-dimensional scaling regime.
 - The paper is explicitly **kinematical**: it averages sprinklings into flat \(\mathbb M^3\), not the causal-set path integral. The flat \(2+1\) background, antichain choice, and dimension-dependent distance reconstruction are assumptions, not emergent results.
 
 The published geometry channel is the scaling of the spatial-neighbour count with \(d_c\), \(\overline{|\mathcal N_c|}\sim d_c^{d_H}\), above the discrete-asymptotic-silence scale. For a project estimate, define \(\bar n(d_c)\) as the mean of \(|\mathcal N_c(e)|\) over uniformly sampled antichain roots and use a local slope such as \(\log_2[\bar n(2d_c)/\bar n(d_c)]\). This is not the same metric observable as UIPT graph-hop ball growth; report the two geometry channels separately.
@@ -141,7 +141,8 @@ No target seeds, target maps, full CS0 study, S2, deployment, paid API, or share
 
 ## Literature and repository basis
 
-- Eichhorn, Surya & Versteegen (2019), *Spectral dimension on spatial hypersurfaces in causal set quantum gravity*, https://arxiv.org/abs/1905.13498 — especially §§II–IV.
+- Eichhorn, Surya & Versteegen (2019a), *Induced spatial geometry from causal structure*, https://arxiv.org/abs/1809.06192 — the meso-scale induced spatial distance and minimum-volume common-future predistance.
+- Eichhorn, Surya & Versteegen (2019b), *Spectral dimension on spatial hypersurfaces in causal set quantum gravity*, https://arxiv.org/abs/1905.13498 — especially §§II–IV.
 - Angel (2003), *Growth and Percolation on the Uniform Infinite Planar Triangulation*, https://arxiv.org/abs/math/0208123 — especially §1.2.2, §2, equations (2.3)–(2.4), Theorem 1.10, and Theorem 1.2.
 - Gwynne & Miller (2017; revised 2020), *Random walk on random planar maps: spectral dimension, resistance, and displacement*, https://arxiv.org/abs/1711.00836 — Type-II model definition and Theorem 1.6.
 - Gwynne & Hutchcroft (2018), *Anomalous diffusion of random walk on random planar maps*, https://arxiv.org/abs/1807.01512 — Type-II UIPT displacement exponent, Theorem 1.1.
