@@ -1,6 +1,6 @@
 # Issue #37 — bounded causal-set spatial-geometry reference
 
-**Status: engineering references integrated; PR #98 carries the witness-aware side-boundary censor as a bounded engineering candidate (2026-11-27).** PR #96 was squash-merged as `25e77cc3f99bd406f6070c91858ee52111fe4914`; PR #97 added the bounded explicit Minkowski-slab Poisson sampler and was squash-merged as `2c545636a664ce7605d4aa5b018c8c8aac0adadd`. This remains engineering infrastructure, not a preregistration, target run, continuum-limit result, or scientific acceptance. Issue #37 remains **UNDECIDABLE**.
+**Status: PRs #96–#98 integrated; bounded engineering references only (2026-11-27).** PR #96 was squash-merged as `25e77cc3f99bd406f6070c91858ee52111fe4914`; PR #97 added the bounded explicit Minkowski-slab Poisson sampler and was squash-merged as `2c545636a664ce7605d4aa5b018c8c8aac0adadd`. This remains engineering infrastructure, not a preregistration, target run, continuum-limit result, or scientific acceptance. Issue #37 remains **UNDECIDABLE**.
 
 ## Why this step
 
