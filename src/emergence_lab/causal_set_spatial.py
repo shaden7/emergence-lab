@@ -171,6 +171,7 @@ def spatial_distance_matrix(
     *,
     meso_cutoff: float,
     spacetime_dimension: int = 3,
+    pair_mask: np.ndarray | None = None,
 ) -> np.ndarray:
     """Compute the full Eq. (31) path-minimized distance for small fixtures.
 
@@ -179,6 +180,11 @@ def spatial_distance_matrix(
     element.  This is the unrestricted full-path reference, not the paper's
     SWB/SIL acceleration.  Unreachable pairs are +inf.  Zero predistances
     remain zero; they are not silently regularized.
+
+    If pair_mask is supplied, it must be a symmetric boolean matrix in the
+    sorted initial-antichain order. False entries are excluded as direct graph
+    edges before path minimization; paths may still connect through other
+    allowed edges.
     """
     if (isinstance(meso_cutoff, (bool, np.bool_))
             or not isinstance(meso_cutoff, (int, float, np.integer, np.floating))
@@ -191,11 +197,24 @@ def spatial_distance_matrix(
         relation, a, spacetime_dimension
     )
     m = a.size
+    if pair_mask is None:
+        allowed_pairs = np.ones((m, m), dtype=np.bool_)
+    else:
+        allowed_pairs = np.asarray(pair_mask)
+        if allowed_pairs.dtype != np.bool_:
+            raise TypeError("pair_mask must be a boolean matrix")
+        if allowed_pairs.shape != (m, m):
+            raise ValueError("pair_mask must match the initial-antichain shape")
+        if not np.array_equal(allowed_pairs, allowed_pairs.T):
+            raise ValueError("pair_mask must be symmetric")
+        if not np.all(np.diag(allowed_pairs)):
+            raise ValueError("pair_mask diagonal must be true")
+
     adjacency: list[list[tuple[int, float]]] = [[] for _ in range(m)]
     for i in range(m):
         for j in range(i + 1, m):
             weight = float(pred[i, j])
-            if math.isfinite(weight) and weight < float(meso_cutoff):
+            if allowed_pairs[i, j] and math.isfinite(weight) and weight < float(meso_cutoff):
                 adjacency[i].append((j, weight))
                 adjacency[j].append((i, weight))
 
@@ -216,4 +235,42 @@ def spatial_distance_matrix(
                     heapq.heappush(queue, (candidate, neighbour))
         for target in range(source + 1, m):
             result[source, target] = result[target, source] = distances[target]
+    return result
+
+
+
+def minimum_common_future_witnesses(
+    prec: np.ndarray,
+    antichain: Iterable[int] | None = None,
+) -> dict[tuple[int, int], tuple[int, ...]]:
+    """Return every element attaining each pair's minimum common-future volume.
+
+    Keys are unordered pairs of original causal-set indices, ordered according
+    to the sorted initial antichain. Values contain *all* common-future elements
+    c that attain min |Fut(A) intersect Past(c)|. An empty tuple means that the
+    pair has no common future in this finite causal set.
+
+    No arbitrary index-based tie-break is applied: vertex indices are labels,
+    not a geometric preference. This is the exact witness set underlying
+    predistance_matrix; it does not change or replace the distance values.
+    """
+    relation = _validated_relation(prec)
+    a = _antichain_indices(relation, antichain)
+    future_of_a = np.any(relation[a, :], axis=0)
+    volumes = np.count_nonzero(relation[future_of_a, :], axis=0)
+
+    result: dict[tuple[int, int], tuple[int, ...]] = {}
+    for i in range(a.size):
+        row = relation[a[i], :]
+        for j in range(i + 1, a.size):
+            common_future = row & relation[a[j], :]
+            pair = (int(a[i]), int(a[j]))
+            if not np.any(common_future):
+                result[pair] = ()
+                continue
+            minimum_volume = int(np.min(volumes[common_future]))
+            minimizers = np.flatnonzero(
+                common_future & (volumes == minimum_volume)
+            )
+            result[pair] = tuple(int(index) for index in minimizers)
     return result
