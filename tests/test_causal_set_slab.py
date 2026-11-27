@@ -331,6 +331,20 @@ def _unsafe_minimum_safe_higher_volume_fixture():
     )
 
 
+
+
+
+def _side_margin(point, x_extent=30.0, y_extent=30.0):
+    t, x, y = point
+    margin = min(
+        x + x_extent / 2.0,
+        x_extent / 2.0 - x,
+        y + y_extent / 2.0,
+        y_extent / 2.0 - y,
+    )
+    return t, margin
+
+
 def test_side_boundary_censor_keeps_pair_with_one_safe_tied_minimizer():
     points = _mixed_safe_unsafe_minimizer_fixture()
     relation = minkowski_slab_causal_relation(points)
@@ -341,6 +355,10 @@ def test_side_boundary_censor_keeps_pair_with_one_safe_tied_minimizer():
     assert witnesses[(0, 7)] == (2, 6)
     volumes = suspended_volumes(relation, antichain)
     assert volumes[2] == volumes[6] == 1
+    t_unsafe, margin_unsafe = _side_margin(points[2])
+    t_safe, margin_safe = _side_margin(points[6])
+    assert margin_unsafe < t_unsafe
+    assert margin_safe >= t_safe
 
     mask = side_boundary_censor_mask(
         points, relation, antichain,
@@ -363,6 +381,10 @@ def test_side_boundary_censor_rejects_unsafe_minimum_even_with_safe_higher_candi
     volumes = suspended_volumes(relation, antichain)
     assert volumes[2] == 1
     assert volumes[13] == 2  # safe, but not a global minimizer
+    t_unsafe, margin_unsafe = _side_margin(points[2])
+    t_safe, margin_safe = _side_margin(points[13])
+    assert margin_unsafe < t_unsafe
+    assert margin_safe >= t_safe
 
     mask = side_boundary_censor_mask(
         points, relation, antichain,
