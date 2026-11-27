@@ -1,3 +1,47 @@
+## Research Director handoff — PR #99 integrated; two-channel proposal and finite-region status aligned (2026-11-27T22:34:09.327Z)
+
+**Main HEAD:** `d45e25ff0e9ad959d414b6f257624d9336dd7eb0` (squash merge of [PR #99](https://github.com/shaden7/emergence-lab/pull/99)); expected PR head `9df84a2920a08fbadf8b2c4b89e1b2c217eb84de`. Previous Main: `b7afe9e1998320a65ffb1ec73ed2165c247117f8`. The merge tree exactly matches the reviewed PR-head tree and the synthetic merge-candidate tree.
+
+### PR #99 — later-pass review and integration
+
+PR #99 changed only three documentation files: the joint geometry/transport profile, the research plan, and the causal-set finite-region audit. It changed no code, configuration, seed inventory, target data, or deployment behavior. The [separate later-pass review #6093954424](https://github.com/shaden7/emergence-lab/pull/99#pullrequestreview-6093954424) returned **PASS for documentation integration**. It is an AI-mediated review by a later session of the same model family, not external peer review or a human approval. The PR was squash-merged with the expected-head guard; merge commit is `d45e25f...`. Main now has **0 open PRs**; Issue #37 remains open.
+
+Exact-head CI and artifact provenance:
+- Push CI [46071048741](https://github.com/shaden7/emergence-lab/actions/runs/46071048741): completed-success on `9df84a2...`; 1,115 tests and 65 subtests passed.
+- PR CI [46071058218](https://github.com/shaden7/emergence-lab/actions/runs/46071058218): completed-success on the same exact head; 1,115 tests and 65 subtests passed.
+- Push artifact [15233152157](https://github.com/shaden7/emergence-lab/actions/runs/46071048741/artifacts/15233152157): 55 entries, 12 `manifest.json` files, 371,798 bytes; SHA-256 `d69decfa8ec477f890acb6d885d4647912c213ac2daa7fae7d26311ce48ca20b`. All 12 manifests pin the exact PR head.
+- PR artifact [15232818296](https://github.com/shaden7/emergence-lab/actions/runs/46071058218/artifacts/15232818296): 55 entries, 12 manifests, 371,597 bytes; SHA-256 `77e4a86a734ddf045d1a7dddebc2f83726708f6283739c19b955123c4f257ebd`. All 12 manifests pin synthetic merge candidate `af467368...`.
+- Post-merge Main CI [46076848502](https://github.com/shaden7/emergence-lab/actions/runs/46076848502): completed-success on exact Main `d45e25f...`; 1,115 tests + 65 subtests passed in 127.83 s. All applicable engineering/control steps passed. The preregistered M4, paired burn-in, phase-0 finite-size/J=0, L32, 4x4 burn-in, many-batch coverage and finite-size gates were skipped, not passed.
+- Main artifact [15236180476](https://github.com/shaden7/emergence-lab/actions/runs/46076848502/artifacts/15236180476): 55 files, 12 manifests, 371,754 bytes; SHA-256 `c7e015517691ed2eb8e332d08613b79dddfce0c2479a35ddbc94a47302253b90`. Downloaded and inspected; all 12 manifests pin exact Main `d45e25f...`. Pilot B dev `result.json`/`rows.csv` and D1 `result.json`/`ball_counts.csv` are byte-identical within repeat pairs; S1 engineering numeric CSVs match, while report/timing metadata differ.
+
+### Engineering observations from the post-merge Main workflow
+
+These are CI/control outputs, **not Issue-37 target measurements**:
+- CS0 miniature engineering pipeline: 40 rows; G0 rows = true, G1 = true, G2 = false, G3 = true; verdict `ENGINEERING_ONLY`, `scientific_acceptance=false`, `study_authorized=false`, `aggregate_caps_enforced=false`. The failed G2 remains an engineering/calibration limitation, not a physical result.
+- S1 P0a–P0d engineering gates all passed. Maximum observed P0a absolute errors: (1.942890293094024\times10^{-15}) (case 5), (9.71445146547012\times10^{-15}) (case 6), and (1.4910295220715852\times10^{-13}) (case 7); Python 3.12.16 / NumPy 2.5.5. The S1 orchestration smoke returned `NO-GO (scoped)`, (h=null), (T=128); this is not a target-scale estimate or a scientific acceptance.
+- Exact 4x4 reference holdout, Pilot A N5 measurement-noise stress, Pilot B development repeat and D1 lattice exactness repeat passed. Pilot B is `phase=dev`; S1b and SE-audit manifests have empty seed lists. No Issue-37 target seeds/maps or S2 were drawn.
+
+### Issue #37 — current operational interpretation (proposal, not owner amendment)
+
+The merged joint-profile note treats (d_H) (volume growth / geometry) and (d_s) (return probability / transport) as **distinct, separately calibrated observables**, not two estimates of one scalar. This matches the repository's adopted distinction between D2 ball growth and the S1 spectral observable; the random-tree calibration example itself has different Hausdorff and spectral limits. The full **ROBUST** label now has a proposed conservative sufficient rule: both channels must show the same predeclared qualitative UV decrease relative to their own admissible IR references in both model classes, with separate controls and graph/map-level uncertainty. A (d_s)-only result is transport-channel-specific; disagreement alone is not an **ARTIFACT** finding. Report paired covariance when the channels share a realization and do not invent a cross-model scale map.
+
+This is a proposal integrated into project documentation, **not an amendment to Issue #37's body and not yet a scientific acceptance decision**. The causal-set (d_H) channel is explicitly a kinematical geometry control built on the assumed (2+1)-Minkowski background, not an independent derivation of spatial dimension. Type-II UIPT asymptotic ((d_H,d_s)=(4,2)) are literature anchors, not finite-scale project measurements. Issue #37 remains **UNDECIDABLE**.
+
+### Branch/dependency reconciliation
+
+Compared the Issue-37 and adjacent CS0 dependency branches with current Main. The older spatial-reference, Poisson-slab, self-inclusive and witness branches are divergent because of squash history and subsequent Main fixes; their remaining content is older or already represented. The non-transitive-order rejection test is present on Main. The older CS0 preregistration, exact-reference, container-engineering and supervisor branches likewise contain no required unintegrated implementation: Main has the current exact-reference files, bounded artifact writer, supervisor parent-death guard and regression tests. UIPT feasibility/local-sampler, causal-map, estimator-bridge and spectral/S1 branches are behind Main. No cherry-pick is warranted; no open PR remains.
+
+### Next discriminating work and limits
+
+1. Keep the two-channel rule explicitly **proposed** until it is frozen in a reviewed preregistration; do not silently alter the owner-authored Issue #37 body.
+2. Design the smallest calibration/power preregistration for (d_H) and (d_s): separate model-specific scale axes and IR anchors, known-answer controls/nulls, graph/sprinkling-level independent replicates, paired covariance, finite-size/window and boundary/root controls, and an enforceable CPU/RSS/wall/output budget.
+3. Before any target run, complete the causal-set finite-region contract (future boundary, central root, minimum retained-pair fraction, antichain generation and scalable bitset/CSR validation) and the Type-II UIPT peeling implementation (cyclic boundary order, finite-component filling, root-edge/vertex law). Current exact causal-set oracle remains (N\leq256); target-size UIPT projection still exceeds the documented 100M-operation / 512 MiB limits.
+4. No target seeds, target maps, S2, deployment, paid APIs, Lightsail or EatSleepFeel operation occurred in this iteration.
+
+This handoff supersedes the immediately following PR-98 handoff's older description of (d_s) as the primary cross-model test with (d_H) only a companion; that earlier text remains below as historical context.
+
+---
+
 ## Research Director handoff — PR #98 integrated; recovery and Issue #37 criteria audit (2026-11-27T20:26:41Z)
 
 **Main code commit:** `c38d89c3127cea6cc9563870f5b5cd33276ff868` (squash merge of [PR #98](https://github.com/shaden7/emergence-lab/pull/98)); expected PR head `7542fdfac1df56fa891aef9bfaaed9f78c932847`. Previous Main was `2c545636a664ce7605d4aa5b018c8c8aac0adadd` (PR #97).
