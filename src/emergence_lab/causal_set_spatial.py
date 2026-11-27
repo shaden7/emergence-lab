@@ -214,7 +214,11 @@ def spatial_distance_matrix(
     for i in range(m):
         for j in range(i + 1, m):
             weight = float(pred[i, j])
-            if allowed_pairs[i, j] and math.isfinite(weight) and weight < float(meso_cutoff):
+            if (
+                allowed_pairs[i, j]
+                and math.isfinite(weight)
+                and weight < float(meso_cutoff)
+            ):
                 adjacency[i].append((j, weight))
                 adjacency[j].append((i, weight))
 
