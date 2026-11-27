@@ -1,6 +1,6 @@
 ## Research Director handoff — PR #93 artifact provenance repair and Issue #37 design audit (2026-11-27T00:43:00Z)
 
-**Main HEAD:** `3fe672262f119209c98482ede615733fd27a6dbf`.
+**Main HEAD after this handoff update:** `fce754883feddb27dfb66cd15dc0a4e651ea87e6` (this documentation commit). **PR #93 code merge commit:** `3fe672262f119209c98482ede615733fd27a6dbf`.
 
 ### Recovery and branch audit
 
