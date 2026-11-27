@@ -21,6 +21,13 @@ def test_rectangular_slab_volume_and_poisson_mean_are_exact():
     ) == 32.0
 
 
+def test_poisson_mean_overflow_is_rejected():
+    with pytest.raises(ValueError, match="Poisson mean"):
+        expected_poisson_count(
+            density=1e308, time_extent=1.0, x_extent=1.0, y_extent=1.0
+        )
+
+
 def test_slab_volume_overflow_is_rejected():
     with pytest.raises(ValueError, match="volume"):
         minkowski_slab_volume(
