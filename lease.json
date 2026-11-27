@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "running",
-  "owner": "rd-gpt6-20261127T222433Z-8f3c1a7d",
-  "leaseId": "b6d2c947-7a31-4f0e-9c85-2d6a1e7b4f93",
-  "acquiredAt": "2026-11-27T22:24:33Z",
-  "heartbeatAt": "2026-11-27T22:24:33Z",
-  "expiresAt": "2026-11-28T00:24:33Z",
-  "task": "later-pass review and integration of PR #99; reconcile Issue #37 research handoff",
-  "previousOwner": "rd-gpt6-20261127T212320Z-1d252ed19a70"
+  "status": "idle",
+  "owner": null,
+  "leaseId": null,
+  "acquiredAt": null,
+  "heartbeatAt": null,
+  "expiresAt": null,
+  "task": null,
+  "previousOwner": "rd-gpt6-20261127T222433Z-8f3c1a7d"
 }
