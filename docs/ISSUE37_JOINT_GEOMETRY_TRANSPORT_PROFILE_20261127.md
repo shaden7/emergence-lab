@@ -100,7 +100,7 @@ The current S0 kernel rejects self-loops and disconnected graphs. It cannot be a
 
 ## What counts as a cross-model result
 
-The owner-proposed Issue #37 criterion asks for the same scale-dependent behaviour in at least two model classes and at least two independently calibrated estimators. Its own calibration example contrasts random-tree Hausdorff dimension 2 with spectral dimension 4/3. That example uses **different exponents**, so the issue does not require the two estimators to estimate one identical scalar. Do not equate, average, or directly compare the numerical values of d_H and d_s.
+The owner-proposed Issue #37 criterion asks for the same scale-dependent behaviour in at least two model classes and at least two independently calibrated estimators. Its own calibration example contrasts random-tree Hausdorff dimension 2 with spectral dimension 4/3. That example uses **different exponents**, so the issue does not explicitly require the two estimators to estimate one identical scalar. Do not equate, average, or directly compare the numerical values of d_H and d_s.
 
 The proposed joint profile is therefore a defensible operationalization of the two-estimator requirement: d_H is the geometry / volume-growth observable, while d_s is the transport / return-probability observable. They must be calibrated separately on known-answer controls in each model family. When measured on the same realization, their errors are paired and their covariance must be reported; distinct observables are not statistically independent merely because they have different definitions.
 
