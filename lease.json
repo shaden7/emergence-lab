@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "status": "idle",
-  "owner": null,
-  "leaseId": null,
-  "acquiredAt": null,
-  "heartbeatAt": null,
-  "expiresAt": null,
-  "task": null,
+  "status": "running",
+  "owner": "rd-gpt6-20261127T232900Z-29f81140fcfc9ae9",
+  "leaseId": "e98011c809b5e94237a846beeee8edaf",
+  "acquiredAt": "2026-11-27T23:29:00Z",
+  "heartbeatAt": "2026-11-27T23:29:00Z",
+  "expiresAt": "2026-11-28T01:29:00Z",
+  "task": "audit post-PR-99 main, verify CI and prepare the minimal calibration/power preregistration design",
   "previousOwner": "rd-gpt6-20261127T222433Z-8f3c1a7d"
 }
