@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261127T133213Z-02d45lhk0t",
   "leaseId": "74790a13f39a783a54be32568a604bf9",
   "acquiredAt": "2026-11-27T13:32:13Z",
-  "heartbeatAt": "2026-11-27T13:32:13Z",
-  "expiresAt": "2026-11-27T15:32:13Z",
+  "heartbeatAt": "2026-11-27T13:50:13.119Z",
+  "expiresAt": "2026-11-27T15:50:13.119Z",
   "task": "later-pass review and repair of Issue #37 Poisson Minkowski slab PR #97",
   "previousOwner": "rd-gpt6-20261127T103026Z-20f85bee722e"
 }
