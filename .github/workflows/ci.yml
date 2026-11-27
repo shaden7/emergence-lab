@@ -122,7 +122,10 @@ jobs:
           grep -q 'Full SE audit requires the once-only marker proof' "$RUNNER_TEMP/se-nomarker.err"
           test ! -e "$RUNNER_TEMP/se-audit-nomarker"
           echo 'SE-audit full mode refused without marker proof: PASS'
-      - run: emergence-lab --config configs/smoke.json --output results
+      - name: Smoke experiment with commit-pinned manifest
+        env:
+          GIT_SHA: ${{ github.sha }}
+        run: emergence-lab --config configs/smoke.json --output results
       - name: Exact 4x4 reference holdout
         env:
           GIT_SHA: ${{ github.sha }}
