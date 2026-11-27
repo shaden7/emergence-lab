@@ -432,3 +432,16 @@ def test_sampler_rejects_unrepresentable_half_extents_and_time_interior():
         poisson_sprinkle_minkowski_slab(
             np.random.default_rng(0), **{**base, "time_extent": smallest}
         )
+
+
+
+def test_side_boundary_censor_keeps_no_common_future_pair_censored():
+    points = np.array([[0.0, -1.0, 0.0], [0.0, 1.0, 0.0]], dtype=np.float64)
+    relation = minkowski_slab_causal_relation(points)
+    antichain = minimal_antichain(relation)
+    assert minimum_common_future_witnesses(relation, antichain)[(0, 1)] == ()
+    mask = side_boundary_censor_mask(
+        points, relation, antichain,
+        time_extent=0.5, x_extent=4.0, y_extent=4.0,
+    )
+    assert not mask[0, 1]
