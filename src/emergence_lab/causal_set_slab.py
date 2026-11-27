@@ -51,7 +51,10 @@ def minkowski_slab_volume(
     t = _positive_finite("time_extent", time_extent)
     lx = _positive_finite("x_extent", x_extent)
     ly = _positive_finite("y_extent", y_extent)
-    return t * lx * ly
+    volume = t * lx * ly
+    if not math.isfinite(volume):
+        raise ValueError("slab volume must be finite")
+    return volume
 
 
 def expected_poisson_count(

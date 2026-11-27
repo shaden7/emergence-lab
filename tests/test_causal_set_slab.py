@@ -21,6 +21,26 @@ def test_rectangular_slab_volume_and_poisson_mean_are_exact():
     ) == 32.0
 
 
+def test_slab_volume_overflow_is_rejected():
+    with pytest.raises(ValueError, match="volume"):
+        minkowski_slab_volume(
+            time_extent=1e308, x_extent=1e308, y_extent=1.0
+        )
+
+
+def test_invalid_max_elements_is_rejected():
+    for value in (-1, 1.5, True):
+        with pytest.raises(ValueError, match="max_elements"):
+            poisson_sprinkle_minkowski_slab(
+                np.random.default_rng(0),
+                density=1.0,
+                time_extent=1.0,
+                x_extent=1.0,
+                y_extent=1.0,
+                max_elements=value,
+            )
+
+
 def test_sampler_matches_one_unconditioned_poisson_draw_and_uniform_coordinates():
     seed = 1234
     expected_rng = np.random.default_rng(seed)
