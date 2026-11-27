@@ -1,6 +1,6 @@
 # Issue #37 — bounded causal-set spatial-geometry reference
 
-**Status: engineering reference candidate, 2026-11-27.** This note describes the bounded exact implementation on the current research branch. It is not a sprinkling generator, preregistration, target run, or scientific result. Issue #37 remains **UNDECIDABLE**.
+**Status: merged engineering reference, 2026-11-27.** PR #96 was squash-merged as `25e77cc3f99bd406f6070c91858ee52111fe4914` after exact-head push/PR CI and post-merge Main CI passed. This remains an engineering reference, not a sprinkling generator, preregistration, target run, or scientific result. Issue #37 remains **UNDECIDABLE**.
 
 ## Why this step
 
@@ -71,7 +71,7 @@ The predistance need not satisfy the triangle inequality. For a meso-cutoff \(\e
 
 The implementation in `src/emergence_lab/causal_set_spatial.py` is deliberately a **full-path reference oracle** using Dijkstra. It does not implement ESV's SWB/SIL search-space accelerations. A later optimized implementation must be checked against this unrestricted reference on small posets before being used at larger sizes.
 
-## Implemented reference contract (branch candidate)
+## Implemented reference contract (merged on main)
 
 - Dense boolean strict-order input; validate irreflexivity, antisymmetry and transitivity.
 - Hard cap `N <= 256` before the reference calculation. This is intentionally far below the paper's \(N=75{,}510\), \(|A|=1{,}571\); it is an exact oracle, not a production solver.
@@ -82,6 +82,15 @@ The implementation in `src/emergence_lab/causal_set_spatial.py` is deliberately 
 
 The deterministic test suite includes: minimal-antichain/initial-surface controls; invalid antichain and poset rejection; strict endpoint-volume counts; a fixture where path minimization is strictly shorter than direct predistance; strict meso-cutoff behavior; absent-common-future censoring; zero-volume preservation; dimension/input/resource validation; input immutability; and vertex-relabeling invariance.
 
+## Composition with the self-inclusive diffusion kernel
+
+The 2019 ESV paper defines the diffusion-neighbour set by (d(e,e') \le d_c), which includes (e) itself because (d(e,e)=0). PR #95's `SelfInclusiveKernel` deliberately requires a loop-free simple undirected unweighted input graph and adds exactly one self-choice. Therefore a future graph builder must:
+- create only off-diagonal edges for (d(e,e') \le d_c);
+- leave the input adjacency diagonal clear;
+- let the kernel add the single self-loop.
+
+Do not conflate the two scales: (d_m) is the strict (widetilde d < d_m) cutoff in the spatial path construction; (d_c) is the inclusive (d le d_c) radius for the diffusion-neighbour graph.
+
 ## Remaining dependencies and limits
 
 1. **Not implemented:** a faithful finite \(2+1\)-Minkowski slab generator with unconditioned Poisson count law and the paper's boundary conventions.
@@ -89,11 +98,19 @@ The deterministic test suite includes: minimal-antichain/initial-surface control
 3. **Not calibrated:** boundary/root censoring, continuum-distance error, the discrete-asymptotic-silence scale, mesoscale window, or the spatial neighbour-count \(d_H^{\mathrm{eff}}\) curve.
 4. **Not authorized:** target seeds, target maps, transport measurements, S2, or any scientific acceptance decision.
 
+## Integration record
+
+- PR #96 merged by squash as `25e77cc3f99bd406f6070c91858ee52111fe4914` with expected head `26d6017755e93264c39ce72b54bfa4af888e7777`.
+- Later-pass review: [PASS for engineering integration only](https://github.com/shaden7/emergence-lab/pull/96#issuecomment-7214909464).
+- Exact-head push and PR CI: 1,075 tests + 65 subtests each; post-merge Main CI: 1,075 tests + 65 subtests.
+- Post-merge artifact `15187206642`: 55 files, 12 manifests, all pin the exact Main merge commit; SHA-256 `66c05229bd1bf7d0608c4e9902f585c71af8a384737794ff7a2473ed245e2a14`.
+- The PR does not add a sprinkling generator or target authorization. Issue #37 remains **UNDECIDABLE**.
+
 ## Evidence classification
 
 - **Mathematical fact:** minimal elements of a finite poset form an inextendible antichain; Dijkstra computes the minimum path sum for nonnegative edge weights.
 - **Literature definition:** the exclusive suspended count, minimum-common-future predistance and meso-cutoff path metric above.
-- **Engineering observation (PR candidate only):** deterministic fixtures test the implementation contract; CI must validate the exact PR head before integration.
+- **Engineering observation (merged code):** the 15 deterministic fixtures passed exact-head push/PR CI and post-merge Main CI; all 12 post-merge artifact manifests pin the merge commit. These checks validate implementation and provenance, not continuum geometry.
 - **Not established:** that a generated antichain hugs the intended continuum boundary, that the distance converges to the continuum metric for a selected finite region, or that any UV dimensional reduction is robust.
 
 Issue #37 remains **UNDECIDABLE** until the model-specific calibration, independent graph-level uncertainty/power plan, criterion settlement, preregistration and separate authorization are complete.

@@ -1,5 +1,41 @@
 ## Research Director handoff — PR #95 self-inclusive kernel integration (2026-11-27T05:42:45Z)
 
+## Research Director handoff — PR #96 spatial reference integrated (2026-11-27T09:46:23.282Z)
+
+**Main code commit:** `25e77cc3f99bd406f6070c91858ee52111fe4914` (squash merge of [PR #96](https://github.com/shaden7/emergence-lab/pull/96)); expected PR head `26d6017755e93264c39ce72b54bfa4af888e7777`. The merge used an expected-head guard. Main branch metadata reported `protected=false`; no branch-protection bypass was attempted.
+
+### Review, CI and artifact provenance
+
+- Later-pass review recorded on [PR #96](https://github.com/shaden7/emergence-lab/pull/96#issuecomment-7214909464): **PASS for engineering integration only**. AI-mediated later-pass review, not external peer review.
+- Exact-head push CI [#45962509336](https://github.com/shaden7/emergence-lab/actions/runs/45962509336): success, 1,075 tests + 65 subtests.
+- Exact-head PR CI [#45962516916](https://github.com/shaden7/emergence-lab/actions/runs/45962516916): success, 1,075 tests + 65 subtests.
+- Post-merge Main CI [#45975377856](https://github.com/shaden7/emergence-lab/actions/runs/45975377856): success, 1,075 tests + 65 subtests; pytest 149.13 s.
+- Base Main CI [#45960740195](https://github.com/shaden7/emergence-lab/actions/runs/45960740195): success, 1,060 tests + 65 subtests.
+- Post-merge artifact [15187206642](https://github.com/shaden7/emergence-lab/actions/runs/45975377856/artifacts/15187206642): 55 files, 12 manifests, 371,694 bytes, SHA-256 `66c05229bd1bf7d0608c4e9902f585c71af8a384737794ff7a2473ed245e2a14`. Downloaded and inspected; all 12 manifests pin exact Main commit `25e77cc...`. Within-run Pilot B and D1 repeat outputs are byte-identical.
+
+The same post-merge workflow passed its engineering containment checks: CS0 host class `non-lightsail`; CPU/memory/PID cgroups and timeout/OOM probes passed and all probe containers were removed. S1b/SE-audit attest `non-lightsail`, loopback-only networking, bounded memory/CPU, clean exit and watchdog success; full modes were refused without the once-only marker. This is evidence about the CI runner and containment harness, not a deployment or target experiment.
+
+### Integrated geometry reference
+
+PR #96 adds `src/emergence_lab/causal_set_spatial.py`, 15 deterministic tests and the design note. It implements the bounded dense strict-order oracle (`N <= 256`): initial antichain validation, exclusive suspended volumes, minimum-common-future predistances with (zeta_3=pi/3), and the full Eq. (31) path minimum by Dijkstra with strict (widetilde d < d_m). It is not a production-scale solver, sprinkling generator or continuum-convergence result.
+
+### Composition contract with PR #95
+
+ESV 2019 Eq. (8) defines the diffusion-neighbour set by (d(e,e') le d_c), including (e) itself. The [PR #95 self-inclusive kernel](https://github.com/shaden7/emergence-lab/pull/95) accepts a loop-free simple undirected unweighted graph and adds exactly one self-choice. Therefore the future graph builder must create **off-diagonal** edges using the inclusive (d le d_c) rule, leave the input diagonal clear, and let the kernel add the single self-loop. Keep the two scales distinct: (d_m) uses the strict (widetilde d < d_m) rule inside spatial path construction; (d_c) uses the inclusive (d le d_c) rule for diffusion neighbours.
+
+### Evidence classification and remaining dependencies
+
+- **Mathematical facts / definitions:** the finite-poset antichain and shortest-path properties; ESV's exclusive suspended-volume construction and (d_m) path metric; ESV 2019's inclusive (d_c) neighbourhood and self-choice.
+- **Numerical observations:** CI test counts, artifact digest/manifest pins and engineering gate outputs above. These are engineering observations only.
+- **Published numerical reference (not a project result):** ESV Appendix A reports (L_t=L_x=L_y=60), realized (N=75{,}510), and (|A|=1{,}571) for its flat 2+1-dimensional example. Do not treat the realized (N) as the Poisson mean; the mean is (ho,mathrm{Vol}(M)) and requires the exact finite-region geometry.
+- **Hypotheses not tested here:** that a chosen finite-region generator yields an antichain hugging the intended continuum boundary, that the distance converges to the continuum metric, or that a UV dimensional trend is robust.
+- **Not proved / not established:** no new theorem about continuum emergence, no continuum-limit convergence, no Issue-37 cross-model result.
+
+Next: recover and freeze the exact finite 2+1 Minkowski region and boundary/censoring conventions; implement an **unconditioned Poisson** count law with mean from the exact region volume; validate small samples against this oracle; then build a scalable bitset/CSR and SWB/SIL path implementation checked against unrestricted Dijkstra. Only after geometry and neighbour calibration should the PR #95 kernel be connected. Issue #37 remains **UNDECIDABLE**; no Issue-37 target seeds/maps, S2 or scientific acceptance are authorized.
+
+---
+
+
 **Main code commit:** `b153fd3373b8599cdf691ddf477645d42e023e0b` (squash merge of PR #95). **Previous Main:** `23725d74e5ff2ffbfeba223cf750c8436d558a16`. **PR head:** `c00ef9ea3b6ee05df3c34f065a235ba21fab18bb`.
 
 ### Recovery and repository audit
