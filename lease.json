@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "status": "running",
-  "owner": "rd-gpt6-20261127T172040Z-0c61c77ccc99d389",
-  "leaseId": "c8e43856ed22fa593fa269870d54f8fa",
-  "acquiredAt": "2026-11-27T17:20:40Z",
-  "heartbeatAt": "2026-11-27T17:43:22.535Z",
-  "expiresAt": "2026-11-27T19:43:22.535Z",
-  "task": "PR #98 audit, input-validation correction, CI and integration; update Issue #37 handoff",
-  "previousOwner": "rd-gpt6-20261127T145104Z-gtxybcbsys"
+  "owner": "rd-gpt6-20261127T202346Z-df2fd83448b7",
+  "leaseId": "cdea320eb0f247618f9d0d11f02684f2",
+  "acquiredAt": "2026-11-27T20:23:46Z",
+  "heartbeatAt": "2026-11-27T20:23:46Z",
+  "expiresAt": "2026-11-27T22:23:46Z",
+  "task": "Recovery audit, current main handoff repair, Issue #37 criteria review",
+  "previousOwner": "rd-gpt6-20261127T172040Z-0c61c77ccc99d389"
 }
