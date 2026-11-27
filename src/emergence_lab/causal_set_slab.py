@@ -9,11 +9,17 @@ conditioning, truncation, or resampling is performed.
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable
 from fractions import Fraction
 
 import numpy as np
 
-from .causal_set_spatial import MAX_REFERENCE_ELEMENTS
+from .causal_set_spatial import (
+    MAX_REFERENCE_ELEMENTS,
+    minimum_common_future_witnesses,
+    minimal_antichain,
+    validate_initial_antichain,
+)
 
 MAX_SLAB_ELEMENTS = MAX_REFERENCE_ELEMENTS
 
@@ -116,6 +122,12 @@ def poisson_sprinkle_minkowski_slab(
     t = _positive_finite("time_extent", time_extent)
     lx = _positive_finite("x_extent", x_extent)
     ly = _positive_finite("y_extent", y_extent)
+    half_x = lx / 2.0
+    half_y = ly / 2.0
+    if half_x == 0.0 or half_y == 0.0:
+        raise ValueError("x_extent and y_extent must have representable positive half-extents")
+    if np.nextafter(t, 0.0) == 0.0:
+        raise ValueError("time_extent must have a representable positive coordinate below its upper bound")
     rho = _positive_finite("density", density)
     mean = expected_poisson_count(
         density=rho, time_extent=t, x_extent=lx, y_extent=ly
@@ -130,8 +142,18 @@ def poisson_sprinkle_minkowski_slab(
 
     unit = rng.random((count, 3), dtype=np.float64)
     scale = np.array([t, lx, ly], dtype=np.float64)
-    offset = np.array([0.0, -lx / 2.0, -ly / 2.0], dtype=np.float64)
-    return unit * scale + offset
+    offset = np.array([0.0, -half_x, -half_y], dtype=np.float64)
+    coordinates = unit * scale + offset
+    # Keep the represented sample inside the half-open region even if a
+    # floating-point multiplication rounds a value to an excluded upper edge.
+    coordinates[:, 0] = np.minimum(coordinates[:, 0], np.nextafter(t, 0.0))
+    coordinates[:, 1] = np.minimum(
+        coordinates[:, 1], np.nextafter(half_x, -np.inf)
+    )
+    coordinates[:, 2] = np.minimum(
+        coordinates[:, 2], np.nextafter(half_y, -np.inf)
+    )
+    return coordinates
 
 
 def minkowski_slab_causal_relation(points: np.ndarray) -> np.ndarray:
@@ -192,3 +214,110 @@ def minkowski_slab_causal_relation(points: np.ndarray) -> np.ndarray:
             if dt * dt > dx * dx + dy * dy:
                 relation[source, target] = True
     return relation
+
+
+
+def side_boundary_censor_mask(
+    points: np.ndarray,
+    prec: np.ndarray,
+    antichain: Iterable[int] | None = None,
+    *,
+    time_extent: float,
+    x_extent: float,
+    y_extent: float,
+) -> np.ndarray:
+    """Return pair-level side-boundary validity for a project-defined Minkowski slab.
+
+    The returned boolean matrix is indexed by the sorted initial antichain.
+    Its diagonal is true; a distinct pair is true exactly when at least one
+    *global minimum-volume common-future witness* has its entire past cone down
+    to t=0 inside the spatial rectangle:
+
+        min(x + Lx/2, Lx/2 - x, y + Ly/2, Ly/2 - y) >= t.
+
+    All tied global minimizers are considered. A pair is retained when any
+    minimizer is side-safe, because then the minimum over side-safe witnesses
+    equals the unrestricted minimum. If every global minimizer is unsafe, a
+    safe but higher-volume candidate does not rescue the pair: the observed
+    minimum could have been lowered by a clipped candidate, so the pair is
+    censored. This avoids arbitrary index-based tie-breaking.
+
+    This is only a side-boundary censor for the stated flat rectangular slab.
+    It does not correct the stochastic minimal-antichain layer, the future
+    boundary, continuum discretization error, or finite-size effects. The
+    supplied relation must exactly match the strict Minkowski order of points.
+    """
+    if isinstance(points, np.ndarray):
+        if points.ndim == 2 and points.shape[0] > MAX_SLAB_ELEMENTS:
+            raise ValueError(
+                f"exact slab censor is limited to N <= {MAX_SLAB_ELEMENTS}"
+            )
+    else:
+        try:
+            input_length = len(points)
+        except (TypeError, AttributeError):
+            input_length = None
+        if input_length is not None and input_length > MAX_SLAB_ELEMENTS:
+            raise ValueError(
+                f"exact slab censor is limited to N <= {MAX_SLAB_ELEMENTS}"
+            )
+
+    coordinates = np.asarray(points, dtype=np.float64)
+    if coordinates.ndim != 2 or coordinates.shape[1] != 3:
+        raise ValueError("points must have shape (N, 3) in (t, x, y) order")
+    if not np.all(np.isfinite(coordinates)):
+        raise ValueError("points must contain only finite coordinates")
+
+    relation = np.asarray(prec)
+    if relation.dtype != np.bool_:
+        raise TypeError("prec must be a boolean strict-order matrix")
+    if relation.shape != (coordinates.shape[0], coordinates.shape[0]):
+        raise ValueError("prec must match the number of embedded points")
+
+    t_bound = Fraction.from_float(_positive_finite("time_extent", time_extent))
+    x_bound = Fraction.from_float(_positive_finite("x_extent", x_extent)) / 2
+    y_bound = Fraction.from_float(_positive_finite("y_extent", y_extent)) / 2
+    exact_points = [
+        tuple(Fraction.from_float(float(value)) for value in row)
+        for row in coordinates
+    ]
+    for t, x, y in exact_points:
+        if not (
+            0 <= t < t_bound
+            and -x_bound <= x < x_bound
+            and -y_bound <= y < y_bound
+        ):
+            raise ValueError("points must lie within the declared half-open slab")
+
+    expected_relation = minkowski_slab_causal_relation(coordinates)
+    if not np.array_equal(relation, expected_relation):
+        raise ValueError(
+            "prec must equal the strict Minkowski relation of the supplied points"
+        )
+
+    if antichain is None:
+        a = minimal_antichain(relation)
+    else:
+        try:
+            requested_antichain = list(antichain)
+        except TypeError as exc:
+            raise ValueError("antichain must be an iterable of indices") from exc
+        a = validate_initial_antichain(relation, requested_antichain)
+
+    witnesses = minimum_common_future_witnesses(relation, a)
+    mask = np.eye(a.size, dtype=np.bool_)
+    for i in range(a.size):
+        for j in range(i + 1, a.size):
+            pair = (int(a[i]), int(a[j]))
+            for witness in witnesses[pair]:
+                t, x, y = exact_points[witness]
+                margin = min(
+                    x + x_bound,
+                    x_bound - x,
+                    y + y_bound,
+                    y_bound - y,
+                )
+                if margin >= t:
+                    mask[i, j] = mask[j, i] = True
+                    break
+    return mask
