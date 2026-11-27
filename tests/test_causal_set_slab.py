@@ -3,6 +3,11 @@ import numpy as np
 import pytest
 
 from emergence_lab.causal_set_mm import check_partial_order
+from emergence_lab.causal_set_spatial import (
+    minimal_antichain,
+    predistance_matrix,
+    spatial_distance_matrix,
+)
 from emergence_lab.causal_set_slab import (
     PoissonDrawExceedsLimit,
     expected_poisson_count,
@@ -90,7 +95,10 @@ def test_empty_poisson_realisation_is_not_conditioned_away():
         y_extent=1.0,
     )
     assert points.shape == (0, 3)
-    assert minkowski_slab_causal_relation(points).shape == (0, 0)
+    relation = minkowski_slab_causal_relation(points)
+    assert relation.shape == (0, 0)
+    with pytest.raises(ValueError, match="at least one element"):
+        minimal_antichain(relation)
 
 
 def test_resource_guard_reports_the_draw_without_truncating_or_redrawing():
@@ -158,3 +166,30 @@ def test_invalid_rng_and_bad_point_coordinates_are_rejected():
         minkowski_slab_causal_relation(np.zeros((3, 2)))
     with pytest.raises(ValueError, match="finite"):
         minkowski_slab_causal_relation(np.array([[0.0, np.nan, 0.0]]))
+
+
+
+def test_poisson_slab_sample_runs_through_exact_spatial_geometry_oracle():
+    points = poisson_sprinkle_minkowski_slab(
+        np.random.default_rng(7),
+        density=1.0,
+        time_extent=4.0,
+        x_extent=4.0,
+        y_extent=4.0,
+    )
+    relation = minkowski_slab_causal_relation(points)
+    antichain = minimal_antichain(relation)
+    predistance = predistance_matrix(relation, antichain)
+    distance = spatial_distance_matrix(
+        relation, antichain, meso_cutoff=5.0
+    )
+
+    assert antichain.size > 0
+    assert predistance.shape == (antichain.size, antichain.size)
+    assert distance.shape == predistance.shape
+    assert np.allclose(predistance, predistance.T)
+    assert np.allclose(distance, distance.T)
+    assert np.all(np.diag(predistance) == 0.0)
+    assert np.all(np.diag(distance) == 0.0)
+    assert np.all(predistance >= 0.0)
+    assert np.all(distance >= 0.0)
