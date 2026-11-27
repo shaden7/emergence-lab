@@ -1,6 +1,6 @@
 """Self-inclusive reversible walk kernel for spatial-neighbour graphs (Issue #37).
 
-This is deliberately separate from the loop-free S0 kernel.  It accepts a
+This is deliberately separate from the loop-free S0 kernel. It accepts a
 simple, undirected, unweighted Graph, adds exactly one self-choice per vertex,
 and supports disconnected components (including isolated singleton vertices).
 It is a deterministic finite-graph instrument; it does not generate causal sets
@@ -24,14 +24,14 @@ class SelfInclusiveKernel:
     """Sparse reversible kernel with one self-choice and component-local floors.
 
     For a simple adjacency matrix A, the transition matrix is
-    P = (A + I) D^{-1}, where D[v,v] = deg_A(v) + 1.  Each component is
-    therefore aperiodic.  Its stationary law is proportional to the closed
+    P = (A + I) D^{-1}, where D[v,v] = deg_A(v) + 1. Each component is
+    therefore aperiodic. Its stationary law is proportional to the closed
     degree k_v = deg_A(v) + 1, and its source-specific return floor is
     k_source / sum_{x in C(source)} k_x.
 
     The memory guard is a conservative estimate for the graph copy, closed
-    adjacency, transition CSR and O(n) work vectors.  It is not an OS-enforced
-    RSS limit.  The operation guard counts transition nonzeros per half-step.
+    adjacency, transition CSR and O(n) work vectors. It is not an OS-enforced
+    RSS limit. The operation guard counts transition nonzeros per full step.
     """
 
     def __init__(
@@ -96,15 +96,13 @@ class SelfInclusiveKernel:
         adjacency.setdiag(1.0)
         adjacency.sum_duplicates()
         adjacency.sort_indices()
-        inverse_degree = 1.0 / degree
-        transition = adjacency.multiply(inverse_degree[:, None]).tocsr()
+        transition = adjacency.multiply((1.0 / degree)[:, None]).tocsr()
         transition.sum_duplicates()
         transition.sort_indices()
 
         self._n = n
         self._transition = transition
         self._degree = degree
-        self._inverse_degree = inverse_degree
         self._component_labels = labels
         self._component_mass = component_mass
         self._estimated_peak_bytes = int(estimated_peak_bytes)
@@ -137,29 +135,34 @@ class SelfInclusiveKernel:
         component = int(self._component_labels[v])
         return float(self._degree[v] / self._component_mass[component])
 
-    def even_returns(
+    def returns(
         self,
         source: int,
-        half_times: Iterable[int],
+        times: Iterable[int],
         *,
         max_transition_ops: int = MAX_TRANSITION_OPS,
     ) -> dict[int, float]:
-        """Return P^(2t)[source,source] using the reversible half-kernel identity."""
+        """Return P^s[source,source] for requested positive integer full-step times.
+
+        Self-choices make each component aperiodic, so odd and even times are
+        both meaningful. The method propagates one sparse row and reads its
+        source entry directly; it does not impose an even-time subsequence.
+        """
         v = self._source(source)
-        times = list(half_times)
-        if not times or any(
+        requested_times = list(times)
+        if not requested_times or any(
             not isinstance(t, (int, np.integer))
             or isinstance(t, (bool, np.bool_))
             or t < 1
-            for t in times
+            for t in requested_times
         ):
-            raise ValueError("half_times must be nonempty positive integers")
+            raise ValueError("times must be nonempty positive integers")
         if (not isinstance(max_transition_ops, (int, np.integer))
                 or isinstance(max_transition_ops, (bool, np.bool_))
                 or max_transition_ops < 0):
             raise ValueError("max_transition_ops must be a nonnegative integer")
 
-        requested = {int(t) for t in times}
+        requested = {int(t) for t in requested_times}
         max_t = max(requested)
         if max_t * self._transition.nnz > int(max_transition_ops):
             raise ValueError("transition operation budget exceeded")
@@ -167,15 +170,11 @@ class SelfInclusiveKernel:
         row = np.zeros(self._n, dtype=np.float64)
         row[v] = 1.0
         result: dict[int, float] = {}
-        for t in range(1, max_t + 1):
+        for step in range(1, max_t + 1):
             row = np.asarray(row @ self._transition).ravel()
-            if t in requested:
-                # Detailed balance: P^(2t)_vv = k_v sum_x P^t_vx^2 / k_x.
-                q = float(
-                    self._degree[v]
-                    * np.dot(row * row, self._inverse_degree)
-                )
+            if step in requested:
+                q = float(row[v])
                 if not (np.isfinite(q) and 0.0 < q <= 1.0 + 1e-10):
                     raise ArithmeticError("invalid return probability")
-                result[t] = q
+                result[step] = q
         return result
