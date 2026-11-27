@@ -24,7 +24,7 @@ class SelfInclusiveKernel:
     """Sparse reversible kernel with one self-choice and component-local floors.
 
     For a simple adjacency matrix A, the transition matrix is
-    P = (A + I) D^{-1}, where D[v,v] = deg_A(v) + 1. Each component is
+    P = D^{-1} (A + I), where D[v,v] = deg_A(v) + 1. Each component is
     therefore aperiodic. Its stationary law is proportional to the closed
     degree k_v = deg_A(v) + 1, and its source-specific return floor is
     k_source / sum_{x in C(source)} k_x.
