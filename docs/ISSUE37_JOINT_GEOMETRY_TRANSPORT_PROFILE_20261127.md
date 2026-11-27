@@ -132,7 +132,7 @@ The minimum implementation sequence is:
 
 1. Freeze the causal-set paper's finite region, Poisson versus fixed-\(N\) conditional sampling law, maximal / inextendible antichain construction and finite-boundary convention. The existing \(D=3\) CS0 sprinkling is only a candidate primitive, not an already matching generator.
 2. Implement the induced spatial predistance from the minimum-volume common-future element \(r_m(p,q)\), the order-count \(V(r_m)\), and segmented path minimisation at the frozen \(d_m=\epsilon\); test pair-specific missing-common-future and truncated-cone cases.
-3. Implement a separate reversible transition-kernel abstraction for the self-inclusive, variable-degree, potentially disconnected spatial graph, with exact dense-oracle tests and component-specific stationary floors. Do not weaken S0's existing loop-free Type-II contract.
+3. **Completed in PR #95:** implement a separate reversible transition-kernel abstraction for the self-inclusive, variable-degree, potentially disconnected spatial graph, with exact dense-oracle tests and component-specific stationary floors. Do not weaken S0's existing loop-free Type-II contract.
 4. Implement Type-II UIPT peeling state with cyclic boundary order / rotation system, exact finite-component Boltzmann fillings, and tests for 2-gon closure, parallel edges, root degree, period-1 finite-map floors and adaptive peeling.
 5. Calibrate each model's geometry and return-probability channels on deterministic controls; then run bounded non-gated resource benchmarks and graph-level variance / power estimates.
 6. Only after the Issue #37 estimator criterion is explicitly settled: later-pass-review a versioned preregistration and create a separate run authorization.
@@ -155,5 +155,12 @@ No target seeds, target maps, full CS0 study, S2, deployment, paid API, or share
 - **Published numerical observations:** causal-set spatial-hypersurface \(d_s\) reduction in finite \(2+1\)-Minkowski sprinklings, with the paper's stated island and boundary limitations.
 - **Derived / methodological:** the joint profile avoids equating distinct exponents; root-law reweighting and the stationary weights above follow from the specified transition laws.
 - **Hypotheses / unverified:** whether the causal-set UV decrease persists in a non-degenerate scaling window after graph-level uncertainty and whether a corresponding UIPT finite-scale decrease exists.
-- **Repository facts:** no causal-set spatial-hypersurface implementation and no Type-II UIPT peeling implementation are present on Main; the current S0 kernel is not directly compatible with the self-inclusive disconnected causal-set walk.
+- **Repository facts:** the separate self-inclusive disconnected reversible kernel is present on Main (PR #95); no complete causal-set spatial-hypersurface generator / induced-distance pipeline and no Type-II UIPT peeling implementation are present. The existing S0 kernel remains incompatible with the self-inclusive disconnected causal-set walk.
 - **Decision:** retain Issue #37 as **UNDECIDABLE**. This document proposes a design interpretation, not a scientific outcome, an amendment to Issue #37's acceptance criterion, or a run authorization.
+
+
+## Implementation status update (2026-11-27; PR #95)
+
+Dependency step 3 above is implemented and merged as `b153fd3373b8599cdf691ddf477645d42e023e0b`. The new `SelfInclusiveKernel` has exact dense-matrix return-probability controls for connected, disconnected and singleton graphs, checks detailed balance and component-local stationary floors, and enforces a pre-CSR estimated-memory guard plus a transition-operation budget. The full post-merge Main workflow passed (1,060 tests + 65 subtests).
+
+This closes only the kernel abstraction. Steps 1–2 (causal-set finite region, antichain and induced spatial-distance construction), step 4 (Type-II UIPT peeling with cyclic boundary order), step 5 (model-specific calibration and power/resource estimates), and step 6 (criterion settlement, preregistration and authorization) remain open. No target data were generated and Issue #37 remains **UNDECIDABLE**.

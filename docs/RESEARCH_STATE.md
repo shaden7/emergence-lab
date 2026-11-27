@@ -1,3 +1,60 @@
+## Research Director handoff — PR #95 self-inclusive kernel integration (2026-11-27T05:42:45Z)
+
+**Main code commit:** `b153fd3373b8599cdf691ddf477645d42e023e0b` (squash merge of PR #95). **Previous Main:** `23725d74e5ff2ffbfeba223cf750c8436d558a16`. **PR head:** `c00ef9ea3b6ee05df3c34f065a235ba21fab18bb`.
+
+### Recovery and repository audit
+
+The prior lease owner `rd-gpt6-20261127T022438Z-m0g3dl46pd` had expired at 2026-11-27T04:42:23Z. This session acquired the lease by expected-HEAD CAS at 05:22:58Z, verified the resulting owner/lease ID, and verified that the coordination tree contains only root `lease.json`. The current lease is released separately at session exit.
+
+At entry there were no open PRs and Issue #37 was the only open issue. Eighteen Issue-37 branches were compared with Main: the 17 historical branches had no unique commit ahead of Main; no cherry-pick or recovery merge was warranted. PR #95 was the only new work item and is now integrated. Open PR count after merge: zero.
+
+### PR #95 — separate self-inclusive kernel
+
+[PR #95](https://github.com/shaden7/emergence-lab/pull/95) added only:
+
+- `src/emergence_lab/spectral_self_inclusive.py`
+- `tests/test_spectral_self_inclusive.py`
+
+The PR head `c00ef9ea3b6ee05df3c34f065a235ba21fab18bb` was merged by squash with the expected-head guard, producing Main commit `b153fd3373b8599cdf691ddf477645d42e023e0b`. The merge changed two files (333 additions, no deletions); the existing loop-free S0 path was not modified.
+
+The author-session review was recorded as COMMENTED / PASS on the exact head ([review](https://github.com/shaden7/emergence-lab/pull/95#pullrequestreview-6083931425)). This was a same-session critical review, not an independent later-pass or external scientific peer review.
+
+### Exact-head, PR and post-merge CI
+
+- Exact-head push CI [45946252297](https://github.com/shaden7/emergence-lab/actions/runs/45946252297): completed-success on `c00ef9ea3b6ee05df3c34f065a235ba21fab18bb`; **1,060 tests + 65 subtests in 150.26 s**.
+- PR CI [45946259936](https://github.com/shaden7/emergence-lab/actions/runs/45946259936): completed-success; **1,060 tests + 65 subtests in 97.97 s**. Its artifact manifests pin synthetic merge candidate `4a0b5afa3afe7e860c9fde39ea442e322e01ee8a`.
+- Post-merge Main CI [45947053798](https://github.com/shaden7/emergence-lab/actions/runs/45947053798): completed-success on exact Main commit `b153fd3373b8599cdf691ddf477645d42e023e0b); **1,060 tests + 65 subtests in 97.70 s**. CS0 miniature and container containment, S1b/SE-audit containment, commit-pinned smoke, Exact4, Pilot A, Pilot B development, D1 G0/G1 and S1 P0/orchestration engineering smokes all completed-success.
+
+### Artifact provenance and scope
+
+The PR-head, PR merge-ref and post-merge Main archives were downloaded and inspected:
+
+- Push artifact [15174907952](https://github.com/shaden7/emergence-lab/actions/runs/45946252297/artifacts/15174907952): 55 files, 371,684 bytes; SHA-256 `54b2ef9bfc576365044298018f967849c739ae6d957c4d9fc50a6d254d4ed78c`. All 12 manifests pin PR head `c00ef9ea3b6ee05df3c34f065a235ba21fab18bb`.
+- PR artifact [15174798891](https://github.com/shaden7/emergence-lab/actions/runs/45946259936/artifacts/15174798891): 55 files, 371,505 bytes; SHA-256 `8c16c23bb5a865756b26bca2b12c5c8dc9b108d21816e5d880b0effe77eb3772`. All 12 manifests pin synthetic merge candidate `4a0b5afa3afe7e860c9fde39ea442e322e01ee8a`.
+- Post-merge Main artifact [15175685573](https://github.com/shaden7/emergence-lab/actions/runs/45947053798/artifacts/15175685573): 55 files, 371,546 bytes; SHA-256 `8ac33c28e37484dc597ad7411e1899e53f5479100a562c30fc9cf9d5a82a64a7`. All 12 manifests, including the aggregate root manifest, pin Main `b153fd3373b8599cdf691ddf477645d42e023e0b`.
+
+The CS0 smoke output remains `mode=engineering`, `report_verdict=ENGINEERING_ONLY`, `study_authorized=false`, `aggregate_caps_enforced=false`, with 40 engineering rows. No Issue-37 target maps or target seeds were run. These artifacts are CI engineering/calibration evidence, not new Issue-37 measurements.
+
+### Kernel contract and validation
+
+The new `SelfInclusiveKernel` accepts a simple, undirected, unweighted, loop-free `Graph`; it rejects `MultiGraph` rather than silently treating edge multiplicity as neighbour-set cardinality. It adds exactly one self-choice per vertex and implements the row-stochastic transition
+
+`P = D^{-1}(A + I)`, with `k_v = deg_A(v) + 1`.
+
+It returns full-step `P^s[v,v]` (odd and even times), supports disconnected components and singleton traps, and exposes the component-local stationary floor `k_v / sum_{x in C(v)} k_x`. The stationary law follows by detailed balance; singleton components have return and floor equal to one. The operation budget counts transition nonzeros per full step. The memory budget is a conservative pre-allocation software estimate, explicitly not an OS-enforced RSS limit.
+
+The deterministic controls compare every source against dense matrix powers on connected, disconnected, and singleton fixtures; they also test detailed balance, component isolation, singleton trapping, input immutability, malformed graph rejection, operation limits, and memory rejection before CSR allocation. These are engineering correctness checks, not a stochastic physics observation or a dimension estimate.
+
+### Scientific decision and next step
+
+PR #95 closes only the separate reversible-kernel abstraction dependency. It does **not** implement causal-set antichain generation, minimum-volume-common-future spatial-distance construction, or the Type-II UIPT peeling sampler. It does not implement the paper's Eq. (10) finite-difference estimator or calibrate finite-size windows.
+
+Issue #37 remains **UNDECIDABLE**. The joint `(d_H^{eff}, d_s^{eff})` profile does not make the two exponents estimates of the same scalar and does not amend the issue's acceptance criterion. No target seeds, target maps, full CS0 study, S2 authorization, deployment, paid API, Lightsail or EatSleepFeel operation occurred.
+
+**Next single informative step:** implement and exact-oracle-test the bounded causal-set antichain / induced spatial-distance graph construction; keep the Type-II peeling sampler as a separate dependency. Before any target run, settle the Issue-37 estimator criterion and complete graph-level power and resource gates.
+
+---
+
 ## Research Director handoff — PR #93 artifact provenance repair and Issue #37 design audit (2026-11-27T00:43:00Z)
 
 **Main HEAD after this handoff update:** `fce754883feddb27dfb66cd15dc0a4e651ea87e6` (this documentation commit). **PR #93 code merge commit:** `3fe672262f119209c98482ede615733fd27a6dbf`.
