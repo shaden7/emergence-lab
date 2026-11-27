@@ -124,9 +124,12 @@ def poisson_sprinkle_minkowski_slab(
     ly = _positive_finite("y_extent", y_extent)
     half_x = lx / 2.0
     half_y = ly / 2.0
-    if half_x == 0.0 or half_y == 0.0:
+    if (
+        Fraction.from_float(half_x) != Fraction.from_float(lx) / 2
+        or Fraction.from_float(half_y) != Fraction.from_float(ly) / 2
+    ):
         raise ValueError(
-            "x_extent and y_extent must have representable positive half-extents"
+            "x_extent and y_extent must have exactly representable positive half-extents"
         )
     if np.nextafter(t, 0.0) == 0.0:
         raise ValueError(
