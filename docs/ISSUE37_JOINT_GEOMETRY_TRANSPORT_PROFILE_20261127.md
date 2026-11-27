@@ -71,11 +71,11 @@ The two components are reported separately for each model.
 Use separate local slopes for the two metric observables:
 
 \[
-d_{H,\mathrm{UIPT}}^{\mathrm{eff}}(r)=
-\log_2\frac{\overline B(2r)}{\overline B(r)},
+d_{H,\mathrm{UIPT},g}^{\mathrm{eff}}(r)=
+\log_2\frac{\bar B_g(2r)}{\bar B_g(r)},
 \qquad
-d_{H,\mathrm{CS}}^{\mathrm{eff}}(d_c)=
-\log_2\frac{\bar n(2d_c)}{\bar n(d_c)}.
+d_{H,\mathrm{CS},g}^{\mathrm{eff}}(d_c)=
+\log_2\frac{\bar n_g(2d_c)}{\bar n_g(d_c)}.
 \]
 
 For each independent realization \(g\), let \(\bar B_g(r)\) be the mean ball cardinality over its frozen root sample and \(\bar n_g(d_c)\) the mean spatial-neighbour count within that sprinkling. The primary finite-scale curves are the per-realization slopes shown above; summarize them across independent maps / sprinklings, preserving graph-level uncertainty and the paired geometry/transport covariance. In the basic UIPT peeling design there is one canonical root per independently sampled map; any additional roots are nested observations, not independent maps. The ratio of ensemble-pooled mean volumes is an annealed sensitivity curve, not a substitute for the per-realization estimator: Angel's almost-sure ball-growth theorem does not by itself identify the exponent of an annealed mean.
