@@ -53,3 +53,16 @@ def test_cli_fails_closed_before_creating_outputs(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="collision"):
         main()
     assert not output.exists()
+
+def test_cli_manifest_pins_git_sha(tmp_path, monkeypatch):
+    cfg_path = tmp_path / "smoke.json"
+    cfg_path.write_text(json.dumps(_config()))
+    output = tmp_path / "results"
+    commit = "a" * 40
+    monkeypatch.setenv("GIT_SHA", commit)
+    monkeypatch.setattr(sys, "argv", [
+        "emergence-lab", "--config", str(cfg_path), "--output", str(output)
+    ])
+    main()
+    manifest = json.loads((output / "manifest.json").read_text())
+    assert manifest["commit"] == commit
