@@ -22,12 +22,12 @@ The previous proposed 2×2 pairing of causal-set Myrheim–Meyer / midpoint with
 
 Use the **spatial-hypersurface diffusion** construction of Eichhorn, Surya and Versteegen (2019), not a full-Hasse-graph walk.
 
-- Start with a Poisson sprinkling into \(2+1\)-dimensional Minkowski spacetime and an inextendible antichain \(\mathcal A\).
-- Reconstruct the induced spatial distance from causal information. The published flat-background predistance uses
+- Start with the paper's \(2+1\)-dimensional Minkowski sprinkling and a maximal / inextendible antichain \(\mathcal A\). Freeze the finite spacetime region, sprinkling count law (unconditioned Poisson versus fixed-\(N\) conditional Poisson), antichain extraction and boundary convention from the source paper. The current repository's \`causal_set_mm.sprinkle_diamond(n, 3, ...)\` draws exactly \(N\) i.i.d. uniform points in a 3D diamond (fixed-\(N\), i.e. Poisson conditioned on \(N\)) and \`causal_matrix\` constructs their order; neither extracts the required antichain nor constructs the induced spatial distance. Do not silently substitute a greedy maximal antichain or treat fixed-\(N\) sampling as an unconditioned Poisson process.
+- For \(p,q\in\mathcal A\), let \(r_m(p,q)\in J^+(p)\cap J^+(q)\) minimize \(V(r)\), where \(V(r)\) is the order-count analogue of \(\operatorname{vol}(J^-(r)\cap J^+(\Sigma))\) above the antichain, with the paper's strict endpoint convention. The published flat-background predistance is
   \[
-  \widetilde{\mathbf d}(p,q)=2\left(\frac{V(\mathbf e)}{\zeta_3}\right)^{1/3},
+  \widetilde{\mathbf d}(p,q)=2\left(\frac{V(r_m(p,q))}{\zeta_3}\right)^{1/3},
   \]
-  followed by path minimisation and a meso-scale cutoff \(d_m\).
+  followed by path minimisation over segments bounded by the paper's meso-scale \(\epsilon\) (called \(d_m\) in this project). Freeze the conversion and units explicitly.
 - For a spatial cutoff \(d_c\), define
   \[
   \mathcal N_c(e)=\{e'\in\mathcal A:\mathbf d(e,e')\le d_c\}.
@@ -130,11 +130,12 @@ Do not identify \(d_c\) with \(r\), \(\sigma\) with \(s\), or set \(r=\sqrt{s}\)
 
 The minimum implementation sequence is:
 
-1. Causal-set antichain extraction and induced spatial-distance construction with explicit \(d_m\) handling.
-2. A separate reversible transition-kernel abstraction for the self-inclusive, variable-degree, potentially disconnected spatial graph, with exact dense-oracle tests. Do not weaken S0's existing loop-free Type-II contract.
-3. Type-II UIPT peeling state with cyclic boundary order / rotation system, exact finite-component Boltzmann fillings, and tests for 2-gon closure, parallel edges, root degree and adaptive peeling.
-4. Model-specific geometry and return-probability calibration on deterministic controls.
-5. Bounded non-gated resource benchmarks, graph-level variance / power estimates, then a later-pass-reviewed preregistration and a separate run authorization.
+1. Freeze the causal-set paper's finite region, Poisson versus fixed-\(N\) conditional sampling law, maximal / inextendible antichain construction and finite-boundary convention. The existing \(D=3\) CS0 sprinkling is only a candidate primitive, not an already matching generator.
+2. Implement the induced spatial predistance from the minimum-volume common-future element \(r_m(p,q)\), the order-count \(V(r_m)\), and segmented path minimisation at the frozen \(d_m=\epsilon\); test pair-specific missing-common-future and truncated-cone cases.
+3. Implement a separate reversible transition-kernel abstraction for the self-inclusive, variable-degree, potentially disconnected spatial graph, with exact dense-oracle tests and component-specific stationary floors. Do not weaken S0's existing loop-free Type-II contract.
+4. Implement Type-II UIPT peeling state with cyclic boundary order / rotation system, exact finite-component Boltzmann fillings, and tests for 2-gon closure, parallel edges, root degree, period-1 finite-map floors and adaptive peeling.
+5. Calibrate each model's geometry and return-probability channels on deterministic controls; then run bounded non-gated resource benchmarks and graph-level variance / power estimates.
+6. Only after the Issue #37 estimator criterion is explicitly settled: later-pass-review a versioned preregistration and create a separate run authorization.
 
 No target seeds, target maps, full CS0 study, S2, deployment, paid API, or shared Lightsail work is authorized by this design.
 
@@ -154,4 +155,4 @@ No target seeds, target maps, full CS0 study, S2, deployment, paid API, or share
 - **Derived / methodological:** the joint profile avoids equating distinct exponents; root-law reweighting and the stationary weights above follow from the specified transition laws.
 - **Hypotheses / unverified:** whether the causal-set UV decrease persists in a non-degenerate scaling window after graph-level uncertainty and whether a corresponding UIPT finite-scale decrease exists.
 - **Repository facts:** no causal-set spatial-hypersurface implementation and no Type-II UIPT peeling implementation are present on Main; the current S0 kernel is not directly compatible with the self-inclusive disconnected causal-set walk.
-- **Decision:** retain Issue #37 as **UNDECIDABLE**. This document selects a design interpretation, not a scientific outcome or run authorization.
+- **Decision:** retain Issue #37 as **UNDECIDABLE**. This document proposes a design interpretation, not a scientific outcome, an amendment to Issue #37's acceptance criterion, or a run authorization.
