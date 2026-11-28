@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "status": "running",
-  "owner": "rd-gpt6-20261128T062230Z-86c966c7cba14ed3",
-  "leaseId": "86c966c7cba14ed38bc7c5f79901fe13",
-  "acquiredAt": "2026-11-28T06:22:30.529Z",
-  "heartbeatAt": "2026-11-28T06:41:56.920Z",
-  "expiresAt": "2026-11-28T08:41:56.920Z",
-  "task": "Implement and validate the Type-II UIPT local peeling sampler",
-  "previousOwner": "rd-gpt6-20261128T032817Z-45a1e5247a07"
+  "owner": "rd-gpt6-20261128T092248Z-05d7ee9d9023",
+  "leaseId": "05d7ee9d90237741d4b3cfdda99801da",
+  "acquiredAt": "2026-11-28T09:22:48.990Z",
+  "heartbeatAt": "2026-11-28T09:22:48.990Z",
+  "expiresAt": "2026-11-28T11:22:48.990Z",
+  "task": "Recover and implement Type-II UIPT peeling; validate dependencies and update handoff",
+  "previousOwner": "rd-gpt6-20261128T062230Z-86c966c7cba14ed3"
 }
