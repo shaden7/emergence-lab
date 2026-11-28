@@ -6,12 +6,12 @@ boundary, not a closed finite spherical triangulation.
 """
 from __future__ import annotations
 
+from bisect import bisect_left, bisect_right
 from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass
 from fractions import Fraction
-from functools import lru_cache
-import math
+from threading import Lock
 import random
 
 import numpy as np
@@ -136,22 +136,23 @@ def _checked_int(value: int, name: str, *, minimum: int) -> int:
     return result
 
 
-@lru_cache(maxsize=None)
-def _z(m: int) -> Fraction:
-    """Free Boltzmann partition function Z_m for an (m+2)-gon."""
-    return (
-        Fraction(math.factorial(2 * m), math.factorial(m) * math.factorial(m + 2))
-        * Fraction(9, 4) ** (m + 1)
-    )
+_PARTITION_LOCK = Lock()
+_Z_VALUES = [Fraction(9, 8)]
+_C_RATIO_VALUES = [Fraction(1)]
 
 
-@lru_cache(maxsize=None)
-def _c_ratio(m: int) -> Fraction:
-    """C_m/C_0; the common irrational normalization cancels in all ratios."""
-    return (
-        Fraction(math.factorial(2 * m + 1), math.factorial(m) ** 2)
-        * Fraction(9, 4) ** m
-    )
+def _ensure_partition_values(max_m: int) -> tuple[list[Fraction], list[Fraction]]:
+    """Extend exact Z_m and C_m/C_0 tables using rational recurrences."""
+    with _PARTITION_LOCK:
+        while len(_Z_VALUES) <= max_m:
+            m = len(_Z_VALUES) - 1
+            _Z_VALUES.append(
+                _Z_VALUES[-1] * Fraction(9 * (2 * m + 1), 2 * (m + 3))
+            )
+            _C_RATIO_VALUES.append(
+                _C_RATIO_VALUES[-1] * Fraction(9 * (2 * m + 3), 2 * (m + 1))
+            )
+    return _Z_VALUES, _C_RATIO_VALUES
 
 
 def uipt_transition_probabilities(m: int) -> tuple[UIPTTransition, ...]:
@@ -160,31 +161,41 @@ def uipt_transition_probabilities(m: int) -> tuple[UIPTTransition, ...]:
     T1 has boundary length i+1; T2 has boundary length m-i+2.
     """
     m = _checked_int(m, "m", minimum=0)
+    z_values, c_values = _ensure_partition_values(m + 1)
     outcomes = [
         UIPTTransition(
             kind="new",
             index=None,
             infinite_side=None,
-            probability=_c_ratio(m + 1) / (ALPHA * _c_ratio(m)),
+            probability=c_values[m + 1] / (ALPHA * c_values[m]),
         )
     ]
-    for i in range(1, m + 1):
-        outcomes.append(
-            UIPTTransition(
-                kind="closure",
-                index=i,
-                infinite_side="T1",
-                probability=_z(m - i) * _c_ratio(i - 1) / _c_ratio(m),
+    if m:
+        # Seed the two closure sequences at i=1, then advance by exact
+        # rational ratios. This avoids recomputing large factorials per i.
+        p_t1 = z_values[m - 1] / c_values[m]
+        p_t2 = c_values[m - 1] * z_values[0] / c_values[m]
+        for i in range(1, m + 1):
+            outcomes.append(
+                UIPTTransition(
+                    kind="closure",
+                    index=i,
+                    infinite_side="T1",
+                    probability=p_t1,
+                )
             )
-        )
-        outcomes.append(
-            UIPTTransition(
-                kind="closure",
-                index=i,
-                infinite_side="T2",
-                probability=_c_ratio(m - i) * _z(i - 1) / _c_ratio(m),
+            outcomes.append(
+                UIPTTransition(
+                    kind="closure",
+                    index=i,
+                    infinite_side="T2",
+                    probability=p_t2,
+                )
             )
-        )
+            if i < m:
+                k = m - i
+                p_t1 *= Fraction((k + 2) * (2 * i + 1), i * (2 * k - 1))
+                p_t2 *= Fraction(k * (2 * i - 1), (2 * k + 1) * (i + 2))
     if sum(outcome.probability for outcome in outcomes) != 1:
         raise ArithmeticError("UIPT peeling probabilities do not sum exactly to one")
     return tuple(outcomes)
@@ -193,57 +204,71 @@ def uipt_transition_probabilities(m: int) -> tuple[UIPTTransition, ...]:
 def free_transition_probabilities(m: int) -> tuple[FreeTransition, ...]:
     """Exact free Boltzmann triangulation probabilities for boundary m+2."""
     m = _checked_int(m, "m", minimum=0)
-    p_new = _z(m + 1) / (ALPHA * _z(m))
+    z_values, _ = _ensure_partition_values(m + 1)
+    p_new = z_values[m + 1] / (ALPHA * z_values[m])
     if m == 0:
         outcomes = (
             FreeTransition("new", None, p_new),
-            FreeTransition("empty", None, 1 / _z(0)),
+            FreeTransition("empty", None, 1 / z_values[0]),
         )
     else:
-        outcomes = (
-            FreeTransition("new", None, p_new),
-            *(
-                FreeTransition(
-                    "split",
-                    i,
-                    _z(i - 1) * _z(m - i) / _z(m),
+        split_prob = z_values[0] * z_values[m - 1] / z_values[m]
+        outcome_list = [FreeTransition("new", None, p_new)]
+        for i in range(1, m + 1):
+            outcome_list.append(FreeTransition("split", i, split_prob))
+            if i < m:
+                k = m - i
+                split_prob *= Fraction(
+                    (2 * i - 1) * (k + 2),
+                    (i + 2) * (2 * k - 1),
                 )
-                for i in range(1, m + 1)
-            ),
-        )
+        outcomes = tuple(outcome_list)
     if sum(outcome.probability for outcome in outcomes) != 1:
         raise ArithmeticError("free triangulation probabilities do not sum exactly to one")
     return outcomes
 
 
 def _draw_exact(rng: random.Random, outcomes: tuple) -> object:
-    """Draw a categorical outcome using exact integer weights.
+    """Draw an exact rational categorical outcome without a common-denominator LCM.
 
-    Python's PRNG supplies the random bits; the transition probabilities and
-    integer categorical partition are exact rationals, with no float rounding.
+    A prefix of random bits defines a dyadic interval in [0, 1). If that
+    interval straddles a cumulative-probability boundary, append more bits.
+    The interval is eventually contained in one category almost surely.
+    No floating-point conversion or potentially enormous LCM is required.
     """
-    denominator = math.lcm(*(outcome.probability.denominator for outcome in outcomes))
-    weights = [
-        outcome.probability.numerator
-        * (denominator // outcome.probability.denominator)
-        for outcome in outcomes
-    ]
-    total = sum(weights)
-    draw = rng.randrange(total)
-    cumulative = 0
-    for outcome, weight in zip(outcomes, weights):
-        cumulative += weight
-        if draw < cumulative:
-            return outcome
-    raise AssertionError("exact categorical draw fell through")
+    cumulative = [Fraction(0)]
+    for outcome in outcomes:
+        cumulative.append(cumulative[-1] + outcome.probability)
+    if cumulative[-1] != 1:
+        raise ArithmeticError("categorical probabilities do not sum exactly to one")
+
+    bits = 0
+    prefix = 0
+    while True:
+        prefix = (prefix << 64) | rng.getrandbits(64)
+        bits += 64
+        denominator = 1 << bits
+        lower = Fraction(prefix, denominator)
+        upper = Fraction(prefix + 1, denominator)
+        lower_index = bisect_right(cumulative, lower) - 1
+        upper_index = bisect_left(cumulative, upper) - 1
+        if lower_index == upper_index:
+            return outcomes[lower_index]
 
 
 class _CombinatorialMap:
     """Mutable oriented combinatorial map with explicit darts and face cycles."""
 
-    def __init__(self, *, max_vertices: int, max_total_peel_steps: int) -> None:
+    def __init__(
+        self,
+        *,
+        max_vertices: int,
+        max_total_peel_steps: int,
+        max_boundary_parameter: int,
+    ) -> None:
         self.max_vertices = max_vertices
         self.max_total_peel_steps = max_total_peel_steps
+        self.max_boundary_parameter = max_boundary_parameter
         self.n_vertices = 0
         self.origin: list[int] = []
         self.target: list[int] = []
@@ -437,8 +462,12 @@ class _CombinatorialMap:
             current_face = pending.pop()
             if current_face not in self.faces:
                 continue
-            self._count_step("free")
             m = len(self.faces[current_face]) - 2
+            if m > self.max_boundary_parameter:
+                raise UIPTSamplingLimitError(
+                    "boundary-parameter budget exceeded; sample discarded"
+                )
+            self._count_step("free")
             outcome = _draw_exact(rng, free_transition_probabilities(m))
             if outcome.kind == "empty":
                 self.stats["free_empty_digon_closures"] += 1
@@ -683,10 +712,14 @@ class _CombinatorialMap:
             if chosen is None:
                 break
 
+            m = len(cycle) - 2
+            if m > self.max_boundary_parameter:
+                raise UIPTSamplingLimitError(
+                    "boundary-parameter budget exceeded; sample discarded"
+                )
             self._count_step("uipt")
             rotated = cycle[chosen + 1 :] + cycle[: chosen + 1]
             self._set_face(self.boundary_face, rotated, "boundary")
-            m = len(rotated) - 2
             outcome = _draw_exact(rng, uipt_transition_probabilities(m))
             if outcome.kind == "new":
                 self.stats["uipt_new_vertex_steps"] += 1
@@ -721,6 +754,7 @@ def sample_uipt_neighborhood(
     *,
     max_vertices: int = 20_000,
     max_total_peel_steps: int = 100_000,
+    max_boundary_parameter: int = 5_000,
 ) -> UIPTSample:
     """Sample an exact local Type-II UIPT neighbourhood through graph radius.
 
@@ -729,8 +763,8 @@ def sample_uipt_neighborhood(
     The finite components cut off by peeling are filled independently from
     the exact free Boltzmann polygon law.
 
-    Resource limits are fail-closed: exceeding either cap raises
-    UIPTSamplingLimitError and returns no partial sample.
+    Resource limits are fail-closed: exceeding any vertex, step or boundary
+    parameter cap raises UIPTSamplingLimitError and returns no partial sample.
     """
     radius = _checked_int(radius, "radius", minimum=1)
     seed = _checked_int(seed, "seed", minimum=0)
@@ -740,10 +774,16 @@ def sample_uipt_neighborhood(
         "max_total_peel_steps",
         minimum=0,
     )
+    max_boundary_parameter = _checked_int(
+        max_boundary_parameter,
+        "max_boundary_parameter",
+        minimum=0,
+    )
     if max_vertices > np.iinfo(np.int32).max:
         raise ValueError("max_vertices exceeds the supported int32 vertex range")
     state = _CombinatorialMap(
         max_vertices=max_vertices,
         max_total_peel_steps=max_total_peel_steps,
+        max_boundary_parameter=max_boundary_parameter,
     )
     return state.sample(radius, seed)
