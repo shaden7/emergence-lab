@@ -21,6 +21,7 @@ from emergence_lab.spectral_dimension import MAX_TRANSITION_OPS, graph_even_retu
 
 
 ALPHA = Fraction(27, 2)
+MAX_CATEGORICAL_RANDOM_BITS = 4_096
 _INF_DISTANCE = 10**18
 
 
@@ -244,7 +245,7 @@ def _draw_exact(rng: random.Random, outcomes: tuple) -> object:
 
     bits = 0
     prefix = 0
-    while True:
+    while bits < MAX_CATEGORICAL_RANDOM_BITS:
         prefix = (prefix << 64) | rng.getrandbits(64)
         bits += 64
         denominator = 1 << bits
@@ -254,6 +255,9 @@ def _draw_exact(rng: random.Random, outcomes: tuple) -> object:
         upper_index = bisect_left(cumulative, upper) - 1
         if lower_index == upper_index:
             return outcomes[lower_index]
+    raise UIPTSamplingLimitError(
+        "categorical bit-refinement budget exceeded; sample discarded"
+    )
 
 
 class _CombinatorialMap:

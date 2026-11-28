@@ -395,3 +395,16 @@ def test_boundary_parameter_limit_fails_closed_before_transition_table():
             seed=0,
             max_boundary_parameter=0,
         )
+
+def test_exact_categorical_draw_fails_closed_if_a_boundary_never_resolves():
+    class RepeatingBoundaryBits:
+        def getrandbits(self, bit_count):
+            assert bit_count == 64
+            return (1 << 64) // 3
+
+    outcomes = (
+        FreeTransition("new", None, Fraction(1, 3)),
+        FreeTransition("empty", None, Fraction(2, 3)),
+    )
+    with pytest.raises(UIPTSamplingLimitError, match="categorical bit-refinement budget"):
+        _draw_exact(RepeatingBoundaryBits(), outcomes)
