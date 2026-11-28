@@ -1,0 +1,92 @@
+# Type-II UIPT local peeling implementation candidate
+
+**Status:** implementation candidate on the Issue #37 research branch; not yet integrated into main. No target seeds, target maps, target simulations, S2 authorization, or scientific acceptance are involved.
+
+## Mathematical basis
+
+The implementation follows Angel (2003), *Growth and Percolation on the Uniform Infinite Planar Triangulation*, Section 2, equations (2.3)–(2.4), and Theorem 1.10:
+
+- https://arxiv.org/abs/math/0208123
+
+Type-II triangulations allow parallel edges but forbid self-loops. The canonical root is the tail of an oriented root edge. The initial root triangle is fixed; the unexplored component has the Type-II UIPT polygon law.
+
+Write the current boundary length as \(m+2\). With \(\alpha=27/2\), the free Boltzmann partition function and the UIPT coefficient ratios are
+
+\[
+Z_m=\frac{(2m)!}{m!(m+2)!}\left(\frac94\right)^{m+1},
+\qquad
+\frac{C_m}{C_0}=\frac{(2m+1)!}{(m!)^2}\left(\frac94\right)^m.
+\]
+
+The new-vertex probability is
+
+\[
+p_{\mathrm{new}}(m)=\frac{C_{m+1}}{\alpha C_m}
+=\frac{2m+3}{3m+3}.
+\]
+
+If the peeled edge closes onto boundary position \(i\), the two orientations are distinct:
+
+\[
+p(T_1\text{ infinite},i)
+=\frac{Z_{m-i}C_{i-1}}{C_m},
+\qquad
+p(T_2\text{ infinite},i)
+=\frac{C_{m-i}Z_{i-1}}{C_m}.
+\]
+
+The implementation computes these probabilities as fractions.Fraction values and samples from integer weights with a common denominator. There is no floating-point rounding in the transition kernel. The random-bit source is Python's seeded random.Random; deterministic reproducibility is scoped to the recorded Python/runtime version.
+
+For a finite free component, the new-vertex probability is \(Z_{m+1}/(\alpha Z_m)\), and a split at \(i\) has probability \(Z_{i-1}Z_{m-i}/Z_m\). The empty 2-gon is a separate outcome with probability \(1/Z_0=8/9\); adding a vertex has probability \(1/9\). This must not be confused with the infinite UIPT at \(m=0\), where a new vertex occurs with probability one.
+
+## Map representation and local exposure
+
+The implementation in src/emergence_lab/uipt_peeling.py stores:
+
+- directed darts with origin, target and an involutive twin relation;
+- oriented face cycles, including one unfilled infinite boundary;
+- a rotation system derived as the twin of the previous dart in each oriented face cycle;
+- parallel edges as distinct dart pairs and distinct MultiGraph half-edge entries;
+- no self-loops.
+
+The peeling edge is selected deterministically as the first boundary dart incident to a vertex whose current root distance is below the requested radius. Angel's spatial-Markov construction permits an arbitrary boundary-edge choice. When a closure occurs, both possible infinite sides are represented explicitly and the other side is filled independently from the free Boltzmann polygon law.
+
+The sampler stops only when every vertex on the infinite boundary has graph distance at least \(R\). Consequently:
+
+- every vertex at distance less than \(R\) is internal and has complete degree;
+- the graph ball \(B(R)\) is fully discovered;
+- ball_size(r) is valid for \(0 <= r <= R\);
+- even_returns(t) is valid only for \(t < R\), because the reversible half-kernel identity needs complete endpoint degrees through distance \(t\).
+
+For a paired geometry/transport point, use \(R_{\mathrm{pair}}=\max(2r,2s+1)\). For one sample reused across scale windows, use \(R_{\mathrm{sample}}=\max(2r_{\max},2s_{\max}+1)\). Geometry radius and transport half-time are separate axes; do not assume \(r=s\).
+
+The root law is the canonical oriented-root-edge tail. No uniform-vertex reweighting is applied. A uniform-vertex sensitivity arm must remain separate and must propagate the factor \(\bar d_N/d_\rho\) through uncertainty.
+
+## Resource and failure behaviour
+
+sample_uipt_neighborhood defaults to 20,000 vertices and 100,000 total UIPT/free-fill peeling steps. These are engineering safety caps, not a target-scale budget or a measured memory envelope. Exceeding either cap raises UIPTSamplingLimitError; no truncated map is returned or marked complete.
+
+The result is a local infinite-map neighbourhood with an unfilled boundary, not a finite spherical Type-II map. Do not assign it a finite stationary-return floor. For finite-map controls, the stationary floor remains \(d_\rho/(2E)\), and Type-II finite maps are period 1 because they contain triangular faces. The deterministic triangular-bipyramid fixture in the tests checks the irregular root-degree law, root reweighting, period and stationary floor; it is not sampled target data.
+
+## Validation included in this candidate
+
+- exact UIPT transition probability sums and known \(m=1,2\) rational values;
+- exact free 2-gon and 3-gon probabilities;
+- one-boundary, Euler-characteristic, face-contiguity, twin-involution and rotation-cycle checks;
+- parallel-edge preservation on a deterministic local sample;
+- seed reproducibility;
+- ball/transport locality guard and dense-matrix return-probability oracle;
+- deterministic irregular finite Type-II control for root law, period 1, stationary floor and dense return probabilities;
+- fail-closed resource-limit behaviour.
+
+These are mathematical and engineering controls. They do not constitute a target-scale benchmark, a graph-level power calculation, a preregistration, or evidence for a finite-scale dimension flow. The current S0 operation proxy and the general 512 MiB process envelope still require a bounded Type-II resource pilot before target use.
+
+## Remaining dependencies
+
+1. Later-pass review of the exact transition/orientation and combinatorial-map update logic.
+2. Broader independent small-map enumeration / peeling-distribution checks, including adaptive-boundary invariance.
+3. Target-scale memory and operation benchmark under the repository's actual resource envelope.
+4. Freeze geometry and transport windows, root/finite-boundary controls, map-level covariance and graph-level power in a reviewed preregistration.
+5. Separate run authorization before any Issue #37 target seeds or target maps.
+
+**Evidence classification:** transition probabilities are exact mathematical expressions from the cited construction; the code and deterministic tests are engineering evidence; no new numerical observation about Issue #37's target models is produced here.
