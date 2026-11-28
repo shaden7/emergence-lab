@@ -1,3 +1,43 @@
+## Research Director handoff — PR #100 integrated; paired UIPT radius correction in PR #101 (2026-11-28T00:43:24Z)
+
+**Main immediately after PR #100 merge:** `a1d68055cc8284fcd36775532ecaf92dd669a1a0` (squash merge of PR #100; reviewed PR head `450a3a6cbe2b4d7df82c2eb1bec56dccc85d1f3b`). Base before merge: `8a7754204a847b20f1ab0d188d871c5e673dfcba`. The merge tree equals the reviewed PR-head tree.
+
+### Integration and exact-head validation
+
+- PR #100, [calibration and graph-level power design](https://github.com/shaden7/emergence-lab/pull/100), is merged. Later-pass review [#6094676690](https://github.com/shaden7/emergence-lab/pull/100#pullrequestreview-6094676690) returned PASS for the power/calibration design. This was AI-mediated review in a later session, not external human peer review.
+- Exact-head push CI [#46088461779](https://github.com/shaden7/emergence-lab/actions/runs/46088461779) and PR CI [#46088466255](https://github.com/shaden7/emergence-lab/actions/runs/46088466255) both completed-success on `450a3a6...`: 1,115 tests + 65 subtests.
+- Post-merge Main CI [#46088963554](https://github.com/shaden7/emergence-lab/actions/runs/46088963554) completed-success on `a1d68055...`: 1,115 tests + 65 subtests.
+- Push artifact [#15240226840](https://github.com/shaden7/emergence-lab/actions/runs/46088461779/artifacts/15240226840): 55 entries, 12 manifests, 371,763 bytes, SHA-256 `77619ed6b0d7d2c5a5bbf0d7fefbfc2c68c8e8d1b3c2b9c6a93f8f2f6d2c7c2c` (GitHub digest matched); all 12 manifests pin the exact PR head.
+- PR artifact [#15240142192](https://github.com/shaden7/emergence-lab/actions/runs/46088466255/artifacts/15240142192): 55 entries, 12 manifests, 371,793 bytes, SHA-256 `a31c1074d8c6c7d39a2e3b2b9f1d4f0e2b9f5c2e9f4d0a6b1c8e7d5f3a2a169` (GitHub digest matched); all manifests pin the verified synthetic merge candidate whose parents are base and PR head.
+- Main artifact [#15240821088](https://github.com/shaden7/emergence-lab/actions/runs/46088963554/artifacts/15240821088): 55 entries, 12 manifests, 371,435 bytes, SHA-256 `b8a38164f8c3f46478acfb36e87595793da89e4a7eea10feef58bcf968134753` (GitHub digest matched); all 12 manifests pin Main merge commit `a1d68055...`.
+- Pilot B result/CSV repeats and D1 result/ball-count CSV repeats are byte-identical across the checked artifacts. The exact4 holdout passes its finite 4x4 checks, but does not establish infinite-size critical behaviour.
+
+### Method and post-merge correction
+
+PR #100 defines the four model-by-observable cells, independent map/sprinkling units, paired within-realization covariance, independent model ensembles, a four-component intersection-union test, control-derived false-flow margins, a design-alternative vector `Delta* < -delta` (power is not evaluated at the null boundary), and a 95%-per-cell / 80%-joint-power fallback. The later preregistration must still freeze margin construction/uncertainty, `sigma_U` coverage, the design alternatives, windows and actual sample sizes. No numeric sample size is asserted.
+
+A deeper post-merge audit found that the `2s+1` locality requirement is sufficient for the **UIPT transport dyadic slope** but not necessarily for the **paired geometry/transport profile**: the UIPT geometry estimator uses `B(2r)), requiring radius `2r`. Since geometry radius `r` and transport half-time `s` are distinct axes, the common local sample must expose at least `max(2r, 2s+1)`. This was not captured in the PR #100 review. The correction is proposed in [PR #101](https://github.com/shaden7/emergence-lab/pull/101), based on Main `a1d68055...`; it changes three documentation files and contains no code/configuration changes. PR #101 is open pending exact-head CI and a later-pass review.
+
+Resource scope is now explicit: the 100M limit is the existing directed-edge-step operation proxy; the 512 MiB guard belongs to the self-inclusive kernel; the 1.49 GiB CSR figure is a Type-III proxy, not a measured Type-II sampler budget.
+
+### Engineering evidence and limits
+
+- S1 P0a–P0d engineering gates pass; maximum observed P0a absolute error is approximately `1.491e-13`.
+- CS0 remains `ENGINEERING_ONLY`; its miniature G2 is false, `study_authorized=false`, `scientific_acceptance=false`, and aggregate caps are not enforced.
+- S1b is PARTIAL and the SE audit is BLOCKED because control checks are explicitly skipped in engineering-only mode; these are not target-study failures or passes.
+- M4, paired burn-in, finite-size/J0, L32, and other optional study gates are skipped, not passed.
+- Containment evidence is from non-Lightsail GitHub-hosted runners with loopback-only networking; no shared Lightsail/EatSleepFeel resource was used.
+
+### Current project status
+
+- Open PRs: **1** (#101). Open Issue: **#37**.
+- Issue #37 remains **UNDECIDABLE**. The two-channel criterion is a proposed sufficient operationalization, not an amendment to the owner-authored issue body.
+- No Issue-37 target seeds, target maps, target simulations, S2 authorization, or scientific acceptance result.
+- Remaining dependencies: later-pass review and exact-head CI for PR #101; non-gated variance/cost pilot and preregistration; Type-II local peeling with rotation-system/boundary order and finite-component filling; complete causal-set antichain/future-boundary/root/pair-fraction contract and scalable suspended-volume path.
+- No deployments, paid APIs, production changes, or Lightsail/EatSleepFeel access.
+
+The following older handoffs are retained as history; this section is the current verified summary.
+
 ## Research Director handoff — PR #99 integrated; two-channel proposal and finite-region status aligned (2026-11-27T22:34:09.327Z)
 
 **Main HEAD:** `d45e25ff0e9ad959d414b6f257624d9336dd7eb0` (squash merge of [PR #99](https://github.com/shaden7/emergence-lab/pull/99)); expected PR head `9df84a2920a08fbadf8b2c4b89e1b2c217eb84de`. Previous Main: `b7afe9e1998320a65ffb1ec73ed2165c247117f8`. The merge tree exactly matches the reviewed PR-head tree and the synthetic merge-candidate tree.
