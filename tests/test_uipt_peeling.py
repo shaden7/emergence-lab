@@ -19,6 +19,10 @@ def test_exact_uipt_transition_probabilities_sum_to_one():
         outcomes = uipt_transition_probabilities(m)
         assert sum(outcome.probability for outcome in outcomes) == Fraction(1)
 
+    m0 = uipt_transition_probabilities(0)
+    assert [(outcome.kind, outcome.probability) for outcome in m0] == [
+        ("new", Fraction(1, 1)),
+    ]
     m1 = uipt_transition_probabilities(1)
     assert [outcome.probability for outcome in m1] == [
         Fraction(5, 6),
@@ -161,8 +165,8 @@ def _is_bipartite(graph):
                     colors[v] = 1 - colors[u]
                     pending.append(v)
                 elif colors[v] == colors[u]:
-                    return True
-    return False
+                    return False
+    return True
 
 
 def test_irregular_finite_type_ii_control_root_law_period_and_stationary_floor():
@@ -176,13 +180,23 @@ def test_irregular_finite_type_ii_control_root_law_period_and_stationary_floor()
     graph = _from_multiedges(5, edge_u, edge_v)
 
     # Triangular bipyramid: six triangular faces, nine edges, five vertices.
-    faces = [(3, 0, 1), (3, 1, 2), (3, 2, 0),
-             (4, 0, 1), (4, 1, 2), (4, 2, 0)]
+    faces = [
+        (3, 0, 1), (3, 1, 2), (3, 2, 0),
+        (4, 0, 1), (4, 1, 2), (4, 2, 0),
+    ]
+    face_edge_counts = Counter(
+        tuple(sorted((u, v)))
+        for face in faces
+        for u, v in zip(face, face[1:] + face[:1])
+    )
     assert len(faces) == 6
+    assert len(face_edge_counts) == 9
+    assert set(face_edge_counts.values()) == {2}
+    assert set(face_edge_counts) == {tuple(sorted(edge)) for edge in edges}
     assert 5 - 9 + 6 == 2
     assert graph.csr().nnz // 2 == 9
     assert graph.degrees.tolist() == [4, 4, 4, 3, 3]
-    assert not _is_bipartite(graph)  # a connected undirected graph with a triangle has period 1
+    assert not _is_bipartite(graph)  # connected and non-bipartite implies period 1
 
     degrees = graph.degrees.tolist()
     edge_root_law = [Fraction(degree, 18) for degree in degrees]
