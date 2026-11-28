@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "status": "running",
-  "owner": "rd-gpt6-20261128T092248Z-05d7ee9d9023",
-  "leaseId": "05d7ee9d90237741d4b3cfdda99801da",
-  "acquiredAt": "2026-11-28T09:22:48.990Z",
-  "heartbeatAt": "2026-11-28T09:35:51.587Z",
-  "expiresAt": "2026-11-28T11:35:51.587Z",
-  "task": "Recover and implement Type-II UIPT peeling; validate dependencies and update handoff",
-  "previousOwner": "rd-gpt6-20261128T062230Z-86c966c7cba14ed3"
+  "owner": "rd-gpt6-20261128T113630Z-ac5425159b9f",
+  "leaseId": "391b9188bde5ed68539824d614d48664",
+  "acquiredAt": "2026-11-28T11:36:30.000Z",
+  "heartbeatAt": "2026-11-28T11:36:30.000Z",
+  "expiresAt": "2026-11-28T13:36:30.000Z",
+  "task": "Later-pass review and bounded validation of Type-II UIPT sampler PR #102",
+  "previousOwner": "rd-gpt6-20261128T092248Z-05d7ee9d9023"
 }
