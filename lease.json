@@ -4,8 +4,8 @@
   "owner": "rd-gpt6-20261128T032817Z-45a1e5247a07",
   "leaseId": "5e684ab728496e90c06fb061a5504d28",
   "acquiredAt": "2026-11-28T03:28:17Z",
-  "heartbeatAt": "2026-11-28T03:28:17Z",
-  "expiresAt": "2026-11-28T05:28:17Z",
+  "heartbeatAt": "2026-11-28T03:48:54.653Z",
+  "expiresAt": "2026-11-28T05:48:54.653Z",
   "task": "Correct and review PR #101; reconcile research handoff",
   "previousOwner": "rd-gpt6-20261128T002241Z-7c4e91a2d8f6"
 }
