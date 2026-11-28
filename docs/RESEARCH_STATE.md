@@ -1,3 +1,59 @@
+## Research Director handoff — PR #101 integrated; paired UIPT radius and resource scope corrected (2026-11-28T03:47:59Z)
+
+**Main immediately after PR #101 merge:** 61c7509b67d5b91016fa5b8fec89eb935d9c59e7 (squash merge of PR #101; reviewed PR head 23b0a76f4591f3c66cefa77327dd8631ec0bf387). Base before merge: 1f7999e35ebee5da2aab346544fbd0f0b8dcd2c5. The squash-merge tree equals the reviewed PR-head tree. This state refresh is a separate process-only documentation commit.
+
+### Integration and exact-head validation
+
+- PR #101, [Bound paired UIPT geometry/transport radius](https://github.com/shaden7/emergence-lab/pull/101), merged by squash with expected head SHA 23b0a76f4591f3c66cefa77327dd8631ec0bf387.
+- Later-pass review #6095521798 recorded PASS as a COMMENT review. It was AI-mediated in a subsequent session, not external scientific peer review.
+- Exact-head push CI [#46103641959](https://github.com/shaden7/emergence-lab/actions/runs/46103641959) and PR CI [#46103645576](https://github.com/shaden7/emergence-lab/actions/runs/46103645576) both completed successfully.
+- Push artifact #15246294673: 55 files, 12 manifests, SHA-256 d95918c18f31f07bc76dee362b3c4b1d7c629d289e38e9666fafe3567f86fcaf. All manifests pin the PR head.
+- PR artifact #15247040100: 55 files, 12 manifests, SHA-256 deed587c21827d5b2e02c539be12af6336263232d0c7003c227e936f13239a66. All manifests pin synthetic merge commit 9ac6ec3f73b8d3e4c205a908b366f1bec447c00c; its tree equals the PR-head tree and its parents are the base and PR head.
+- Post-merge Main CI [#46104280889](https://github.com/shaden7/emergence-lab/actions/runs/46104280889) completed successfully on 61c7509. Main artifact #15245739926: 55 files, 12 manifests, SHA-256 c70ddf252e1c6f9b4dca0e28e0b19037efbbfc93e1a172bcc5e8c95e4ee36bb9. All manifests pin 61c7509.
+- Within each workflow artifact, Pilot B, D1, and S1 repeated outputs are byte-identical. Across separate push/PR runner instances, some floating-point CSV values differ only in last bits (maximum absolute differences observed: Pilot B z 7.28e-12; S1 killed probability 5.3e-23; exact4 autocorrelation/effective-sample fields 5.7e-14). No nonnumeric/categorical differences or gate-decision changes were found.
+- Exact4 validation passed; Pilot A N5 G1–G6 passed; S1 P0a–P0d passed (largest observed P0a absolute error 1.491e-13). CS0 remains ENGINEERING_ONLY with G2=false and study_authorized=false. S1 orchestration remains NO-GO (scoped). S1b and SE-audit remain engineering-only and s2_run_authorized=false.
+
+### Paired UIPT radius correction
+
+For the reversible random walk, the half-kernel identity is
+\[
+Q_t=P^{2t}(\rho,\rho)=d_\rho\sum_x\frac{P^t(\rho,x)^2}{d_x}.
+\]
+The support of P^t is contained in the graph ball of radius t; exact evaluation needs complete degrees for all endpoints in that ball, hence local peeling exposure through t+1.
+
+- Geometry B(2r) requires exposure through 2r.
+- The transport slope uses Q(2s)=P^(4s), requiring exposure through 2s+1.
+- For one paired geometry/transport point, R_pair=max(2r,2s+1).
+- For one local root sample reused across all preregistered scale points, R_sample=max(2r_max,2s_max+1), with maxima over the geometry and transport windows.
+- The 2s+1 entry in the transport-control matrix is transport-specific, not the full paired-profile bound. No assumption r=s is made.
+
+The cited Angel local-peeling/spatial-Markov construction supplies a literature basis for exact Type-II UIPT neighborhoods. Gwynne–Miller's Type-II result supplies an asymptotic spectral-dimension reference, not a finite-size acceptance threshold or a project measurement. The repository still does not implement the Type-II local peeling sampler, boundary/rotation-system bookkeeping, or finite-component filling.
+
+### Resource accounting
+
+- The 100M directed-edge-step proxy is the operation budget for the current exact S0 graph_even_returns kernel. The projected Type-II target grid exceeds it by operation-count projection; no target-scale benchmark has been run.
+- The S0 preregistration specifies a general 512 MiB process envelope.
+- The separate code-level 512 MiB estimated-memory guard belongs to SelfInclusiveKernel, not the Type-II graph_even_returns path.
+- The 1.49 GiB static CSR estimate is for Type-III simple-graph storage only. It is not a Type-II memory measurement or failure; Type-II target-scale memory remains unbenchmarked.
+
+### Branch and dependency reconciliation
+
+Twenty-four Issue-37-related branches were reconciled against post-merge main. No required unintegrated implementation or cherry-pick was found. Branches with apparent ahead commits were stale/divergent history or older content: the calibration-power branch has older documentation; the spatial-reference and Poisson-slab branches have older code/tests than main; self-inclusive and witness-side-censor code/test blobs match main; the two-channel branch is the already integrated PR #99 head. UIPT-feasibility/local-sampler-review and the remaining S1/S1b/SE-audit branches are behind main. The open-PR count is zero; Issue #37 remains the only open issue.
+
+### Current scientific status and next dependencies
+
+**Issue #37 remains UNDECIDABLE.** No target maps, target seeds, target simulations, S2 authorization, or scientific acceptance result were produced. The calibration/power memo remains design-only, not a preregistration or run authorization.
+
+Next research dependencies:
+1. Implement and validate the exact Type-II local peeling sampler, including boundary order, rotation system, parallel-edge multiplicity, finite-component filling, and exact small-map controls.
+2. Freeze separate geometry and transport windows, root law, boundary/finite-size controls, map-level covariance, effect margins from controls, and joint graph-level power before any target run.
+3. Benchmark Type-II target-scale memory and operation cost using the actual multiplicity-preserving local sampler; do not infer a Type-II memory failure from the Type-III 1.49 GiB projection.
+4. Continue causal-set finite-region, witness, and side-boundary validation; no S2 work is authorized.
+
+No deployments, paid APIs, Lightsail access, or EatSleepFeel changes were performed.
+
+The following older handoffs are retained as history; this section is the current verified summary.
+
 ## Research Director handoff — PR #100 integrated; paired UIPT radius correction in PR #101 (2026-11-28T00:43:24Z)
 
 **Main immediately after PR #100 merge:** `a1d68055cc8284fcd36775532ecaf92dd669a1a0` (squash merge of PR #100; reviewed PR head `450a3a6cbe2b4d7df82c2eb1bec56dccc85d1f3b`). Base before merge: `8a7754204a847b20f1ab0d188d871c5e673dfcba`. The merge tree equals the reviewed PR-head tree.
@@ -35,8 +91,6 @@ Resource scope is now explicit: the 100M limit is the existing directed-edge-ste
 - No Issue-37 target seeds, target maps, target simulations, S2 authorization, or scientific acceptance result.
 - Remaining dependencies: later-pass review and exact-head CI for PR #101; non-gated variance/cost pilot and preregistration; Type-II local peeling with rotation-system/boundary order and finite-component filling; complete causal-set antichain/future-boundary/root/pair-fraction contract and scalable suspended-volume path.
 - No deployments, paid APIs, production changes, or Lightsail/EatSleepFeel access.
-
-The following older handoffs are retained as history; this section is the current verified summary.
 
 ## Research Director handoff — PR #99 integrated; two-channel proposal and finite-region status aligned (2026-11-27T22:34:09.327Z)
 
